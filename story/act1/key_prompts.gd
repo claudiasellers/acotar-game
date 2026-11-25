@@ -5,11 +5,11 @@
 ##   E  check the snare at her empty snare on the doe trail (OpeningHunt)
 ##   E  pick up the arrow  beside a stuck or fallen arrow
 ##   Ctrl crouch        standing, within 70 m of the doe clearing
-##   Q  ash arrow       the doe or the great wolf is near and the ash arrow isn't nocked
+##   Q  ash arrow       the doe or the great wolf is near and the ash arrow isn't the one chosen
 ##   LMB draw and let go, RMB a closer view  prey is near, until her first shot
 ##   The great wolf, from the moment she sees him, one key at a time, each
 ##   until she has used it there (whatever she learnt before him):
-##     Q  nock the ash arrow    while it isn't the arrow on the string
+##     Q  switch to the ash arrow    while it isn't the arrow chosen
 ##     LMB hold to draw, let go to shoot   until her first arrow at him
 ##     Shift steady your breath  with an arrow on the string (Focus)
 ##   He never comes for her, so no sidestep or knife is named here: those

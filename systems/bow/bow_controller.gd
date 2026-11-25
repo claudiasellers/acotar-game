@@ -1,8 +1,10 @@
 ## Feyre's bow as a component of Feyre (plans/combat/bow-combat-design.md).
 ##
 ## Controls, as in other bow games on a PC: press fire (left mouse / right
-## trigger) and the bow comes up and the string comes back over
-## BowData.draw_time; let go and the arrow flies at full power. Every arrow is
+## trigger) and the bow is up with an arrow on the string, already coming back
+## over BowData.draw_time; let go and the arrow flies at full power. She never
+## readies an arrow herself: if the quiver has one, it is there on the press.
+## The arrow key (Q) only changes which type that is. Every arrow is
 ## a full-power arrow: letting go early is remembered, and the arrow leaves the
 ## moment the draw is complete, so a quick click is a quick shot. Holding keeps
 ## the string back until she lets go. Aim (right mouse / left trigger) is
@@ -32,9 +34,6 @@ signal bow_shown(bow: BowData)
 signal craft_failed(arrow_item_id: StringName, why: String)
 ## The shot was taken back: the string came down and nothing flew.
 signal let_down
-## An arrow has seated on the string: on the raise, and again after each
-## shot's follow-through. The id is the arrow item on the string.
-signal nocked(arrow_item_id: StringName)
 ## The draw has just reached the anchor.
 signal full_draw
 ## She reached for an arrow with the bow raised and the quiver empty.
@@ -97,8 +96,7 @@ var _taken_back: bool = false
 ## She has let go of the string before the draw was complete (or clicked in
 ## the follow-through): one arrow is owed, and leaves when the draw is full.
 var _owed: bool = false
-## An arrow is seated on the string; fire was held last tick.
-var _seated: bool = false
+## Fire was held last tick.
 var _fire_was_held: bool = false
 ## Real seconds Focus holds after a Focused release.
 var _focus_linger: float = 0.0
@@ -251,13 +249,8 @@ func _loose() -> Arrow:
 	return arrow
 
 
-## What the string tells whoever listens (sound, the reticle): an arrow
-## seating, and her hand finding the quiver empty.
+## Her hand finds the quiver empty on a press of fire.
 func _note_string(fire_held: bool) -> void:
-	var seated := is_nocked and _recover <= 0.0
-	if seated and not _seated:
-		nocked.emit(_available())
-	_seated = seated
 	if is_aiming and not is_nocked and fire_held and not _fire_was_held:
 		quiver_empty.emit()
 	_fire_was_held = fire_held

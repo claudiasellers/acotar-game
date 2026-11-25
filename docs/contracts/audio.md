@@ -17,7 +17,7 @@ gets sound by emitting what it already emits. Files are self-made and CC0
 | `Feyre.jump_motor.jumped / landed` | cloth whoosh; heavy snow landing above 7 m/s impact |
 | `Feyre.is_drawing` rises / falls | bow creak starts / stops |
 | `Feyre.arrow_fired(arrow)` | string release (the ash arrow's own, else the bow's own `bow_release_<bow id>` if the bank has one, else the hunting bow's); whoosh rides the arrow; `arrow.hit` → flesh (any `Creature` or group `creature`), a clatter on stone (`Arrow.is_stone`), wood (`StaticBody3D`, CSG), else snow; `arrow.broke` → snap |
-| `BowController.nocked` / `let_down` / `quiver_empty` | a wood click as an arrow seats (the raise, and after each follow-through) / the string eased forward with nothing loosed / her hand patting an empty quiver |
+| `BowController.let_down` / `quiver_empty` | the string eased forward with nothing loosed / her hand patting an empty quiver |
 | `BowController.draw_amount` at 1 while drawing | the string creak loop, pitching up 25% with `BowController.fatigue()` |
 | `BowController.arrow_type_changed(item)` | `arrow_select_<type>`: each arrow type's own short sound |
 | `BowController.focus_changed(on)` | an inhale and her heartbeat loop / an exhale; the `Ambience` bus (the beds' own, sending to Sound) hushes through its two effects, an amplify to `hush_duck_db` and a low-pass to 800 Hz. No player's volume is changed |

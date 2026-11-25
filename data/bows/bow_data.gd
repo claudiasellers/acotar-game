@@ -8,7 +8,7 @@ extends Resource
 ## Seconds from the fire press (left mouse / right trigger) to a full draw.
 ## Every arrow leaves at full draw: let go sooner and it flies the moment the
 ## draw completes.
-@export var draw_time: float = 0.3
+@export var draw_time: float = 0.2
 ## Arrow launch speed in m/s. Every shot is full power.
 @export var max_speed: float = 48.0
 ## Metres the arrow flies dead straight to the crosshair before it starts to

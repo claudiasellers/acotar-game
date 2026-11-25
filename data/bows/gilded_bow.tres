@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"gilded_bow"
 display_name = "Gilded bow"
-draw_time = 0.25
+draw_time = 0.17
 max_speed = 62.0
 true_range = 40.0
 sway_degrees = 0.8

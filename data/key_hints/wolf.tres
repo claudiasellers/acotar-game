@@ -8,7 +8,7 @@ script = ExtResource("1")
 id = &"wolf_ash"
 priority = 113
 keys = Array[StringName]([&"cycle_arrow"])
-says = PackedStringArray("nock the ash arrow")
+says = PackedStringArray("switch to the ash arrow")
 always = false
 
 [sub_resource type="Resource" id="wolf_draw"]

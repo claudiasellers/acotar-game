@@ -424,7 +424,6 @@ func _attach_feyre(feyre: Feyre) -> void:
 	feyre.arrow_fired.connect(_on_arrow_fired)
 	var bow := feyre.bow_controller
 	if bow:
-		bow.nocked.connect(func(_item: StringName) -> void: play(&"bow_nock", feyre.global_position))
 		bow.let_down.connect(func() -> void: play(&"bow_let_down", feyre.global_position))
 		bow.quiver_empty.connect(func() -> void: play(&"bow_empty", feyre.global_position))
 		bow.arrow_type_changed.connect(_on_arrow_type)

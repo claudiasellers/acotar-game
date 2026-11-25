@@ -130,7 +130,7 @@ func test_the_quickest_click_is_a_full_power_shot_a_draw_later() -> void:
 	var got := _wait_for_arrow()
 	var arrow: Arrow = got[0]
 	assert_not_null(arrow, "one tick of fire is a shot")
-	assert_almost_eq(float(got[1]), bow.bow.draw_time, 0.04, "0.3 s on the hunting bow")
+	assert_almost_eq(float(got[1]), bow.bow.draw_time, 0.04, "0.2 s on the hunting bow")
 	if arrow:
 		assert_almost_eq(arrow.linear_velocity.length(), bow.bow.max_speed, 0.01, "never a weak arrow")
 
