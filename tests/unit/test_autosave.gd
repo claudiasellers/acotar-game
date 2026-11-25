@@ -37,7 +37,6 @@ func after_each() -> void:
 	SaveSystem.active_slot = "slot_0"
 	SaveSystem._autosave_due = false
 	SaveSystem._loading = {}
-	SaveSystem._open_spaces.clear()
 	SaveSystem.delete_save(SLOT)
 	StoryControl.release()
 	Clock.paused = false
@@ -78,8 +77,10 @@ func test_a_save_waits_out_a_cutscene_then_happens_once_it_ends() -> void:
 
 func test_a_save_waits_out_an_open_scene_space() -> void:
 	EventBus.scene_space_started.emit(&"film_x")
+	StoryControl.set_mode(StoryControl.Mode.NONE)  # a scene holds her controls
 	_advance_phase()
 	assert_false(FileAccess.file_exists(PATH))
+	StoryControl.release()
 	EventBus.scene_space_finished.emit(&"film_x")
 	assert_true(FileAccess.file_exists(PATH))
 
