@@ -54,12 +54,15 @@ var sight := 0.0
 var _sight_target := 0.0
 const SIGHT_SECONDS := 6.0
 ## The one glow in the game (owner, 2026-11-25: "normal", no glow over
-## everything). Only real light sources bloom: flames, lamps, faelights, eyes,
-## sparkles (emission well above white). No grade sets glow, so the look never
-## hazes in a region, a mood or at night. A sunlit pastel peaks near 2.0 raw
-## (sun 1.8 x albedo cap 0.88 + ambient), so it stays crisp under THRESHOLD.
-const GLOW_THRESHOLD := 2.2
-const GLOW_INTENSITY := 0.6
+## everything). Only real light sources bloom, faintly: flames, lamps,
+## faelights, eyes, sparkles (emission well above white). No grade sets glow,
+## so the look never hazes in a region, a mood or at night. A sunlit pastel
+## peaks near 2.0 raw (sun 1.8 x albedo cap 0.88 + ambient), so it stays crisp
+## under THRESHOLD; LUMINANCE_CAP keeps a lamp's hot specular on a glossy table
+## from out-blooming the flame itself (additive at 0.6 haloed every highlight).
+const GLOW_THRESHOLD := 2.6
+const GLOW_INTENSITY := 0.35
+const GLOW_LUMINANCE_CAP := 3.5
 ## Tight halos (levels 2-4), no wide level-5+ haze.
 const GLOW_LEVELS := [0.0, 0.6, 1.0, 0.4, 0.0, 0.0, 0.0]
 
@@ -82,13 +85,14 @@ func _ready() -> void:
 ## Sets `env` to the game's light-source-only glow.
 static func light_source_glow(env: Environment) -> void:
 	env.glow_enabled = true
-	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_ADDITIVE
+	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SCREEN
 	env.glow_normalized = false
 	env.glow_intensity = GLOW_INTENSITY
 	env.glow_strength = 1.0
 	env.glow_bloom = 0.0
 	env.glow_hdr_threshold = GLOW_THRESHOLD
 	env.glow_hdr_scale = 2.0
+	env.glow_hdr_luminance_cap = GLOW_LUMINANCE_CAP
 	for i in GLOW_LEVELS.size():
 		env.set_glow_level(i, GLOW_LEVELS[i])
 
