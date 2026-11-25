@@ -40,13 +40,14 @@ func set_frost_human(human: bool) -> void:
 
 ## An attack she cannot see is winding up: the edge on that side beats until
 ## it lands. `side` runs -1 (hard left) to 1 (hard right), 0 is behind her.
-## Follows the hit marks setting, like the bruise it warns of.
+## `seconds` of 0 calls it off. Follows the hit marks setting, like the bruise
+## it warns of.
 static func warn(tree: SceneTree, side: float, seconds: float) -> void:
 	if not bool(GameSettings.get_value(&"hit_marks")):
 		return
 	for fx: VitalsEdgeFx in tree.get_nodes_in_group(GROUP):
 		fx._warn_for = maxf(seconds, 0.05)
-		fx._warn_left = fx._warn_for
+		fx._warn_left = maxf(seconds, 0.0)
 		fx._mat.set_shader_parameter(&"warn_side", clampf(side, -1.0, 1.0))
 
 
