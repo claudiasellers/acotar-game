@@ -16,7 +16,14 @@ func test_demo_loads_and_creatures_stand_on_the_ground() -> void:
 	add_child_autofree(demo)
 	await wait_physics_frames(45)
 	var creatures := get_tree().get_nodes_in_group(Creature.GROUP)
-	assert_gt(creatures.size(), 1, "the demo's creatures spawned")
+	# Exactly what the demo placed, read from the demo itself: every creature it
+	# put on the hill is in the group, and nothing else is.
+	var placed := demo.get_children().filter(func(n: Node) -> bool: return n is Creature)
+	assert_gt(placed.size(), 1, "the demo placed its creatures")
+	assert_eq(creatures.size(), placed.size(), "each one the demo placed, and only those")
+	for c in placed:
+		assert_true(creatures.has(c), "%s is in the creature group" % c.name)
+	assert_gt(demo.pack.members.size(), 0, "the pack has its wolves")
 	var grounded := 0
 	for c in creatures:
 		if (c as Creature).is_on_floor():

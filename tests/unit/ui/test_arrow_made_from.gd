@@ -5,7 +5,14 @@ extends GutTest
 
 
 func test_an_arrow_says_what_it_is_made_from() -> void:
-	assert_true(SatchelMenu.made_from(&"arrow_wood").begins_with("Made from "), "the plain arrow says its parts")
+	# The plain arrow names each of its recipe's parts, as the data has them.
+	var said := SatchelMenu.made_from(&"arrow_wood")
+	var recipe := Crafting.recipe(&"arrow_wood")
+	assert_not_null(recipe, "the plain arrow has a recipe")
+	for key: String in recipe.inputs:
+		var part := ItemCatalog.get_item(StringName(key))
+		var word := key.trim_prefix("tag:") if key.begins_with("tag:") else (part.display_name.to_lower() if part else key)
+		assert_string_contains(said, "%d %s" % [int(recipe.inputs[key]), word], "names %s" % key)
 	assert_eq(SatchelMenu.made_from(&"ing_rose_red"), "", "only arrows")
 	assert_eq(SatchelMenu.made_from(&"arrow_nobody_makes"), "")
 	for recipe in Crafting.all_recipes():
