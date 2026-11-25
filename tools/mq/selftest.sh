@@ -501,6 +501,12 @@ case_reject_notes() {
 	expect "conflict: names the file and the cleanup advice" sh -c "git cat-file -p refs/tags/rejected/T24-1 | grep -q 'conflicts with main in: same' && git cat-file -p refs/tags/rejected/T24-1 | grep -q 'accept the deletion'"
 	expect "carried work: names the other task" sh -c "git cat-file -p refs/tags/rejected/T26-1 | grep -q 'unmerged work from T25'"
 	expect "the stacked first slice is not blamed for its follower" not sh -c "git cat-file -p refs/tags/rejected/T25-1 | grep -q 'unmerged work'"
+	expect "rejection tag leads with the full-log line" sh -c "git cat-file -p refs/tags/rejected/T21-1 | grep -q '^Full log: git fetch origin mq/rej-T21-1 && git show FETCH_HEAD:failing.log'"
+	git fetch -q origin mq/rej-T21-1
+	expect "rej branch has failing.log, diagnosis.txt, batch.txt" test "$(git ls-tree --name-only FETCH_HEAD | tr '\n' ' ')" = "batch.txt diagnosis.txt failing.log "
+	expect "failing.log is the full log with no colour codes" sh -c "git show FETCH_HEAD:failing.log | grep -q . && ! git show FETCH_HEAD:failing.log | grep -q \$'\\x1b'"
+	expect "batch.txt names the commit" sh -c "git show FETCH_HEAD:batch.txt | grep -q '$a'"
+	expect "rej branch is marked for cleanup" sh -c "grep -qx 'target=mq/rej-T21-1' .git/mq/cleanup/marks/remote_branch-*.mark"
 	expect "the event carries the class" grep -q 'REJECTED T21 failed gut:tests/test_new.gd. \[own-new-test\]' .git/mq/events.log
 }
 

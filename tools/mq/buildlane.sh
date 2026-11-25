@@ -108,6 +108,22 @@ reject() { # entry-file reason [logfile] [kind detail]: kind is conflict, gate o
 		cls=$("$here/diagnose.sh" class "$kind" "$sha" "$task" "$detail" 2>/dev/null)
 	fi
 	[ -n "$log" ] && [ -f "$log" ] && "$here/diagnose.sh" clean "$log" > "$MQ_DIR/done/rejected/$id.log"
+	# The complete answer for a cloud lane: the whole failing log (or the reason when there is none)
+	# and what the batch was. pull_ready.sh publishes both as mq/rej-<key>.
+	if [ -n "$log" ] && [ -f "$log" ]; then
+		"$here/diagnose.sh" strip "$log" > "$MQ_DIR/done/rejected/$id.full"
+	else
+		printf '%s\n' "$reason" > "$MQ_DIR/done/rejected/$id.full"
+	fi
+	{
+		echo "rejected commit: $sha (task $task)"
+		echo "tested on main: ${cur_base:-unknown}"
+		echo "other entries in the batch:"
+		local o
+		for o in "${cur_batch:-/nonexistent}"/*.entry; do
+			[ -f "$o" ] && [ "$o" != "$e" ] && echo "  $(kv_get "$o" task) $(kv_get "$o" sha)"
+		done
+	} > "$MQ_DIR/done/rejected/$id.batch" 2>/dev/null
 	mv "$e" "$MQ_DIR/done/rejected/"
 	[ -d "$MQ_DIR/tasks/$task" ] && kv_set "$MQ_DIR/tasks/$task/meta" status rejected
 	mq_event REJECTED "$task $reason${cls:+ [$cls]}"
@@ -218,7 +234,7 @@ restack() { # entry-file
 # it couldn't try.
 build_chain() { # base batch-dir
 	local base="$1" b="$2" e sha task hits conf i rc
-	chain=(); entries=()
+	chain=(); entries=(); cur_base="$base"; cur_batch="$b"
 	goto "$base" || return 3
 	for e in "$b"/*.entry; do
 		[ -f "$e" ] || continue

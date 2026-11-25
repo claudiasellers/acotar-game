@@ -79,6 +79,9 @@ frame times (`tools/perf/frame_probe.tscn`).
    `merged/<TASK-ID>-<n>` means it's in `origin/main`; `rejected/<TASK-ID>-<n>` is
    annotated with why, what to do and the end of the failing log. Neither yet
    means it's waiting or the machine is off. Nothing is lost.
+   A rejection also carries the complete log: the note's first line is
+   `Full log: git fetch origin mq/rej-<ID>-<n> && git show FETCH_HEAD:failing.log`.
+   That branch holds `failing.log`, `diagnosis.txt` and `batch.txt`, and is cleaned up after about 14 days.
 
 Never move or reuse a ready name. A resubmission takes the next number.
 

@@ -16,6 +16,11 @@ mode="${1:-}"; shift || true
 
 strip_ansi() { sed $'s/\x1b\\[[0-9;]*[A-Za-z]//g' | tr -d '\r'; }
 
+if [ "$mode" = strip ]; then
+	[ -f "${1:-}" ] && strip_ansi < "$1"
+	exit 0
+fi
+
 if [ "$mode" = clean ]; then
 	[ -f "${1:-}" ] || exit 0
 	all=$(strip_ansi < "$1")
