@@ -349,3 +349,9 @@ Numbers the slice tests hold the game to, derived from the systems' own rates.
 |---|---|---|---|---|---|
 | `REED_FIRE_CLEAR_S` | tests/unit/hostile/test_naga_slice1.gd | 3.0 s | 2.5–5 s | Slice 1 (c): after a fire arrow lights a lured camp's reed bed, every naga has fled or died within this. From the fire's numbers: a lured naga stands within 1 m of the lure (`_go_to` stop) and fears flame within `fire_fear_radius` 3 m, so it sees it on its first `Creature.FIRE_SCAN` (0.3 s); one that wandered to 5 m waits for the front to cross 2 m at about 1 / `ElementField.HEAT_RATE` (1.1 s) a metre at calm: 0.3 + 2.2 = 2.5 s, rounded up. | L75 |
 | `LOSE_WITHIN_S` | tests/unit/hostile/test_naga_slice1.gd | 20 s, 9 of 10 seeded runs | — | Slice 1 (b): a pack trailing her by scent past the leash loses her once she drinks a hush draught (quiet 2, scent_scale 0.5 = `NagaRoamer.HUSH_SCALE`), and keeps her without it. | L75 |
+
+## Feyre's breath (L76)
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| `FeyreBreath.PUFF_ALPHA` | characters/feyre/feyre_breath.gd | 0.35 | 0.2–0.6 | How solid a fresh cold-breath puff is (the color_ramp's start alpha; it fades to 0 over the puff's life). Each puff is a soft radial disc, albedo 0.85. | L76 |
