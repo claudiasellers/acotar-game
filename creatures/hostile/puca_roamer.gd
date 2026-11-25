@@ -308,7 +308,23 @@ func apply_hit(cause: StringName, weapon_id: StringName, weapon_mult: float, zon
 
 
 ## A light arrow "burns white": its true form shows, and then it flees.
+## A steeped arrow's damage takes its element row (HostileElements).
+func on_arrow_hit(arrow: Node3D) -> void:
+	if not alive:
+		return
+	if not HostileElements.arrow_hit(self, arrow):
+		super.on_arrow_hit(arrow)
+
+
+## Light shows its true form (its row: weak to light, plan §7); every element
+## shows its reaction, and one it resists does nothing.
 func on_arrow_effect(effect: StringName, arrow: Node3D) -> void:
+	if not alive or state == State.HIDDEN:
+		return
+	if effect in HostileElements.ELEMENTS:
+		var at := Creature.read_impact(arrow) if arrow else global_position
+		if HostileElements.react(self, effect, at) <= HostileElements.RESISTED:
+			return
 	if effect == &"light":
 		reveal()
 		return

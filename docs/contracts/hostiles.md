@@ -169,8 +169,10 @@ come first); the spawn rows will be gated on `puca_resisted`, at most one per re
 ## Briarlings (`BriarlingRoamer`, slice 2(c))
 
 `creatures/hostile/briarling_roamer.tscn`, data `data/creatures/hostile/briarling_roamer.tres`
-(16 HP, 8 per wood arrow, ash kills, burn 8 HP/s, sight 31.5 m, hearing 48 m,
-scent 35 m, walk 1.5, run 6). Not in any site or spawn table yet.
+(8 HP, 8 per wood arrow and per knife hit, so one of either kills; ash kills;
+burn 8 HP/s; `hit_box_scale` 1.5; sight 31.5 m, hearing 48 m, scent 35 m,
+walk 1.5, run 6). Small means fragile (owner, 2026-11-25): one arrow or one
+knife hit, and a box bigger than the body.
 
 - A thin subclass of `HostileRoamer` (below). Its values are on
   `briarling_roamer.tscn` (`attack_id` briarling_lash, `grab_attack`
@@ -228,6 +230,22 @@ listed.
   `driven_off` when it flees, `killed` when ash kills it (from any distance),
   `lured` when she follows it into a camp's leash, and `slipped` when she walks
   out of its sight or dawn comes.
+
+## Element rows (`HostileElements`)
+
+Each family's `CreatureData.element_rows` (element -> multiplier, from the
+hostile plan's §7 matrix: ✔ 1.5 weak, ◐ 1.0 normal, ✖ 0 resisted; no entry is
+normal) scales a steeped arrow (fire, frost, light, sleep): its damage
+(`HostileElements.arrow_hit`) and its effect (burn, frost slow, sleep).
+
+- Weak: a big burst in the element's colour, its own bright sound, the effect
+  ×1.5, and it thrashes away from the wound for `WEAK_FLEE_SECONDS` (3 s).
+- Normal: a small burst; the plain effect.
+- Resisted: a dull grey puff, a flat tick, no damage, no effect, no reaction.
+- Every one emits `EventBus.hostile_element_reacted(creature_id, kind,
+  element, reaction)` (her first-time thought, L54, listens).
+- Rows today: naga fire/frost/sleep 1.5, light 1.0; puca light 1.5 (it shows
+  its true form), fire 1.0; briarling fire/sleep 1.5, frost 1.0.
 
 ## Held sites
 

@@ -93,6 +93,7 @@ func _ready() -> void:
 	EventBus.player_released.connect(_on_player_released)
 	_circle_sign = 1.0 if member_index % 2 == 0 else -1.0
 	tell = AttackTell.on(self)
+	_grow_hit_box()
 
 
 ## The trail holds while she was smelled in the last TRAIL_SECONDS, unless a
@@ -526,16 +527,62 @@ func stagger(seconds: float) -> void:
 	super.stagger(seconds)
 
 
+## A steeped arrow's damage takes the family's element row (HostileElements).
+func on_arrow_hit(arrow: Node3D) -> void:
+	if not alive:
+		return
+	if not HostileElements.arrow_hit(self, arrow):
+		super.on_arrow_hit(arrow)
+
+
 ## Frost slows it (Creature slow). Fire, sleep, barbs and lures are the base's.
-## Asleep, it lets her go.
+## Asleep, it lets her go. An element goes through the family's row first:
+## resisted, it takes nothing and doesn't look; weak, the effect runs 1.5x and
+## it thrashes away from the wound.
 func on_arrow_effect(effect: StringName, arrow: Node3D) -> void:
 	if not alive:
 		return
+	var mult := 1.0
+	if effect in HostileElements.ELEMENTS:
+		var at := Creature.read_impact(arrow) if arrow else global_position
+		mult = HostileElements.react(self, effect, at)
+		if mult <= HostileElements.RESISTED:
+			return
 	if effect == &"sleep" and fight != Fight.CHARGE:
 		_set_fight(Fight.CHARGE)
 	if effect == &"frost":
-		slowed_left = maxf(slowed_left, FROST_SLOW_SECONDS)
+		slowed_left = maxf(slowed_left, FROST_SLOW_SECONDS * mult)
 	super.on_arrow_effect(effect, arrow)
+	if mult > HostileElements.NORMAL:
+		match effect:
+			&"sleep":
+				asleep_left *= mult
+			&"fire":
+				ignite(ARROW_BURN_SECONDS * mult)
+		if effect != &"sleep":
+			_thrash_away(arrow.global_position if arrow else global_position)
+
+
+## Small foes are easy to hit: the body box grows by data.hit_box_scale.
+func _grow_hit_box() -> void:
+	if data.hit_box_scale <= 1.0:
+		return
+	var shape := get_node_or_null(^"Collision") as CollisionShape3D
+	if shape and shape.shape is BoxShape3D:
+		var box := (shape.shape as BoxShape3D).duplicate() as BoxShape3D
+		box.size *= data.hit_box_scale
+		shape.shape = box
+		shape.position.y = box.size.y * 0.5
+
+
+## Weak to it: it thrashes and runs from where the element struck.
+func _thrash_away(from: Vector3) -> void:
+	_set_fight(Fight.CHARGE)
+	_flee_from = from
+	_flee_left = maxf(_flee_left, HostileElements.WEAK_FLEE_SECONDS)
+	_lure_left = 0.0
+	if animator:
+		animator.hit(from)
 
 
 func _on_wounded(from: Vector3, _cause: StringName) -> void:

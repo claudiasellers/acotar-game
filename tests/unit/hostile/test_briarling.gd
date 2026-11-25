@@ -2,7 +2,7 @@
 ## briarling stands among the Rosewild's real roses in their own material, and
 ## the only tell is that it doesn't sway. It is a bush by day, walks its brake
 ## from 18:00, unfolds before it moves, lashes, snares every third strike, and
-## two wood arrows kill it.
+## one wood arrow or one knife hit kills it.
 extends GutTest
 
 const BRIARLING := preload("res://creatures/hostile/briarling_roamer.tscn")
@@ -150,12 +150,23 @@ func test_every_third_strike_is_a_snare() -> void:
 			BriarlingRoamer.LASH, BriarlingRoamer.LASH, BriarlingRoamer.SNARE])
 
 
-func test_two_wood_arrows_kill_it() -> void:
+## Small means fragile (owner, 2026-11-25): one arrow, or one knife hit.
+func test_one_wood_arrow_kills_it() -> void:
 	var b := _briarling()
 	b.apply_hit(&"arrow_wood", &"wood", 1.0, &"body", b.global_position)
-	assert_true(b.alive)
-	b.apply_hit(&"arrow_wood", &"wood", 1.0, &"body", b.global_position)
 	assert_false(b.alive)
+
+
+func test_one_knife_hit_kills_it() -> void:
+	var b := _briarling()
+	b.apply_hit(&"knife", &"knife", StrikeController.KNIFE_MULT, &"body", b.global_position)
+	assert_false(b.alive)
+
+
+func test_its_hit_box_is_bigger_than_its_body() -> void:
+	var b := _briarling()
+	var box := (b.get_node(^"Collision") as CollisionShape3D).shape as BoxShape3D
+	assert_almost_eq(box.size.x, b.data.body_width * 1.5, 0.01)
 
 
 func test_the_naga_keeps_its_own_rows() -> void:

@@ -72,6 +72,13 @@ enum BodyPlan { QUADRUPED, BIRD }
 ## What story beats and sound call the weak spot (EventBus.creature_hit part).
 @export var weak_zone_name: StringName = &"weak"
 
+## Small means fragile and easy to hit (owner, 2026-11-25): above 1 the box
+## arrows and the knife find is this much bigger than the body.
+@export var hit_box_scale: float = 1.0
+## A hostile family's element row (HostileElements; hostile plan §7):
+## element (fire, frost, light, sleep) -> multiplier, 1.5 weak, 1.0 normal,
+## 0 resisted. An element with no entry is normal.
+@export var element_rows: Dictionary = {}
 @export_group("Fire")
 ## Health lost per second while it burns (a fire arrow, or burning ground under
 ## it). 0: fire never takes hold on it.

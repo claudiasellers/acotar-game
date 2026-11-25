@@ -18,7 +18,7 @@ turn_speed = 8.0
 sight_range = 31.5
 hearing_range = 48.0
 scent_range = 35.0
-max_health = 16.0
+max_health = 8.0
 arrow_damage = 8.0
 lethal_arrow_ids = Array[StringName]([&"ash"])
 lethal_delay = 0.0
@@ -29,3 +29,9 @@ leaves_prints = true
 stride = 0.3
 print_size = 0.05
 flora_id = &"flora_bush_rose"
+hit_box_scale = 1.5
+element_rows = {
+&"fire": 1.5,
+&"frost": 1.0,
+&"sleep": 1.5
+}

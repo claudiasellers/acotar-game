@@ -70,6 +70,8 @@ ROAMERS = {
             ("leaves_prints", "true"),
             ("stride", "0.9"),
             ("print_size", "0.12"),
+            # Element row (plan §7): fire, frost and sleep weak, light normal.
+            ("element_rows", '{\n&"fire": 1.5,\n&"frost": 1.5,\n&"light": 1.0,\n&"sleep": 1.5\n}'),
         ],
         # The family's values on the shared brain (HostileRoamer exports).
         "scene_fields": [
@@ -103,8 +105,9 @@ ROAMERS = {
             ("sight_range", "31.5"),
             ("hearing_range", "48.0"),
             ("scent_range", "35.0"),
-            # 2 wood arrows (8 into 16), ash 1, the heart-knot x3, burns 8 HP/s.
-            ("max_health", "16.0"),
+            # Small means fragile (owner, 2026-11-25): one wood arrow or one
+            # knife hit (8 into 8), ash 1, burns 8 HP/s; a box 1.5x its body.
+            ("max_health", "8.0"),
             ("arrow_damage", "8.0"),
             ("lethal_arrow_ids", "Array[StringName]([&\"ash\"])"),
             ("lethal_delay", "0.0"),
@@ -115,6 +118,9 @@ ROAMERS = {
             ("stride", "0.3"),
             ("print_size", "0.05"),
             ("flora_id", '&"flora_bush_rose"'),
+            ("hit_box_scale", "1.5"),
+            # Element row (plan §7): fire and sleep weak, frost normal.
+            ("element_rows", '{\n&"fire": 1.5,\n&"frost": 1.0,\n&"sleep": 1.5\n}'),
         ],
         "scene_fields": [
             ("strike_reach", "1.3"),

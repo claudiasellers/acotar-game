@@ -29,3 +29,7 @@ burn_dps = 0.0
 leaves_prints = false
 twig_chance = 0.0
 model_scene = ExtResource("2")
+element_rows = {
+&"fire": 1.0,
+&"light": 1.5
+}
