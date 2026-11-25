@@ -38,7 +38,8 @@ Signal `struck(kind, target)`: `&"knife"`, `&"sneak"`, `&"finisher"`,
 
 ## Hints (L81 G20)
 
-Strike will nudge two KeyHints rows, the UI lane's to define: `strike_bash`
-the first time an engaged hostile is in reach while the bow is raised, and
-`strike_cut_free` on the first grab. The nudges land once those rows are in
-main, called with no check, so a missing row fails rather than passes.
+Two KeyHints rows, the UI lane's table (L77-53), called with no check so a
+missing row fails: `strike_bash` is nudged the first time an engaged hostile
+(its HostileLadder is hostile) is in reach while the bow is raised;
+`strike_cut_free` is held for as long as she is grabbed (`player_grabbed` to
+`player_released`) and learnt the first time she cuts herself free.

@@ -103,7 +103,7 @@ Driven by `CreatureSenses.awareness` (0..1). One `step(awareness, delta)` per th
   before contact. SoundDirector plays the family's wind-up cue where it starts
   (`WINDUP_CUES`, naga: `naga_hiss`), on the Sound bus. The coil is a grab
   row (vitals.md: a hold), so it crouches. The
-  procedural pose is the one tell; the rig lane's `windup_<damage_kind>` clips
+  procedural pose is the one tell; the rig lane's `telegraph_<row id>` clips
   replace it outright when they land (bestiary §1.5). A
   naga on a **scent trail** ignores the leash while it smelled her within the
   last 6 s; a hush draught (scent_scale ≤ 0.5) breaks the trail.
