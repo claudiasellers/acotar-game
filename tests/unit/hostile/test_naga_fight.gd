@@ -261,10 +261,10 @@ func test_from_behind_it_coils_and_a_held_coil_ends_in_a_heavy_claw() -> void:
 	assert_true(held, "behind her it coils")
 	assert_eq(v.grab_source, &"naga_lone")
 	assert_eq(n.fight, NagaRoamer.Fight.HOLD)
-	_run(n, NagaRoamer.COIL_SECONDS + 0.2)
+	_run(n, AttackTable.resolve(NagaRoamer.COIL).grab_seconds + 0.2)
 	assert_false(v.is_grabbed())
 	assert_true(hits.any(func(h: Array) -> bool: return h[1] == NagaRoamer.CLAW \
-			and is_equal_approx(float(h[2]), NagaRoamer.COIL_FOLLOW_SCALE)), "she didn't break it")
+			and is_equal_approx(float(h[2]), AttackTable.resolve(NagaRoamer.COIL).grab_fail_scale)), "she didn't break it")
 
 
 func test_breaking_the_coil_spares_the_claw() -> void:
@@ -275,7 +275,7 @@ func test_breaking_the_coil_spares_the_claw() -> void:
 		if v.is_grabbed():
 			break
 	assert_true(v.is_grabbed())
-	for p in NagaRoamer.COIL_PRESSES:
+	for p in AttackTable.resolve(NagaRoamer.COIL).grab_presses:
 		v.press_break_free()
 	assert_false(v.is_grabbed())
 	assert_eq(n.fight, NagaRoamer.Fight.RECOVER)

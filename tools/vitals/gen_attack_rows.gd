@@ -58,6 +58,14 @@ const WINDUP := {
 	&"wolf_bite": 0.55,
 }
 
+## Grab rows: [presses to break, seconds it holds, fail strike scale]
+## (health-interactions §4: the coil 6 / 3 s then a claw ×1.5; the snare
+## 4 / 2.5 s then two lashes).
+const GRABS := {
+	&"naga_coil": [6, 3.0, 1.5],
+	&"briarling_snare": [4, 2.5, 2.0],
+}
+
 
 func _init() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT))
@@ -78,6 +86,10 @@ func _init() -> void:
 		row.can_knock_down = r[11]
 		row.floor_hp = r[12]
 		row.windup_s = float(WINDUP.get(row.id, 0.0))
+		if GRABS.has(row.id):
+			row.grab_presses = int(GRABS[row.id][0])
+			row.grab_seconds = float(GRABS[row.id][1])
+			row.grab_fail_scale = float(GRABS[row.id][2])
 		if ResourceSaver.save(row, OUT + "%s.tres" % row.id) == OK:
 			written += 1
 	print("gen_attack_rows: wrote %d rows to %s" % [written, OUT])

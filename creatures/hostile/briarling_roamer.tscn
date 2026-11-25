@@ -6,3 +6,8 @@
 [node name="BriarlingRoamer" type="CharacterBody3D"]
 script = ExtResource("1")
 data = ExtResource("2")
+strike_reach = 1.3
+strike_cooldown = 1.65
+attack_id = &"briarling_lash"
+grab_attack = &"briarling_snare"
+dread_radius = Vector2(14, 5)

@@ -69,7 +69,7 @@ Driven by `CreatureSenses.awareness` (0..1). One `step(awareness, delta)` per th
   or contested pair; every pair of cores keeps a ≥60 m corridor beyond both
   territories; no leash ring covers a listed road point or whorl stone.
 
-## Naga roamers (`NagaRoamer` extends `Creature`)
+## Naga roamers (`NagaRoamer` extends `HostileRoamer`)
 - Data `data/creatures/hostile/naga_roamer.tres` (written by the generator):
   kind `naga` (shares the family's face, voice and bestiary; the canon ambush
   only counts kills while it runs, before `naga_survived`), walk 2 / run 8 m/s,
@@ -172,10 +172,9 @@ come first); the spawn rows will be gated on `puca_resisted`, at most one per re
 (16 HP, 8 per wood arrow, ash kills, burn 8 HP/s, sight 31.5 m, hearing 48 m,
 scent 35 m, walk 1.5, run 6). Not in any site or spawn table yet.
 
-- Built on the naga's brain (`extends NagaRoamer`), which now has these hooks
-  with the naga's values as defaults: `grab_attack`, `grab_presses`,
-  `grab_seconds`, `grab_follow_scale`, `dread_radius`, `routine_at(hour)`,
-  `pick_strike(player)`.
+- A thin subclass of `HostileRoamer` (below). Its values are on
+  `briarling_roamer.tscn` (`attack_id` briarling_lash, `grab_attack`
+  briarling_snare, no `lunge_attack`, `strike_reach` 1.3, `dread_radius` 14/5).
 - Rows: `briarling_lash` (thorn, 0.4 s) and, every third strike in reach,
   `briarling_snare` (grab, 0.6 s; 4 presses in 2.5 s; failing it takes two
   lashes). No lunge. DreadField 14 m / 5 m.
@@ -184,6 +183,30 @@ scent 35 m, walk 1.5, run 6). Not in any site or spawn table yet.
   FOLDING (1.0 s, at home with nothing to do by day). `is_bush()`.
 - The tell: every GeometryInstance3D of its model wears `mimic_material`,
   `CourtAssets.material_for(&"flora_bush_rose")` duplicated with `wind_amount` 0.
-  The Rosewild's real `flora_bush_rose` layers keep their wind. Placeholder body
-  is that rose bush model until the rig lands (bestiary §7.4/7.5).
+  The Rosewild's real `flora_bush_rose` layers keep their wind. Its body comes
+  from the flora table by id (`CreatureData.flora_id` = `flora_bush_rose`, built
+  by `PlaceholderBody.flora` from `CourtAssets.mesh`), never a file path, so a
+  flora swap of that rose reaches it with no edit; the rig replaces it later.
+
+## The shared brain (`HostileRoamer`)
+
+`creatures/hostile/hostile_roamer.gd` holds everything a camp member does
+whatever its family: the ladder, the leash and scent trail, camp reports,
+attack tokens, the fight states (`Fight`) and timer, the tell
+(`AttackTell`, `hostile_windup`/`_cancelled`), holds, fire, frost, sleep and
+lures. It names no family (a test checks). A family is a thin subclass plus
+its own data:
+
+- scene exports: `strike_reach`, `strike_cooldown`, `attack_id` (strike row),
+  `grab_attack` (grab row or empty), `lunge_attack` (lunge row or empty),
+  `dread_radius` (x 0: no DreadField);
+- its rows: a grab row (`AttackData`) carries `grab_presses`, `grab_seconds`
+  and `grab_fail_scale`, read through `grab_presses()`, `grab_seconds()`,
+  `grab_fail_scale()`;
+- overrides where it differs: `routine_at(hour)` (default `hunt`, the ring
+  walk), `_routine`, `sight_scale()`, `hearing_scale()`, `is_on_watch()`,
+  `pick_strike(player)` (default its strike row).
+
+`NagaRoamer`: bask/hunt/nest day, watch member, coil only from behind.
+`BriarlingRoamer`: bush/hunt, forms, snare every third strike.
 

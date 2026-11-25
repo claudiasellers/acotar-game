@@ -38,15 +38,20 @@ func _think(b: BriarlingRoamer, seconds: float) -> void:
 
 # --- 2(c): the bush doesn't sway; the real roses do ------------------------------
 
+## The flora table id the briarling copies, from its own data.
+func _rose() -> StringName:
+	return (load("res://data/creatures/hostile/briarling_roamer.tres") as CreatureData).flora_id
+
+
 func test_the_real_roses_sway() -> void:
 	var content := load(ROSEWILD) as CourtRegionContent
 	var found := false
 	for e in content.decor:
-		if e.mesh_id == BriarlingRoamer.BUSH_MESH:
+		if e.mesh_id == _rose():
 			found = true
 			assert_gt(e.wind, 0.0, "the Rosewild's rose bushes are planted swaying")
 	assert_true(found, "the Rosewild grows the rose bush a briarling copies")
-	assert_gt(BriarlingRoamer.wind_of(CourtAssets.material_for(BriarlingRoamer.BUSH_MESH)), 0.0,
+	assert_gt(BriarlingRoamer.wind_of(CourtAssets.material_for(_rose())), 0.0,
 			"and their material moves in the wind")
 
 
@@ -63,7 +68,7 @@ func test_a_briarling_bush_has_wind_0() -> void:
 
 func test_the_bush_wears_the_roses_own_look() -> void:
 	var b := _briarling()
-	var real := CourtAssets.material_for(BriarlingRoamer.BUSH_MESH) as ShaderMaterial
+	var real := CourtAssets.material_for(_rose()) as ShaderMaterial
 	var mimic := b.mimic_material as ShaderMaterial
 	assert_not_null(real)
 	assert_not_null(mimic)
@@ -71,8 +76,12 @@ func test_the_bush_wears_the_roses_own_look() -> void:
 		assert_eq(mimic.shader, real.shader, "the same shader as the real roses")
 		assert_ne(mimic, real, "its own copy: the real roses keep their wind")
 		assert_gt(BriarlingRoamer.wind_of(real), 0.0)
-	assert_eq(b.data.model_scene.resource_path.get_file().get_basename(), String(BriarlingRoamer.BUSH_MESH),
-			"the court's own rose bush model")
+	assert_eq(b.data.flora_id, &"flora_bush_rose", "the Rosewild's rose bush, by its flora id")
+	assert_null(b.data.model_scene, "no file path: a flora swap of the rose reaches it")
+	var mi := b.model.find_children("*", "MeshInstance3D", true, false)
+	assert_false(mi.is_empty())
+	if not mi.is_empty():
+		assert_eq((mi[0] as MeshInstance3D).mesh, CourtAssets.mesh(_rose()), "the flora table's own mesh")
 
 
 # --- the brain -------------------------------------------------------------------
@@ -119,9 +128,10 @@ func test_its_rows() -> void:
 	var b := _briarling()
 	assert_eq(b.attack_id, BriarlingRoamer.LASH)
 	assert_eq(b.grab_attack, BriarlingRoamer.SNARE)
-	assert_eq(b.grab_presses, 4)
-	assert_almost_eq(b.grab_seconds, 2.5, 0.001)
-	assert_almost_eq(b.grab_follow_scale, 2.0, 0.001, "failing the snare: two lashes")
+	assert_eq(b.grab_presses(), 4, "the snare row's terms")
+	assert_almost_eq(b.grab_seconds(), 2.5, 0.001)
+	assert_almost_eq(b.grab_fail_scale(), 2.0, 0.001, "failing the snare: two lashes")
+	assert_eq(b.lunge_attack, &"", "knee-high: no lunge row")
 	assert_almost_eq(NagaRoamer.windup_of(BriarlingRoamer.LASH), 0.4, 0.001)
 	assert_almost_eq(NagaRoamer.windup_of(BriarlingRoamer.SNARE), 0.6, 0.001)
 	assert_eq(AttackTell.pose_kind(BriarlingRoamer.LASH), &"thorn")
@@ -154,6 +164,25 @@ func test_the_naga_keeps_its_own_rows() -> void:
 	n.set_physics_process(false)
 	assert_eq(n.attack_id, NagaRoamer.CLAW)
 	assert_eq(n.grab_attack, NagaRoamer.COIL)
-	assert_eq(n.grab_presses, NagaRoamer.COIL_PRESSES)
-	assert_almost_eq(n.grab_seconds, NagaRoamer.COIL_SECONDS, 0.001)
+	assert_eq(n.lunge_attack, NagaRoamer.LUNGE_ATTACK)
+	assert_eq(n.grab_presses(), 6, "the coil: six presses")
+	assert_almost_eq(n.grab_seconds(), 3.0, 0.001, "in three seconds")
+	assert_almost_eq(n.grab_fail_scale(), 1.5, 0.001, "then a claw at 1.5")
+	assert_almost_eq(n.strike_reach, 1.7, 0.001)
 	assert_eq(n.routine_at(12.0), NagaRoamer.routine_for(12.0))
+
+
+## R18: the shared brain carries no family's values; each family is a thin
+## subclass whose values are on its scene and in its rows.
+func test_the_shared_brain_is_no_familys() -> void:
+	var src := FileAccess.get_file_as_string("res://creatures/hostile/hostile_roamer.gd")
+	for word in ["naga_", "briarling_", "NagaRoamer", "BriarlingRoamer"]:
+		assert_false(src.contains(word), "hostile_roamer.gd names %s" % word)
+	var bare := HostileRoamer.new()
+	assert_eq(bare.attack_id, &"")
+	assert_eq(bare.grab_attack, &"")
+	assert_eq(bare.lunge_attack, &"")
+	assert_eq(bare.dread_radius, Vector2.ZERO)
+	bare.free()
+	for script in [NagaRoamer, BriarlingRoamer]:
+		assert_eq((script as GDScript).get_base_script(), HostileRoamer)

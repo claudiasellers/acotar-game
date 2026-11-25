@@ -1,7 +1,6 @@
-[gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="CreatureData" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]
-[ext_resource type="PackedScene" path="res://world/spring_court/wider/assets/flora/flora_bush_rose.gltf" id="2"]
 
 [resource]
 script = ExtResource("1")
@@ -29,4 +28,4 @@ burn_dps = 8.0
 leaves_prints = true
 stride = 0.3
 print_size = 0.05
-model_scene = ExtResource("2")
+flora_id = &"flora_bush_rose"

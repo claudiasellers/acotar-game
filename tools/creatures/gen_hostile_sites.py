@@ -71,6 +71,58 @@ ROAMERS = {
             ("stride", "0.9"),
             ("print_size", "0.12"),
         ],
+        # The family's values on the shared brain (HostileRoamer exports).
+        "scene_fields": [
+            ("strike_reach", "1.7"),
+            ("strike_cooldown", "1.65"),
+            ("attack_id", '&"naga_claw"'),
+            ("grab_attack", '&"naga_coil"'),
+            ("lunge_attack", '&"naga_lunge"'),
+            ("dread_radius", "Vector2(30, 10)"),
+        ],
+    },
+    # Briarlings (bestiary §7): a rose bush from the flora table by id, so a
+    # flora swap of that rose reaches it (no model file).
+    "briarling_roamer": {
+        "script": "res://creatures/hostile/briarling_roamer.gd",
+        "node": "BriarlingRoamer",
+        "model": None,
+        "fields": [
+            ("kind", '&"briarling"'),
+            ("display_name", '"Briarling"'),
+            ("fae", "true"),
+            ("canon", '"X"'),
+            ("body_length", "0.8"),
+            ("body_height", "0.7"),
+            ("body_width", "0.8"),
+            ("coat_color", "Color(0.93, 0.66, 0.74, 1)"),
+            ("walk_speed", "1.5"),
+            ("run_speed", "6.0"),
+            ("turn_speed", "8.0"),
+            # Sight x0.7, hearing x1.2, scent x0.5 of the shared 45/40/70.
+            ("sight_range", "31.5"),
+            ("hearing_range", "48.0"),
+            ("scent_range", "35.0"),
+            # 2 wood arrows (8 into 16), ash 1, the heart-knot x3, burns 8 HP/s.
+            ("max_health", "16.0"),
+            ("arrow_damage", "8.0"),
+            ("lethal_arrow_ids", "Array[StringName]([&\"ash\"])"),
+            ("lethal_delay", "0.0"),
+            ("weak_zone_height", "0.5"),
+            ("weak_zone_name", '&"heart_knot"'),
+            ("burn_dps", "8.0"),
+            ("leaves_prints", "true"),
+            ("stride", "0.3"),
+            ("print_size", "0.05"),
+            ("flora_id", '&"flora_bush_rose"'),
+        ],
+        "scene_fields": [
+            ("strike_reach", "1.3"),
+            ("strike_cooldown", "1.65"),
+            ("attack_id", '&"briarling_lash"'),
+            ("grab_attack", '&"briarling_snare"'),
+            ("dread_radius", "Vector2(14, 5)"),
+        ],
     },
 }
 
@@ -183,19 +235,25 @@ def check_overlap(sites, roads, anchors, stones):
 
 def write_roamer(rid, spec):
     os.makedirs(DATA_ROAMERS, exist_ok=True)
-    lines = ['[gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]', "",
-             '[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]',
-             f'[ext_resource type="PackedScene" path="{spec["model"]}" id="2"]', "",
-             "[resource]", 'script = ExtResource("1")']
+    model = spec.get("model")
+    lines = [f'[gd_resource type="Resource" script_class="CreatureData" load_steps={3 if model else 2} format=3]', "",
+             '[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]']
+    if model:
+        lines.append(f'[ext_resource type="PackedScene" path="{model}" id="2"]')
+    lines += ["", "[resource]", 'script = ExtResource("1")']
     lines += [f"{k} = {v}" for k, v in spec["fields"]]
-    lines += ['model_scene = ExtResource("2")', ""]
+    if model:
+        lines.append('model_scene = ExtResource("2")')
+    lines.append("")
     with open(os.path.join(DATA_ROAMERS, f"{rid}.tres"), "w") as f:
         f.write("\n".join(lines))
     scene = ["[gd_scene load_steps=3 format=3]", "",
              f'[ext_resource type="Script" path="{spec["script"]}" id="1"]',
              f'[ext_resource type="Resource" path="res://data/creatures/hostile/{rid}.tres" id="2"]', "",
              f'[node name="{spec["node"]}" type="CharacterBody3D"]',
-             'script = ExtResource("1")', 'data = ExtResource("2")', ""]
+             'script = ExtResource("1")', 'data = ExtResource("2")']
+    scene += [f"{k} = {v}" for k, v in spec.get("scene_fields", [])]
+    scene.append("")
     with open(os.path.join(SCENE_ROAMERS, f"{rid}.tscn"), "w") as f:
         f.write("\n".join(scene))
 

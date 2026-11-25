@@ -2,28 +2,25 @@
 ## bestiary §7): knee-high thorn-folk that look exactly like the court's rose
 ## bushes. By day (BUSH routine) it stands still among the real roses; from
 ## 18:00 to 07:00 it walks its brake. When it wakes it unfolds (UNFOLD_SECONDS,
-## silent) and fights on the naga's brain: a lash, and every SNARE_EVERY-th
-## strike a snare (roots round her ankle, 4 presses in 2.5 s; failing it
-## takes two lashes). It burns fast and flees fire; it folds back into a bush
-## when it is home with nothing to do.
+## silent) and fights on the shared HostileRoamer brain: a lash, and every
+## SNARE_EVERY-th strike a snare (its row holds the terms: roots round her
+## ankle, 4 presses in 2.5 s; failing it takes two lashes). It burns fast and
+## flees fire; it folds back into a bush when it is home with nothing to do.
 ##
-## The tell (slice 2(c)): its bush wears the Rosewild roses' own material
-## (CourtAssets.material_for(BUSH_MESH)) with `wind_amount` 0, so the real
-## roses round it sway and it doesn't. Nothing else gives it away.
-## Placeholder body: the court's rose bush model itself, until the rig lands
-## (bestiary §7.4 clips; one skeleton for both forms).
+## The tell (slice 2(c)): its body is the flora table's own rose bush
+## (CreatureData.flora_id, CourtAssets), in the real roses' own material
+## (CourtAssets.material_for) with `wind_amount` 0, so the roses round it sway
+## and it doesn't. Nothing else gives it away. A flora swap of that rose
+## reaches it with no edit. Its values are on briarling_roamer.tscn and in its rows.
 class_name BriarlingRoamer
-extends NagaRoamer
+extends HostileRoamer
 
 enum Form { BUSH, UNFOLDING, CREATURE, FOLDING }
 
 const FAMILY := &"briarling"
+## Its two rows (the scene names them; these are for tests and story).
 const LASH := &"briarling_lash"
 const SNARE := &"briarling_snare"
-## The snare (health-interactions §4.3): 4 presses in 2.5 s; failing it, two lashes.
-const SNARE_PRESSES := 4
-const SNARE_SECONDS := 2.5
-const SNARE_FOLLOW_SCALE := 2.0
 ## Every this-many strikes in reach, one is a snare.
 const SNARE_EVERY := 3
 ## Bestiary §7.2: unfold 1.2 s, fold 1.0 s.
@@ -32,12 +29,8 @@ const FOLD_SECONDS := 1.0
 ## Active 18:00 to 07:00; a bush otherwise.
 const ACTIVE_FROM := 18.0
 const ACTIVE_TO := 7.0
-## The Rosewild's rose bush: the mesh it copies and whose material it wears.
-const BUSH_MESH := &"flora_bush_rose"
 ## The mimic layer's wind (plan §5.3): none.
 const MIMIC_WIND := 0.0
-## A lash reaches about this far: it is knee-high.
-const LASH_REACH := 1.3
 
 var form: Form = Form.BUSH
 ## The bush's material: the real roses' own, with no wind.
@@ -46,26 +39,16 @@ var _form_left: float = 0.0
 var _strikes: int = 0
 
 
-func _init() -> void:
-	attack_id = LASH
-	grab_attack = SNARE
-	grab_presses = SNARE_PRESSES
-	grab_seconds = SNARE_SECONDS
-	grab_follow_scale = SNARE_FOLLOW_SCALE
-	strike_reach = LASH_REACH
-	dread_radius = Vector2(14.0, 5.0)
-
-
 func _ready() -> void:
 	super._ready()
-	mimic_material = BriarlingRoamer.bush_material()
+	mimic_material = BriarlingRoamer.bush_material(data.flora_id)
 	for g in model.find_children("*", "GeometryInstance3D", true, false):
 		(g as GeometryInstance3D).material_override = mimic_material
 
 
-## The real roses' material with the wind taken out: the only tell.
-static func bush_material() -> Material:
-	var real := CourtAssets.material_for(BUSH_MESH)
+## The real plant's material with the wind taken out: the only tell.
+static func bush_material(flora_id: StringName) -> Material:
+	var real := CourtAssets.material_for(flora_id)
 	if real == null:
 		return null
 	var m := real.duplicate() as Material
@@ -96,26 +79,12 @@ func routine_at(hour: float) -> StringName:
 	return &"hunt" if BriarlingRoamer.is_active(hour) else &"bush"
 
 
-func is_on_watch() -> bool:
-	return false
-
-
-## Never a lunge: it is knee-high.
-func _may_lunge() -> bool:
-	return false
-
-
 ## A lash, and every SNARE_EVERY-th strike a snare (unless she is already held).
 func pick_strike(player: Node3D) -> StringName:
 	_strikes += 1
-	if _strikes % SNARE_EVERY == 0 and not _is_held(player):
-		return SNARE
-	return LASH
-
-
-func _tune_senses() -> void:
-	senses.sight_range = data.sight_range
-	senses.hearing_range = data.hearing_range
+	if grab_attack != &"" and _strikes % SNARE_EVERY == 0 and not _is_held(player):
+		return grab_attack
+	return attack_id
 
 
 func _think(delta: float) -> void:

@@ -30,6 +30,10 @@ enum BodyPlan { QUADRUPED, BIRD }
 ## Uniform scale on the model scene, so one Blender mesh can serve a bigger cousin
 ## (the songbird body as a hawk, the lamb as a ewe).
 @export var model_scale: float = 1.0
+## A mimic's body from the court's flora table (CourtAssets id) instead of
+## model_scene, so it is always the very plant it hides among: when the flora
+## lane swaps that plant's model, the mimic follows (briarlings).
+@export var flora_id: StringName = &""
 
 @export_group("Movement")
 @export var walk_speed: float = 1.2
