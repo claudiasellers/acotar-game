@@ -16,6 +16,8 @@ const GROUP := &"creatures"
 ## only with this much height or less between the two. One rule for both
 ## sides: a creature's claw and her knife (within_reach).
 const REACH_HEIGHT := 1.2
+## Metres over which a ranged body fades out (CreatureData.draw_distance).
+const DRAW_FADE := 12.0
 ## Creatures at least this tall (m) are solid to Feyre while alive (T092).
 const SOLID_HEIGHT := 0.6
 ## Special arrows (gameplay lane, Arrow.arrow_effect): how long each lasts.
@@ -135,6 +137,22 @@ func _ready() -> void:
 		FollowLeash.on(self, data.follow_leash_m).wounded_only = data.leash_wounded_only
 		LostNudge.on(self).wounded_only = data.leash_wounded_only
 		nudge.cue = data.lost_cue
+	if data.draw_distance > 0.0:
+		# Deferred, so the face and a carried weapon (added in a subclass's
+		# _ready) are ranged with the body.
+		Creature.range_body.call_deferred(model, data.draw_distance)
+
+
+## Every mesh under `body` stops drawing past `distance` m, fading over the last
+## DRAW_FADE m (CreatureData.draw_distance).
+static func range_body(body: Node, distance: float) -> void:
+	if not is_instance_valid(body):
+		return
+	for node in body.find_children("*", "GeometryInstance3D", true, false):
+		var g := node as GeometryInstance3D
+		g.visibility_range_end = distance
+		g.visibility_range_end_margin = DRAW_FADE
+		g.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
 
 
 func _physics_process(delta: float) -> void:

@@ -34,6 +34,10 @@ enum BodyPlan { QUADRUPED, BIRD }
 ## model_scene, so it is always the very plant it hides among: when the flora
 ## lane swaps that plant's model, the mimic follows (briarlings).
 @export var flora_id: StringName = &""
+## R9: the body's meshes stop drawing past this many metres (with a short
+## fade), set once the creature is built, its face and anything in its hands
+## included. 0 draws it at any distance.
+@export var draw_distance: float = 0.0
 
 @export_group("Movement")
 @export var walk_speed: float = 1.2

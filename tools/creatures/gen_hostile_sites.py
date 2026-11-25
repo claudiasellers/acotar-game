@@ -68,6 +68,8 @@ ROAMERS = {
             # Burns at 6 HP/s; burning reeds within 3 m send it running.
             ("burn_dps", "6.0"),
             ("leaves_prints", "true"),
+            # R9: stops drawing past 120 m, well past any leash (56 m) plus the fade.
+            ("draw_distance", "120.0"),
             ("stride", "0.9"),
             ("print_size", "0.12"),
             # Element row (plan §7): fire, frost and sleep weak, light normal.
@@ -117,6 +119,8 @@ ROAMERS = {
             ("weak_zone_name", '&"heart_knot"'),
             ("burn_dps", "8.0"),
             ("leaves_prints", "true"),
+            # R9: stops drawing past 120 m, well past any leash (56 m) plus the fade.
+            ("draw_distance", "120.0"),
             ("stride", "0.3"),
             ("print_size", "0.05"),
             ("hit_box_scale", "1.5"),
@@ -165,6 +169,8 @@ ROAMERS = {
             # Burns at 6 HP/s and flees fire.
             ("burn_dps", "6.0"),
             ("leaves_prints", "true"),
+            # R9: stops drawing past 120 m, well past any leash (56 m) plus the fade.
+            ("draw_distance", "120.0"),
             ("stride", "0.6"),
             ("print_size", "0.1"),
             # Element row (plan §7): fire, light and sleep weak, frost normal.
@@ -223,6 +229,8 @@ ROAMERS = {
             ("fire_fear_radius", "6.0"),
             ("element_rows", '{\n&"fire": 1.5,\n&"frost": 1.0,\n&"light": 1.0,\n&"sleep": 1.0\n}'),
             ("leaves_prints", "true"),
+            # R9: stops drawing past 120 m, well past any leash (56 m) plus the fade.
+            ("draw_distance", "120.0"),
             ("stride", "1.8"),
             ("print_size", "0.45"),
         ],

@@ -26,6 +26,7 @@ weak_zone_height = 0.78
 weak_zone_name = &"throat"
 burn_dps = 6.0
 leaves_prints = true
+draw_distance = 120.0
 stride = 0.9
 print_size = 0.12
 element_rows = {

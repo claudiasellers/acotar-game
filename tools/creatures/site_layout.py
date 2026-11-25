@@ -252,10 +252,6 @@ def _water_distance(water_lines, x, z):
 # pool holds one.
 NAGA_BY_WATER = {"the Thornwater": 3, "the glen stream": 3, "starlight pool": 1, "hollow pool": 1,
                  "mill pond": 1, "pond of watchers": 1}
-# R9 headroom (gen_hostile_sites.budget): one member fewer in the two river
-# parties that share a view in the border woods, the densest region.
-TRIM = {"naga_great_oak": 2, "naga_willow_glen": 2}
-
 # What a camp is called after its place: the first by a place takes the first
 # word, a second by the same place the next (and so on).
 NOUNS = {
@@ -422,7 +418,6 @@ def plan(authored, roads, anchors, stones):
                 count = FAMILY[family]["count"][wave]
                 if family == "naga":
                     count = NAGA_BY_WATER.get(anchor, count)
-                count = TRIM.get(sid, count)
                 row = (sid, family, title, region, (round(x, 1), round(z, 1)), radius,
                        FAMILY[family]["roamer"], count, [WAVES[wave]], "X")
                 chosen.append(row)

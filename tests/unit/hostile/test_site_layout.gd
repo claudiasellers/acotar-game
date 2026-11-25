@@ -2,7 +2,7 @@
 ## every open region has camps, the size ladder holds, gates are timeline flags,
 ## the overlap corridor holds across all sites, and every camp's gear is L88's
 ## and lies on the ground clear of its loot container (CampDressing).
-# gate: when:tools/creatures/site_layout.py,tools/creatures/gen_hostile_sites.py,data/creatures/hostile_sites/*,creatures/hostile/sites/*,creatures/hostile/camp_dressing.gd
+# gate: when:creatures/creature.gd,creatures/creature_data.gd,data/creatures/hostile/*,tools/creatures/site_layout.py,tools/creatures/gen_hostile_sites.py,data/creatures/hostile_sites/*,creatures/hostile/sites/*,creatures/hostile/camp_dressing.gd
 extends GutTest
 
 const SITES_DIR := "res://data/creatures/hostile_sites/"
@@ -116,3 +116,30 @@ func test_clear_of_pushes_a_piece_out_along_its_bearing() -> void:
 	assert_gte(p.distance_to(Vector2(1.2, 0)), 2.4)
 	assert_almost_eq(p.y, 0.0, 0.001, "along its bearing")
 	assert_eq(CampDressing.clear_of(Vector2(9, 0), Vector2.ZERO, Vector2(1.2, 0), 2.4), Vector2(9, 0))
+
+
+## R9: a placed roamer's body (its face and the weapon in its hand too) stops
+## drawing at its draw_distance; a creature whose data leaves it 0 is unranged.
+func test_roamer_bodies_end_at_their_draw_distance() -> void:
+	var scene := load(SCENES_DIR + "gloamer_crocus_knoll.tscn") as PackedScene
+	var site := scene.instantiate() as HostileSite
+	site.snap_to_core = false
+	site.height_func = func(_x: float, _z: float) -> float: return 0.0
+	add_child_autofree(site)
+	await get_tree().process_frame
+	assert_false(site.members.is_empty())
+	var m := site.members[0]
+	assert_eq(m.data.draw_distance, 120.0)
+	var meshes := m.model.find_children("*", "GeometryInstance3D", true, false)
+	assert_false(meshes.is_empty())
+	for g in meshes:
+		assert_eq((g as GeometryInstance3D).visibility_range_end, 120.0, String(g.name))
+
+
+func test_a_zero_draw_distance_leaves_the_body_unranged() -> void:
+	var data := (load("res://data/creatures/hostile/gloamer_roamer.tres") as CreatureData).duplicate() as CreatureData
+	data.draw_distance = 0.0
+	var body := PlaceholderBody.build(data)
+	for g in body.find_children("*", "GeometryInstance3D", true, false):
+		assert_eq((g as GeometryInstance3D).visibility_range_end, 0.0)
+	body.free()

@@ -13,6 +13,6 @@ core = Vector2(83.4, 1096.0)
 territory_radius = 35.0
 leash_scale = 1.6
 member_scene = ExtResource("2")
-count = 2
+count = 3
 require_flags = PackedStringArray("naga_survived")
 canon = "X"
