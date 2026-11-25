@@ -1,7 +1,8 @@
 ## The settings page of Feyre's journal, on the book's ribbon. Esc (or Start)
 ## in play opens the book here; Esc again closes it. Left sheet: what she can
 ## do from a pause (Resume, Wriggle free, Return Home, Save & Title, Save &
-## Quit), then sound, text size, movement keys and the minimap. Right sheet:
+## Quit), then sound, text size, movement keys, the minimap, and the bow and
+## fights. Right sheet:
 ## camera, play, her HUD and Feyre's thoughts, or every key (KeyList) while
 ## "Every key" is down. Every control writes its
 ## setting as it changes (GameSettings, InputSettings, GuideSettings,
@@ -207,6 +208,12 @@ func _build_left(col: VBoxContainer) -> void:
 	_minimap_check = _check_box(col, "Show the minimap (N)")
 	_minimap_check.toggled.connect(func(on: bool) -> void: MapSettings.set_minimap_shown(on))
 
+	_section(col, "Bow and fights")
+	var bow := _row(col)
+	_stepper(bow, &"soft_aim", "Pad aim pull: %s", GameSettings.SOFT_AIM_LEVELS)
+	_stepper(bow, &"hit_stop", "Hit-stop: %s", GameSettings.HIT_STOP_LEVELS)
+	_check(bow, &"break_free_hold", "Hold to break free")
+
 
 func _build_right(col: VBoxContainer) -> void:
 	_section(col, "Camera", false)
@@ -250,13 +257,7 @@ func _build_right(col: VBoxContainer) -> void:
 		b.size_flags_horizontal = Control.SIZE_FILL
 		b.pressed.connect(func() -> void: GameSettings.set_value(&"hud_mode", i))
 	_controls[&"hud_mode"] = modes
-	var edges := _chip(hud, "", null)
-	edges.size_flags_horizontal = Control.SIZE_FILL
-	edges.set_meta(&"format", "Edges: %s")
-	edges.set_meta(&"words", GameSettings.EDGE_FX_LEVELS)
-	edges.pressed.connect(func() -> void:
-		GameSettings.set_value(&"edge_fx", (int(GameSettings.get_value(&"edge_fx")) + 1) % GameSettings.EDGE_FX_LEVELS.size()))
-	_controls[&"edge_fx"] = edges
+	_stepper(hud, &"edge_fx", "Edges: %s", GameSettings.EDGE_FX_LEVELS).size_flags_horizontal = Control.SIZE_FILL
 	_check(hud, &"hit_marks", "Hit marks")
 	col.add_child(BookKit.label("When her health and stamina show, how strongly the screen's edges warn of cold, hurt and fear, and a mark where a hit came from.", &"SatchelSmall", true))
 
@@ -309,6 +310,17 @@ func _chip(parent: Control, text: String, group: ButtonGroup) -> Button:
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	b.pressed.connect(func() -> void: Juice.bounce_control(b, 0.08))
 	parent.add_child(b)
+	return b
+
+
+## A chip that steps a setting through its words: "Edges: Soft".
+func _stepper(parent: Control, key: StringName, format: String, words: Array[String]) -> Button:
+	var b := _chip(parent, "", null)
+	b.set_meta(&"format", format)
+	b.set_meta(&"words", words)
+	b.pressed.connect(func() -> void:
+		GameSettings.set_value(key, (int(GameSettings.get_value(key)) + 1) % words.size()))
+	_controls[key] = b
 	return b
 
 

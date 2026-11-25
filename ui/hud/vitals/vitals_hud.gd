@@ -35,6 +35,8 @@ const WAKE_LINES := {
 const WAKE_LINE_SECONDS := 6.0
 const HIT_FADE := 1.2
 const EDGE_STRENGTH: Array[float] = [1.0, 0.5, 0.0]
+## Vitals.sight_scale at which the hidden edge is fully drawn in.
+const HIDDEN_FULL := 0.5
 
 var health_bar: VitalsHealthBar
 var stamina_bow: VitalsStaminaBow
@@ -218,6 +220,8 @@ func _update_edges(delta: float) -> void:
 	t[&"fae"] = clampf((body.fae_toll - 0.45) / 0.5, 0.0, 1.0) if body else 0.0
 	t[&"ease"] = clampf(v.ease_pulse, 0.0, 1.0)
 	t[&"heal"] = 1.0 if health_bar.healing else 0.0
+	# Hard to see (crouched, later gear): the page's edge draws in from half hidden.
+	t[&"hidden"] = clampf(inverse_lerp(1.0, HIDDEN_FULL, Vitals.sight_scale(_player)), 0.0, 1.0)
 	var drowsy := v.affliction(&"drowsy")
 	var lid := 0.0
 	if drowsy >= 0.5:
