@@ -131,6 +131,41 @@ def _head(m: Mesh, rng: random.Random, head: str, tip: Vector, axis: Vector, rad
 		L.ellipsoid(m, tip, (radius, radius, radius * 1.25), c, glow, seg=8, rings=5)
 
 
+def rose_bush(m: Mesh, rng: random.Random, core: str = "leaf_deep") -> None:
+	"""The court's rose bush. It is the briarling's bush form, point for point
+	(tools/blender/monsters/briarling.py: bush_static), so a briarling sitting
+	among real roses differs from them only in that it does not sway. Its canes,
+	leaves, buds and bloom, round a dark heart of leaf that stands in for the
+	briarling's cage."""
+	import os
+	import sys
+	here = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "blender", "monsters")
+	if here not in sys.path:
+		sys.path.insert(0, here)
+	import briarling
+	pts, tris, cols = briarling.bush_static(light=True)
+	low = float(pts[:, 2].min())
+	verts = [m.bm.verts.new((float(p[0]), float(p[1]), float(p[2]) - min(low, 0.0))) for p in pts]
+	for a, b, c in tris:
+		if len({int(a), int(b), int(c)}) < 3:
+			continue
+		try:
+			f = m.bm.faces.new((verts[int(a)], verts[int(b)], verts[int(c)]))
+		except ValueError:  # the same triangle twice
+			continue
+		f.smooth = True
+		for loop in f.loops:
+			k = loop.vert.index if loop.vert.index >= 0 else 0
+			loop[m.col] = (0.0, 0.0, 0.0, 0.0)
+	m.bm.verts.index_update()
+	for f in m.bm.faces:
+		for loop in f.loops:
+			c = cols[loop.vert.index]
+			loop[m.col] = (float(c[0]), float(c[1]), float(c[2]), 0.0)
+	cc = tuple(x * 0.45 for x in _c(core))
+	L.ellipsoid(m, V((0.0, 0.0, 0.15 - min(low, 0.0))), (0.2, 0.24, 0.17), cc, seg=7, rings=4, rng=rng, noise=0.08, flat_bottom=True)
+
+
 def berry_shrub(m: Mesh, rng: random.Random, height: float = 0.5, radius: float = 0.35, leaf_color: str = "leaf",
 		berry: str = "strawberry", berries: int = 12, berry_r: float = 0.015, blobs: int = 4,
 		flower_color: str | None = None, flowers: int = 0, drupelets: bool = False, thorny: bool = False,
