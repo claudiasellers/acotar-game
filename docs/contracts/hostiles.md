@@ -249,7 +249,12 @@ normal) scales a steeped arrow (fire, frost, light, sleep): its damage
 - Normal: a small burst; the plain effect.
 - Resisted: a dull grey puff, a flat tick, no damage, no effect, no reaction.
 - Every one emits `EventBus.hostile_element_reacted(creature_id, kind,
-  element, reaction)` (her first-time thought, L54, listens).
+  element, reaction)`.
+- Her thought (L81 G24; the Keeper's lines): the first weak hit of each
+  element (`WEAK_THOUGHTS`: ember, rime, glimmer, hush; `WEAK_THOUGHT` for any
+  other) and the first resisted hit of any element (`RESISTED_THOUGHT`), each
+  once per save (WorldState `thought.<line id>`), as her inner voice through
+  `DialogueDirector.staged` (`HostileElements.think`). Normal says nothing.
 - Rows today: naga fire/frost/sleep 1.5, light 1.0; puca light 1.5 (it shows
   its true form), fire 1.0; briarling fire/sleep 1.5, frost 1.0.
 
