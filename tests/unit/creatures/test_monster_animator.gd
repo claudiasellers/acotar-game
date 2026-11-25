@@ -98,6 +98,24 @@ func test_a_wind_up_stretches_to_the_rows_time_and_holds_until_the_strike() -> v
 	assert_false(a.is_acting())
 
 
+func test_a_held_clip_loops_until_something_replaces_it() -> void:
+	var a := _spawn(NAGA).animator
+	# startle is 0.8 s and does not loop by itself
+	assert_almost_eq(a.hold(&"startle"), 0.8, 0.05)
+	await wait_seconds(1.1)
+	assert_true(a.is_acting(), "still on after the clip's own length")
+	assert_eq(a.action_clip(), &"startle")
+	assert_gt(a.play_oneshot(&"recover"), 0.0)
+	assert_eq(a.action_clip(), &"recover", "a play replaces it")
+	a.hold(&"startle")
+	a.play_windup(&"naga_claw", 0.3)
+	assert_eq(a.action_clip(), &"telegraph_naga_claw", "so does a wind-up")
+	await wait_seconds(0.5)
+	a.cancel_attack()
+	assert_false(a.is_acting())
+	assert_eq(a.hold(&"no_such_clip"), 0.0)
+
+
 func test_a_throat_shot_plays_its_own_death() -> void:
 	var a := _spawn(NAGA).animator
 	a.tree.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL

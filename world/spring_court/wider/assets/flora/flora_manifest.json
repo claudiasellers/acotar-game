@@ -1290,19 +1290,19 @@
    "tris_lod1": 506
   },
   {
-   "archetype": "berry_shrub",
+   "archetype": "rose_bush",
    "biome_tags": [
     "garden",
     "rosewild"
    ],
    "file": "flora_bush_rose.gltf",
    "glows": false,
-   "height_m": 1.155,
+   "height_m": 0.783,
    "id": "flora_bush_rose",
    "kind": "decor",
-   "radius_m": 0.65,
-   "tris": 2802,
-   "tris_lod1": 1401
+   "radius_m": 0.568,
+   "tris": 2864,
+   "tris_lod1": 1432
   },
   {
    "archetype": "hydrangea",

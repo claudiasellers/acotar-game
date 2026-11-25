@@ -197,8 +197,8 @@ TABLE: list[tuple[str, str, str, dict, list[str]]] = [
 	("flora_fern_a", D, "fern", {"fronds": 7, "length": 0.7}, ["woodland"]),
 	("flora_fern_b", D, "fern", {"fronds": 9, "length": 1.0, "color": "teal_leaf", "tip": "mint"}, ["woodland", "riverbank"]),
 	# ---------------------------------------------------------------- bushes
-	("flora_bush_rose", D, "berry_shrub", {"height": 1.1, "radius": 0.7, "leaf_color": "leaf_deep", "berry": "rose",
-		"berries": 0, "blobs": 5, "flower_color": "rose", "flowers": 14}, ["garden", "rosewild"]),
+	# the briarling's bush form, point for point (lane L83): the only tell is that a briarling does not sway
+	("flora_bush_rose", D, "rose_bush", {}, ["garden", "rosewild"]),
 	("flora_bush_hydrangea", D, "hydrangea", {}, ["garden", "manor"]),
 	("flora_bush_boxwood", D, "berry_shrub", {"height": 0.9, "radius": 0.5, "leaf_color": "leaf_deep",
 		"leaf_color2": "leaf", "berries": 0, "blobs": 1}, ["garden", "manor"]),

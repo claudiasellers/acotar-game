@@ -154,6 +154,8 @@ What the animator adds for them (all no-ops on a model without the clip):
   each family's test checks every attack row it uses has its clip.
 - `play_strike(id) -> float`: `attack_<id>` alone; returns its `contact_s`.
 - `play_oneshot(clip) -> float`: one clip once; returns its length.
+- `hold(clip) -> float`: one clip looping on the action layer until a `play_*`,
+  a wind-up or `cancel_attack` replaces it (a day-long bush pose, a sleeper).
 - `set_alert(on)`: the looping `alert` layer, while standing.
 - `die(variant)`: `die(&"throat")` plays `death_throat` when the model has it.
 - `clip_contact`, `clip_travel`: the two new columns, by clip name.

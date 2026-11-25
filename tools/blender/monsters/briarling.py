@@ -172,6 +172,10 @@ def thorn(pc, base, out, along, size, kind=0.0):
         pc.face(b[j], b[(j + 1) % 3], tip)
 
 
+LEAF_SIDE = ((0.17, 0.33), (0.47, 0.5), (0.78, 0.31))      # a leaflet's outline: (how far along, half width)
+LEAF_SIDE_LIGHT = ((0.3, 0.46), (0.7, 0.4))                  # the same leaf with fewer corners, for the court's real rose bush
+
+
 def leaflet(pc, root, along, face, length, width, kind):
     """An ovate leaflet with a drawn-out point, folded a little along its midrib
     and arched over its length."""
@@ -181,10 +185,10 @@ def leaflet(pc, root, along, face, length, width, kind):
     side = {}
     for s in (1.0, -1.0):
         side[s] = [pc.vert(root + along * length * u + across * s * width * w + face * (width * w * 0.42 - length * 0.1 * (u - 0.45) ** 2 * 4.0), (u, w / 0.5, kind))   # grad lays the leaflet flat on its swatch
-                   for u, w in ((0.17, 0.33), (0.47, 0.5), (0.78, 0.31))]
+                   for u, w in LEAF_SIDE]
     tip = pc.vert(root + along * length - face * length * 0.12, (1.0, 0.0, kind))
     for s in (1.0, -1.0):
-        q = (a, side[s][0], side[s][1], side[s][2], tip)
+        q = (a, *side[s], tip)
         pc.face(*(q if s < 0 else reversed(q)))
 
 
@@ -982,6 +986,59 @@ def build(fast=False, bake=True):
     author(r)
     r.finish()
     return sources, low, arm, r, paths
+
+
+def bush_static(light=True):
+    """The briarling in its bush pose as plain geometry, for the court's real
+    rose bush (tools/court/blender/flora_archetypes.py: rose_bush): the canes,
+    leaves, buds and bloom, without the cage, thorns, teeth or roots. Returns
+    (points, triangles, colours): numpy arrays, colours per point (linear rgb).
+    Leaves the scene as it found it."""
+    global LEAF_SIDE
+    before = (set(bpy.data.objects), set(bpy.data.meshes), set(bpy.data.armatures), set(bpy.data.materials))
+    full = LEAF_SIDE
+    if light:
+        LEAF_SIDE = LEAF_SIDE_LIGHT
+    try:
+        hard = hard_parts()
+    finally:
+        LEAF_SIDE = full
+    arm = rig.build_armature(NAME, bones())
+    keep = [(o, part, bone) for o, part, bone in hard if part in (10, 11, 30, 31, 32, 33, 40) or 50 <= part <= 55]
+    for o, part, bone in keep:
+        if isinstance(bone, list):
+            rig.bind_chain(o, arm, bone)
+        else:
+            rig.bind_rigid(o, bone)
+    low = kit.join([o for o, _, _ in keep], NAME + "_bush")
+    kit.triangulate(low)
+    rig.attach(low, arm)
+    r = rig.Rig(arm, low, spec())
+    M, _ = r.solve(pose(r, dict(BUSH)))
+    P = kit.co(low)
+    P4 = np.concatenate([P, np.ones((len(P), 1))], axis=1)
+    out = np.zeros((len(P), 3))
+    total = np.zeros(len(P))
+    names = {g.index: g.name for g in low.vertex_groups}
+    skin = {b: np.array(M[b] @ r.rest[b].inverted()) for b in names.values() if b in M}
+    for v in low.data.vertices:
+        for g in v.groups:
+            b = names[g.group]
+            if b in skin and g.weight > 0.0:
+                out[v.index] += g.weight * (skin[b] @ P4[v.index])[:3]
+                total[v.index] += g.weight
+    out /= np.maximum(total, 1e-9)[:, None]
+    me = low.data
+    tri = np.zeros(len(me.polygons) * 3, dtype=np.int32)
+    me.polygons.foreach_get("vertices", tri)
+    col = np.zeros(len(me.vertices) * 4, dtype=np.float32)
+    me.color_attributes["tint"].data.foreach_get("color", col)
+    col = col.reshape(-1, 4)[:, :3].copy()
+    tri = tri.reshape(-1, 3).copy()
+    for coll, was in zip((bpy.data.objects, bpy.data.meshes, bpy.data.armatures, bpy.data.materials), before):
+        for item in [x for x in coll if x not in was]:
+            coll.remove(item, do_unlink=True)
+    return out, tri, col
 
 
 if __name__ == "__main__":
