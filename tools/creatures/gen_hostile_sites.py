@@ -153,9 +153,11 @@ ROAMERS = {
             ("sight_range", "40.5"),
             ("hearing_range", "44.0"),
             ("scent_range", "70.0"),
-            # 3 wood arrows (24 HP, 8 each), 1 to the throat (x3), ash 1.
+            # 3 wood arrows (24 HP, 8 each), 1 to the throat (x3), ash 1;
+            # 2 knife hits (12 each, knife_scale 1.5).
             ("max_health", "24.0"),
             ("arrow_damage", "8.0"),
+            ("knife_scale", "1.5"),
             ("lethal_arrow_ids", "Array[StringName]([&\"ash\"])"),
             ("lethal_delay", "0.0"),
             ("weak_zone_height", "0.8"),
@@ -165,6 +167,8 @@ ROAMERS = {
             ("leaves_prints", "true"),
             ("stride", "0.6"),
             ("print_size", "0.1"),
+            # Element row (plan §7): fire, light and sleep weak, frost normal.
+            ("element_rows", '{\n&"fire": 1.5,\n&"frost": 1.0,\n&"light": 1.5,\n&"sleep": 1.5\n}'),
         ],
         "scene_fields": [
             ("strike_reach", "1.2"),
@@ -203,6 +207,29 @@ SITES = [
     # one small brake at the rose garden's outer edge, from naga_survived.
     ("briarling_rose_garden_edge", "briarling", "Rose Garden Brake", "manor_grounds", (-60.0, -560.0), 12.0,
      "briarling_roamer", 3, ["naga_survived"], "X"),
+    # The common tier's gloamer packs (plan §6.2; bestiary §16): few from
+    # naga_survived, more from P4 (starlight_pool_found) and stranger_met, most
+    # once the glamour lifts. The brackenhound packs follow with their brain.
+    ("gloamer_hollow_log_edge", "gloamer", "Hollow Log Edge", "border_woods", (-380.0, 520.0), 35.0,
+     "gloamer_roamer", 3, ["naga_survived"], "X"),
+    ("gloamer_woodcutters_edge", "gloamer", "Woodcutter's Edge", "eastern_woods", (820.0, 200.0), 35.0,
+     "gloamer_roamer", 4, ["naga_survived"], "X"),
+    ("gloamer_ash_ride", "gloamer", "Ash Ride", "eastern_woods", (1550.0, 260.0), 35.0,
+     "gloamer_roamer", 4, ["stranger_met"], "X"),
+    ("gloamer_orchard_wall", "gloamer", "Orchard Wall", "blossom_vale", (1150.0, 1000.0), 35.0,
+     "gloamer_roamer", 4, ["starlight_pool_found"], "X"),
+    ("gloamer_hedge_lane", "gloamer", "Hedge Lane", "blossom_vale", (500.0, 1000.0), 35.0,
+     "gloamer_roamer", 3, ["stranger_met"], "X"),
+    ("gloamer_shepherds_rocks", "gloamer", "Shepherd's Rocks", "western_fells", (-1250.0, 400.0), 35.0,
+     "gloamer_roamer", 4, ["starlight_pool_found"], "X"),
+    ("gloamer_fell_gate_edge", "gloamer", "Fell Gate Edge", "western_fells", (-1050.0, 750.0), 35.0,
+     "gloamer_roamer", 5, ["glamour_lifted"], "X"),
+    ("gloamer_steading_fields", "gloamer", "Steading Fields", "blighted_reaches", (600.0, -1550.0), 35.0,
+     "gloamer_roamer", 5, ["glamour_lifted"], "X"),
+    ("gloamer_grey_hedgerow", "gloamer", "Grey Hedgerow", "blighted_reaches", (-500.0, -1600.0), 35.0,
+     "gloamer_roamer", 5, ["glamour_lifted"], "X"),
+    ("gloamer_ash_pits", "gloamer", "Ash Pits", "blighted_reaches", (1200.0, -1450.0), 35.0,
+     "gloamer_roamer", 4, ["glamour_lifted"], "X"),
 ]
 
 # Sites placed and checked but carried by no spawn table yet. The rose-garden

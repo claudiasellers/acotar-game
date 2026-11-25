@@ -20,6 +20,7 @@ hearing_range = 44.0
 scent_range = 70.0
 max_health = 24.0
 arrow_damage = 8.0
+knife_scale = 1.5
 lethal_arrow_ids = Array[StringName]([&"ash"])
 lethal_delay = 0.0
 weak_zone_height = 0.8
@@ -28,4 +29,10 @@ burn_dps = 6.0
 leaves_prints = true
 stride = 0.6
 print_size = 0.1
+element_rows = {
+&"fire": 1.5,
+&"frost": 1.0,
+&"light": 1.5,
+&"sleep": 1.5
+}
 model_scene = ExtResource("2")

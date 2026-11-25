@@ -1,9 +1,22 @@
-## HostileSite contract: the generated naga camps, their gating, the
-## blackboard's report delay (a silent kill stays silent) and the settle fact.
+## HostileSite contract: the generated naga camps and gloamer packs, their
+## gating, the blackboard's report delay (a silent kill stays silent) and the settle fact.
 extends GutTest
 
 const SITE_IDS := [&"naga_reed_marsh", &"naga_stream_glen", &"naga_falls_bluff", &"naga_weir", &"naga_backwater"]
 const SITE_SCRIPT := preload("res://creatures/hostile/hostile_site.gd")
+## The common tier's gloamer packs (plan §6.2): site id -> [region, members, flag].
+const GLOAMER_SITES := {
+	&"gloamer_hollow_log_edge": [&"border_woods", 3, "naga_survived"],
+	&"gloamer_woodcutters_edge": [&"eastern_woods", 4, "naga_survived"],
+	&"gloamer_ash_ride": [&"eastern_woods", 4, "stranger_met"],
+	&"gloamer_orchard_wall": [&"blossom_vale", 4, "starlight_pool_found"],
+	&"gloamer_hedge_lane": [&"blossom_vale", 3, "stranger_met"],
+	&"gloamer_shepherds_rocks": [&"western_fells", 4, "starlight_pool_found"],
+	&"gloamer_fell_gate_edge": [&"western_fells", 5, "glamour_lifted"],
+	&"gloamer_steading_fields": [&"blighted_reaches", 5, "glamour_lifted"],
+	&"gloamer_grey_hedgerow": [&"blighted_reaches", 5, "glamour_lifted"],
+	&"gloamer_ash_pits": [&"blighted_reaches", 4, "glamour_lifted"],
+}
 
 
 func after_each() -> void:
@@ -38,7 +51,7 @@ func test_spawn_tables_carry_each_site_gated() -> void:
 	for region in [&"eastern_woods", &"border_woods", &"blossom_vale"]:
 		var table: CreatureSpawnTable = load("res://data/creatures/spawn/%s.tres" % region)
 		for e in table.entries:
-			if String(e.id).begins_with("site_"):
+			if StringName(String(e.id).trim_prefix("site_")) in SITE_IDS:
 				found[e.id] = true
 				assert_false(e.allowed(12.0, func(_f: String) -> bool: return false, false),
 						"%s stays off before naga_survived" % e.id)
@@ -104,6 +117,31 @@ func test_leash() -> void:
 	var r := site.leash_radius()
 	assert_true(site.in_leash(site.global_position + Vector3(r - 1.0, 0, 0)))
 	assert_false(site.in_leash(site.global_position + Vector3(r + 1.0, 0, 0)))
+
+
+## Each gloamer pack is in its region's table, off until its phase's flag.
+func test_gloamer_packs_are_placed_and_gated_by_phase() -> void:
+	for id: StringName in GLOAMER_SITES:
+		var row: Array = GLOAMER_SITES[id]
+		var d := _data(id)
+		assert_not_null(d, String(id))
+		if d == null:
+			continue
+		assert_eq(d.family, &"gloamer")
+		assert_eq(d.count, int(row[1]), "%s: pack size" % id)
+		assert_eq(d.member_scene.resource_path, "res://creatures/hostile/gloamer_roamer.tscn")
+		var table: CreatureSpawnTable = load("res://data/creatures/spawn/%s.tres" % row[0])
+		var entry: SpawnEntry = null
+		for e in table.entries:
+			if e.id == StringName("site_%s" % id):
+				entry = e
+		assert_not_null(entry, "%s is in %s's table" % [id, row[0]])
+		if entry == null:
+			continue
+		var flag: String = row[2]
+		assert_false(entry.allowed(22.0, func(_f: String) -> bool: return false, false), "%s waits" % id)
+		assert_true(entry.allowed(22.0, func(f: String) -> bool: return f == flag, flag == "glamour_lifted"),
+				"%s comes with %s" % [id, flag])
 
 
 func test_overlap_rules_hold_for_the_generated_layout() -> void:

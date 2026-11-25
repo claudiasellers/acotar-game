@@ -134,7 +134,9 @@ rain are the senses' own terms, so each counts once.
 ## Hits on creatures (`Creature.apply_hit`, health-interactions §2.2)
 Every hit (arrow, knife, bow bash, fire) goes through
 `apply_hit(cause, weapon_id, weapon_mult, zone, at)`, which calls the pure
-`Creature.resolve_hit`. Damage is `arrow_damage x weapon_mult x zone`; the
+`Creature.resolve_hit`. Damage is `arrow_damage x weapon_mult x zone`, and
+for the knife (weapon_id `knife`) also `x CreatureData.knife_scale` (default
+1; the one per-family knife value); the
 arrow's `ArrowData.damage` and the bow's speed (`Creature.bow_mult`, capped
 1.3) make up an arrow's `weapon_mult`. `weak_zone_height` marks the top of the
 body as the weak spot (`weak_zone_mult`, default 3). Ash (in
@@ -204,9 +206,9 @@ of 3-5); no sites yet (plan §6.2, a later hand-in).
 
 - Body: L83's rigged `creatures/models/fae/gloamer.gltf`
   (`data/animation/creatures/gloamer_gaits.txt`). 24 HP, 8 per wood arrow (3),
-  the throat (top 20% of 1.3 m) x3 (1), ash 1 at once; burns 6 HP/s. Walk 2,
-  run 6.5 m/s; sight 40.5, hearing 44, scent 70 m. No element row (the matrix
-  has no gloamer column): every element is normal.
+  the throat (top 20% of 1.3 m) x3 (1), ash 1 at once, 2 knife hits
+  (`knife_scale` 1.5); burns 6 HP/s. Walk 2, run 6.5 m/s; sight 40.5,
+  hearing 44, scent 70 m. Element row: fire, light and sleep 1.5, frost 1.0.
 - `routine_at`: `hunt` 18:00-06:00, `rest` otherwise: at home it holds
   `sleep` (`is_lying_up()`), at half sight and 0.7 hearing, and plays `wake`
   as anything moves it or sets it on her.
@@ -296,7 +298,8 @@ normal) scales a steeped arrow (fire, frost, light, sleep): its damage
   not busy, so one that lands during a scene or caption waits for the next
   hit; the Director records `dlg.<id>` when it is heard. Normal says nothing.
 - Rows today: naga fire/frost/sleep 1.5, light 1.0; puca light 1.5 (it shows
-  its true form), fire 1.0; briarling fire/sleep 1.5, frost 1.0.
+  its true form), fire 1.0; briarling fire/sleep 1.5, frost 1.0; gloamer fire/light/sleep 1.5,
+  frost 1.0.
 
 ## Held sites
 
