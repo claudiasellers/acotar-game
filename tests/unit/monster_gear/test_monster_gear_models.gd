@@ -10,6 +10,8 @@ const DIR := "res://art/monster_gear/"
 const MANIFEST := DIR + "monster_gear_manifest.json"
 const MAX_TRIS := 3000
 const ALBEDO_CAP := 0.85
+## The least a worn twin's outline differs from the clean one's, as a share of the clean outline.
+const WORN_DELTA := 0.04
 ## plans/hostile-fae/monster-gear.md: the weapons the loot rules name.
 const WEAPONS: Array[String] = [
 	"wpn_gloamer_hookknife", "wpn_gloamer_knuckleclub", "wpn_gloamer_trinket_flail", "wpn_gloamer_scythe_glaive",
@@ -119,6 +121,8 @@ func test_weapons_have_a_grip_a_tip_an_imbue_point_and_a_worn_twin() -> void:
 		assert_almost_eq(at.x, 0.0, 0.01, "%s tip is in the swing plane" % id)
 		assert_almost_eq(at.length(), float(entry["reach_m"]), 0.005, "%s reach matches the manifest" % id)
 		assert_gt(float(entry["rest_lift_m"]), 0.0, "%s can be laid on the ground" % id)
+		# measured by the generator from the side, the view of a weapon in the hand
+		assert_gte(float(entry.get("worn_delta", 0.0)), WORN_DELTA, "%s worn twin reads as worn in outline" % id)
 
 
 func test_containers_have_a_loot_point_and_lids_hinge() -> void:

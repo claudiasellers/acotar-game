@@ -1,7 +1,7 @@
 {
  "assets": [
   {
-   "bytes": 96492,
+   "bytes": 103188,
    "family": "gloamer",
    "file": "wpn_gloamer_hookknife.glb",
    "group": "weapon",
@@ -33,10 +33,11 @@
    ],
    "tris": 1282,
    "tris_lod1": 640,
-   "tris_worn": 1310
+   "tris_worn": 1524,
+   "worn_delta": 0.21
   },
   {
-   "bytes": 137172,
+   "bytes": 148360,
    "family": "gloamer",
    "file": "wpn_gloamer_knuckleclub.glb",
    "group": "weapon",
@@ -68,10 +69,11 @@
    ],
    "tris": 1734,
    "tris_lod1": 865,
-   "tris_worn": 1460
+   "tris_worn": 1754,
+   "worn_delta": 0.187
   },
   {
-   "bytes": 131216,
+   "bytes": 139072,
    "cord_at": [
     0,
     0.292,
@@ -108,10 +110,11 @@
    ],
    "tris": 2072,
    "tris_lod1": 1035,
-   "tris_worn": 1016
+   "tris_worn": 1248,
+   "worn_delta": 0.116
   },
   {
-   "bytes": 197964,
+   "bytes": 208472,
    "family": "gloamer",
    "file": "wpn_gloamer_scythe_glaive.glb",
    "group": "weapon",
@@ -143,10 +146,11 @@
    ],
    "tris": 2746,
    "tris_lod1": 1368,
-   "tris_worn": 2566
+   "tris_worn": 2902,
+   "worn_delta": 0.076
   },
   {
-   "bytes": 61448,
+   "bytes": 69160,
    "family": "gloamer",
    "file": "wpn_woodcutter_hatchet.glb",
    "group": "weapon",
@@ -178,10 +182,11 @@
    ],
    "tris": 692,
    "tris_lod1": 346,
-   "tris_worn": 858
+   "tris_worn": 1102,
+   "worn_delta": 0.1
   },
   {
-   "bytes": 123496,
+   "bytes": 133672,
    "family": "gloamer",
    "file": "wpn_pruning_hook.glb",
    "group": "weapon",
@@ -213,10 +218,11 @@
    ],
    "tris": 1582,
    "tris_lod1": 790,
-   "tris_worn": 1276
+   "tris_worn": 1608,
+   "worn_delta": 0.223
   },
   {
-   "bytes": 71128,
+   "bytes": 78752,
    "family": "naga",
    "file": "wpn_naga_talon_knife.glb",
    "group": "weapon",
@@ -248,10 +254,11 @@
    ],
    "tris": 950,
    "tris_lod1": 474,
-   "tris_worn": 940
+   "tris_worn": 1184,
+   "worn_delta": 0.174
   },
   {
-   "bytes": 134828,
+   "bytes": 141036,
    "family": "naga",
    "file": "wpn_naga_talon_hook.glb",
    "group": "weapon",
@@ -283,10 +290,11 @@
    ],
    "tris": 1856,
    "tris_lod1": 928,
-   "tris_worn": 1846
+   "tris_worn": 2036,
+   "worn_delta": 0.157
   },
   {
-   "bytes": 113708,
+   "bytes": 123860,
    "family": "naga",
    "file": "wpn_fishers_gaff.glb",
    "group": "weapon",
@@ -318,10 +326,11 @@
    ],
    "tris": 1496,
    "tris_lod1": 742,
-   "tris_worn": 1540
+   "tris_worn": 1860,
+   "worn_delta": 0.057
   },
   {
-   "bytes": 128456,
+   "bytes": 138524,
    "family": "briarling",
    "file": "wpn_briar_thorn_whip.glb",
    "group": "weapon",
@@ -353,10 +362,11 @@
    ],
    "tris": 1770,
    "tris_lod1": 884,
-   "tris_worn": 1244
+   "tris_worn": 1564,
+   "worn_delta": 0.344
   },
   {
-   "bytes": 42160,
+   "bytes": 49704,
    "family": "briarling",
    "file": "wpn_briar_rose_shiv.glb",
    "group": "weapon",
@@ -388,10 +398,11 @@
    ],
    "tris": 496,
    "tris_lod1": 248,
-   "tris_worn": 534
+   "tris_worn": 772,
+   "worn_delta": 0.271
   },
   {
-   "bytes": 71404,
+   "bytes": 79092,
    "family": "hob",
    "file": "wpn_smiths_hammer.glb",
    "group": "weapon",
@@ -423,10 +434,11 @@
    ],
    "tris": 842,
    "tris_lod1": 420,
-   "tris_worn": 918
+   "tris_worn": 1158,
+   "worn_delta": 0.065
   },
   {
-   "bytes": 100584,
+   "bytes": 117504,
    "family": "hob",
    "file": "wpn_shepherds_crook.glb",
    "group": "weapon",
@@ -447,21 +459,22 @@
    ],
    "rest_lift_m": 0.029,
    "size_m": [
-    0.058,
+    0.053,
     1.793,
-    0.188
+    0.171
    ],
    "tip": [
     0,
     0.8628,
     -0.0989
    ],
-   "tris": 1372,
-   "tris_lod1": 686,
-   "tris_worn": 1302
+   "tris": 1512,
+   "tris_lod1": 756,
+   "tris_worn": 1668,
+   "worn_delta": 0.125
   },
   {
-   "bytes": 117720,
+   "bytes": 129452,
    "family": "hob",
    "file": "wpn_hob_tooth_cleaver.glb",
    "group": "weapon",
@@ -493,11 +506,12 @@
    ],
    "tris": 1570,
    "tris_lod1": 784,
-   "tris_worn": 1608,
-   "unique": true
+   "tris_worn": 1978,
+   "unique": true,
+   "worn_delta": 0.077
   },
   {
-   "bytes": 109028,
+   "bytes": 116308,
    "family": "blackvein",
    "file": "wpn_blackvein_veinhook.glb",
    "group": "weapon",
@@ -529,10 +543,11 @@
    ],
    "tris": 1408,
    "tris_lod1": 698,
-   "tris_worn": 1512
+   "tris_worn": 1742,
+   "worn_delta": 0.164
   },
   {
-   "bytes": 131076,
+   "bytes": 137144,
    "family": "blackvein",
    "file": "wpn_blackvein_jaw_shears.glb",
    "group": "weapon",
@@ -564,10 +579,11 @@
    ],
    "tris": 1804,
    "tris_lod1": 898,
-   "tris_worn": 1594
+   "tris_worn": 1792,
+   "worn_delta": 0.211
   },
   {
-   "bytes": 184448,
+   "bytes": 197372,
    "family": "martax",
    "file": "wpn_martax_tooth_club.glb",
    "group": "weapon",
@@ -599,10 +615,11 @@
    ],
    "tris": 2502,
    "tris_lod1": 1250,
-   "tris_worn": 2410
+   "tris_worn": 2782,
+   "worn_delta": 0.085
   },
   {
-   "bytes": 92700,
+   "bytes": 100432,
    "family": "martax",
    "file": "wpn_martax_fang_knife.glb",
    "group": "weapon",
@@ -634,10 +651,11 @@
    ],
    "tris": 1040,
    "tris_lod1": 511,
-   "tris_worn": 1070
+   "tris_worn": 1318,
+   "worn_delta": 0.296
   },
   {
-   "bytes": 76500,
+   "bytes": 84244,
    "family": "crow",
    "file": "wpn_crow_beak_awl.glb",
    "group": "weapon",
@@ -669,7 +687,8 @@
    ],
    "tris": 1046,
    "tris_lod1": 522,
-   "tris_worn": 940
+   "tris_worn": 1182,
+   "worn_delta": 0.443
   },
   {
    "bytes": 139624,

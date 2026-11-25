@@ -444,3 +444,85 @@ def trinkets_on(p, pts, kinds, seed=1.0, drop=0.03):
         d = drop * (0.6 + 0.8 * h1(i, seed))
         p.add(K.tube([tuple(q), (q.x, q.y, q.z - d)], 0.0012, 3), SINEW, "matte")
         trinket(p, kind, T(q.x, q.y, q.z - d) @ R("Z", 360 * h1(i, seed + 1.0)), seed + i)
+
+
+# ------------------------------------------------------------------ wear
+
+
+def wear(p, seed=1.0):
+    """Turns a built weapon into its worn twin, so that near breaking reads in
+    her hand by outline and not only up close: a bite out of its leading edge, the
+    haft splinted (or, on a short weapon, its binding slipped and trailing),
+    and everything a step darker and duller. Each builder still adds its own
+    chips and cracks first. The weapon runs up Z with its edge toward +Y."""
+    bm = p.bm
+    lo, hi = p.bounds()
+    L = hi.z - lo.z
+    for f in bm.faces:                               # darker, duller
+        for loop in f.loops:
+            c = loop[p.col]
+            g = 0.3 * c[0] + 0.5 * c[1] + 0.2 * c[2]
+            loop[p.col] = (0.62 * (0.7 * c[0] + 0.3 * g), 0.62 * (0.7 * c[1] + 0.3 * g), 0.62 * (0.7 * c[2] + 0.3 * g), c[3])
+    # the far corner on the striking side has broken away
+    # (a bite out of whatever stands furthest forward: a hook's point, a blade's belly, a hammer's face)
+    n = Vector((0.0, 0.86, 0.5)).normalized()
+    reach = max(v.co.dot(n) for v in bm.verts)
+    bite = max(0.14 * (hi.y - lo.y), 0.012)
+    before = set(bm.faces)
+    res = bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:], plane_co=n * (reach - bite), plane_no=n, clear_outer=True)
+    cut = [e for e in res["geom_cut"] if isinstance(e, bmesh.types.BMEdge)]
+    bmesh.ops.holes_fill(bm, edges=cut)
+    dark = K.srgb(CHAR)
+    for f in bm.faces:
+        if f not in before and all(abs((v.co - n * (reach - bite)).dot(n)) < 1e-5 for v in f.verts):
+            f.material_index = 0
+            f.smooth = False
+            for loop in f.loops:
+                loop[p.col] = dark
+    rag_col = K.mix(HIDE_PALE, ASH, 0.4)
+    if L >= 0.6:                                     # a splint lashed along the haft above the grip
+        z0, ln = 0.09, min(0.24, 0.2 * L)
+        p.add(shaft(ln, 0.0075, 0.006, seed + 3.0, 0.004, 1, 5), DRIFTWOOD, "matte", T(0.0, -0.024, z0) @ R("X", -3), shade=wood(DRIFTWOOD, seed))
+        for k in (0.18, 0.80):
+            z = z0 + ln * k
+            p.add(lash(0.021, z - 0.012, z + 0.012, 1.5, 0.004, 3, 1.25, 0.003, seed + k), rag_col, "fabric", T(0, -0.008, 0))
+            p.add(rag(0.085 + 0.04 * h1(k, seed), 0.02, seed + k * 7, 0.5, 4, 0.0015), rag_col, "fabric", T(0.0, -0.034, z) @ R("X", 38) @ R("Z", 90))
+    else:                                            # the binding has slipped and trails
+        for i, (z, ang) in enumerate(((0.045, 55), (-0.02, 35), (-0.05, 65))):
+            p.add(rag(max(0.07, 0.30 * L) * (0.8 + 0.5 * h1(i, seed)), max(0.016, 0.05 * L), seed + i * 5, 0.5, 4, 0.0015), rag_col, "fabric",
+                  T(0.0, -0.012, z) @ R("X", ang) @ R("Z", 90))
+        p.add(lash(0.017, -0.075, -0.05, 1.5, 0.0035, 4, 1.2, 0.006, seed), rag_col, "fabric", T(0, -0.004, 0) @ R("X", 14))
+
+
+def silhouette_delta(a, b, px=420):
+    """How far two meshes differ in outline seen from the side (the YZ plane,
+    the view of a weapon in the hand): the area in one outline and not the
+    other, as a fraction of the first's area."""
+    import numpy as np
+
+    def tri_list(ob):
+        me = ob.data
+        me.calc_loop_triangles()
+        co = np.array([(v.co.y, v.co.z) for v in me.vertices])
+        return co[np.array([t.vertices[:] for t in me.loop_triangles])]
+    ta, tb = tri_list(a), tri_list(b)
+    both = np.concatenate([ta.reshape(-1, 2), tb.reshape(-1, 2)])
+    lo, hi = both.min(0), both.max(0)
+    scale = (px - 1) / max(hi - lo)
+
+    def mask(tris):
+        w, h = (np.ceil((hi - lo) * scale) + 2).astype(int)
+        m = np.zeros((h, w), bool)
+        for t in (tris - lo) * scale:
+            x0, y0 = np.floor(t.min(0)).astype(int)
+            x1, y1 = np.ceil(t.max(0)).astype(int) + 1
+            xs, ys = np.meshgrid(np.arange(x0, x1) + 0.5, np.arange(y0, y1) + 0.5)
+            d = (t[1, 0] - t[0, 0]) * (t[2, 1] - t[0, 1]) - (t[2, 0] - t[0, 0]) * (t[1, 1] - t[0, 1])
+            if abs(d) < 1e-9:
+                continue
+            u = ((xs - t[0, 0]) * (t[2, 1] - t[0, 1]) - (t[2, 0] - t[0, 0]) * (ys - t[0, 1])) / d
+            v = ((t[1, 0] - t[0, 0]) * (ys - t[0, 1]) - (xs - t[0, 0]) * (t[1, 1] - t[0, 1])) / d
+            m[y0:y1, x0:x1] |= (u >= 0) & (v >= 0) & (u + v <= 1)
+        return m
+    ma, mb = mask(ta), mask(tb)
+    return float((ma ^ mb).sum()) / max(float(ma.sum()), 1.0)

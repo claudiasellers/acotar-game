@@ -9,8 +9,10 @@ Contract (docs/contracts/monster_gear_models.md). Every file holds the mesh
 
 Weapons: the grip's centre is at the origin, the weapon runs up +Y and its
 cutting edge or striking face looks down -Z (the bows' axes, so one hand
-socket fits both). "<id>_worn" is the same weapon chipped and cracked, shown
-below 30% durability. Empties, children of "<id>": "<id>_tip" at the far end
+socket fits both). "<id>_worn" is the same weapon chipped, cracked, bitten at its
+leading edge and splinted or trailing its binding, shown below 30% durability;
+its outline differs from the clean one's by at least WORN_DELTA (the
+manifest's worn_delta). Empties, children of "<id>": "<id>_tip" at the far end
 (its distance is the manifest's reach_m) and "<id>_imbue" where a steep's
 glow hangs. The same file is the world drop: the manifest's rest_deg and
 rest_lift_m lay it on the ground.
@@ -46,6 +48,7 @@ for _f in MODULES:
     FAMILY_OF.update({k: getattr(_m, "FAMILY", {}).get(k, _f) for k in list(_m.WEAPONS) + list(_m.CAMP)})
 ALL = {**WEAPONS, **CAMP}
 POINTS = ("tip", "imbue", "loot", "fire", "rest", "cut")
+WORN_DELTA = 0.04
 
 
 def to_game(v):
@@ -90,9 +93,11 @@ def build(pid, lod=True):
     if weapon:
         w = Prop(pid + "_worn")
         ALL[pid](w, True)
+        G.wear(w, float(len(pid)))
         wo = w.to_object(pid + "_worn")
         objs.append(wo)
         row["tris_worn"] = K.mesh_tris(wo)
+        row["worn_delta"] = round(G.silhouette_delta(ob, wo), 3)
         blo, bhi = p.bounds()
         row["reach_m"] = round(Vector(row["tip"]).length, 3)
         row["length_m"] = round(bhi.z - blo.z, 3)
@@ -134,8 +139,8 @@ def main():
     if "--sheet" in args:
         sheet(args[args.index("--sheet") + 1], only)
         return
-    rows, over = [], []
-    print(f"  {'id':30s} {'lod0':>6s} {'lod1':>6s} {'worn':>6s} {'bytes':>8s} {'albedo':>6s}  size (x, y, z)")
+    rows, over, same = [], [], []
+    print(f"  {'id':30s} {'lod0':>6s} {'lod1':>6s} {'worn':>6s} {'delta':>6s} {'bytes':>8s} {'albedo':>6s}  size (x, y, z)")
     for pid in ALL:
         if only and pid not in only:
             continue
@@ -148,14 +153,19 @@ def main():
         K.export_glb(objs, path)
         nbytes = os.path.getsize(path)
         ext = [round(bhi.x - blo.x, 3), round(bhi.z - blo.z, 3), round(bhi.y - blo.y, 3)]
-        print(f"  {pid:30s} {n0:6d} {n1:6d} {row.get('tris_worn', 0):6d} {nbytes:8d} {alb:6.3f}  {ext}")
+        print(f"  {pid:30s} {n0:6d} {n1:6d} {row.get('tris_worn', 0):6d} {row.get('worn_delta', 0):6.3f} {nbytes:8d} {alb:6.3f}  {ext}")
         rows.append(dict(row, tris=n0, tris_lod1=n1, bytes=nbytes, size_m=ext))
         if max(n0, row.get("tris_worn", 0)) > U.MAX_PROP_TRIS or alb > U.ALBEDO_CAP + 0.005:
             over.append(pid)
+        if row.get("worn_delta", 1.0) < WORN_DELTA:
+            same.append(pid)
     if not only:
         U.write_manifest(os.path.join(OUT, "monster_gear_manifest.json"), rows)
     if over:
         print("OVER BUDGET:", ", ".join(over))
+    if same:
+        print("WORN TWIN TOO LIKE THE CLEAN ONE:", ", ".join(same))
+    if over or same:
         sys.exit(1)
 
 

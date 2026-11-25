@@ -24,7 +24,7 @@ model is at or under 3,000 triangles with a LOD1 at half.
 | Node | What |
 |---|---|
 | `<id>` | the weapon. The grip's centre is the origin, it runs up +Y, and its edge or striking face looks down -Z: the bows' axes, so one hand socket fits both |
-| `<id>_worn` | the same weapon chipped and cracked, in the same place. Hidden by default in the game's hands: show it instead of `<id>` below 30% durability |
+| `<id>_worn` | the same weapon near breaking, in the same place: chipped and cracked, a bite out of its leading edge, the haft splinted or the binding trailing, a step darker. Its outline from the side differs from the clean one's by at least 4% (the manifest's `worn_delta`; the build fails under that). Hidden by default in the game's hands: show it instead of `<id>` below 30% durability |
 | `<id>_lod1` | one merged mesh at half the triangles |
 | `<id>_tip` | empty at the far end. Its distance from the grip is the manifest's `reach_m` |
 | `<id>_imbue` | empty where a steep's glow hangs |

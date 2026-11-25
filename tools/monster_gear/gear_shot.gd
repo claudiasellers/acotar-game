@@ -1,14 +1,16 @@
 ## Monster weapons and camp gear lined up beside Feyre (1.7 m), in the game's
 ## own shading, so size and look can be judged (lane L88). Renders in the cloud:
-##   xvfb-run -a godot --path . res://tools/monster_gear/gear_shot.tscn -- <out_dir> <weapons|camp|hands> [family]
+##   xvfb-run -a godot --path . res://tools/monster_gear/gear_shot.tscn -- <out_dir> <weapons|camp|hands|tiles> [family]
 ## weapons: every weapon standing on its butt in a row, the worn one behind it.
 ## camp: the camp gear in a row. hands: one in her hand and one in a gloamer's.
+## tiles: one close-up per piece (tile_<id>.png), a weapon beside its worn twin.
 extends Node
 
 const SIZE := Vector2i(2880, 1620)
 const FEYRE := "res://characters/feyre/model/feyre_model.tscn"
 const GLOAMER := "res://creatures/models/fae/gloamer.gltf"
 const GEAR := "res://art/monster_gear/"
+const TILE := Vector2i(900, 900)
 const FOV := 33.0
 
 
@@ -30,6 +32,14 @@ func _run() -> void:
 	var lo := -0.5
 	var hi := 0.5
 	var top := 1.8
+	if mode == "tiles":
+		feyre.visible = false
+		get_tree().root.size = TILE
+		for row: Dictionary in rows:
+			if family == "" or row["family"] == family:
+				await _tile(row, cam, out)
+		get_tree().quit()
+		return
 	if mode == "hands":
 		await _hold(feyre, "RightHand", "wpn_gloamer_hookknife")
 		if ResourceLoader.exists(GLOAMER):
@@ -90,6 +100,53 @@ func _run() -> void:
 	img.convert(Image.FORMAT_RGB8)
 	img.save_png("%s/monster_gear_%s%s.png" % [out, mode, ("_" + family) if family != "" else ""])
 	get_tree().quit()
+
+
+## One piece alone, filling the frame: a weapon on its butt with its worn twin
+## on its right (the top 0.7 m of a long one), camp gear on the ground (or hung, if it hangs).
+func _tile(row: Dictionary, cam: Camera3D, out: String) -> void:
+	var id := String(row["id"])
+	var size: Array = row["size_m"]
+	var m := gear(id)
+	add_child(m)
+	var box := AABB(Vector3(-float(size[0]) * 0.5, 0.0, -float(size[2]) * 0.5), Vector3(float(size[0]), float(size[1]), float(size[2])))
+	var dir := Vector3(0.35, 0.3, -1.0)
+	if row["group"] == "weapon":
+		var body := m.find_child(id, true, false) as MeshInstance3D
+		var bb := body.get_aabb()
+		var butt := -bb.position.y
+		var high := bb.end.y
+		var cord := m.find_child(id + "_cord", true, false) as Node3D
+		if cord != null:
+			cord.rotation.x = PI
+			butt = 0.95
+		m.rotation.y = -PI * 0.5
+		m.position = Vector3(0.0, butt, 0.0)
+		var gap := maxf(float(size[2]) + 0.06, 0.1)
+		var worn := m.find_child(id + "_worn", true, false) as Node3D
+		worn.visible = true
+		worn.position = Vector3(0.0, 0.0, gap)  # the model's +Z is the stage's -X after the turn
+		var tall := butt + high
+		# a long weapon shows its working end: the pole below is in the row shots
+		var from := maxf(tall - 0.7, 0.0) if cord == null else 0.0
+		box = AABB(Vector3(-gap - float(size[2]) * 0.5, from, -0.05), Vector3(gap + float(size[2]), tall - from, 0.1))
+		dir = Vector3(0.0, 0.12, -1.0)
+	elif row.get("hangs", false):
+		m.position.y = float(size[1]) + 0.2
+		box.position.y = 0.2
+	var mid := box.get_center()
+	var dist := box.size.length() * 0.5 / tan(deg_to_rad(FOV * 0.5)) * (1.05 if row["group"] == "weapon" else 0.72)
+	cam.fov = FOV
+	cam.global_position = mid + dir.normalized() * dist
+	cam.look_at(mid)
+	for i in 6:
+		await get_tree().process_frame
+	await RenderingServer.frame_post_draw
+	var img := get_viewport().get_texture().get_image()
+	img.convert(Image.FORMAT_RGB8)
+	img.save_png("%s/tile_%s.png" % [out, id])
+	remove_child(m)
+	m.free()
 
 
 ## One gear model as the game shows it: the finish shader on, LOD1 and the worn
