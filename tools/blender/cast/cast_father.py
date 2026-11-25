@@ -486,7 +486,7 @@ SIT_SEAT = 0.42   # low fireside stool, m (warped space)
 
 def sit_carve_frame(phase, rig):
     import feyre_anims as fa
-    fr = fa.idle_frame(phase, still=0.5)
+    fr = fa.idle_frame(phase, still=0.5, lower=72.0)   # the lap pose below was set on this arm drop
     breath = math.sin(2.0 * math.pi * 2.0 * phase)
     hip_z = rig.rest["Hips"].translation.z
     fr.hips = V((0.0, 0.14, SIT_SEAT + 0.05 - hip_z + 0.002 * breath))

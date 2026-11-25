@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tools/playtest/opening_hunt_clip.gd" id="1"]
+
+[node name="OpeningHuntClip" type="Node"]
+script = ExtResource("1")

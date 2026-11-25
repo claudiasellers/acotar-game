@@ -26,7 +26,7 @@ func test_feyre_has_her_components_and_arrows() -> void:
 	assert_not_null(feyre.bow_controller)
 	assert_not_null(feyre.body_state)
 	assert_not_null(feyre.element_state)
-	assert_eq(feyre.quiver, feyre.starting_arrows)
+	assert_eq(feyre.quiver, 12, "a test hill has no phase row: the plain dozen")
 	assert_eq(Gameplay.wardrobe.equipped_in(&"top"), &"hunter_tunic")
 
 
@@ -62,11 +62,9 @@ func test_release_uses_a_wood_arrow_never_the_ash_by_fallback() -> void:
 	Gameplay.inventory.remove(&"arrow_wood", 100)
 	Gameplay.inventory.add(&"arrow_ash")
 	feyre.bow_controller.selected = &"arrow_wood"
-	feyre.bow_controller.update_bow(0.5, true, true)
-	assert_false(feyre.bow_controller.is_drawing, "won't draw the ash arrow unless chosen")
+	assert_null(feyre.bow_controller.release(), "won't loose the ash arrow unless chosen")
 	feyre.bow_controller.cycle_arrow()
 	assert_eq(feyre.bow_controller.selected, &"arrow_ash")
-	feyre.bow_controller.update_bow(0.5, true, true)
 	var arrow := feyre.bow_controller.release()
 	assert_not_null(arrow)
 	assert_eq(arrow.arrow_id, &"ash")
@@ -93,16 +91,6 @@ func test_arrows_break_on_stone_by_chance() -> void:
 	assert_eq(broke.size(), 1)
 	assert_false(is_instance_valid(a))
 	assert_true(b.stuck)
-
-
-func test_focus_slows_time_until_stamina_runs_out() -> void:
-	feyre.bow_controller.update_bow(0.5, true, false)
-	assert_eq(Engine.time_scale, 1.0, "raising the bow alone leaves time alone")
-	feyre.bow_controller.update_bow(0.1, true, false, true)
-	assert_eq(Engine.time_scale, feyre.bow_controller.tuning.focus_scale)
-	feyre.stamina = 0.0
-	feyre.bow_controller.update_bow(0.1, true, false, true)
-	assert_eq(Engine.time_scale, 1.0)
 
 
 func test_wardrobe_station_opens_the_dressing_room() -> void:
@@ -268,8 +256,9 @@ func test_nearest_find_glints_and_names_itself() -> void:
 	assert_false(focus.focus.is_empty(), "something glints nearby")
 	assert_true((focus._glint.draw_pass_1.surface_get_material(0) as ShaderMaterial) != null, "soft star glints, not plain quads")
 	assert_true(focus._glint.get_node(^"GroundGlow").visible, "a glow on the ground under it")
-	assert_true(focus._card.visible, "a pick card shows in reach")
-	assert_string_contains(focus._card.text(), "pick")
+	var offer := UsePrompt.of(get_tree()).offered()
+	assert_false(offer.is_empty(), "the use prompt offers the pick in reach")
+	assert_string_contains(String(offer[0]) if not offer.is_empty() else "", "pick")
 	var id: StringName = focus.focus.id
 	var before := Gameplay.inventory.count(id)
 	assert_true(feyre.interactor.interact())

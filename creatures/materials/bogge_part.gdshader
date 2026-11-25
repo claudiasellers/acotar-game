@@ -26,6 +26,9 @@ uniform vec3 edge_color : source_color = vec3(0.6, 0.72, 0.85);
 uniform float edge_glow : hint_range(0.0, 2.0) = 0.35;
 
 instance uniform float presence : hint_range(0.0, 1.0) = 1.0;
+// The eye's light and the edge's shine. 0 until the Bogge's code raises it
+// (night, or once the glamour has lifted): no world emissives by day.
+instance uniform float eye_glow = 0.0;
 
 varying vec3 at;
 
@@ -57,7 +60,10 @@ void fragment() {
 	}
 	float edge = 1.0 - smoothstep(0.0, 0.35, there);
 	vec3 orm = texture(orm_tex, UV).rgb;
-	ALBEDO = mix(texture(albedo_tex, UV).rgb, edge_color * 0.6, edge * 0.7);
+	float rim = candy_fresnel(NORMAL, VIEW, rim_power);
+	// the rim and the rimed edge are lit, not glowing: nothing here shines by day
+	vec3 base = mix(texture(albedo_tex, UV).rgb, edge_color * 0.6, edge * 0.7);
+	ALBEDO = mix(base, rim_color, clamp(rim * rim_amount * 0.35 * orm.r, 0.0, 1.0));
 	ROUGHNESS = mix(clamp(orm.g, 0.03, 1.0), 0.8, edge);
 	METALLIC = orm.b;
 	SPECULAR = specular;
@@ -65,6 +71,5 @@ void fragment() {
 	AO_LIGHT_AFFECT = 0.35;
 	NORMAL_MAP = texture(normal_tex, UV).rgb;
 	NORMAL_MAP_DEPTH = normal_depth;
-	float rim = candy_fresnel(NORMAL, VIEW, rim_power);
-	EMISSION = rim_color * rim * rim_amount * 0.35 * orm.r + texture(emit_tex, UV).rgb * emit_base + edge_color * edge * edge_glow;
+	EMISSION = (texture(emit_tex, UV).rgb * emit_base + edge_color * edge * edge_glow) * eye_glow;
 }

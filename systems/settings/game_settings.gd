@@ -13,6 +13,7 @@ const SECTIONS := {
 	&"mouse_steers": "camera",
 	&"gentle_mode": "play", &"reduced_effects": "play",
 	&"hud_mode": "play", &"edge_fx": "play", &"hit_marks": "play", &"key_hints": "play",
+	&"soft_aim": "play", &"hit_stop": "play", &"break_free_hold": "play",
 	&"music_volume": "audio", &"sound_volume": "audio",
 	&"text_size": "ui",
 }
@@ -28,6 +29,10 @@ const DEFAULTS := {
 	&"hud_mode": 1, &"edge_fx": 0, &"hit_marks": true,
 	## Key prompts that teach a key the first time it matters (KeyPrompts).
 	&"key_hints": true,
+	## Bow and fights (health-interactions §3.5, bow design §11): SOFT_AIM_LEVELS
+	## index (the pad's aim pull), HIT_STOP_LEVELS index, and whether a grab is
+	## broken by holding the key instead of pressing it over and over.
+	&"soft_aim": 1, &"hit_stop": 0, &"break_free_hold": false,
 	&"music_volume": 0.8, &"sound_volume": 0.8,
 	&"text_size": 1,
 }
@@ -44,6 +49,8 @@ const SENSITIVITY_MIN := 0.25
 const SENSITIVITY_MAX := 2.5
 const HUD_MODES: Array[String] = ["Auto", "Always", "Off"]
 const EDGE_FX_LEVELS: Array[String] = ["Full", "Soft", "Off"]
+const SOFT_AIM_LEVELS: Array[String] = ["Off", "Light", "Strong"]
+const HIT_STOP_LEVELS: Array[String] = ["Full", "Half", "Off"]
 const TEXT_SIZES: Array[String] = ["Small", "Medium", "Large", "Largest"]
 const TEXT_SCALES: Array[float] = [0.9, 1.0, 1.15, 1.3]
 const MUSIC_BUS := &"Music"
@@ -73,6 +80,9 @@ var gentle_mode: bool:
 	get: return bool(get_value(&"gentle_mode"))
 var reduced_effects: bool:
 	get: return bool(get_value(&"reduced_effects"))
+## Whether a grab is broken by holding: her own choice, or Gentle Mode's.
+var break_free_hold: bool:
+	get: return bool(get_value(&"break_free_hold")) or gentle_mode
 
 
 func _ready() -> void:

@@ -58,6 +58,23 @@ enum BodyPlan { QUADRUPED, BIRD }
 @export var lethal_delay: float = 0.0
 ## When true only a lethal arrow can kill; anything else wounds it and drives it off.
 @export var only_lethal_kills: bool = false
+## Lethal-arrow hits it takes before the lethal arrow opens its mortal wound
+## (Creature.resolve_hit): 1 for most fae, 2 or 3 for the big ones.
+@export var ash_hits: int = 1
+## Its weak spot (throat, eye, heart-knot) as a height band: a hit at or above
+## this fraction of body_height counts weak_zone_mult times. 0: no weak spot.
+@export var weak_zone_height: float = 0.0
+@export var weak_zone_mult: float = 3.0
+## What story beats and sound call the weak spot (EventBus.creature_hit part).
+@export var weak_zone_name: StringName = &"weak"
+
+@export_group("Fire")
+## Health lost per second while it burns (a fire arrow, or burning ground under
+## it). 0: fire never takes hold on it.
+@export var burn_dps: float = 0.0
+## Burning ground within this many metres sends it away from the fire. 0: it
+## doesn't fear fire.
+@export var fire_fear_radius: float = 3.0
 
 @export_group("Tracks")
 ## Prints and twigs belong to the winter forest; spring creatures leave none.

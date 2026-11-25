@@ -4,6 +4,9 @@
 class_name FeyreBreath
 extends GPUParticles3D
 
+## How solid a fresh puff is (docs/tuning.md, Feyre's breath); it fades to 0.
+const PUFF_ALPHA := 0.35
+
 var _body_state: BodyState
 var _phase: float = 0.0
 
@@ -24,7 +27,7 @@ func _init(body_state: BodyState) -> void:
 	mat.scale_min = 0.6
 	mat.scale_max = 1.4
 	var grad := Gradient.new()
-	grad.set_color(0, Color(1, 1, 1, 0.35))
+	grad.set_color(0, Color(1, 1, 1, PUFF_ALPHA))
 	grad.set_color(1, Color(1, 1, 1, 0))
 	var ramp := GradientTexture1D.new()
 	ramp.gradient = grad
@@ -37,6 +40,17 @@ func _init(body_state: BodyState) -> void:
 	pm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	pm.vertex_color_use_as_albedo = true
 	pm.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	pm.albedo_color = Color(0.85, 0.85, 0.87)
+	# A soft round puff, so each one reads as vapour, not a square.
+	var soft := Gradient.new()
+	soft.set_color(0, Color(1, 1, 1, 1))
+	soft.set_color(1, Color(1, 1, 1, 0))
+	var vapour := GradientTexture2D.new()
+	vapour.gradient = soft
+	vapour.fill = GradientTexture2D.FILL_RADIAL
+	vapour.fill_from = Vector2(0.5, 0.5)
+	vapour.fill_to = Vector2(0.5, 0.0)
+	pm.albedo_texture = vapour
 	puff.material = pm
 	draw_pass_1 = puff
 

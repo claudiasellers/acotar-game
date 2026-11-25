@@ -24,6 +24,16 @@ const ONCE_WINDOW_MS := 1500
 ## Voice files the dialogue lane plays (systems/dialogue): res://audio/voice/<line_id>.ogg.
 const VOICE_PATH := "res://audio/voice/%s.ogg"
 const VOICE_DUCK_DB := -7.0
+## The beds' own bus (it sends to Sound). The Focus hush is two effects on it:
+## an amplify that drops and a low-pass that closes (bow design §5.3).
+const AMBIENCE_BUS := &"Ambience"
+## Wind-up sounds by family (health-interactions §3.5 items 4, 5, 13): played
+## where the tell starts, so a coil from behind is heard behind her. They go on
+## the Sound bus like every cue (GameSettings); the WindUp bus and its Ambience
+## sidechain come with the audio request.
+const WINDUP_CUES := {&"naga": &"naga_hiss"}
+const HUSH_OPEN_HZ := 20000.0
+const HUSH_CLOSED_HZ := 800.0
 
 ## The live director, for SoundDirector.cue() calls from other lanes.
 static var current: SoundDirector = null
@@ -41,6 +51,11 @@ var _feyre: Feyre
 var _feet: AudioStreamPlayer3D
 var _draw: AudioStreamPlayer3D
 var _was_drawing: bool = false
+var _creak: AudioStreamPlayer3D
+var _heart: AudioStreamPlayer
+var _hush_tween: Tween
+## 0 open, 1 fully hushed (the Ambience bus effects follow it).
+var hush: float = 0.0
 var _last_pos: Vector3 = Vector3.INF
 var _cadence := FootstepCadence.new()
 var _beds: Array[AudioStreamPlayer] = []
@@ -80,8 +95,10 @@ func _ready() -> void:
 	current = self
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	bank = load(BANK_PATH) as SoundBank
+	_ensure_ambience_bus()
 	for i in 2:
 		_beds.append(_make_player(false))
+		_beds[i].bus = AMBIENCE_BUS
 		_music.append(_make_player(true))
 	_dread_bed = _make_player(false)
 	_start_loop(_dread_bed, &"amb_dread")
@@ -91,6 +108,7 @@ func _ready() -> void:
 	EventBus.mood_requested.connect(_on_mood)
 	EventBus.story_actor_cue.connect(_on_actor_cue)
 	EventBus.creature_hit.connect(_on_creature_hit)
+	EventBus.hostile_windup.connect(_on_hostile_windup)
 	EventBus.creature_killed.connect(_on_creature_killed)
 	EventBus.celebration_requested.connect(_on_celebration)
 	EventBus.journal_entry_added.connect(_on_journal_entry)
@@ -315,11 +333,26 @@ func _in_interior(point: Vector3) -> bool:
 
 func _on_mood(mood: StringName, intensity: float, seconds: float) -> void:
 	var target := clampf(intensity, 0.0, 1.0) if mood == &"dread" else 0.0
-	if mood == &"dread" and dread < 0.5 and target >= 0.5 and _spaces.is_empty():
+	if mood == &"dread" and dread < 0.5 and target >= 0.5 and not _scene_running():
 		play(&"horror_wrong")
 	_set_dread(target, seconds)
 	if target < 0.3:
 		_stop_loop(&"beast_heartbeat", 3.0)
+
+
+## True while a story scene that takes control is running. A background moment
+## (the hall marks, the manor map: they wait on deeds all act and hold nothing)
+## is not a scene. A space with no live node to ask counts, as a film does.
+func _scene_running() -> bool:
+	var holders := StoryControl.holders()
+	for id in _spaces:
+		var ref: WeakRef = _spaces[id]
+		if ref == null:
+			return true
+		var n := ref.get_ref() as Object
+		if n != null and holders.has(n):
+			return true
+	return false
 
 
 func _on_space_started(space_id: StringName) -> void:
@@ -382,7 +415,20 @@ func _attach_feyre(feyre: Feyre) -> void:
 	_draw = AudioStreamPlayer3D.new()
 	_draw.unit_size = 4.0
 	feyre.add_child(_draw)
+	_creak = AudioStreamPlayer3D.new()
+	_creak.unit_size = 4.0
+	feyre.add_child(_creak)
+	_heart = AudioStreamPlayer.new()
+	_heart.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(_heart)
 	feyre.arrow_fired.connect(_on_arrow_fired)
+	var bow := feyre.bow_controller
+	if bow:
+		bow.nocked.connect(func(_item: StringName) -> void: play(&"bow_nock", feyre.global_position))
+		bow.let_down.connect(func() -> void: play(&"bow_let_down", feyre.global_position))
+		bow.quiver_empty.connect(func() -> void: play(&"bow_empty", feyre.global_position))
+		bow.arrow_type_changed.connect(_on_arrow_type)
+		bow.focus_changed.connect(_on_focus)
 	feyre.jump_motor.jumped.connect(func(_i: int) -> void: play(&"foot_jump", feyre.global_position))
 	feyre.jump_motor.landed.connect(_on_landed)
 
@@ -419,11 +465,76 @@ func _update_bow() -> void:
 	elif not drawing and _was_drawing:
 		_draw.stop()
 	_was_drawing = drawing
+	# The string creaks for as long as she holds it at full draw, and climbs
+	# in pitch as her arm tires.
+	var bow := _feyre.bow_controller
+	var holding := drawing and bow != null and bow.draw_amount >= 1.0
+	if holding and not _creak.playing:
+		_loop_on(_creak, &"bow_creak")
+	elif not holding and _creak.playing:
+		_creak.stop()
+	if holding:
+		_creak.pitch_scale = 1.0 + 0.25 * bow.fatigue()
+
+
+func _loop_on(player: Node, cue_id: StringName) -> void:
+	var c := bank.cue(cue_id)
+	if c == null:
+		return
+	player.set(&"stream", c.pick())
+	player.set(&"volume_db", c.volume_db)
+	player.call(&"play")
+	played[cue_id] = int(played.get(cue_id, 0)) + 1
+
+
+## Each arrow type has a short sound of its own, so what is nocked is heard.
+func _on_arrow_type(item_id: StringName) -> void:
+	play(StringName("arrow_select_%s" % String(item_id).trim_prefix("arrow_")))
+
+
+## Focus: an inhale, her heartbeat for as long as she holds, an exhale; and
+## the world's beds drop away behind a low-pass (the hush).
+func _on_focus(focused: bool) -> void:
+	play(&"bow_focus_in" if focused else &"bow_focus_out")
+	if focused:
+		_loop_on(_heart, &"bow_heartbeat")
+	else:
+		_heart.stop()
+	var tuning: BowTuning = _feyre.bow_controller.tuning if is_instance_valid(_feyre) and _feyre.bow_controller else null
+	if _hush_tween:
+		_hush_tween.kill()
+	_hush_tween = create_tween()
+	_hush_tween.set_ignore_time_scale(true)
+	_hush_tween.tween_method(func(v: float) -> void: _set_hush(v, tuning.hush_duck_db if tuning else -12.0),
+		hush, 1.0 if focused else 0.0, tuning.hush_fade_s if tuning else 0.12)
+
+
+func _set_hush(amount: float, duck_db: float) -> void:
+	hush = amount
+	var bus := AudioServer.get_bus_index(AMBIENCE_BUS)
+	if bus == -1:
+		return
+	(AudioServer.get_bus_effect(bus, 0) as AudioEffectAmplify).volume_db = duck_db * amount
+	(AudioServer.get_bus_effect(bus, 1) as AudioEffectLowPassFilter).cutoff_hz = \
+		exp(lerpf(log(HUSH_OPEN_HZ), log(HUSH_CLOSED_HZ), amount))
+
+
+func _ensure_ambience_bus() -> void:
+	if AudioServer.get_bus_index(AMBIENCE_BUS) != -1:
+		return
+	AudioServer.add_bus()
+	var bus := AudioServer.bus_count - 1
+	AudioServer.set_bus_name(bus, AMBIENCE_BUS)
+	AudioServer.set_bus_send(bus, GameSettings.SOUND_BUS if AudioServer.get_bus_index(GameSettings.SOUND_BUS) != -1 else &"Master")
+	AudioServer.add_bus_effect(bus, AudioEffectAmplify.new(), 0)
+	var low := AudioEffectLowPassFilter.new()
+	low.cutoff_hz = HUSH_OPEN_HZ
+	AudioServer.add_bus_effect(bus, low, 1)
 
 
 func _on_arrow_fired(arrow: Arrow) -> void:
 	var at := _feyre.global_position
-	play(&"bow_release", at)
+	play(release_cue(arrow, _feyre.bow_controller.bow if _feyre.bow_controller else null, bank), at)
 	var whoosh := play(&"bow_whoosh", at) as AudioStreamPlayer3D
 	if whoosh and is_instance_valid(arrow):
 		whoosh.reparent(arrow, false)
@@ -436,9 +547,20 @@ func _on_arrow_hit(collider: Node, at: Vector3) -> void:
 	play(arrow_hit_cue(collider, surface), at)
 
 
-## Which impact an arrow makes: flesh on a creature, wood on static bodies
-## (trees, posts, walls), otherwise the ground.
+## Which release is heard: the ash arrow's own, else the bow's own if it has
+## one, else the hunting bow's.
+static func release_cue(arrow: Arrow, bow: BowData, sounds: SoundBank) -> StringName:
+	if arrow and arrow.arrow_id == &"ash":
+		return &"bow_release_ash"
+	var own := StringName("bow_release_%s" % bow.id) if bow else &""
+	return own if own != &"" and sounds and sounds.cue(own) else &"bow_release"
+
+
+## Which impact an arrow makes: flesh on a creature, a clatter on stone, wood
+## on other static bodies (trees, posts, walls), otherwise the ground.
 static func arrow_hit_cue(collider: Node, ground_surface: StringName) -> StringName:
+	if Arrow.is_stone(collider):
+		return &"bow_hit_stone"
 	var n := collider
 	while n:
 		if n is Creature or n.is_in_group(&"creature"):
@@ -567,6 +689,13 @@ func _on_creature_hit(id: StringName, kind: StringName, _cause: StringName, _par
 		# Canon: he faces her with a low growl, and the snow begins falling again.
 		_later(0.8, func() -> void: play(&"wolf_growl_low", _kind_position(kind)))
 		_set_dread(minf(dread, 0.45), 3.0)
+
+
+func _on_hostile_windup(_id: StringName, kind: StringName, _attack: StringName, at: Vector3, _seconds: float) -> void:
+	var cue_id: StringName = WINDUP_CUES.get(kind, &"")
+	if cue_id == &"":
+		return
+	play(cue_id, at)
 
 
 func _on_creature_killed(_id: StringName, kind: StringName, _cause: StringName, at: Vector3) -> void:

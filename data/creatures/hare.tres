@@ -24,6 +24,7 @@ max_health = 4.0
 arrow_damage = 8.0
 follow_leash_m = 60.0
 leash_wounded_only = true
+lost_cue = &"hare_lost"
 stride = 0.5
 print_size = 0.05
 twig_chance = 0.02

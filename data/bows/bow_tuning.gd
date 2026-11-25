@@ -7,8 +7,13 @@ extends Resource
 @export_group("Shot cycle")
 ## After a shot, seconds before the next draw can start (the bow stays raised).
 @export var follow_through_s: float = 0.25
-## A release this close to full draw still looses, at full draw.
-@export var release_buffer_s: float = 0.15
+## The share of the bow's speed an arrow leaves at with no draw at all; a full
+## draw is 1.0 and the rest lies between.
+@export var min_power: float = 0.35
+## A shot let go under this much draw counts as short (her one thought about it).
+@export var short_draw: float = 0.5
+## The bow stays in her hands this long after the last shot or the last hold.
+@export var stay_up_s: float = 1.6
 ## A shot's recoil leaves the aim at least this unsettled (0..1).
 @export var settle_after_shot: float = 0.7
 
@@ -26,6 +31,8 @@ extends Resource
 @export var fatigue_max: float = 2.0
 ## Stamina per second while the trembling arm lasts.
 @export var hold_drain: float = 6.0
+## Sway without aim held (shooting from the hip), against 1.0 with it.
+@export var hip_sway: float = 1.3
 @export var stance_still: float = 1.0
 @export var stance_crouched: float = 0.8
 @export var stance_walking: float = 1.6
@@ -54,6 +61,20 @@ extends Resource
 @export_group("Reticle")
 ## The ring is this much larger while the aim is fully unsettled.
 @export var ring_unsettled_grow: float = 0.3
+
+@export_group("Feedback")
+## The share of her draw she keeps when a blow lands on her.
+@export var draw_kept_when_hit: float = 0.5
+## The share of her draw she keeps through a sidestep.
+@export var draw_kept_when_sidestepping: float = 0.5
+## The ring's draw arc: how far outside the ring it sits (px) and how long the
+## catch at full draw and the pulse on a creature hit last (real seconds).
+@export var draw_arc_gap: float = 5.0
+@export var full_draw_catch_s: float = 0.18
+@export var hit_pulse_s: float = 0.22
+## The Focus hush on the Ambience bus (dB), and how fast it comes and goes.
+@export var hush_duck_db: float = -12.0
+@export var hush_fade_s: float = 0.12
 
 @export_group("Camera")
 ## Mouse and stick look speed while the bow is raised.

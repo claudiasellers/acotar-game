@@ -5,6 +5,7 @@ class_name QuiverCard
 extends Node
 
 const SHOW_SECONDS := 2.2
+const GREW_LINE := "A bigger quiver. It holds %d arrows."
 
 var controller: BowController
 var text: String = ""
@@ -28,26 +29,59 @@ func _ready() -> void:
 	_panel.visible = false
 	if controller:
 		controller.arrow_type_changed.connect(func(_id: StringName) -> void: show_card())
+		controller.craft_failed.connect(_on_craft_failed)
+		controller.bow_shown.connect(func(bow: BowData) -> void: say(bow.display_name))
+	Gameplay.listen(&"story_item_granted", _on_granted)
+	Gameplay.inventory.quiver_grew.connect(_on_quiver_grew)
 
 
-func show_card() -> void:
-	text = describe()
+## An arrow the story hands her (the hunt's one given back) is named as it
+## lands, so her count never changes with nothing to show why.
+func _on_granted(item_id: StringName, _count: int) -> void:
+	if String(item_id).begins_with("arrow_"):
+		show_card.call_deferred(item_id)
+
+
+## A bigger quiver is something she got, so the pickup log says it.
+func _on_quiver_grew(arrows: int) -> void:
+	PickupLog.of(get_tree()).note(GREW_LINE % arrows)
+
+
+## A press that made nothing still answers: what the arrow is short of.
+func _on_craft_failed(item_id: StringName, why: String) -> void:
+	say("%s: %s" % [_arrow_name(item_id), why])
+
+
+## Shows the nocked arrow and its count, or those of `item_id` when given.
+func show_card(item_id: StringName = &"") -> void:
+	say(describe(item_id))
+
+
+## Shows a line on the card for a moment.
+func say(line: String) -> void:
+	text = line
 	_label.text = text
 	_left = SHOW_SECONDS
 	_panel.visible = true
 	_panel.modulate.a = 1.0
 
 
-## "Wood arrow  ×12", or "No arrows".
-func describe() -> String:
+## "Wood arrow  ×2 · 3 of 10" (that arrow's count, then all her arrows of
+## what the quiver holds), or "No arrows".
+func describe(item_id: StringName = &"") -> String:
 	if controller == null:
 		return ""
-	var id := controller._available()
+	var id := item_id if item_id != &"" else controller._available()
 	if id == &"":
 		return "No arrows"
+	var inv := Gameplay.inventory
+	return "%s  ×%d · %d of %d" % [_arrow_name(id), inv.arrow_count(id), inv.arrow_count(),
+			int(inv.capacity(Inventory.QUIVER))]
+
+
+func _arrow_name(id: StringName) -> String:
 	var data: ArrowData = BowController.arrow_data().get(id)
-	var label := data.display_name if data else String(id)
-	return "%s  ×%d" % [label, Gameplay.inventory.arrow_count(id)]
+	return data.display_name if data else String(id).trim_prefix("arrow_").capitalize() + " arrow"
 
 
 func _process(delta: float) -> void:

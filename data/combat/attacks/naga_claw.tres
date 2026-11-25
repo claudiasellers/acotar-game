@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AttackData" format=3]
+
+[ext_resource type="Script" path="res://systems/vitals/attack_data.gd" id="1_nb0ra"]
+
+[resource]
+script = ExtResource("1_nb0ra")
+id = &"naga_claw"
+family = &"naga"
+is_default = true
+damage = 22.0
+damage_kind = &"claw"
+reaction = &"medium"
+knockback_m = 2.0
+dread_spike = 0.15
+windup_s = 0.55

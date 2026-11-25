@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StationUse" format=3 uid="uid://dl2vpyltoha1b"]
+
+[ext_resource type="Script" path="res://systems/interaction/station_use.gd" id="1_use"]
+
+[resource]
+script = ExtResource("1_use")
+station_id = &"armory_rack"
+verb = "take arrows"
+kind = "arrows"
+lines = PackedStringArray("Good yew. Better arrows than I could ever afford.")
+alt_lines = PackedStringArray("Ten arrows. That's all I need.")
+item_id = &"arrow_wood"
+fill_to = 10
+canon = "X"

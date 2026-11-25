@@ -142,6 +142,7 @@ def add_clips(arm):
         bpy.data.actions.remove(a)
     g = stroll()
     rig = fa.Rig(arm)
+    fa.ARM_CLEAR = getattr(C, "ARM_CLEAR", 0.0)
     clips = [("idle", [fa.idle_frame(f / fa.IDLE_FRAMES) for f in range(fa.IDLE_FRAMES)], True, 0.0),
              ("walk", [fa.gait_frame(g, f / g.frames) for f in range(g.frames)], True, g.speed),
              ("talk", [talk_frame(f / 120) for f in range(120)], True, None),

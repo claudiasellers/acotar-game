@@ -6,12 +6,21 @@ class_name VitalsEdgeFx
 extends ColorRect
 
 const SHADER := preload("res://ui/hud/vitals/edge_fx.gdshader")
-const EASED: Array[StringName] = [&"dread", &"low_health", &"venom", &"cold", &"fae", &"ease", &"heal"]
+const GROUP := &"vitals_edge_fx"
+## The unseen-attack beat: how solid it is at its peak, how fast it beats
+## (radians a second), and how strong it starts before rising to full.
+const WARN_OPACITY := 0.85
+const WARN_RATE := 11.0
+const WARN_START := 0.4
+const EASED: Array[StringName] = [&"dread", &"low_health", &"venom", &"cold", &"fae", &"ease", &"heal", &"hidden"]
 
 ## uniform -> wanted value.
 var target: Dictionary = {}
 var _now: Dictionary = {}
 var _mat: ShaderMaterial
+## Seconds left of the unseen-attack beat, and the seconds it was given.
+var _warn_left: float = 0.0
+var _warn_for: float = 1.0
 
 
 func _init() -> void:
@@ -20,6 +29,11 @@ func _init() -> void:
 	_mat = ShaderMaterial.new()
 	_mat.shader = SHADER
 	material = _mat
+	add_to_group(GROUP)
+	_mat.set_shader_parameter(&"warn_opacity", WARN_OPACITY)
+	_mat.set_shader_parameter(&"warn_rate", WARN_RATE)
+	var paper := JournalTheme.color(&"paper")
+	_mat.set_shader_parameter(&"paper_color", Vector3(paper.r, paper.g, paper.b))
 
 
 func set_strength(value: float) -> void:
@@ -31,7 +45,23 @@ func set_frost_human(human: bool) -> void:
 	_mat.set_shader_parameter(&"frost_color", Vector3(c.r, c.g, c.b))
 
 
+## An attack she cannot see is winding up: the edge on that side beats until
+## it lands. `side` runs -1 (hard left) to 1 (hard right), 0 is behind her.
+## `seconds` of 0 calls it off. Follows the hit marks setting, like the bruise
+## it warns of.
+static func warn(tree: SceneTree, side: float, seconds: float) -> void:
+	if not bool(GameSettings.get_value(&"hit_marks")):
+		return
+	for fx: VitalsEdgeFx in tree.get_nodes_in_group(GROUP):
+		fx._warn_for = maxf(seconds, 0.05)
+		fx._warn_left = maxf(seconds, 0.0)
+		fx._mat.set_shader_parameter(&"warn_side", clampf(side, -1.0, 1.0))
+
+
 func _process(delta: float) -> void:
+	_warn_left = maxf(_warn_left - delta, 0.0)
+	# Rises as the blow nears.
+	target[&"warn"] = lerpf(1.0, WARN_START, _warn_left / _warn_for) if _warn_left > 0.0 else 0.0
 	var view := get_viewport_rect().size
 	_mat.set_shader_parameter(&"aspect", view.x / maxf(view.y, 1.0))
 	for key: StringName in target:

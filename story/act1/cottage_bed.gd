@@ -25,28 +25,19 @@ func use(user: Node) -> void:
 		sleep()
 
 
+## Through the one sleep fade (SleepFade): the Clock jumps to night while it
+## is dark, and the sleep rests her (VitalsState.rest; a day's sleep in the
+## cold cottage, so not Well rested).
 func sleep() -> void:
 	sleeping = true
-	StoryControl.hold(self, StoryControl.Mode.NONE)
-	var layer := CanvasLayer.new()
-	layer.layer = UiLayers.VEIL
-	var veil := ColorRect.new()
-	veil.color = Color(0.03, 0.02, 0.05)
-	veil.set_anchors_preset(Control.PRESET_FULL_RECT)
-	veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	veil.modulate.a = 0.0
-	layer.add_child(veil)
-	get_tree().root.add_child(layer)
-	var tween := layer.create_tween()
-	tween.tween_property(veil, ^"modulate:a", 1.0, fade_seconds)
-	tween.tween_callback(skip_to_night)
-	tween.tween_interval(hold_seconds)
-	tween.tween_property(veil, ^"modulate:a", 0.0, fade_seconds * 1.4)
-	tween.tween_callback(func() -> void:
-		layer.queue_free()
-		StoryControl.release(self)
+	var at_dark := func() -> void:
+		skip_to_night()
+		var vitals := Vitals.of(get_tree().get_first_node_in_group(&"player"))
+		if vitals:
+			vitals.rest(false)
+	var woke := func() -> void:
 		sleeping = false
-		SaveSystem.autosave())
+	SleepFade.run(self, at_dark, woke, fade_seconds, hold_seconds)
 
 
 ## Advances the Clock (so day_started and everything time-driven still fire).

@@ -74,9 +74,17 @@ func test_a_lost_ash_arrow_comes_back_once() -> void:
 	assert_eq(granted, [], "not while one is stuck in the world to pick up")
 	wolf.ash_struck = true
 	stuck.remove_from_group(Arrow.STUCK_GROUP)
+	var plain := Gameplay.inventory.count(&"arrow_wood")
+	Gameplay.inventory.add(&"arrow_wood", 1)
 	for i in 10:
 		wolf._physics_process(0.5)
-	assert_eq(granted, [], "not once the ash arrow has done its work")
+	assert_eq(granted, [], "not once the ash arrow has done its work and she has one for his eye")
+	# Three arrows is all she carries: with none left anywhere, one plain one.
+	Gameplay.inventory.remove(&"arrow_wood", Gameplay.inventory.count(&"arrow_wood"))
+	for i in 9:
+		wolf._physics_process(0.5)
+	assert_eq(granted, [[&"arrow_wood", 1]], "the hunt can always end")
+	Gameplay.inventory.add(&"arrow_wood", plain)
 
 
 func test_the_knife_press_does_not_use_the_bed() -> void:
@@ -95,7 +103,8 @@ func test_the_knife_press_does_not_use_the_bed() -> void:
 		guard += 1
 	assert_true(door.current_beat_label().begins_with("decision"), "at the window")
 	assert_false(StoryControl.can_interact(), "E doesn't reach the stations")
-	assert_true(StoryControl.can_shoot(), "the bracelets (fire) still can")
+	assert_true(StoryControl.allowed_actions.has("fire"), "the bracelets (fire) still can")
+	assert_false(StoryControl.can_shoot(), "and the button is never the bow")
 	var press := InputEventAction.new()
 	press.action = &"interact"
 	press.pressed = true

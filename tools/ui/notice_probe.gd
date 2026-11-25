@@ -1,7 +1,7 @@
 ## Saves one frame of each notice and key prompt over the brightest ground the
 ## act has (noon snow, a Spring path at noon), with Feyre in the follow camera
 ## and the in-play HUD: a find, a rare find, a note, a chapter heading, the
-## press prompt, the beast's row of keys, the quiver card, the pickup log and the paint tin.
+## press prompt, the use prompt, the beast's row of keys, the quiver card, the pickup log and the paint tin.
 ##   xvfb-run -a -s "-screen 0 1920x1080x24" godot --audio-driver Dummy --path . \
 ##     res://tools/ui/notice_probe.tscn -- <dir> [phase]
 ## (A scene, not a -s script, so the autoloads exist.)
@@ -72,9 +72,12 @@ func _go() -> void:
 		"note": func() -> void: PickupLog.of(tree).note("Two more flowers for a crown."),
 		"heading": func() -> void: ChapterHeading.show(tree, "The Wolf in the Snow"),
 		"prompt": func() -> void: press.show_text("step in"),
-		"prompt_row": func() -> void:
+		"use": func() -> void:
 			press.show_text("")
-			keys.says(KeyPrompts.row(&"beast")),
+			UsePrompt.of(tree).offer(feyre, "ride"),
+		"prompt_row": func() -> void:
+			UsePrompt.of(tree).offer(feyre, "")
+			keys.says(KeyHints.row(&"beast")),
 		"quiver": func() -> void:
 			keys.clear()
 			feyre.bow_controller.quiver_card.show_card(),
@@ -89,6 +92,12 @@ func _go() -> void:
 			for tag: StringName in VITALS_SHOWN:
 				v.apply_status(&"probe", tag, 0.6, 40.0)
 			v.health_changed.emit(v.health, VitalsState.MAX_HEALTH, -1.0, &"probe"),
+		"hidden": func() -> void: feyre.crouch.set_crouched(true),
+		"hidden_full": func() -> void: pass,
+		"warn_left": func() -> void:
+			feyre.crouch.set_crouched(false)
+			VitalsEdgeFx.warn(tree, -1.0, CATCH_SECONDS + 0.05),
+		"warn_behind": func() -> void: VitalsEdgeFx.warn(tree, 0.0, CATCH_SECONDS + 0.05),
 		"tin": func() -> void: satchel.bar.pinned.emit(1, satchel.bar.entry(1)),
 		"tin_chord": func() -> void: satchel._set_chord(true),
 	}

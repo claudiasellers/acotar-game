@@ -437,8 +437,9 @@ func _celebrate(text: String, landmark_id: String, big: bool) -> void:
 
 
 ## The name of what she found: a place is a chapter heading, a landmark a
-## note in the log.
+## note in the log. The first of either names the map's key (KeyHints).
 func notice(tree: SceneTree, text: String, big: bool) -> void:
+	KeyHints.of(tree).nudge(&"map")
 	if big:
 		ChapterHeading.show(tree, text)
 	elif landmark_note_due():

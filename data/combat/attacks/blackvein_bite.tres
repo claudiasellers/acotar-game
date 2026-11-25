@@ -11,3 +11,4 @@ status_tag = &"venom"
 status_magnitude = 0.35
 status_seconds = 1.0
 dread_spike = 0.2
+windup_s = 0.45

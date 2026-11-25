@@ -1,6 +1,6 @@
 ## Makes finds findable: a soft glint twinkles on the nearest pickable forage
-## within a few metres, and a small "E  pick Rose hips" card shows once it is
-## in reach. Works on every lane's forage fields (group "forage_field", meta
+## within a few metres; once it is in reach the Interactor offers "E   pick
+## rose hips" on the one use prompt. Works on every lane's forage fields (group "forage_field", meta
 ## "ingredient_id"), skipping picked instances and closed windows.
 class_name ForageFocus
 extends Node
@@ -9,12 +9,11 @@ const GLINT_RADIUS := 9.0
 const REFRESH := 0.15
 
 var interactor: Interactor
-## {"id", "position", "distance"} of the nearest find, or {}.
+## {"id", "position", "distance", "field"} of the nearest find, or {}.
 var focus: Dictionary = {}
 
 var _since := 0.0
 var _glint: GPUParticles3D
-var _card: KeyPrompt
 
 
 func _init(owner_interactor: Interactor = null) -> void:
@@ -25,7 +24,6 @@ func _init(owner_interactor: Interactor = null) -> void:
 func _ready() -> void:
 	_glint = _make_glint()
 	add_child(_glint)
-	_card = KeyPrompt.make(self)
 
 
 func _process(delta: float) -> void:
@@ -43,9 +41,6 @@ func _process(delta: float) -> void:
 	if not focus.is_empty():
 		_glint.global_position = focus.position + Vector3.UP * 0.35
 		glow.global_position = focus.position + Vector3.UP * 0.04
-	var in_reach: bool = not focus.is_empty() and focus.distance <= Interactor.REACH
-	var item := ItemCatalog.get_item(focus.id) if in_reach else null
-	_card.say(KeyPrompt.key(&"interact"), "pick %s" % (item.display_name.to_lower() if item else String(focus.id)) if in_reach else "")
 
 
 ## The nearest unpicked, in-window forage instance within `radius` of `at`.
@@ -72,7 +67,7 @@ func nearest(at: Vector3, radius: float) -> Dictionary:
 			var d := p.distance_to(at)
 			if d < best_d:
 				best_d = d
-				best = {"id": StringName(mmi.get_meta(&"ingredient_id")), "position": p, "distance": d}
+				best = {"id": StringName(mmi.get_meta(&"ingredient_id")), "position": p, "distance": d, "field": mmi}
 	return best
 
 

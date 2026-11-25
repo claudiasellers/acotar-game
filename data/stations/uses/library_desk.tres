@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StationUse" format=3 uid="uid://c02otsac8cma"]
+
+[ext_resource type="Script" path="res://systems/interaction/station_use.gd" id="1_use"]
+
+[resource]
+script = ExtResource("1_use")
+station_id = &"library_desk"
+verb = "practise my letters"
+kind = "letters"
+lines = PackedStringArray("A jumble of letters. I copy them anyway.", "Letter after letter. Half of them still lean the wrong way.", "I can sound out a few words now, if no one is watching.", "Forty words on my list. Barely legible, but mine.", "A whole line. Slowly, but all of it.")
+alt_lines = PackedStringArray("Enough for today. The letters have started to swim.")
+phases = PackedStringArray("p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+minutes = 30.0
+canon = "C"

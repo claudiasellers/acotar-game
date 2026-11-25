@@ -11,6 +11,7 @@ var station: StringName = DressingRoom.SATCHEL
 var view: DressingRoomView = null
 ## Who is dressing; the player when left empty.
 var who: Feyre = null
+var _crown_seen: bool = false
 
 
 ## The scene's wardrobe page, made (as a child of the shell) if it has none.
@@ -35,6 +36,16 @@ func available() -> bool:
 	return is_inside_tree() and _player() != null
 
 
+## News on its tab: she has the blooms for a crown and has not opened the
+## page since she did (weaving has no key in the world; this is how she
+## learns she can).
+func has_news() -> bool:
+	if CrownWeaver.best_recipe(Gameplay.inventory) == null:
+		_crown_seen = false
+		return false
+	return not _crown_seen
+
+
 func _player() -> Feyre:
 	return get_tree().get_first_node_in_group(&"player") as Feyre
 
@@ -43,6 +54,7 @@ func _shown() -> void:
 	var feyre := who if is_instance_valid(who) else _player()
 	if feyre == null:
 		return
+	_crown_seen = true
 	# Pieces arrive with the story (WardrobeStock); her satchel only holds
 	# what she already has.
 	if station != DressingRoom.SATCHEL:

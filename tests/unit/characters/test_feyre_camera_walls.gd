@@ -7,10 +7,6 @@ extends GutTest
 const FEYRE := preload("res://characters/feyre/feyre.tscn")
 
 
-func after_each() -> void:
-	Input.action_release(&"aim")
-
-
 func _slab(center: Vector3, size: Vector3) -> void:
 	var body := StaticBody3D.new()
 	var shape := CollisionShape3D.new()
@@ -32,7 +28,8 @@ func _aiming_feyre(face: float, thick: float) -> Feyre:
 	add_child_autofree(f)
 	f.global_position = Vector3(0, 0.05, 0)
 	# Aiming puts the arm 0.55 m over her right shoulder, the widest offset.
-	Input.action_press(&"aim")
+	f.bow_controller.set_physics_process(false)
+	f.bow_controller.update_bow(0.016, true, false)
 	await wait_seconds(1.0)
 	return f
 
@@ -55,3 +52,22 @@ func test_a_thin_wall_at_her_shoulder_is_never_passed() -> void:
 func test_in_the_open_the_full_shoulder_offset_stays() -> void:
 	var f := await _aiming_feyre(0.0, 0.0)
 	assert_almost_eq(f.camera.global_position.x, 0.55, 0.03, "nothing beside her: the usual offset")
+
+
+func test_a_far_story_focus_outdoors_takes_the_shoulder_so_it_is_not_behind_her() -> void:
+	_slab(Vector3(0, -0.5, 0), Vector3(80, 1, 80))
+	var f := FEYRE.instantiate() as Feyre
+	add_child_autofree(f)
+	f.global_position = Vector3(0, 0.05, 0)
+	var doe := Node3D.new()
+	add_child_autofree(doe)
+	doe.global_position = Vector3(0, 0, -30)
+	await wait_seconds(0.5)
+	assert_almost_eq(f.camera_control._spring_arm.position.x, 0.0, 0.03, "centred with nothing to look at")
+	StoryControl.set_focus(doe)
+	await wait_seconds(1.0)
+	assert_almost_eq(f.camera_control._spring_arm.position.x, FeyreCamera.AIM_SHOULDER, 0.03, "over her shoulder for the doe")
+	doe.global_position = Vector3(0, 0, -FeyreCamera.FAR_FOCUS * 0.5)
+	await wait_seconds(1.0)
+	assert_almost_eq(f.camera_control._spring_arm.position.x, 0.0, 0.03, "someone near her stays centred")
+	StoryControl.set_focus(null)

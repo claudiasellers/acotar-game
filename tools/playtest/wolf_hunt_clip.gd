@@ -16,6 +16,8 @@ const FPS := 4.0
 const SAVE_SIZE := Vector2i(1280, 720)
 ## The longest she waits for the nudge before drawing anyway.
 const WAIT_FOR_NUDGE := 45.0
+## How far to the side of an animal she rests her view, as a share of its distance.
+const BESIDE := 0.16
 
 var _rec: bool = false
 var _rec_left: float = 0.0
@@ -51,15 +53,15 @@ func _play() -> void:
 	await _watch_and_shoot(hunt)
 
 
-## Spawns, walks to the clearing and starts recording as the hunt begins.
-## Null (the beat already failed) if any of that didn't happen.
-func _enter_hunt() -> WolfKill:
+## Waits for her at the cottage with control, and listens for her lines.
+## False (the beat already failed) if she never got there.
+func _spawn_in() -> bool:
 	_frames_dir = out_path.get_base_dir()
 	DirAccess.make_dir_recursive_absolute(_frames_dir)
 	_begin("spawn", "Feyre at the cottage, controllable")
 	if not await _until(func() -> bool: return game.spawned, 30.0):
 		_fail("never spawned")
-		return null
+		return false
 	feyre = game.feyre
 	feyre.arrow_fired.connect(func(arrow: Node) -> void:
 		arrow.hit.connect(func(collider: Node, at: Vector3) -> void:
@@ -69,11 +71,19 @@ func _enter_hunt() -> WolfKill:
 	var director := get_tree().get_first_node_in_group(DialogueDirector.GROUP) as DialogueDirector
 	if director == null:
 		_fail("no DialogueDirector in the game")
-		return null
+		return false
 	director.line_spoken.connect(func(id: StringName, _s: StringName, text: String, _at: Vector3, _inner: bool) -> void:
 		spoken.append(String(id))
 		_note("%5.1f s  [%s] %s" % [_secs(), id, text]))
 	_pass()
+	return true
+
+
+## Spawns, walks to the clearing and starts recording as the hunt begins.
+## Null (the beat already failed) if any of that didn't happen.
+func _enter_hunt() -> WolfKill:
+	if not await _spawn_in():
+		return null
 
 	_begin("walk_in", "walk to the clearing until the hunt starts")
 	var clearing := _anchor(&"act1_wolf_clearing")
@@ -91,6 +101,10 @@ func _enter_hunt() -> WolfKill:
 	if not await _until(func() -> bool: return hunt.running, 20.0):
 		_fail("the hunt never started")
 		return null
+	var spot := hunt.global_transform * hunt.doe_offset
+	var here := Vector2(feyre.global_position.x, feyre.global_position.z)
+	_note("hunt began %.0f m from the doe's spot; her line to it is %.1f m clear of the wood" % [_flat(spot),
+		Act1Wayfinding.sight_open(here, Vector2(spot.x, spot.z), hunt._trees)])
 	_t0 = Time.get_ticks_msec()
 	_rec = true
 	_pass()
@@ -108,6 +122,7 @@ func _watch_and_shoot(hunt: WolfKill) -> void:
 	_pass()
 
 	_begin("shoot", "draw on him and hold; ash into his side; then the eye")
+	focus_shots = true
 	var wolf := hunt.wolf
 	for shot in 12:
 		if WorldState.has_flag("wolf_killed") or not is_instance_valid(wolf):
@@ -116,6 +131,9 @@ func _watch_and_shoot(hunt: WolfKill) -> void:
 			if not await _retrieve_arrow(&"ash"):
 				# Lost: the hunt gives one back after a few seconds.
 				await _until(func() -> bool: return Gameplay.inventory.count(&"arrow_ash") > 0, 8.0)
+		if hunt.ash_struck and Gameplay.inventory.arrow_count() == 0:
+			if not await _retrieve_arrow(&"wood"):
+				await _until(func() -> bool: return Gameplay.inventory.arrow_count() > 0, 8.0)
 		await _select_arrow(&"arrow_ash" if not hunt.ash_struck else &"arrow_wood")
 		if _flat(wolf.global_position) > 30.0:
 			await _walk_to(wolf.global_position, 22.0, Callable(), 20.0)
@@ -141,7 +159,11 @@ func _hold_on(node: Callable, until: Callable, seconds: float) -> void:
 			return
 		var n: Node3D = node.call()
 		if is_instance_valid(n):
-			_turn_camera_to(n.global_position + Vector3.UP * 0.9)
+			# A little to the right of it, as a player holds the view: the animal sits beside her, not behind her head.
+			# While the scene holds her eye on it the camera is already over her shoulder: straight at it then.
+			var to := n.global_position - feyre.global_position
+			var aside := BESIDE if StoryControl.focus == null else 0.0
+			_turn_camera_to(n.global_position + Vector3.UP * 0.9 + to.cross(Vector3.UP).normalized() * to.length() * aside)
 		await get_tree().physics_frame
 		var before := t
 		t += get_physics_process_delta_time()

@@ -45,6 +45,9 @@ const DROWSY_DECAY := 0.08
 const DREAD_RISE := 0.25
 const DREAD_FALL := 0.06
 const GRAB_PRESS_STAMINA := 12.0
+## With Hold to break free on, holding interact counts one press this often,
+## about a steady mash.
+const GRAB_HOLD_STEP := 0.18
 const COLD_EXPOSURE_AT := 0.85
 const COLD_EXPOSURE_AFTER := 20.0
 ## A fall is measured from where she last stood to where she lands, so a jump
@@ -82,6 +85,7 @@ var grab_source: StringName = &""
 var grab_presses_left: int = 0
 var grab_presses_total: int = 0
 var grab_time_left: float = 0.0
+var _grab_held: float = 0.0
 ## Most recent hit, for the HUD's hit-direction mark.
 var last_hit_origin: Vector3 = Vector3.INF
 ## Seconds since the last damage.
@@ -166,6 +170,12 @@ func max_stamina() -> float:
 
 func affliction(tag: StringName) -> float:
 	return float(afflictions[tag]["magnitude"]) if afflictions.has(tag) else 0.0
+
+
+## Nothing lands on her for `seconds` (the sidestep). The one i-frame clock:
+## a longer spell already running is kept.
+func grant_iframes(seconds: float) -> void:
+	_iframes = maxf(_iframes, seconds)
 
 
 func is_invulnerable() -> bool:
@@ -324,6 +334,7 @@ func _end_grab() -> void:
 	grab_source = &""
 	grab_presses_left = 0
 	grab_time_left = 0.0
+	_grab_held = 0.0
 	released.emit(source)
 
 
@@ -573,6 +584,14 @@ func _step_grab(delta: float) -> void:
 	grab_time_left -= delta
 	if grab_time_left <= 0.0:
 		_end_grab()
+		return
+	if not (break_free_hold() and Input.is_action_pressed(&"interact")):
+		_grab_held = 0.0
+		return
+	_grab_held += delta
+	while _grab_held >= GRAB_HOLD_STEP and is_grabbed():
+		_grab_held -= GRAB_HOLD_STEP
+		press_break_free()
 
 
 func _step_hazards(delta: float) -> void:
@@ -695,6 +714,12 @@ func _hunger() -> float:
 func _phase() -> String:
 	var pm := Gameplay.autoload(&"PhaseManager")
 	return String(pm.get(&"current_phase")) if pm else ""
+
+
+## Her Hold to break free setting (Gentle Mode turns it on too).
+func break_free_hold() -> bool:
+	var settings := Gameplay.autoload(&"GameSettings")
+	return settings != null and bool(settings.get(&"break_free_hold"))
 
 
 func _gentle() -> bool:

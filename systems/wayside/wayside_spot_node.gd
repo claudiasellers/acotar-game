@@ -11,7 +11,6 @@ const PROMPT_RADIUS := 3.0
 var spot: WaysideSpot
 var director: Wayside
 
-var _prompt: Label3D
 
 
 ## Override: build the meshes. Called once, inside the tree.
@@ -80,21 +79,15 @@ func give(items: PackedStringArray) -> PackedStringArray:
 	return given
 
 
-## A soft key glyph over the spot while Feyre is within reach.
+## What E does here, said by the one use prompt while she is within reach.
 func set_prompt(on: bool) -> void:
-	if on and _prompt == null:
-		_prompt = Label3D.new()
-		_prompt.text = "E"
-		_prompt.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-		_prompt.no_depth_test = true
-		_prompt.font_size = 40
-		_prompt.outline_size = 10
-		_prompt.modulate = Color(1.0, 0.96, 0.86, 0.9)
-		_prompt.outline_modulate = Color(0.42, 0.3, 0.45, 0.8)
-		_prompt.position = Vector3.UP * 1.6
-		add_child(_prompt)
-	if _prompt:
-		_prompt.visible = on
+	if is_inside_tree():
+		UsePrompt.of(get_tree()).offer(self, prompt_verb() if on else "")
+
+
+## The verb a kind's prompt says; kinds say their own.
+func prompt_verb() -> String:
+	return "look closer"
 
 
 ## Kinds with the interact key call this from _process.

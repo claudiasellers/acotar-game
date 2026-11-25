@@ -20,16 +20,16 @@ func test_flank_slots_spread_over_the_arc() -> void:
 
 
 func test_wood_only_wounds_the_great_wolf() -> void:
-	var r := Creature.resolve_arrow(GREAT_DATA, 10.0, &"wood")
+	var r := Creature.resolve_hit(GREAT_DATA, 10.0, &"wood")
 	assert_false(r.killed)
 	assert_eq(r.health, 1.0)
 
 
 func test_ash_leaves_a_mortal_wound_and_any_next_arrow_kills() -> void:
-	var r := Creature.resolve_arrow(GREAT_DATA, 40.0, &"ash")
+	var r := Creature.resolve_hit(GREAT_DATA, 40.0, &"ash")
 	assert_false(r.killed)
 	assert_true(r.mortal)
-	assert_true(Creature.resolve_arrow(GREAT_DATA, r.health, &"wood", true).killed)
+	assert_true(Creature.resolve_hit(GREAT_DATA, r.health, &"wood", 1.0, r.ash_taken, true).killed)
 
 
 func test_arrow_id_is_read_from_meta() -> void:

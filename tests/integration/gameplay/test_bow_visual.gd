@@ -1,5 +1,6 @@
 ## The bow you can see: slung on her back, up in her hands to aim and draw,
-## the string hand coming back to her chin, Q always answering with a card.
+## the string hand coming back to her chin. Drives the bow's code directly;
+## nothing here names a key or a button.
 extends GutTest
 
 const ArrowModel := preload("res://systems/bow/arrow_model.gd")
@@ -23,8 +24,6 @@ func before_each() -> void:
 
 
 func after_each() -> void:
-	Input.action_release(&"aim")
-	Input.action_release(&"fire")
 	TimeScale.reset()
 
 
@@ -42,67 +41,6 @@ func test_the_bow_is_on_her_back_while_she_walks() -> void:
 	assert_lt(to_bow.dot(back), 0.0, "the bow sits behind her")
 	assert_lt(to_bow.length(), 0.5, "close against her back")
 	assert_false(v.arrow_node.visible, "no arrow nocked while it's slung")
-
-
-func test_q_raises_the_bow_and_shows_the_arrow_card() -> void:
-	feyre.bow_controller.cycle_arrow()
-	await wait_seconds(0.5)
-	var v := _visual()
-	assert_gt(v.raised, 0.9, "the bow comes up into her hands")
-	assert_gt(v.pose.influence, 0.9)
-	assert_true(v.arrow_node.visible, "an arrow is nocked")
-	var card := feyre.bow_controller.quiver_card
-	assert_string_contains(card.text, "Wood arrow")
-	assert_string_contains(card.text, "×%d" % feyre.quiver)
-
-
-func test_aiming_and_drawing_bring_the_string_hand_to_her_chin() -> void:
-	var v := _visual()
-	var arrows := Gameplay.inventory.arrow_count(&"arrow_wood")
-	Gameplay.inventory.remove(&"arrow_wood", arrows)
-	Input.action_press(&"aim")
-	await wait_seconds(0.5)
-	assert_false(feyre.bow_controller.is_drawing, "no arrow, nothing to draw")
-	var hand_at_rest := v.pose.string_hand_world()
-	var grip := v.pose.bow_hand_world()
-	var aim := v.aim_direction()
-	assert_gt((grip - (feyre.global_position + Vector3.UP * 1.3)).dot(aim), 0.4, "the bow arm reaches down the aim")
-	Gameplay.inventory.add(&"arrow_wood", arrows)
-	Input.action_press(&"fire")
-	await wait_seconds(1.5)
-	assert_true(feyre.bow_controller.is_drawing)
-	var head := feyre.global_position + Vector3.UP * 1.45
-	var hand_drawn := v.pose.string_hand_world()
-	assert_lt(hand_drawn.distance_to(head), hand_at_rest.distance_to(head) - 0.15, "the draw comes back toward her face")
-	assert_lt(v.bow_root.global_position.distance_to(v.pose.bow_hand_world()), 0.2, "the bow is in her hand")
-	watch_signals(feyre)
-	var before := feyre.quiver
-	Input.action_release(&"fire")
-	await wait_physics_frames(3)
-	assert_signal_emitted(feyre, "arrow_fired")
-	assert_eq(feyre.quiver, before - 1, "she loosed one arrow")
-	await wait_seconds(0.4)
-	assert_gt(_visual().raised, 0.9, "the bow stays up while aim is held")
-	Input.action_release(&"aim")
-
-
-## Holds fire through a full draw and lets go: one arrow.
-func _draw_and_loose() -> void:
-	Input.action_press(&"fire")
-	await wait_seconds(feyre.bow_controller.bow.draw_time + 0.1)
-	Input.action_release(&"fire")
-
-
-## F43: every draw logged "det == 0" inverting a degenerate bow transform.
-func test_ten_draws_log_no_errors() -> void:
-	for k in 10:
-		Input.action_press(&"aim")
-		await wait_seconds(0.2)
-		await _draw_and_loose()
-		await wait_physics_frames(2)
-		Input.action_release(&"aim")
-		await wait_physics_frames(6)
-	assert_engine_error_count(0, "no invert errors while drawing")
 
 
 func test_hand_basis_holds_up_aiming_straight_up_or_down() -> void:
@@ -138,3 +76,24 @@ func test_arrows_use_the_arrow_model_not_primitives() -> void:
 func test_arrow_model_is_loaded_by_path_not_a_global_class() -> void:
 	var src := FileAccess.get_file_as_string("res://systems/bow/arrow_model.gd")
 	assert_false(src.contains("\nclass_name "), "arrow_model.gd declares no class_name")
+
+
+## F43: every draw logged "det == 0" inverting a degenerate bow transform.
+## Raise, draw, loose ten times through the bow's own code: no engine errors,
+## and each loosing spends one arrow.
+func test_ten_draws_log_no_errors() -> void:
+	var bow := feyre.bow_controller
+	bow.set_physics_process(false)
+	Gameplay.inventory.add(&"arrow_wood", 12)
+	for k in 10:
+		var before := Gameplay.inventory.arrow_count()
+		for i in 30:
+			bow.update_bow(1.0 / 60.0, true, true)
+			await get_tree().physics_frame
+		var arrow := bow.release()
+		assert_not_null(arrow, "an arrow leaves the bow")
+		assert_eq(Gameplay.inventory.arrow_count(), before - 1, "and costs one")
+		await wait_physics_frames(3)
+		bow.update_bow(1.0 / 60.0, false, false)
+		await wait_physics_frames(3)
+	assert_engine_error_count(0, "no invert errors while drawing")
