@@ -11,3 +11,4 @@ damage = 25.0
 reaction = &"medium"
 knockback_m = 2.0
 dread_spike = 0.2
+windup_s = 0.55

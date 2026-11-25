@@ -61,6 +61,7 @@ func test_every_setting_round_trips_through_the_file() -> void:
 		&"invert_y": true, &"camera_follow": false, &"mouse_steers": true, &"gentle_mode": true,
 		&"reduced_effects": true, &"music_volume": 0.25, &"sound_volume": 0.6, &"text_size": 3,
 		&"hud_mode": 2, &"edge_fx": 1, &"hit_marks": false, &"key_hints": false,
+		&"soft_aim": 2, &"hit_stop": 1, &"break_free_hold": true,
 	}
 	assert_eq(changed.size(), GameSettings.DEFAULTS.size(), "test covers every setting")
 	for key: StringName in changed:

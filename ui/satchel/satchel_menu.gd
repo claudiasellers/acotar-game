@@ -416,7 +416,7 @@ func _show_detail() -> void:
 	_callouts.queue_redraw()
 	_name.text = e.name
 	_line.text = e.description
-	_where.text = where_text(item)
+	_where.text = " ".join([where_text(item), made_from(e.id)]).strip_edges()
 	_where.visible = _where.text != ""
 	for c in _chips.get_children():
 		c.queue_free()
@@ -480,6 +480,20 @@ static func where_text(item: ItemData) -> String:
 		return ""
 	var out := ", ".join(parts)
 	return out.left(1).to_upper() + out.substr(1) + "."
+
+
+## What an arrow is made from, from its recipe: "Made from 1 arrow shaft,
+## 1 fletching, 1 arrowhead." Empty for anything else.
+static func made_from(id: StringName) -> String:
+	var recipe := Crafting.recipe(id) if String(id).begins_with("arrow_") else null
+	if recipe == null:
+		return ""
+	var parts: Array[String] = []
+	for key: String in recipe.inputs:
+		var part := ItemCatalog.get_item(StringName(key))
+		var word := key.trim_prefix("tag:") if key.begins_with("tag:") else (part.display_name.to_lower() if part else key)
+		parts.append("%d %s" % [int(recipe.inputs[key]), word])
+	return "Made from %s." % ", ".join(parts)
 
 
 ## Small chips: its chemistry tags, whether she can eat it, and how rare it

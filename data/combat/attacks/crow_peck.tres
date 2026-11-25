@@ -10,3 +10,4 @@ is_default = true
 damage = 4.0
 damage_kind = &"claw"
 dread_spike = 0.05
+windup_s = 0.4

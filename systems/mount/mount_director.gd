@@ -11,7 +11,9 @@
 ## of the Wall, or into dread: she balks at the Bogge's DreadField and won't
 ## enter the Suriel glade or the naga reeds. Riding never skips a deed
 ## trigger: every ActionTrigger the mare passes through fires as if Feyre
-## walked it.
+## walked it. A story scene is one that holds StoryControl; the background
+## moments that only wait on deeds (the hall marks, the manor map) leave her
+## free and never stop the mare (T148).
 ##
 ## Getting on and off is one motion (MountMotion, L47-6): a vault up from her
 ## near side and a slide down it, never a teleport. The whistle is a gesture
@@ -62,7 +64,7 @@ const LOOK_GRACE := 0.8
 const TRIGGER_SWEEP := 0.1
 const PROMPT_RADIUS := 3.0
 const DELTAS := &"mount"
-const HINT := "Whistle for her with H (share on a pad), and she'll come."
+const HINT := "Whistle for her with %s, and she'll come."
 
 var data: MountData = DATA
 var mare: MareMount
@@ -74,13 +76,11 @@ var last_block: StringName = &""
 ## Probes and clips steer without input: returns [Vector3 world direction, bool gallop].
 var autopilot: Callable
 
-var _spaces: Dictionary = {}
 var _e_down: float = -1.0
 var _since_look: float = 99.0
 var _sweep: float = 0.0
 var _inside: Dictionary = {}
 var _whistle: AudioStreamPlayer
-var _prompt: Label3D
 var _unlock: ActionTrigger
 var _wind: AudioStreamPlayer
 var _base_fov: float = -1.0
@@ -139,11 +139,6 @@ var _gust: AudioStreamPlayer
 func _ready() -> void:
 	name = "MountDirector"
 	_ensure_action()
-	EventBus.scene_space_started.connect(func(id: StringName) -> void:
-		_spaces[id] = true
-		if riding or motion:
-			dismount(true))
-	EventBus.scene_space_finished.connect(func(id: StringName) -> void: _spaces.erase(id))
 	_whistle = AudioStreamPlayer.new()
 	_whistle.stream = WHISTLE
 	_whistle.volume_db = -6.0
@@ -218,8 +213,6 @@ func dread_at(at: Vector3) -> float:
 func block_reason(at: Vector3) -> StringName:
 	if not available():
 		return &"not_yet"
-	if not _spaces.is_empty():
-		return &"scene"
 	if StoryControl.mode != StoryControl.Mode.FULL:
 		return &"story"
 	if not WorldMap.is_in_prythian(at) or WorldMap.distance_to_wall(at) < 12.0:
@@ -261,7 +254,6 @@ func spawn_mare(at: Vector3, yaw: float) -> MareMount:
 	mare.global_position = at
 	mare.rotation.y = yaw
 	mare.used.connect(_on_used)
-	_add_prompt()
 	return mare
 
 
@@ -271,7 +263,6 @@ func free_mare() -> void:
 	if mare and is_instance_valid(mare):
 		mare.queue_free()
 	mare = null
-	_prompt = null
 
 
 ## Ground height under (x, z), or NAN with nothing loaded there.
@@ -484,10 +475,8 @@ func open_tending() -> MareTendingView:
 	var p := _player()
 	if p == null or mare == null or riding or motion or tending or mare.state != MareMount.State.STANDING:
 		return null
-	if block_reason(p.global_position) in [&"scene", &"story"]:
+	if block_reason(p.global_position) == &"story":
 		return null
-	if _prompt and is_instance_valid(_prompt):
-		_prompt.visible = false
 	tending = MareTendingView.open(self, mare, p, Gameplay.inventory)
 	tending.closed.connect(func() -> void:
 		tending = null
@@ -521,8 +510,6 @@ func mount(user: Node = null, instant: bool = false) -> bool:
 	mare.set_mountable(false)
 	pose = Saddle.seat(p)
 	_gesture_t = -1.0
-	if _prompt and is_instance_valid(_prompt):
-		_prompt.visible = false
 	if pose:
 		pose.clear_overrides()
 		pose.amount = 0.0
@@ -599,7 +586,7 @@ func _finish_dismount(at: Vector3, face_mare: bool = true) -> void:
 	# Taught once, kept with the world (not a story flag).
 	if unlocked() and not WorldDeltas.get_region_value(DELTAS, "whistle_taught", false):
 		WorldDeltas.set_region_value(DELTAS, "whistle_taught", true)
-		PickupLog.of(get_tree()).note(HINT)
+		PickupLog.of(get_tree()).note(HINT % KeyPrompt.key(ACTION))
 	elif unlocked() and not WorldDeltas.get_region_value(DELTAS, "tend_taught", false):
 		WorldDeltas.set_region_value(DELTAS, "tend_taught", true)
 		PickupLog.of(get_tree()).note(TEND_HINT)
@@ -623,9 +610,9 @@ func _set_bow(on: bool) -> void:
 	var p := _player()
 	if p == null:
 		return
-	var bow := p.get(&"bow_controller") as Node
+	var bow := p.get(&"bow_controller") as BowController
 	if bow:
-		bow.set_physics_process(on)
+		bow.stow(not on)
 
 
 ## Where her hips sit: the saddle, riding the spine bone through each stride.
@@ -686,7 +673,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _tap_interact() -> void:
 	var p := _player()
 	var interactor := p.get(&"interactor") as Interactor if p else null
-	if interactor and (interactor.pick_up_arrow() or interactor._harvest() or interactor._forage() or interactor._field()):
+	if interactor and interactor.pick_up():
 		return
 	# A station in reach: straight down to use it; otherwise the slide off.
 	var station := interactor != null and _station_near(p)
@@ -732,7 +719,7 @@ func _process(delta: float) -> void:
 				_finish_dismount(_off_at, false)
 			else:
 				_last_yaw = NAN
-		elif riding and block_reason(p.global_position) in [&"scene", &"story", &"realm"]:
+		elif riding and block_reason(p.global_position) in [&"story", &"realm"]:
 			dismount(true)
 		return
 	if riding:
@@ -742,7 +729,7 @@ func _process(delta: float) -> void:
 				_e_down = -1.0
 				dismount()
 				return
-		if block_reason(p.global_position) in [&"scene", &"story", &"realm"]:
+		if block_reason(p.global_position) in [&"story", &"realm"]:
 			dismount(true)
 			return
 		_steer()
@@ -1008,22 +995,10 @@ func _meet(p: Node3D, far: float) -> void:
 	mare.nicker()
 
 
-func _add_prompt() -> void:
-	_prompt = Label3D.new()
-	_prompt.text = "E"
-	_prompt.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	_prompt.no_depth_test = true
-	_prompt.font_size = 40
-	_prompt.outline_size = 10
-	_prompt.modulate = Color(1.0, 0.96, 0.86, 0.9)
-	_prompt.outline_modulate = Color(0.42, 0.3, 0.45, 0.8)
-	_prompt.position = Vector3.UP * 2.3
-	_prompt.visible = false
-	mare.add_child(_prompt)
-
-
+## "E   ride": said by the one use prompt while she stands by the mare.
 func _update_prompt(p: Node3D) -> void:
-	if _prompt == null or not is_instance_valid(_prompt) or mare == null:
+	if mare == null or not is_instance_valid(mare):
 		return
 	var d := Vector2(mare.global_position.x - p.global_position.x, mare.global_position.z - p.global_position.z).length()
-	_prompt.visible = d <= PROMPT_RADIUS and mare.state == MareMount.State.STANDING
+	var on := d <= PROMPT_RADIUS and mare.state == MareMount.State.STANDING and not riding and not tending
+	UsePrompt.of(get_tree()).offer(self, "ride" if on else "")

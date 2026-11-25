@@ -9,6 +9,9 @@ var hill: Node3D
 
 func before_each() -> void:
 	WorldState.clear()
+	# Gameplay.inventory is static: a full quiver left by an earlier test in
+	# the same process would refuse the pickup below (30 stays 30).
+	Gameplay.reset()
 	PhaseManager.start(TEST_SET)
 	hill = SCENE.instantiate()
 	add_child_autofree(hill)
@@ -50,5 +53,6 @@ func test_stuck_arrows_can_be_picked_up() -> void:
 	arrow.global_position = feyre.global_position + Vector3(1.0, 0.5, 0.0)
 	arrow.add_to_group(Arrow.STUCK_GROUP)
 	var before := feyre.quiver
+	assert_lt(before, Inventory.FULL_QUIVER, "precondition: room in the quiver")
 	assert_true(feyre.pick_up_nearest_arrow())
 	assert_eq(feyre.quiver, before + 1)

@@ -108,7 +108,9 @@ LOCOMOTION = tuple(c[0] for c in CLIPS if c[7] == "gait")
 # far faster than the performers', so they get their speed from a longer stride at
 # the captured cadence rather than from playing the clip faster.
 POSTURE = {
-    "idle": dict(lean=0.0, head=0.0, back=6.0, down=4.0, arms=3.0, hip_sway=0.0),
+    # Standing, the performer holds the arms a hand's width off the body; arms < 0
+    # brings them in so her hands rest beside her thighs.
+    "idle": dict(lean=0.0, head=0.0, back=6.0, down=4.0, arms=-2.0, hip_sway=0.0),
     "walk": dict(lean=1.0, head=0.0, back=8.0, down=5.0, arms=5.0, hip_sway=3.0),
     "run": dict(lean=5.0, head=-2.0, back=8.0, down=5.0, arms=7.0, hip_sway=3.0, stride=1.25),
     "sprint": dict(lean=9.0, head=-4.0, back=6.0, down=4.0, arms=6.0, hip_sway=1.5, stride=1.38),

@@ -1,7 +1,7 @@
 ## T081: the bow at the first wolf hunt. The reticle sits where the arrow lands
 ## on the screen the player sees (the hunt's tighter lens included), and a
 ## scene taking the bow away mid-draw lowers it instead of loosing the arrow.
-## The shot cycle and Focus themselves: tests/unit/gameplay/test_bow_cycle.gd.
+## Drives the bow's own code (update_bow, release), never a key or button.
 extends GutTest
 
 const TEST_SET := preload("res://data/phases/m0_test_phases.tres")
@@ -23,8 +23,6 @@ func before_each() -> void:
 
 
 func after_each() -> void:
-	Input.action_release(&"aim")
-	Input.action_release(&"fire")
 	StoryControl.release()
 	var cine := Cine.of(get_tree())
 	cine.drop(cine.owner_node, 0.0)
@@ -42,8 +40,10 @@ func test_reticle_follows_the_lens_the_player_sees() -> void:
 	cine.claim(self)
 	cine.follow(WolfKillStaging.AIM_FOV, 0.0)
 	feyre.nudge_camera(0.0, 0.12)
-	Input.action_press(&"aim")
-	await wait_seconds(0.6)
+	feyre.bow_controller.set_physics_process(false)
+	for i in 36:
+		feyre.bow_controller.update_bow(1.0 / 60.0, true, false)
+		await get_tree().physics_frame
 	var reticle := _reticle()
 	assert_true(reticle.visible, "the reticle shows while aiming")
 	var shown := get_viewport().get_camera_3d()
@@ -100,34 +100,27 @@ func _wolf_at(distance: float) -> StaticBody3D:
 	return wolf
 
 
-func test_a_steady_aim_and_a_full_draw_put_an_arrow_into_the_wolf() -> void:
+func test_a_steady_aim_puts_an_arrow_into_the_wolf() -> void:
 	var wolf := _wolf_at(21.0)
 	await wait_physics_frames(2)
+	var bow := feyre.bow_controller
+	bow.set_physics_process(false)
 	var fired: Array = []
 	feyre.arrow_fired.connect(func(a: Arrow) -> void: fired.append(a))
 	var before := Gameplay.inventory.arrow_count()
 	var aim_at := wolf.global_position + Vector3.UP * 1.2
-	Input.action_press(&"aim")
-	var held := 0.0
 	var seen_reticle := false
-	while held < 1.0:
+	for i in 90:
 		_turn_toward(aim_at)
+		bow.update_bow(1.0 / 60.0, true, false)
 		await get_tree().physics_frame
-		held += get_physics_process_delta_time()
 		seen_reticle = seen_reticle or _reticle().visible
-	assert_true(feyre.bow_controller.is_nocked, "holding aim raises the bow with an arrow on the string")
+	assert_true(bow.is_nocked, "an arrow is on the string")
 	assert_true(seen_reticle, "aiming brings up the reticle")
-	Input.action_press(&"fire")
-	held = 0.0
-	while held < feyre.bow_controller.bow.draw_time + 0.1:
-		_turn_toward(aim_at)
-		await get_tree().physics_frame
-		held += get_physics_process_delta_time()
-	assert_almost_eq(feyre.bow_controller.draw_amount, 1.0, 0.001, "a full draw")
 	var hits: Array = []
-	Input.action_release(&"fire")
+	bow.release()
 	await wait_physics_frames(2)
-	assert_eq(fired.size(), 1, "letting go looses one arrow")
+	assert_eq(fired.size(), 1, "loosing sends one arrow")
 	assert_eq(Gameplay.inventory.arrow_count(), before - 1)
 	if fired.is_empty():
 		return

@@ -52,6 +52,12 @@ signal mood_requested(mood: StringName, intensity: float, seconds: float)
 ## Creatures: an arrow or blade struck a creature without (yet) killing it.
 ## part: &"side", &"eye", &"leg"... as the creatures lane resolves it.
 signal creature_hit(creature_id: StringName, kind: StringName, cause: StringName, part: StringName)
+## Creatures: a hostile started telegraphing an attack (AttackData row
+## attack_id) at `at`; contact comes in `seconds` (the row's windup_s). For the
+## wind-up sound and the HUD edge on the side it comes from.
+signal hostile_windup(creature_id: StringName, kind: StringName, attack_id: StringName, at: Vector3, seconds: float)
+## The tell was called off before contact (stagger, sleep, death).
+signal hostile_windup_cancelled(creature_id: StringName)
 ## Story to world: change the weather now (&"snow_heavy", &"snow_slow",
 ## &"snow_pause", &"clear"), blended over `seconds`.
 signal weather_requested(weather: StringName, seconds: float)

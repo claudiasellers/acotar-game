@@ -41,14 +41,13 @@ of blooms are the R3 look (X).
 | reason | when |
 |---|---|
 | `not_yet` | before `first_dinner_eaten` |
-| `scene` | any SceneSpace is running (one starting mid-ride takes Feyre down at once) |
-| `story` | `StoryControl.mode` isn't FULL |
+| `story` | `StoryControl.mode` isn't FULL: a scene holds her controls (one taking them mid-ride takes Feyre down at once). A running SceneSpace that holds nothing (the hall marks, the manor map, which wait on deeds all act) never blocks her (T148) |
 | `realm` | south of the Wall, or within 12 m of it |
 | `indoors` | a roof over the spot (the manor, the stables' rooms) |
 | `dread` | `DreadField.withdrawal_at` > 0.15 (the Bogge) or a region in `MountData.no_ride_regions` (`suriel_glade`, which holds the naga reeds) |
 
 The whistle and mounting check it; riding into dread, she balks (snort, head
-toss, stops) and only turns back. `scene`, `story` and `realm` mid-ride
+toss, stops) and only turns back. `story` and `realm` mid-ride
 dismount her.
 
 ## Deed triggers are never skipped

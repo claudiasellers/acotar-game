@@ -52,3 +52,7 @@ func _process(_delta: float) -> void:
 	var t := Time.get_ticks_msec() * 0.002
 	for i in glints.size():
 		glints[i].rotation.y = t + i
+
+
+func prompt_verb() -> String:
+	return "take it"

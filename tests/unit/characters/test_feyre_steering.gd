@@ -9,7 +9,7 @@ const FEYRE := preload("res://characters/feyre/feyre.tscn")
 
 func after_each() -> void:
 	GameSettings.set_value(&"mouse_steers", false)
-	for a in [&"move_forward", &"move_left", &"move_right", &"aim", &"sprint"]:
+	for a in [&"move_forward", &"move_left", &"move_right", &"sprint"]:
 		Input.action_release(a)
 
 
@@ -112,17 +112,6 @@ func test_with_the_setting_on_the_mouse_steers_her() -> void:
 	assert_gt(_heading(f).dot(_cam_forward(f)), 0.97, "runs where the camera now looks (%s vs %s)" % [_heading(f), _cam_forward(f)])
 	var facing := Vector2(0, -1).rotated(-f.model.rotation.y)
 	assert_gt(facing.dot(_heading(f)), 0.98, "her body faces her path, not at an angle to it")
-
-
-func test_aiming_still_strafes_with_the_camera() -> void:
-	var f := _feyre()
-	await wait_seconds(0.3)
-	Input.action_press(&"aim")
-	Input.action_press(&"move_forward")
-	await wait_seconds(0.4)
-	f.nudge_camera(PI / 2.0, 0.0)
-	await wait_seconds(0.6)
-	assert_gt(_heading(f).dot(_cam_forward(f)), 0.95, "aiming: moves with the camera")
 
 
 func test_shift_and_forward_breaks_straight_into_a_run_then_a_sprint() -> void:

@@ -42,6 +42,7 @@ WARP = dict(height=HEIGHT, head=1.015, legs=0.985, arm_len=0.99, arm_thick=1.01,
             wx=((0.0, 1.0), (0.85, 1.01), (1.00, 1.01), (1.28, 1.0), (1.47, 1.0)),
             wy=((0.0, 1.0), (1.47, 1.0)))
 GAIT = "female"
+ARM_CLEAR = 10.0     # the bell of her skirt starts at the wrist
 SKIN_LINEAR = (0.82, 0.55, 0.45)        # warm, rosy
 SKIN_SRGB = "EAC4B3"
 IRIS = ((0.13, 0.065, 0.025), (0.42, 0.24, 0.09), (0.72, 0.48, 0.17))   # warm brown with honey flecks

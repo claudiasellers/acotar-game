@@ -28,7 +28,6 @@ const ARRIVE_OFFSET := Vector3(0.0, 0.0, 2.2)
 
 var def: WhorlStoneDef
 var mark_node: MeshInstance3D
-var _prompt: Label3D
 
 
 static func make(stone_def: WhorlStoneDef) -> WhorlStone:
@@ -100,7 +99,14 @@ func marked() -> bool:
 func _process(_delta: float) -> void:
 	var p := get_tree().get_first_node_in_group(&"player") as Node3D
 	var near := p != null and Vector2(p.global_position.x - global_position.x, p.global_position.z - global_position.z).length() <= PROMPT_RADIUS
-	_set_prompt(near and StoryControl.mode == StoryControl.Mode.FULL)
+	# Said only while E would do something: tracing is always hers, riding
+	# waits for a second marked pair and for the story to let her travel.
+	var verb := ""
+	if near and not marked():
+		verb = "trace the whorl"
+	elif near and WhorlStones.can_travel() and not WhorlStones.destinations(def.id).is_empty():
+		verb = "ride the stones"
+	UsePrompt.of(get_tree()).offer(self, verb)
 
 
 ## Interactor: E. First time: trace, paint, celebrate. After: the travel card.
@@ -138,19 +144,5 @@ func paint_mark() -> void:
 	Gameplay.sketchbook.add(StringName("whorl_%s" % def.id), "Whorl stones: %s" % WhorlStones.place_label(def))
 	if is_inside_tree():
 		PickupLog.of(get_tree()).note(WhorlStones.mark_line())
-
-
-func _set_prompt(on: bool) -> void:
-	if on and _prompt == null:
-		_prompt = Label3D.new()
-		_prompt.text = "E"
-		_prompt.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-		_prompt.no_depth_test = true
-		_prompt.font_size = 40
-		_prompt.outline_size = 10
-		_prompt.modulate = Color(1.0, 0.96, 0.86, 0.9)
-		_prompt.outline_modulate = Color(0.42, 0.3, 0.45, 0.8)
-		_prompt.position = Vector3.UP * 2.3
-		add_child(_prompt)
-	if _prompt:
-		_prompt.visible = on
+		if WhorlStones.marked_ids().size() == 2:
+			DialogueDirector.staged(self, &"whorl_ride_thought", "", WhorlStones.RIDE_THOUGHT)

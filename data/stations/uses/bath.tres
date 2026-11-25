@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="StationUse" format=3 uid="uid://iusndiuqhuk0"]
+
+[ext_resource type="Script" path="res://systems/interaction/station_use.gd" id="1_use"]
+
+[resource]
+script = ExtResource("1_use")
+station_id = &"bath"
+verb = "take a long soak"
+kind = "soak"
+lines = PackedStringArray("Nearly an hour in the water. Warm right through.", "A good, long soak. The ache's gone out of me.")
+minutes = 60.0
+canon = "A"

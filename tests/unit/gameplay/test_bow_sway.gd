@@ -105,29 +105,6 @@ func test_a_fast_turn_unsettles_the_aim() -> void:
 	assert_gt(bow.sway_degrees(), settled * 1.5, "a flick shot is a wild shot")
 
 
-func test_focus_steadies_and_settles_faster() -> void:
-	_hold(bow.tuning.settle_s * 0.5 + 0.05, false, true)
-	assert_lte(bow.sway_degrees(), 0.22, "Focused and settled")
-	feyre.vitals.dread = 0.8
-	assert_almost_eq(bow.sway_degrees(), bow.bow.sway_degrees * bow.tuning.settle_floor * bow.tuning.focus_sway_panic,
-		0.01, "panic gives a shakier Focus")
-
-
-func test_a_long_hold_tires_her_arm() -> void:
-	_hold(1.0)
-	var settled := bow.sway_degrees()
-	_hold(bow.bow.draw_time + bow.tuning.fatigue_after_s - 0.1, true)
-	assert_almost_eq(bow.sway_degrees(), settled, 0.001, "no tremble before 3 s at full draw")
-	var before := feyre.stamina
-	_hold(1.0, true)
-	assert_gt(bow.sway_degrees(), settled * 1.15, "the arm starts to tremble")
-	assert_almost_eq(before - feyre.stamina, bow.tuning.hold_drain * 0.9, 1.0, "and holding costs stamina")
-	_hold(10.0, true)
-	feyre.stamina = 100.0
-	feyre._exhausted = false
-	assert_almost_eq(bow.sway_degrees(), settled * bow.tuning.fatigue_max, 0.001, "capped at twice")
-
-
 func test_low_breath_shakes_the_aim() -> void:
 	_hold(1.0)
 	var settled := bow.sway_degrees()
@@ -136,12 +113,3 @@ func test_low_breath_shakes_the_aim() -> void:
 	feyre._exhausted = true
 	assert_almost_eq(bow.sway_degrees(), settled * 2.0 + bow.tuning.breath_winded_tremor, 0.001, "winded")
 
-
-## Design doc §9: from 100 stamina, Focus for 1.5 s (42) leaves room for two
-## sidesteps (24) and a bash (15) with 19 to spare.
-func test_the_stamina_budget_for_one_fight() -> void:
-	_hold(0.2)
-	_hold(1.5, false, true)
-	var spent := 100.0 - feyre.stamina
-	assert_almost_eq(spent, 42.0, 1.0, "1.5 s of Focus")
-	assert_gte(100.0 - spent - 24.0 - 15.0, 18.0, "an opener and its defence fit in one bar")

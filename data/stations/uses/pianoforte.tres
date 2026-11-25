@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StationUse" format=3 uid="uid://ti27ae8hycca"]
+
+[ext_resource type="Script" path="res://systems/interaction/station_use.gd" id="1_use"]
+
+[resource]
+script = ExtResource("1_use")
+station_id = &"pianoforte"
+verb = "play a few notes"
+kind = "play"
+lines = PackedStringArray("I never learned to play. It sounds lovely anyway.", "Three notes, and the whole room listens.")
+canon = "X"

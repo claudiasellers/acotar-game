@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StationUse" format=3 uid="uid://byoa56c02m2sh"]
+
+[ext_resource type="Script" path="res://systems/interaction/station_use.gd" id="1_use"]
+
+[resource]
+script = ExtResource("1_use")
+station_id = &"bed"
+verb = "sleep"
+day_verb = "rest a while"
+kind = "sleep"
+lines = PackedStringArray("I slept. Truly slept, for once.", "Morning already. The nightmares kept their distance.", "The wolf came again in my dreams. Still, I feel rested.")
+day_lines = PackedStringArray("A little rest. My bones thank me.")
+minutes = 120.0
+canon = "C"

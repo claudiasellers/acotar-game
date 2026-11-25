@@ -56,42 +56,59 @@ static func respawn_days_for(id: StringName) -> float:
 	return 2.0
 
 
-## Works on any MultiMeshInstance3D with meta "ingredient_id".
+## Works on any MultiMeshInstance3D with meta "ingredient_id": finds and
+## takes the nearest unpicked instance in one go.
 static func pick_from(field: MultiMeshInstance3D, world_pos: Vector3, radius: float) -> StringName:
+	var index := nearest_unpicked(field, world_pos, radius)
+	return take(field, index) if index >= 0 else &""
+
+
+## The nearest instance within `radius` that is unpicked and in its window
+## (-1 when none). Changes nothing, so the caller can check her bags first.
+static func nearest_unpicked(field: MultiMeshInstance3D, world_pos: Vector3, radius: float) -> int:
 	var mm := field.multimesh
 	if mm == null:
-		return &""
+		return -1
 	var id := StringName(field.get_meta(&"ingredient_id", &""))
 	if id == &"":
-		return &""
-	var region := StringName(field.get(&"region_id")) if &"region_id" in field else &"world"
+		return -1
+	var region := _region(field)
 	var local := field.global_transform.affine_inverse() * world_pos
 	var best := -1
 	var best_d := radius
 	for i in mm.instance_count:
-		var key := "%s:%d" % [field.name, i]
-		if Gameplay.forage.is_picked(region, key):
+		if Gameplay.forage.is_picked(region, "%s:%d" % [field.name, i]):
 			continue
 		var d := mm.get_instance_transform(i).origin.distance_to(local)
 		if d <= best_d:
 			best_d = d
 			best = i
 	if best < 0:
-		return &""
+		return -1
 	var item := ItemCatalog.get_item(id)
 	var now := ForageRegistry.current_conditions(field.get_tree())
 	if not ForageRegistry.in_window(item, now.hour, now.weather):
-		return &""
-	Gameplay.forage.mark_picked(region, "%s:%d" % [field.name, best], respawn_days_for(id))
-	_hide(field, best)
+		return -1
+	return best
+
+
+## Marks instance `index` picked, hides it and returns its item id.
+static func take(field: MultiMeshInstance3D, index: int) -> StringName:
+	var id := StringName(field.get_meta(&"ingredient_id", &""))
+	Gameplay.forage.mark_picked(_region(field), "%s:%d" % [field.name, index], respawn_days_for(id))
+	_hide(field, index)
 	return id
+
+
+static func _region(field: Node) -> StringName:
+	return StringName(field.get(&"region_id")) if &"region_id" in field else &"world"
 
 
 static func refresh_field(field: MultiMeshInstance3D) -> void:
 	var mm := field.multimesh
 	if mm == null:
 		return
-	var region := StringName(field.get(&"region_id")) if &"region_id" in field else &"world"
+	var region := _region(field)
 	var originals: Dictionary = field.get_meta(&"_forage_original", {})
 	for i in mm.instance_count:
 		var picked := Gameplay.forage.is_picked(region, "%s:%d" % [field.name, i])

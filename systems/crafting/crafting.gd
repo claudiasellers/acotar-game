@@ -46,6 +46,25 @@ static func resolve(r: CraftRecipe, inventory: Inventory) -> Dictionary:
 	return plan
 
 
+## What the inventory is short of for `r`: input key -> how many more it
+## needs. Empty when it has everything.
+static func missing(r: CraftRecipe, inventory: Inventory) -> Dictionary:
+	var short := {}
+	var spoken := {}
+	for key: String in r.inputs:
+		var need := int(r.inputs[key])
+		var have := 0
+		if key.begins_with("tag:"):
+			for id in inventory.ids_with_craft_tag(StringName(key.substr(4))):
+				have += maxi(inventory.count(id) - int(spoken.get(id, 0)), 0)
+		else:
+			have = maxi(inventory.count(StringName(key)) - int(spoken.get(StringName(key), 0)), 0)
+			spoken[StringName(key)] = int(spoken.get(StringName(key), 0)) + need
+		if have < need:
+			short[key] = need - have
+	return short
+
+
 static func can_craft(r: CraftRecipe, inventory: Inventory, station: StringName = &"") -> bool:
 	if r.station != &"" and r.station != station:
 		return false

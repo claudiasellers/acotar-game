@@ -60,7 +60,7 @@ func test_bus_declares_every_vitals_signal_with_its_arguments() -> void:
 
 func test_attack_rows_resolve_by_id_family_and_unknown() -> void:
 	assert_gte(AttackTable.count(), 25)
-	assert_eq(AttackTable.resolve(&"naga").id, &"naga_bite", "a family resolves to its default row")
+	assert_eq(AttackTable.resolve(&"naga").id, &"naga_claw", "a family resolves to its default row")
 	assert_eq(AttackTable.resolve(&"martax_roar").status_tag, &"roar_shake")
 	assert_eq(AttackTable.resolve(&"no_such_attack").id, &"generic_hit")
 
@@ -221,6 +221,35 @@ func test_a_chip_is_taught_once_then_named_on_hover() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 
 
+func test_a_gauge_is_taught_when_it_bites_and_meters_on_offer() -> void:
+	var path := "user://test_gauge_taught.cfg"
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	var row := VitalsStatusRow.new()
+	row.settings_path = path
+	add_child_autofree(row)
+	var calm: Array[Dictionary] = [{"tag": &"cold", "magnitude": 0.1, "seconds_left": -1.0, "total": -1.0, "stage": 0}]
+	row.set_statuses(calm)
+	row._process(0.1)
+	assert_eq(row.teaching, &"", "a calm gauge waits")
+	var uneasy: Array[Dictionary] = [{"tag": &"cold", "magnitude": 0.5, "seconds_left": -1.0, "total": -1.0, "stage": 1}]
+	row.set_statuses(uneasy)
+	row._process(0.1)
+	assert_eq(row.teaching, &"cold")
+	row.offer(&"health")
+	row._process(VitalsStatusRow.TEACH_SECONDS + 0.1)
+	row._process(0.1)
+	assert_eq(row.teaching, &"health", "a meter is taught on offer")
+	assert_ne(StatusRules.blurb(&"stamina"), "")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+
+
+func test_she_has_a_thought_on_waking() -> void:
+	var hud := VitalsHud.new()
+	add_child_autofree(hud)
+	assert_eq(hud.wake_line(&"manor_bed"), VitalsHud.WAKE_LINES[&"carried"])
+	assert_ne(hud.wake_line(&""), "", "where she fell")
+
+
 func test_every_status_tag_has_an_icon() -> void:
 	for tag: StringName in StatusRules.ORDER:
 		assert_true(Icons.has(Icons.STATUS, tag), String(tag))
@@ -256,6 +285,26 @@ func test_grab_breaks_free_with_presses_that_cost_stamina() -> void:
 		v.press_break_free()
 	assert_false(v.is_grabbed())
 	assert_almost_eq(player.presses_paid, 3.0 * VitalsState.GRAB_PRESS_STAMINA, 0.01)
+
+
+func test_hold_to_break_free_counts_a_held_key_as_a_steady_mash() -> void:
+	var saved := GameSettings.settings_path
+	GameSettings.settings_path = "user://test_vitals_hold.cfg"
+	GameSettings.load_settings()
+	EventBus.player_grabbed.emit(&"puca", 3, 4.0)
+	Input.action_press(&"interact")
+	v.step(VitalsState.GRAB_HOLD_STEP * 3.5)
+	assert_true(v.is_grabbed(), "setting off: holding does nothing")
+	GameSettings.set_value(&"break_free_hold", true)
+	v.step(VitalsState.GRAB_HOLD_STEP * 1.5)
+	assert_eq(v.grab_presses_left, 2, "one press per step held")
+	v.step(VitalsState.GRAB_HOLD_STEP * 2.0)
+	assert_false(v.is_grabbed(), "held long enough, she breaks free")
+	assert_almost_eq(player.presses_paid, 3.0 * VitalsState.GRAB_PRESS_STAMINA, 0.01, "each held press costs what a mash does")
+	Input.action_release(&"interact")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(GameSettings.settings_path))
+	GameSettings.settings_path = saved
+	GameSettings.load_settings()
 
 
 func test_a_teleport_mid_fall_lands_her_unhurt() -> void:

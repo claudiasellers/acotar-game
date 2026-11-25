@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="QuiverLoadouts" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/bows/quiver_loadouts.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+by_phase = {
+&"p0_winter": {
+&"arrow_ash": 1,
+&"arrow_wood": 2
+},
+&"p1_wolf_and_crossing": {
+&"arrow_ash": 1,
+&"arrow_wood": 2
+}
+}
+size_by_phase = {
+&"p0_winter": 3,
+&"p1_wolf_and_crossing": 3,
+&"p2_grounds": 10,
+&"p3_house_and_woods": 20
+}
+otherwise = {
+&"arrow_wood": 12
+}

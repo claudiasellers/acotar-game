@@ -10,6 +10,14 @@
 class_name FeyreCamera
 extends RefCounted
 
+## Metres the arm sits over her right shoulder while she aims, or while a
+## scene's focus is at least FAR_FOCUS metres off outdoors.
+const AIM_SHOULDER := 0.55
+## The same with the bow up and no aim held: the arm is long there, so she is
+## moved farther aside and the ring and a low target in front of her stand
+## clear of her body (HIP_RING_CLEAR_PX in the framing test).
+const HIP_SHOULDER := 0.85
+const FAR_FOCUS := 12.0
 const DEFAULT_PITCH := -0.2094  # -12 degrees
 ## Indoors (a roof or ceiling above her head) the camera stays in the room: it may
 ## rise at most this far above its pivot (her head height, 1.5 m), which keeps it
@@ -113,8 +121,14 @@ func update(delta: float) -> void:
 	camera.v_offset = randf_range(-0.03, 0.03) * shake
 	_update_kick(delta)
 	_update_indoor(delta)
-	var aiming := f.is_aiming
-	var target_length := 1.7 if aiming else lerpf(3.6 + f.camera_arm_extra, INDOOR_ARM, indoor)
+	# Aim held brings the lens in over her shoulder; a draw from the hip only
+	# moves her off the middle of the frame, so the arrow's line is clear.
+	var bow_up := f.bow_controller != null and f.bow_controller.is_up()
+	var precise := f.bow_controller != null and f.bow_controller.is_precise
+	var target_length := 1.7 if precise else lerpf(3.6 + f.camera_arm_extra, INDOOR_ARM, indoor)
+	# A hostile after her and close: a step back, so she sees what is coming.
+	if f.is_inside_tree() and SoftAim.engaged_near(f.get_tree(), f.global_position):
+		target_length += SoftAim.PULL_BACK
 	_update_room_arm(delta, target_length)
 	target_length = minf(target_length, _room_arm)
 	# The arm and the shoulder ease on real seconds, so the aim framing
@@ -122,7 +136,12 @@ func update(delta: float) -> void:
 	var ease := minf(10.0 * TimeScale.real(delta), 1.0)
 	_spring_arm.spring_length = lerpf(_spring_arm.spring_length, target_length, ease)
 	_clamp_indoor_pitch()
-	var shoulder := 0.55 if aiming else close_shoulder(_spring_arm.spring_length)
+	var shoulder := close_shoulder(_spring_arm.spring_length)
+	if precise or _far_focus():
+		shoulder = AIM_SHOULDER
+	elif bow_up:
+		# Scaled to the arm: indoors, on a short arm, the hip offset shrinks to the aim's.
+		shoulder = lerpf(AIM_SHOULDER, HIP_SHOULDER, clampf(inverse_lerp(1.7, 3.6, _spring_arm.spring_length), 0.0, 1.0))
 	_spring_arm.position.x = minf(lerpf(_spring_arm.position.x, shoulder, ease),
 			shoulder_clearance(shoulder))
 
@@ -265,6 +284,15 @@ func rise() -> float:
 func _auto_turn(new_yaw: float) -> void:
 	_feyre.camera_auto_yaw += angle_difference(rig.rotation.y, new_yaw)
 	rig.rotation.y = new_yaw
+
+
+## Outdoors, a scene's focus this far off (the doe across the clearing) sits on
+## the horizon straight behind her head from a centred camera: the camera
+## takes the aim's shoulder so what her eye has found is beside her, in view.
+func _far_focus() -> bool:
+	var focus := StoryControl.focus
+	return focus != null and is_instance_valid(focus) and indoor < 0.5 \
+			and focus.global_position.distance_to(rig.global_position) >= FAR_FOCUS
 
 
 ## During anchored moments the camera eases toward what the scene is about.

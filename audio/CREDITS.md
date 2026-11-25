@@ -22,6 +22,16 @@ Licence: CC0 1.0 (public domain dedication). Rebuild any file with
 | audio/music/spring_estate.ogg | Music, spring estate (from Act II): harp waltz in E lydian | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/music/village.ogg | Music, village: A dorian lute and drone | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/music/winter_forest.ogg | Music, winter forest: drone and sparse cold bells | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/arrow/select_ash.ogg | The ash arrow comes to hand | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/arrow/select_barbed.ogg | The barbed arrow comes to hand | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/arrow/select_fire.ogg | The fire arrow comes to hand | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/arrow/select_frost.ogg | The frost arrow comes to hand | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/arrow/select_light.ogg | The light arrow comes to hand | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/arrow/select_lure.ogg | The lure arrow comes to hand | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/arrow/select_rope.ogg | The rope arrow comes to hand | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/arrow/select_signal.ogg | The signal arrow comes to hand | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/arrow/select_sleep.ogg | The sleep arrow comes to hand | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/arrow/select_wood.ogg | The wood arrow comes to hand | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/beast/bellow_murderers.ogg | The beast bellows MURDERERS (wordless) | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/beast/bellow_who.ogg | The beast bellows WHO KILLED HIM (wordless) | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/beast/claws.ogg | Claws embed in the table one by one; the table groans | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
@@ -40,13 +50,28 @@ Licence: CC0 1.0 (public domain dedication). Rebuild any file with
 | audio/sfx/bogge/whisper_1.ogg | The Bogge begs inside her head, variant 1 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bogge/whisper_2.ogg | The Bogge begs inside her head, variant 2 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bogge/whisper_3.ogg | The Bogge begs inside her head, variant 3 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bow/bash.ogg | The bow limb as a club: a wooden thud | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/break.ogg | Arrow snaps | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bow/creak_loop.ogg | A held full draw: string and limb creak (loop) | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/draw.ogg | Bow draw: wood and string creak | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bow/empty_pat.ogg | Her hand pats an empty quiver | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bow/focus_in.ogg | Focus: a steadying inhale | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bow/focus_out.ogg | Focus let go: an exhale | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bow/heartbeat.ogg | Her heartbeat in the hush, one slow beat (loop) | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/hit_flesh.ogg | Arrow hits flesh | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/hit_snow.ogg | Arrow lands in snow | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bow/hit_stone.ogg | An arrow clatters off stone | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/hit_wood.ogg | Arrow hits wood, shaft quivering | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bow/let_down.ogg | The string eased forward, nothing loosed | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bow/nock.ogg | An arrow seats on the string: a wood click | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/release.ogg | Bow release: string twang and slap | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bow/release_ash.ogg | The ash arrow leaves: a deeper thrum with a faint chime tail | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bow/release_gilded.ogg | Gilded bow release: a ringing note | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bow/release_recurve.ogg | Fae recurve release: a soft bright snap | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bow/release_warbow.ogg | Sentry warbow release: a heavy thwack | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bow/retrieve.ogg | An arrow pulled out of what it stuck in | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/whoosh.ogg | Arrow in flight | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bow/winded.ogg | Out of breath: a short gasp when she can't sidestep | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/foot/grass_1.ogg | Footstep on grass, variant 1 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/foot/grass_2.ogg | Footstep on grass, variant 2 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/foot/grass_3.ogg | Footstep on grass, variant 3 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
@@ -75,6 +100,8 @@ Licence: CC0 1.0 (public domain dedication). Rebuild any file with
 | audio/sfx/naga/hurt.ogg | A naga's hissing shriek when hit | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/naga/strike.ogg | Naga talons rake her | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/naga/throat_tear.ogg | Tamlin tears out a naga's throat | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/prey/deer_lost.ogg | A lost deer gives itself away: a crash in the brush and a snort | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/prey/hare_lost.ogg | A lost rabbit squeals in the brush | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/puca/dart.ogg | The puca darts away in a shimmer | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/puca/ripple.ogg | The puca's image ripples like water | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/suriel/scream.ogg | The Suriel screams as the snare takes it | self-made, `tools/audio/gen_act1_audio.py` | CC0 |

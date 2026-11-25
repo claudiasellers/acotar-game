@@ -1,4 +1,4 @@
-## Where Feyre comes round after a knockdown: a bed, the infirmary cot, a hearth,
+## Where Feyre comes round after a knockdown: a bed (her manor bedroom), a hearth,
 ## a marked whorl stone. The nearest one in the group wins (plan §5.2).
 class_name RestPoint
 extends Marker3D
