@@ -147,6 +147,22 @@ func test_a_pickup_is_held_at_once_and_wears_and_breaks() -> void:
 	assert_null(rack.held_weapon(), "back to the boot knife")
 
 
+## The wear shows before it breaks: `worn` (and a note) once, when it drops
+## below 30%, then a note when one blow is left.
+func test_wear_shows_before_it_breaks() -> void:
+	rack.add(HOOK)
+	watch_signals(rack)
+	for i in 12:
+		rack.wear_held()
+	assert_signal_not_emitted(rack, "worn", "13 of 18 left is not worn yet")
+	rack.wear_held()
+	assert_signal_emitted_with_parameters(rack, "worn", [HOOK])
+	for i in 4:
+		rack.wear_held()
+	assert_signal_emit_count(rack, "worn", 1, "it tells her once")
+	assert_true(rack.last_hit())
+
+
 func test_when_one_breaks_she_takes_up_the_next() -> void:
 	rack.add(HOOK, 1.0 / 18.0)
 	rack.add(CLUB)

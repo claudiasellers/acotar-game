@@ -42,7 +42,10 @@ swap (L76/L77) write these slots; they don't build a second system.
   resisted element. On the last hit the weapon breaks (`broke`): her hand goes
   to the next one she carries, or to the boot knife. `last_hit()` is true when
   the next hit breaks it, and that hit lands `BREAK_MULT` (×2). `is_worn(i)`
-  is true below 30%, which is when L88's `<id>_worn` node shows.
+  is true below 30%, which is when L88's `<id>_worn` node shows. Wear shows before
+  the break: crossing 30% emits `worn` and notes "The x is cracking." in the
+  pickup log, the hit that leaves one blow notes "won't take another blow", and
+  the break notes "The x broke."
 - A unique weapon drops once per save (`fact.weapon_unique.<id>`). When it
   breaks it leaves `fact.weapon_broken_keepsake.<id>` for the keepsake.
 - Save provider `weapon_rack`.

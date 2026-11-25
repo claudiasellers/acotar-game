@@ -16,6 +16,8 @@ const ALERT_DECAY := 0.05
 ## tiny.
 const TOKENS := {&"martax": 1, &"crow": 3}
 const DEFAULT_TOKENS := 2
+## The day a pack last scattered from her here (G25; the camp is not cleared).
+const ROUTED_FLAG := "fact.site_routed.%s"
 ## An encounter ends as "slipped" once no member has been hostile or
 ## searching for this long (she got away, or they lost her).
 const ENCOUNTER_CALM_S := 8.0
@@ -270,6 +272,25 @@ func _maybe_rout(dead: Creature) -> void:
 		if is_instance_valid(m) and m.alive and m.has_method(&"rout"):
 			m.call(&"rout", from)
 	end_encounter(HostileEncounters.DRIVEN_OFF)
+	_close_rout()
+
+
+## G25: a rout has an ending. One of them calls as it goes, the dread eases
+## (HostileRoamer.rout), a small swell brings the place back for the night,
+## and she says so once. The camp isn't cleared: `fact.site_routed.<id>` holds
+## the day, and they come back.
+func _close_rout() -> void:
+	WorldState.set_flag(ROUTED_FLAG % data.id, Clock.day)
+	for m in members:
+		if is_instance_valid(m) and m.alive and m is HostileRoamer:
+			var r := m as HostileRoamer
+			if r.call_clip != &"" and r.animator:
+				r.animator.play_oneshot(r.call_clip)
+			break
+	if swell == null:
+		swell = SettleSwell.grow(self, data.territory_radius, Clock.is_night(), false)
+	if is_inside_tree():
+		HostileRoamer.say_once(get_tree(), HostileRoamer.ROUT_LINE)
 
 
 ## A glint fell at `at` (a light arrow's glow): the members nearest it that
@@ -306,6 +327,10 @@ func settle() -> void:
 	is_settled = true
 	# A camp cleared is a fight won, met head-on or not.
 	end_encounter(HostileEncounters.KILLED)
+	if swell and is_instance_valid(swell):
+		# A rout's small swell gives way to the settle's.
+		remove_child(swell)
+		swell.queue_free()
 	swell = SettleSwell.grow(self, data.territory_radius, Clock.is_night(), true)
 	WorldState.set_flag(settle_flag(data.id), Clock.day)
 	if EventBus.has_signal(&"celebration_requested"):

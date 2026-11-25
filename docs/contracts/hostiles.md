@@ -225,6 +225,12 @@ of 3-5); no sites yet (plan §6.2, a later hand-in).
   (`HostileRoamer.rout(from)`: it gives her up and runs for `ROUT_SECONDS`,
   10 s, `is_fleeing()`), and the fight ends `driven_off`. Once a fight; the
   next `report()` clears it. 0 (the naga, the briarling) fights to the last.
+  The rout has an ending (`_close_rout`): the first runner plays its
+  `call_clip`, each routed member's dread eases to `ROUT_DREAD` (0.3) until it
+  takes her up again, a quiet `SettleSwell` (no sparkle or petals) grows if
+  none is there, `fact.site_routed.<id>` holds the day, and her once-line
+  `hostile_rout` plays. A later settle replaces that swell with its own.
+  The first glint grab plays her once-line `hostile_glint_grab`.
 - **The glint**: a light arrow coming to rest emits
   `EventBus.arrow_light_landed(at)` (ArrowEffects). A site whose leash ring
   holds `at` calls `glint(at)`: the members nearest it that `wants_glint()`,

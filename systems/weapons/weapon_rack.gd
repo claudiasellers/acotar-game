@@ -8,6 +8,8 @@ extends Node
 signal changed
 signal picked(weapon_id: StringName)
 signal broke(weapon_id: StringName)
+## The held weapon dropped below WORN_BELOW (L88's `<id>_worn` node shows).
+signal worn(weapon_id: StringName)
 
 const NODE_NAME := "WeaponRack"
 const SAVE_KEY := "weapon_rack"
@@ -41,6 +43,21 @@ static func of(player: Node) -> WeaponRack:
 		r.name = NODE_NAME
 		player.add_child(r)
 	return r
+
+
+## The pickup log's notes as it wears (the rack card comes with the UI).
+const WORN_NOTE := "The %s is cracking."
+const LAST_NOTE := "The %s won't take another blow."
+const BROKE_NOTE := "The %s broke."
+
+func _note(text: String) -> void:
+	if is_inside_tree():
+		PickupLog.of(get_tree()).note(text)
+
+
+static func _name_of(id: StringName) -> String:
+	var w := WeaponTable.get_weapon(id)
+	return w.display_name.to_lower() if w and w.display_name != "" else String(id)
 
 
 func _ready() -> void:
@@ -141,11 +158,20 @@ func last_hit(resisted: bool = false) -> bool:
 func wear_held(resisted: bool = false) -> bool:
 	if held < 0 or held >= carried.size():
 		return false
+	var was_worn := is_worn(held)
 	carried[held].left = int(carried[held].left) - (RESISTED_WEAR if resisted else 1)
+	var id: StringName = carried[held].id
 	if int(carried[held].left) > 0:
+		# Wear shows before it breaks (catalogue §1.5): a note when it starts to
+		# crack, and one when a single blow is left in it.
+		if last_hit():
+			_note(LAST_NOTE % _name_of(id))
+		elif is_worn(held) and not was_worn:
+			worn.emit(id)
+			_note(WORN_NOTE % _name_of(id))
 		changed.emit()
 		return false
-	var id: StringName = carried[held].id
+	_note(BROKE_NOTE % _name_of(id))
 	carried.remove_at(held)
 	# Her hand goes to the next one she carries, or back to the boot knife.
 	held = 0 if not carried.is_empty() else -1

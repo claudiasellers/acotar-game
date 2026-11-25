@@ -200,6 +200,15 @@ func test_half_the_pack_down_and_the_rest_scatter() -> void:
 	assert_eq(_ended, [[&"gloamer_test_pack", &"gloamer", HostileEncounters.DRIVEN_OFF]],
 			"the fight ends driven off, once")
 	assert_false(site.is_settled, "the camp isn't cleared")
+	# G25: the rout has an ending: the day is kept, a small swell comes back.
+	assert_eq(WorldState.get_flag(HostileSite.ROUTED_FLAG % &"gloamer_test_pack"), Clock.day)
+	assert_not_null(site.swell, "the place comes back for the night")
+	if site.swell:
+		assert_null(site.swell.sparkle, "the quiet swell, not the settle's")
+	var r2 := site.members[2] as HostileRoamer
+	assert_not_null(r2._dread)
+	if r2._dread:
+		assert_eq(r2._dread.max_intensity, HostileRoamer.ROUT_DREAD, "the dread eases")
 
 
 func test_a_naga_camp_fights_to_the_last() -> void:
