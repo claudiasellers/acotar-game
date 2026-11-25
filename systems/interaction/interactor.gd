@@ -38,6 +38,8 @@ const COLLECTION_UI := preload("res://ui/collection_book/collection_book_ui.gd")
 ## that doesn't fit gives way to the next one that does, and when none does
 ## she says there's no room and nothing changes.
 const ORDER: Array[StringName] = [&"arrow", &"carcass", &"spot", &"field", &"station"]
+## What the use prompt says beside an arrow her quiver has no room for.
+const FULL_QUIVER_VERB := "quiver full"
 ## Her "no room" line waits this long before it is said again (ms).
 const NO_ROOM_GAP_MS := 4000
 var _spent_ms: int = -NO_ROOM_GAP_MS
@@ -200,8 +202,10 @@ func _target_of(kind: StringName) -> Dictionary:
 			if node == null:
 				return {}
 			var item := _arrow_item(node)
-			return {"kind": kind, "node": node, "item": item, "verb": "pull the arrow",
-				"fits": inv.room_for(item) > 0}
+			# A full quiver still shows the prompt, and says why E won't take it.
+			var room := inv.room_for(item) > 0
+			return {"kind": kind, "node": node, "item": item,
+				"verb": "pull the arrow" if room else FULL_QUIVER_VERB, "fits": room}
 		&"carcass":
 			var node := _nearest(get_tree().get_nodes_in_group(&"harvestable"))
 			if node == null or not node.has_method(&"harvest"):
