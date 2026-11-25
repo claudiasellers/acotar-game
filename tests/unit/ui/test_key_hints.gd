@@ -14,7 +14,6 @@ var _saved_path: String
 
 func before_each() -> void:
 	Gameplay.reset()
-	SatchelHud.ensure_actions()
 	StoryControl.release()
 	_saved_path = GameSettings.settings_path
 	GameSettings.settings_path = SETTINGS
