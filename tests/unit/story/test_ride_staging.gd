@@ -79,7 +79,7 @@ func test_ride_north_staging_follows_the_rider_through_the_teleport() -> void:
 	await wait_process_frames(3)
 	assert_eq(staging.shot_name, &"drive")
 	assert_lt(cine.camera.global_position.distance_to(horse.global_position), 12.0, "cut with them to the gate")
-	EventBus.story_actor_cue.emit(&"tamlin_beast", &"leave")
+	EventBus.scene_space_finished.emit(space.space_id)
 	assert_eq(staging.shot_name, &"released", "never past the dismount")
 	await wait_seconds(1.5)
 	assert_true(_player_cam.current)
@@ -111,7 +111,7 @@ func test_freed_veil_is_left_alone() -> void:
 	horse.free()
 	await wait_process_frames(5)
 	assert_eq(staging.shot_name, &"drive", "quietly holds until released")
-	EventBus.story_actor_cue.emit(&"tamlin_beast", &"leave")
+	EventBus.scene_space_finished.emit(space.space_id)
 	assert_eq(staging.shot_name, &"released")
 
 

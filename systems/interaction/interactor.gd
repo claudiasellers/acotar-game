@@ -231,13 +231,18 @@ func _target_of(kind: StringName) -> Dictionary:
 				"verb": "pick %s" % _item_name(find.id, "it"), "fits": inv.room_for(find.id) > 0}
 		&"station":
 			# L62: the cottage hearth (a plain node in group "hearth") brews too.
-			var node := _nearest(get_tree().get_nodes_in_group(&"station") \
-					+ get_tree().get_nodes_in_group(ChemistryStations.HEARTH_GROUP))
+			# The nearest station in reach that does something now: a spent one
+			# (a deed already done) never hides a live one beside it.
+			var live: Array = []
+			for n in get_tree().get_nodes_in_group(&"station") + get_tree().get_nodes_in_group(ChemistryStations.HEARTH_GROUP):
+				if n is Node3D and (n as Node3D).is_inside_tree() \
+						and feyre.global_position.distance_to((n as Node3D).global_position) < REACH \
+						and _station_does_something(n, StringName(n.get(&"station_id")) if &"station_id" in n else &""):
+					live.append(n)
+			var node := _nearest(live)
 			if node == null:
 				return {}
 			var id := StringName(node.get(&"station_id")) if &"station_id" in node else &""
-			if not _station_does_something(node, id):
-				return {}
 			return {"kind": kind, "node": node, "id": id, "item": &"", "verb": _station_verb(node, id), "fits": true}
 	return {}
 
@@ -293,6 +298,9 @@ func _use_station(station: Node3D, id: StringName) -> bool:
 ## only when something here runs it. Anything else (a whorl stone, the mare, a
 ## wayside nook, a lever) has its own use().
 func _station_does_something(station: Node, id: StringName) -> bool:
+	# A station that knows when it is open (a story deed's EveningStation) says so.
+	if station.has_method(&"open_now"):
+		return bool(station.call(&"open_now"))
 	if DRESSING_STATIONS.has(id) or id == &"easel":
 		return true
 	var row := StationUses.of(id)
@@ -304,9 +312,12 @@ func _station_does_something(station: Node, id: StringName) -> bool:
 	return script != ManorStation and script != SimpleStation and station.has_method(&"use")
 
 
-## The use prompt's verb. Brewing stations show BrewPrompt, and stations with
-## their own use() offer their own verb, so they offer nothing here.
-func _station_verb(_station: Node, id: StringName) -> String:
+## The use prompt's verb. A station with its own `use_verb` offers that;
+## brewing stations show BrewPrompt, and other stations with their own use()
+## offer nothing here.
+func _station_verb(station: Node, id: StringName) -> String:
+	if &"use_verb" in station and String(station.get(&"use_verb")) != "":
+		return String(station.get(&"use_verb"))
 	if DRESSING_STATIONS.has(id):
 		return "dress"
 	if id == &"easel":

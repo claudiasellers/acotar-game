@@ -154,7 +154,7 @@ func test_pages_wear_one_look() -> void:
 		for line in FileAccess.get_file_as_string(path).split("\n"):
 			if not line.strip_edges().begins_with("#") and bad.search(line):
 				hits.append(line.strip_edges())
-		assert_eq(hits, [], "%s styles itself outside JournalTheme" % path)
+		assert_eq(hits, [], "%s styles itself outside JournalTheme. Fix: take styleboxes and fonts from the theme (theme_type_variation, JournalTheme.font()), not StyleBoxFlat/fonts of its own" % path)
 
 
 func test_every_page_writes_on_the_books_sheets() -> void:
@@ -186,7 +186,7 @@ func test_one_book_and_no_page_draws_its_own() -> void:
 		for line in FileAccess.get_file_as_string(path).split("\n"):
 			if not line.strip_edges().begins_with("#") and bad.search(line):
 				hits.append(line.strip_edges())
-		assert_eq(hits, [], "%s frames itself instead of using the book's sheets" % path)
+		assert_eq(hits, [], "%s frames itself instead of using the book's sheets. Fix: write on left_sheet()/right_sheet() of MenuTab; the shell owns the cover, paper and tabs" % path)
 
 
 func test_neither_the_shell_nor_a_page_pauses_for_itself() -> void:

@@ -49,6 +49,30 @@ func test_a_story_swap_holds_off_the_region_grade_until_released() -> void:
 	assert_eq(director.target_id(), &"manor", "released, the region's grade takes over")
 
 
+## A house's rooms inside its estate: the higher priority wins wherever both
+## contain her, whatever order they joined the tree in (the estate's grade now
+## arrives first, before the house is built).
+func test_the_higher_priority_grade_wins_where_two_overlap() -> void:
+	var focus := Node3D.new()
+	add_child_autofree(focus)
+	director.focus = focus
+	var estate := RegionGrade.new()
+	estate.grade = &"manor"
+	estate.bounds = Rect2(-50.0, -50.0, 100.0, 100.0)
+	add_child_autofree(estate)
+	var rooms := RegionGrade.new()
+	rooms.grade = &"manor_interior"
+	rooms.priority = 10
+	rooms.bounds = Rect2(-5.0, -5.0, 10.0, 10.0)
+	add_child_autofree(rooms)
+	director._process(0.1)
+	assert_eq(director.target_id(), &"manor_interior", "in the rooms")
+	director.swap_to(director.target_id(), 0.0)
+	focus.position = Vector3(30.0, 0.0, 0.0)
+	director._process(0.1)
+	assert_eq(director.target_id(), &"manor", "out on the grounds")
+
+
 func test_the_house_grade_has_no_gi_and_the_manor_tone_mapper() -> void:
 	var inside := GradeDirector.load_preset(&"manor_interior")
 	var manor := GradeDirector.load_preset(&"manor")

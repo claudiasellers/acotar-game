@@ -47,8 +47,24 @@ entries = Array[ExtResource("3_entry")]([SubResource("e_hunt"), SubResource("e_s
 [sub_resource type="Resource" id="e_home"]
 script = ExtResource("3_entry")
 id = &"home"
-memory = "A life for a life. I said I would go, and I went."
+memory = "Supper, all of us at the table. Nesta and Tomas Mandray, and Father's hope."
 guide_thread = &"home"
+sketch = &"house"
+canon = "V"
+
+[sub_resource type="Resource" id="e_rest"]
+script = ExtResource("3_entry")
+id = &"rest"
+memory = "I slept through the dusk, for once."
+guide_thread = &"rest"
+sketch = &"house"
+canon = "X"
+
+[sub_resource type="Resource" id="e_night"]
+script = ExtResource("3_entry")
+id = &"night"
+memory = "A life for a life. I said I would go, and I went."
+guide_thread = &"night"
 sketch = &"house"
 canon = "V"
 
@@ -70,7 +86,7 @@ numeral = "Chapter Two"
 title = "The Long Night"
 opener = "Coin in the jar and a fire in the hearth. For one night, we can rest."
 sketch = &"moon"
-entries = Array[ExtResource("3_entry")]([SubResource("e_home"), SubResource("e_ride")])
+entries = Array[ExtResource("3_entry")]([SubResource("e_home"), SubResource("e_rest"), SubResource("e_night"), SubResource("e_ride")])
 
 [sub_resource type="Resource" id="e_arrive"]
 script = ExtResource("3_entry")

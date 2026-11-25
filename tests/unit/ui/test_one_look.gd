@@ -45,7 +45,10 @@ func test_no_ui_script_carries_a_colour_or_a_typeface_of_its_own() -> void:
 			var line := lines[i].strip_edges()
 			if not line.begins_with("#") and own.search(line):
 				hits.append("%s:%d: %s" % [path, i + 1, line])
-	assert_eq(hits, [] as Array[String], "a colour or font outside JournalTheme")
+	assert_eq(hits, [] as Array[String], ("a colour or font outside JournalTheme (docs/contracts/ui-theme.md). Fix: "
+			+ "use a token, JournalTheme.color(&\"ink\") or Color(JournalTheme.color(&\"ink\"), 0.4) for your own "
+			+ "alpha; add a new token to JournalTheme if none fits; set type with theme_type_variation or "
+			+ "JournalTheme.font(). A script that paints a picture can be listed in PICTURES here, with why."))
 
 
 func test_every_picture_let_off_is_still_there() -> void:

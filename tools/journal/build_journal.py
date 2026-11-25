@@ -26,7 +26,9 @@ CHAPTERS = [
         dict(id="sell", guide="sell", memory="The pelt sold. Coin enough to breathe on, for a while.", canon="V"),
     ]),
     ("p1_wolf_and_crossing", "Chapter Two", "The Long Night", "Coin in the jar and a fire in the hearth. For one night, we can rest.", [
-        dict(id="home", guide="home", memory="A life for a life. I said I would go, and I went.", canon="V"),
+        dict(id="home", guide="home", memory="Supper, all of us at the table. Nesta and Tomas Mandray, and Father's hope.", canon="V"),
+        dict(id="rest", guide="rest", memory="I slept through the dusk, for once.", canon="X"),
+        dict(id="night", guide="night", memory="A life for a life. I said I would go, and I went.", canon="V"),
         dict(id="ride", done="wall_crossed", req=["beast_claim_accepted"],
              after="Wherever it's taking me, there's no turning back now.",
              hints=["The white horse knows the way. All I can do is hold on and look.",
@@ -213,7 +215,7 @@ CHAPTER_SKETCH = {
     "p6_blight_tightens": "mask", "p7_return_home": "house", "p8_the_pass": "mountain",
 }
 SKETCH = {
-    "hunt": "bow", "shoot": "bow", "skin": "tree", "sell": "coin", "home": "house", "ride": "moon",
+    "hunt": "bow", "shoot": "bow", "skin": "tree", "sell": "coin", "home": "house", "rest": "house", "night": "house", "ride": "moon",
     "arrive": "door", "bathe": "wave", "dinner": "flame", "curtain_trap": "moon", "bogge": "tree", "stables": "bow",
     "puca": "moon", "map": "door", "wound": "flame", "mural": "brush", "suriel": "tree",
     "naga": "wave", "summer_faerie": "feather", "starlight": "wave", "gallery": "brush",

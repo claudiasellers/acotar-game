@@ -12,7 +12,7 @@
 ##      below, and the log then names what held shutdown ("shutdown suspects").
 ##   2. The log has "PLAYTEST exit 0", and the report lists these beats,
 ##      each "pass": spawn, hunt_to_clearing, wolf_kill, skin, pelt_sale,
-##      sleep, beast_door, crossing, manor_arrival; then Act II's first
+##      evening, sleep, beast_door, crossing, manor_arrival; then Act II's first
 ##      evening (tools/playtest/act2_beats.gd, L24): act2_arrival, act2_bath,
 ##      act2_dinner, curtain_trap; then the grounds
 ##      (tools/playtest/act2_grounds_beats.gd, L25): first_dinner (already
@@ -52,7 +52,7 @@ extends Node
 const GAME_SCENE := "res://story/act1/act1_game.tscn"
 ## Header, acceptance item 2, in play order.
 const ACCEPTANCE_BEATS: Array[String] = ["spawn", "hunt_to_clearing", "wolf_kill", "skin", "pelt_sale",
-	"sleep", "beast_door", "crossing", "manor_arrival", "act2_arrival", "act2_bath", "act2_dinner",
+	"evening", "sleep", "beast_door", "crossing", "manor_arrival", "act2_arrival", "act2_bath", "act2_dinner",
 	"curtain_trap", "first_dinner", "bogge_hunt", "puca_gate"] + P3P4Chain.BEATS
 ## Meshes that count as code-built placeholders when they sit on an actor.
 const PRIMITIVE_MESHES: Array[String] = ["BoxMesh", "CapsuleMesh", "CylinderMesh", "SphereMesh", "PrismMesh"]
@@ -512,41 +512,57 @@ func _play() -> void:
 	if _beat.id == stop_after:
 		return
 
-	# 6. Home to sleep the day away.
-	_begin("sleep", "walk home; night falls (coming home after the sale brings the evening, else the ironwood bed)")
-	var bed := _find_named(&"BedKeepsake")
-	if bed == null:
+	# 6. Home for the evening: the four deeds (CottageEvening), supper last.
+	_begin("evening", "walk home; lay the table, feed the fire, change, sit; supper is eaten")
+	var chair := _find_named(&"EveningChair")
+	if chair == null:
 		await _walk_region(&"cottage")
-		bed = _find_named(&"BedKeepsake")
-	if bed == null:
-		return _fail("no BedKeepsake (CottageBed) in the cottage")
-	_note("bed at %s, %.0f m away" % [_v(bed.global_position), _flat(bed.global_position)])
+		chair = _find_named(&"EveningChair")
+	if chair == null:
+		return _fail("no EveningChair (CottageEvening) in the cottage")
 	var door_anchor := _anchor(&"act1_cottage_door")
 	var room := _anchor(&"act1_cottage_interior")
 	if door_anchor and room:
 		var out := door_anchor.global_position - room.global_position
 		out.y = 0.0
 		await _walk_to(door_anchor.global_position + out.normalized() * 3.0, 1.0)
-		await _walk_to(door_anchor.global_position, 0.6, _evening_falling, 15.0)
-	if not _evening_falling.call():
-		await _walk_to(bed.global_position, 2.0, _evening_falling, 20.0)
-	if _evening_falling.call():
-		_note("home: the evening fell as she came in (no bed needed)")
-	else:
-		await _until(func() -> bool: return StoryControl.can_interact(), 5.0)
+		await _walk_to(door_anchor.global_position, 0.6)
+	for deed: Array in [[&"EveningTable", CottageEvening.TABLE], [&"EveningFire", CottageEvening.FIRE],
+			[&"EveningDresser", CottageEvening.CHANGED], [&"EveningChair", CottageEvening.SAT]]:
+		var station := _find_named(deed[0])
+		if station == null:
+			return _fail("no %s station" % deed[0])
+		await _walk_to(_approach(station), 0.6, Callable(), 8.0)
+		await _until(func() -> bool: return StoryControl.can_interact(), 10.0)
 		await _press(&"interact")
-	_note("feyre %s on floor %s; interior anchor %s; bed %s; ground under bed %.1f" % [_v(feyre.global_position), feyre.is_on_floor(),
-		_v(room.global_position) if room else "none", _v(bed.global_position), _ground_at(bed.global_position)])
+		if not await _until(func() -> bool: return WorldState.has_flag(deed[1]), 6.0):
+			return _fail("pressed interact at %s (%.1f m); %s never rose" % [deed[0], _flat(station.global_position), deed[1]])
+		_note("%s: %s" % [deed[0], deed[1]])
+	if not await _until(func() -> bool: return WorldState.has_flag(CottageEvening.SUPPER), 90.0):
+		var supper := _find_named(&"CottageSupper") as SceneSpace
+		return _fail("sat down; supper never ended (beat '%s')" % (supper.current_beat_label() if supper else "no CottageSupper"))
+	_pass()
+	if _beat.id == stop_after:
+		return
+
+	# 7. "Rest, Feyre": to the ironwood bed; the night comes.
+	_begin("sleep", "after supper, the ironwood bed; night falls")
+	var bed := _find_named(&"BedKeepsake")
+	if bed == null:
+		return _fail("no BedKeepsake (CottageBed) in the cottage")
+	await _walk_to(bed.global_position, 1.5, Callable(), 20.0)
+	await _until(func() -> bool: return StoryControl.can_interact(), 10.0)
+	await _press(&"interact")
 	_note("bed: can_sleep %s, sleeping %s, control %s, %.1f m (3D)" % [bed.call(&"can_sleep"), bed.get(&"sleeping"), _mode(),
 		bed.global_position.distance_to(feyre.global_position)])
-	if not await _until(func() -> bool: return Clock.is_night(), 8.0):
-		return _fail("pressed interact at the bed (%.1f m); still day (%.2f)" % [_flat(bed.global_position), Clock.time_of_day])
+	if not await _until(func() -> bool: return Clock.is_night() and WorldState.has_flag(CottageEvening.SLEPT), 8.0):
+		return _fail("pressed interact at the bed (%.1f m); still day (%.2f) or not slept" % [_flat(bed.global_position), Clock.time_of_day])
 	_note("time of day %.2f" % Clock.time_of_day)
 	_pass()
 	if _beat.id == stop_after:
 		return
 
-	# 7. The beast at the door: choose (interact = throw the knife).
+	# 8. The beast at the door: choose (interact = throw the knife).
 	_begin("beast_door", "the beast breaks in; choose; beast_claim_accepted")
 	var door := _find_named(&"BeastDoor") as BeastDoor
 	if door == null:
@@ -555,7 +571,8 @@ func _play() -> void:
 		return _fail("night, Feyre home, the beast never came (player_inside=%s, can_start=%s)" % [door._player_inside, door.can_start()])
 	await _until(func() -> bool: return not is_instance_valid(door) or door.current_beat_label().begins_with("decision"), 20.0)
 	await _press(&"interact")
-	if not await _until(func() -> bool: return WorldState.has_flag("beast_claim_accepted"), 20.0):
+	# He speaks the Treaty's terms in full and her father pleads (O1): about a minute.
+	if not await _until(func() -> bool: return WorldState.has_flag("beast_claim_accepted"), 120.0):
 		return _fail("stuck at beat '%s'" % (door.current_beat_label() if is_instance_valid(door) else "door gone"))
 	if is_instance_valid(door):
 		_note("choice: %s" % door.chosen_fact)
@@ -563,7 +580,7 @@ func _play() -> void:
 	if _beat.id == stop_after:
 		return
 
-	# 8. The ride north and the wall.
+	# 9. The ride north and the wall.
 	_begin("crossing", "ride starts by itself; wall_crossed; phase p2_grounds")
 	var ride := _find_named(&"RideNorth") as RideNorth
 	if ride == null:
@@ -594,7 +611,7 @@ func _play() -> void:
 	if _beat.id == stop_after:
 		return
 
-	# 9. Arrival at the manor.
+	# 10. Arrival at the manor.
 	_begin("manor_arrival", "after the ride Feyre is on the manor estate, free to walk")
 	await _wait(2.0)
 	var manor := WorldStreamer.get_region(&"manor_estate")
@@ -671,16 +688,6 @@ func _jump_to_manor() -> void:
 
 
 # --- input ------------------------------------------------------------------
-
-## Night has come, or is fading in, or the beast's scene has begun.
-func _evening_falling() -> bool:
-	if Clock.is_night():
-		return true
-	for space in get_tree().get_nodes_in_group(BeastDoor.GROUP):
-		if (space as SceneSpace).shifting_time or (space as SceneSpace).running:
-			return true
-	return false
-
 
 func _press(action: StringName) -> void:
 	var down := InputEventAction.new()
@@ -852,6 +859,27 @@ func _pick_up_arrows() -> void:
 
 
 ## Stick-walks toward `target` until within `radius` (or `done` says so).
+## Where to stand to use `station`: 0.8 m out from it on the side away from
+## the nearest other station within 3 m (the hearth beside the kindling, the
+## bed beside the dresser), as a player walking up to it would.
+func _approach(station: Node3D) -> Vector3:
+	var at := station.global_position
+	var other: Node3D = null
+	var best := 3.0
+	for n in get_tree().get_nodes_in_group(&"station") + get_tree().get_nodes_in_group(ChemistryStations.HEARTH_GROUP):
+		if n == station or not n is Node3D:
+			continue
+		var d := Vector2(at.x - n.global_position.x, at.z - n.global_position.z).length()
+		if d < best:
+			best = d
+			other = n
+	if other == null:
+		return at
+	var away := at - other.global_position
+	away.y = 0.0
+	return at + away.normalized() * 0.8
+
+
 func _walk_to(target: Vector3, radius: float, done: Callable = Callable(), timeout: float = -1.0) -> bool:
 	var dist0 := _flat(target)
 	if timeout < 0.0:

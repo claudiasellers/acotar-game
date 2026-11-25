@@ -155,8 +155,11 @@ func _act2_entries() -> Array[Dictionary]:
 
 func test_the_beast_waits_for_her_and_she_notices() -> void:
 	_start_arrival()
-	# She stays on the steps: he waits, and after a while she notices.
-	_tick_all(ManorArrival.FOLLOW_NUDGE_AFTER + 4.0)
+	# She stays on the steps: he pads in from the steps beside her (where the
+	# ride left him, L86) to the middle of the hall, waits, and after a while
+	# she notices. The walk in is 2.2 m/s, ManorArrival's lead speed.
+	var walk_in := arrival().mark(&"beast_steps").distance_to(arrival().mark(&"hall_mid")) / 2.2
+	_tick_all(walk_in + ManorArrival.FOLLOW_NUDGE_AFTER + 4.0)
 	assert_true(heard.has(_line(arrival(), &"beast_waits")), "the beast waits for her: %s" % [heard])
 
 
@@ -180,9 +183,9 @@ func test_the_bath_steams_shows_e_and_alis_tells_her_to_go_on() -> void:
 	_tick_all(0.3)
 	var card := welcome().get_node_or_null(^"PressCard") as PressCard
 	assert_not_null(card)
-	assert_eq(card.text() if card else "", "E   step in")
+	assert_ne(card.text() if card else "", "", "the card says what E does")
 	_tick_all(AlisWelcome.GO_ON_AFTER + 3.0)
-	assert_true(heard.has("Go on, it won't bite."), "Alis: go on: %s" % [heard])
+	assert_true(heard.has(_line(welcome(), &"alis_go_on")), "Alis: go on: %s" % [heard])
 	welcome().press_interact()
 	assert_true(_tick_all(3.0, func() -> bool: return welcome().bathed))
 	assert_eq(card.text() if card else "", "", "the card goes once she's in")

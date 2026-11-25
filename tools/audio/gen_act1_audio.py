@@ -725,6 +725,27 @@ def ash_arrow_snap():
     return normalize(x, -2)
 
 
+def beast_throw_glance():
+    """Her knife or the iron bracelets strike his hide and drop: a dull smack on
+    fur and muscle, a bright inharmonic iron clink, and one small skitter on the
+    floorboards. Useless against him, and it should sound it."""
+    r = rng(523)
+    s = 1.1
+    n = secs(s)
+    x = np.zeros(n)
+    place(x, thump(140, 0.12, 0.05, 0.5) * 0.7 + bp(white(r, secs(0.12)), 200, 1600) * env_exp(secs(0.12), 0.02) * 0.5, 0.0)
+    clink = np.zeros(secs(0.6))
+    t = np.arange(clink.size) / SR
+    for f, g, d in [(2310, 1.0, 0.16), (3770, 0.6, 0.09), (5260, 0.35, 0.06), (6920, 0.2, 0.04)]:
+        clink += np.sin(2 * np.pi * f * r.uniform(0.985, 1.015) * t) * g * np.exp(-t / d)
+    place(x, clink * 0.5, 0.012)
+    for k, at in enumerate([0.42, 0.55, 0.62]):
+        tick = np.sin(2 * np.pi * r.uniform(2600, 3400) * np.arange(secs(0.08)) / SR) * env_exp(secs(0.08), 0.015)
+        place(x, tick * (0.32 - k * 0.08), at)
+        place(x, bp(white(r, secs(0.05)), 900, 4000) * env_exp(secs(0.05), 0.01) * 0.12, at)
+    return normalize(fade(x, 0.001, 0.15), -3)
+
+
 # ======================================================================
 # UI (the princess side: glassy, sparkly, never harsh)
 # ======================================================================
@@ -933,6 +954,7 @@ SOUNDS = {
     "sfx/beast/heartbeat": (heartbeat_loop, 3, "Feyre's heartbeat pounding in her ears (loop)"),
     "sfx/beast/huff": (beast_huff, 4, "The beast's huffing breath"),
     "sfx/beast/snap_arrow": (ash_arrow_snap, 4, "The beast snaps the ash arrow"),
+    "sfx/beast/throw_glance": (beast_throw_glance, 4, "Her knife or iron bracelets glance off the beast's hide"),
     "ui/hover": (ui_hover, 4, "UI hover: glass tick"),
     "ui/click": (ui_click, 4, "UI press: soft bell"),
     "ui/open": (ui_open, 4, "Menu open: harp rise and glitter"),
@@ -1005,6 +1027,7 @@ CUES = {
     "beast_footfall": (["sfx/beast/footfall_%d" % i for i in range(1, 4)], -2, 0.05, False, False, 100),
     "beast_huff": (["sfx/beast/huff"], -4, 0.05, False, False, 60),
     "beast_snap_arrow": (["sfx/beast/snap_arrow"], -2, 0, False, False, 40),
+    "beast_throw_glance": (["sfx/beast/throw_glance"], -2, 0.04, False, False, 30),
     "ui_hover": (["ui/hover"], -6, 0.03, False, False, 0),
     "ui_click": (["ui/click"], -4, 0.02, False, False, 0),
     "ui_open": (["ui/open"], -4, 0, False, False, 0),

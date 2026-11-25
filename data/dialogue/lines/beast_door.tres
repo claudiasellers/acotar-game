@@ -1,0 +1,425 @@
+[gd_resource type="Resource" script_class="DialogueBook" format=3]
+
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_line.gd" id="1"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_place.gd" id="2"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_book.gd" id="3"]
+
+[sub_resource type="Resource" id="L0"]
+script = ExtResource("1")
+id = &"bd_treaty"
+speaker = &"feyre"
+who = ""
+text = "Five hundred years, and the Treaty's all that keeps them on their side of the wall."
+canon = "A"
+trigger = 6
+where = &"beast_door.fire"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: quiet, by the fire"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L1"]
+script = ExtResource("1")
+id = &"bd_tomas"
+speaker = &"feyre"
+who = "Feyre"
+text = "Nesta. About Tomas Mandray—"
+canon = "A"
+trigger = 6
+where = &"beast_door.tomas"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "turning to her sister; cut off by the roar"
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L2"]
+script = ExtResource("1")
+id = &"A1_10_beast_murderers"
+speaker = &"tamlin_beast"
+who = "The beast"
+text = "MURDERERS!"
+canon = "V"
+trigger = 6
+where = &"beast_door.accuse"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "an animal roar that forms a word; raw throat"
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L3"]
+script = ExtResource("1")
+id = &"H1_anything"
+speaker = &"feyre"
+who = ""
+text = "Bracelets. Knife. Anything."
+canon = "X"
+trigger = 6
+where = &"beast_door.anything"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, a whisper, frozen"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L4"]
+script = ExtResource("1")
+id = &"H1_chin"
+speaker = &"feyre"
+who = ""
+text = "Better to die with my chin held high than groveling like a cowering worm."
+canon = "V"
+trigger = 6
+where = &"beast_door.chin"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, defiant, gritted"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L5"]
+script = ExtResource("1")
+id = &"A1_11_beast_who"
+speaker = &"tamlin_beast"
+who = "The beast"
+text = "Who killed the wolf?"
+canon = "V"
+trigger = 6
+where = &"beast_door.who"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "menacing, low, each word forced out through a snarl"
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L6"]
+script = ExtResource("1")
+id = &"A1_12_feyre_idid"
+speaker = &"feyre"
+who = "Feyre"
+text = "I did."
+canon = "V"
+trigger = 6
+where = &"beast_door.confess"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "short, steady, chin up; terrified underneath"
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L7"]
+script = ExtResource("1")
+id = &"A1_13_beast_provoked"
+speaker = &"tamlin_beast"
+who = "The beast"
+text = "Did it attack you? Were you provoked?"
+canon = "V"
+trigger = 6
+where = &"beast_door.provoked"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "cold, measured, a judge"
+emotion = &"contempt"
+
+[sub_resource type="Resource" id="L8"]
+script = ExtResource("1")
+id = &"A1_14_feyre_deserved"
+speaker = &"feyre"
+who = "Feyre"
+text = "No. But considering all that your kind has done to us, it was deserved."
+canon = "A"
+trigger = 6
+where = &"beast_door.deserved"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "defiance through clenched teeth, low, building contempt"
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L9"]
+script = ExtResource("1")
+id = &"A1_15_beast_life"
+speaker = &"tamlin_beast"
+who = "The beast"
+text = "A life for a life. Any unprovoked attacks on faerie-kind by humans are to be paid only by a human life in exchange."
+canon = "V"
+trigger = 6
+where = &"beast_door.life"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "grave, formal: the Treaty speaking through him, slow and clear"
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L10"]
+script = ExtResource("1")
+id = &"A1_16_beast_choice"
+speaker = &"tamlin_beast"
+who = "The beast"
+text = "You can either come live at my home in Prythian, or you can walk outside right now and be shredded to ribbons. Your choice."
+canon = "A"
+trigger = 6
+where = &"beast_door.life"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "quiet menace, very close to her throat"
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L11"]
+script = ExtResource("1")
+id = &"A1_16a_father_spare"
+speaker = &"father"
+who = "Father"
+text = "Please, good sir—Feyre is my youngest. I beseech you to spare her. She is all … she is all …"
+canon = "V"
+trigger = 6
+where = &"beast_door.plead"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "trembling, begging, gripping her shoulder; cut off by a roar"
+emotion = &"weary"
+
+[sub_resource type="Resource" id="L12"]
+script = ExtResource("1")
+id = &"A1_16b_beast_silence"
+speaker = &"tamlin_beast"
+who = "The beast"
+text = "Silence."
+canon = "V"
+trigger = 6
+where = &"beast_door.silence"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "one word, a growl, final"
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L13"]
+script = ExtResource("1")
+id = &"A1_16c_father_gold"
+speaker = &"father"
+who = "Father"
+text = "I can get gold—"
+canon = "V"
+trigger = 6
+where = &"beast_door.gold"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "desperate, fast; cut off"
+emotion = &"weary"
+
+[sub_resource type="Resource" id="L14"]
+script = ExtResource("1")
+id = &"A1_17_beast_worth"
+speaker = &"tamlin_beast"
+who = "The beast"
+text = "How much is your daughter's life worth to you?"
+canon = "V"
+trigger = 6
+where = &"beast_door.worth"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "contempt for the father, a scoff before it"
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L15"]
+script = ExtResource("1")
+id = &"A1_18_feyre_when"
+speaker = &"feyre"
+who = "Feyre"
+text = "When do we go?"
+canon = "V"
+trigger = 6
+where = &"beast_door.when"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "quiet, resigned, steady, drained"
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L16"]
+script = ExtResource("1")
+id = &"A1_19_beast_now"
+speaker = &"tamlin_beast"
+who = "The beast"
+text = "Now."
+canon = "V"
+trigger = 6
+where = &"beast_door.now"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "one low word, flat, final"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L17"]
+script = ExtResource("1")
+id = &"A1_22_father_name"
+speaker = &"father"
+who = "Father"
+text = "You were always too good for here, Feyre. You go somewhere new, and you make a name for yourself."
+canon = "A"
+trigger = 6
+where = &"beast_door.goodbye"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "trembling, tender, too late; voice cracking"
+emotion = &"weary"
+
+[resource]
+script = ExtResource("3")
+area = &"beast_door"
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17")])
+places = Array[ExtResource("2")]([])

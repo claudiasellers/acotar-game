@@ -4,9 +4,10 @@ const BOOK := preload("res://data/guide/act1_guide.tres")
 const SETTINGS_PATH := "user://test_guide_settings.cfg"
 ## Every Act I flag state in story order, up to the first evening past the wall.
 const LADDER: Array[String] = ["wolf_killed", "fact.wolf_skinned", "pelt_sold",
-	"beast_claim_accepted", "wall_crossed", "first_dinner_eaten"]
-## The thread each prefix of LADDER should resolve to ("" = deliberate silence).
-const EXPECTED: Array[String] = ["hunt", "skin", "sell", "home", "", "quiet", ""]
+	"fact.evening.supper_eaten", "fact.evening.slept", "beast_claim_accepted", "wall_crossed", "first_dinner_eaten"]
+## The thread each prefix of LADDER should resolve to ("" = deliberate silence:
+## the ride).
+const EXPECTED: Array[String] = ["hunt", "skin", "sell", "home", "rest", "night", "", "quiet", ""]
 
 var _flags: Dictionary = {}
 

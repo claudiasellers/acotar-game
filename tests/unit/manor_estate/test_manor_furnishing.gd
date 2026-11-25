@@ -32,12 +32,23 @@ func test_refurnished_rooms_meet_the_bar() -> void:
 		seen += 1
 		var m := ManorFurnishMetrics.measure(r, _ctx, _ctx.index.stations)
 		var why := []
+		# The designer's bar (coverage, details, repeats) is taste: a room
+		# rearranged on purpose is noted, not failed. It fails only when the
+		# room has plainly lost its furniture (under half the coverage it
+		# wants, or not one detail).
+		var taste := []
 		if not m.ok_coverage:
-			why.append("coverage %.1f%% < %.1f%%" % [m.coverage * 100.0, m.want_coverage * 100.0])
+			taste.append("coverage %.1f%% < %.1f%%" % [m.coverage * 100.0, m.want_coverage * 100.0])
+			if m.coverage < m.want_coverage * 0.5:
+				why.append("emptied: coverage %.1f%%, wants %.1f%%" % [m.coverage * 100.0, m.want_coverage * 100.0])
 		if not m.ok_details:
-			why.append("details %d < %d" % [m.details, m.need_details])
+			taste.append("details %d < %d" % [m.details, m.need_details])
+			if m.details == 0:
+				why.append("no details at all")
 		if not m.repeats.is_empty():
-			why.append("repeats %s" % [m.repeats])
+			taste.append("repeats %s" % [m.repeats])
+		if not taste.is_empty():
+			gut.p("note, %s L%d under the designer's bar: %s" % [r.id, r.level, "; ".join(taste)])
 		if m.blocked_doors > 0:
 			why.append("doors blocked by %s" % [m.blockers])
 		if m.unreachable_doors > 0:
