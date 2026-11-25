@@ -58,7 +58,7 @@ func _on_creature_hit(_id: StringName, _kind: StringName, cause: StringName, _pa
 
 func _process(delta: float) -> void:
 	var feyre := bow.feyre if bow else null
-	var show := feyre != null and feyre.is_aiming and feyre.camera != null
+	var show := feyre != null and bow.is_up() and feyre.camera != null
 	visible = show
 	if not show:
 		return
