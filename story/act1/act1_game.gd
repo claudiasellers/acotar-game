@@ -75,6 +75,7 @@ func _ready() -> void:
 	PlayerPlacement.attach.call_deferred(feyre)
 	add_child(GuideJournal.new())
 	add_child(StoryJournal.new())
+	add_child(BondsTab.new())
 	add_child(KeyPrompts.new())
 	add_child(OpeningHunt.new())
 	add_child(Act1Wayfinding.new())
