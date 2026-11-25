@@ -74,8 +74,8 @@ id = &"ride"
 done_flag = "wall_crossed"
 require_flags = PackedStringArray("beast_claim_accepted")
 after = "Wherever it's taking me, there's no turning back now."
-hints = PackedStringArray("The white horse knows the way. All I can do is hold on and look.", "Ride on through the woods. There's nothing to do but watch.")
-memory = "His magic put me under. I woke in the saddle, and it was spring."
+hints = PackedStringArray("Keep close behind him. The mare won't carry me anywhere else.", "Follow him north. He won't let me run, and he won't explain.")
+memory = "He led and I followed: through our woods, through the Wall, into spring."
 sketch = &"moon"
 canon = "A"
 

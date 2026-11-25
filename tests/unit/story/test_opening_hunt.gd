@@ -206,6 +206,36 @@ func test_crouch_is_offered_near_the_doe_until_she_crouches() -> void:
 	assert_eq(prompts.want(), &"")
 
 
+## The owner, 2026-11-25: meeting the wolf names the keys of that moment one
+## at a time, each until she has used it there, whatever she learnt before him.
+func test_meeting_the_wolf_names_ash_then_the_shot_then_her_breath() -> void:
+	for learnt: StringName in [&"draw", &"ash", &"crouch", &"walk", &"look"]:
+		hints.learn(learnt)
+	Gameplay.inventory.add(&"arrow_wood", 2)
+	Gameplay.inventory.add(&"arrow_ash", 1)
+	var bow := feyre.bow_controller
+	bow.set_physics_process(false)
+	assert_eq(prompts.want(), &"", "nothing before the hunt")
+	EventBus.scene_space_started.emit(&"wolf_kill")
+	assert_eq(prompts.want(), &"", "nor before she has seen him")
+	WorldState.set_flag("fact.wolf_spotted", true)
+	assert_eq(prompts.want(), &"wolf_ash", "first the arrow that matters")
+	bow.select_arrow(&"arrow_ash")
+	prompts._learn(0.016)
+	assert_eq(prompts.want(), &"wolf_draw", "then the shot, though she has shot before")
+	feyre.arrow_fired.emit(Arrow.create())
+	assert_true(hints.taught.get(&"wolf_draw", false))
+	assert_eq(prompts.want(), &"", "her breath is named only with an arrow on the string")
+	bow.update_bow(0.016, true, false)
+	assert_eq(prompts.want(), &"focus")
+	bow.update_bow(0.016, true, false, true)
+	prompts._learn(0.016)
+	assert_eq(prompts.want(), &"", "each of the three, once")
+	EventBus.scene_space_finished.emit(&"wolf_kill")
+	for row: StringName in [&"wolf_ash", &"wolf_draw"]:
+		assert_eq((KeyHints.ROWS[row] as Array).size(), 1, "one key at a time")
+
+
 func test_hints_off_hides_every_taught_key() -> void:
 	var stuck := Node3D.new()
 	add_child_autofree(stuck)

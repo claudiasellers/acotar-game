@@ -64,7 +64,7 @@ script = ExtResource("1")
 id = &"draw"
 priority = 140
 keys = Array[StringName]([&"fire", &"aim"])
-says = PackedStringArray("hold to draw, let go to shoot", "steady your aim")
+says = PackedStringArray("hold to draw, let go to shoot", "a closer view")
 always = false
 
 [resource]

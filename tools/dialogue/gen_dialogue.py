@@ -332,10 +332,56 @@ door("A1_22_father_name", "goodbye", "father",
      "You were always too good for here, Feyre. You go somewhere new, and you make a name for yourself.",
      canon="A", delivery="trembling, tender, too late; voice cracking")
 
-# The ride north (ch5): the one thought it keeps, before the enchanted sleep.
+# The ride north (ch5-6), played: her thoughts as she reaches each stretch of
+# his road, and what happens when she strays (Keeper 2026-11-25,
+# lore/02-locations/the-wall.md "The ride north, played"). He is nearly
+# wordless all the way north; the one thing he says unasked is the block.
 A = "ride_north"
-line(A, "H1_metal", "feyre", "The air tastes like metal.", "scene", "ride_north.smell_metal", HUMAN,
-     inner=True, canon="A", delivery="inner voice: dry, quiet, close", once=False, cd=0.0)
+RIDE = ph(1, 2)   # the claim to the manor steps, either side of the Wall
+
+
+def ride(lid, b, text, canon="X", speaker="feyre", delivery="inner voice: quiet, close, riding", **kw):
+    inner = speaker == "feyre" and kw.pop("inner", True)
+    line(A, lid, speaker, text, "scene", "ride_north." + b, RIDE, inner=inner, canon=canon,
+         delivery=delivery if speaker == "feyre" else kw.pop("beast_delivery", delivery),
+         once=False, cd=0.0, **kw)
+
+
+ride("rn_look_back", "mounted", "I didn't dare look back.", canon="A")
+ride("rn_still", "still", "I'd never seen the forest so still.", canon="V")
+ride("rn_father", "village", "I could see my father limping through town, pleading for coppers.", canon="A",
+     delivery="inner voice: aching, past the dark houses")
+ride("rn_live", "live", "Live with him. Live, not die.", canon="V", delivery="inner voice: a vow, steadying")
+ride("rn_ash", "ash", "No ash. Not one.", delivery="inner voice: searching the trees, flat")
+ride("rn_what", "faerie", "What manner of faerie are you?", canon="V", inner=False,
+     delivery="aloud, to his back; no answer comes")
+ride("rn_lamb", "lamb", "A lamb in a kingdom of wolves.", canon="V", delivery="inner voice: small, bitter")
+# The tang is his magic putting her under (ch5); awake on the ride she fights
+# it off (Keeper 2026-11-25).
+ride("H1_metal", "smell_metal", "The air tastes like metal. Heavy—everything's going heavy. No. Stay awake.", canon="A",
+     delivery="inner voice: dry and close, slurring, then a sharp pull back")
+ride("rn_birds", "birds", "Birds. In winter.", delivery="inner voice: disbelief, almost a whisper")
+ride("rn_warm", "warm", "Too warm for winter wool. It's spring here.",
+     delivery="inner voice: sweating, wary")
+ride("rn_name", "name", "Do you have a name?", canon="V", inner=False, delivery="aloud, careful, to his back")
+ride("rn_name_beast", "name", "Does it even matter to you, human?", canon="V", speaker="tamlin_beast",
+     who=BEAST, beast_delivery="a low growl of annoyance; he doesn't turn")
+ride("rn_gate", "gate", "My prison or my salvation—I couldn't decide which.", canon="V",
+     delivery="inner voice: as the gate swings open on its own")
+ride("rn_magic", "magic", "Of course it would be magic, because it was spring here.", canon="V",
+     delivery="inner voice: wonder and dread together")
+ride("rn_paint", "paint", "To paint it would be useless.", canon="A", delivery="inner voice: soft, overwhelmed")
+ride("rn_fool", "stairs", "Only a fool would run with no food, no strength.", canon="V",
+     delivery="inner voice: the mare won't move; reasoning herself down")
+ride("rn_food", "stairs", "Food first. Then run.", canon="A", delivery="inner voice: decided, low")
+# Straying (Keeper's tiers): the mare first, then his growl, his roar, the block.
+ride("rn_stray_mare", "stray_mare", "She won't go. She's his.", delivery="inner voice: the reins useless, rising fear")
+ride("rn_stray_growl", "stray_growl", "Live, not die.", canon="V", delivery="inner voice: a whisper, frozen")
+ride("rn_stray_roar", "stray_roar", "I wouldn't get half a mile before he caught me.", canon="A",
+     delivery="inner voice: shaking, after the roar")
+ride("rn_stray_block", "stray_block", "Shredded to ribbons, human. Your choice.", canon="A", speaker="tamlin_beast",
+     who=BEAST, beast_delivery="very close, fangs at her face; quiet menace")
+ride("rn_stray_not_here", "stray_block", "Not here. Not like this.", delivery="inner voice: breathless, giving in")
 
 # =============================================================================
 # The village (ch3), and the gold she brings back (ch29-30)

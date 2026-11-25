@@ -2,8 +2,10 @@
 ## cottage to the first evening past the wall (plans/guidance-journal.md).
 ## Tier 0 lines are the keeper's (plans/voice-lines-act1.md, H1_*); tiers 1-2
 ## are plainer nudges in her voice, invented where the book is silent (X).
-## The ride north (beast_claim_accepted until wall_crossed) is scripted, so it
-## deliberately has no thread.
+## The ride north (beast_claim_accepted until wall_crossed) deliberately has no
+## thread: the ride holds her all the way to the manor steps, the guide is
+## silent while a scene holds her, and the beast and her own thoughts on the
+## road (ride_north.* scene lines) are its only guidance.
 ##   godot --headless --path . -s tools/guide/gen_act1_guide.gd
 extends SceneTree
 
