@@ -287,6 +287,26 @@ func test_her_empty_belly_is_thought_once_when_she_first_runs_low() -> void:
 		assert_true(load(path) is GuideThread, path)
 
 
+## UX review O6: the ash arrow is named as the one that matters before the wolf.
+func test_her_first_nock_names_her_three_arrows_once() -> void:
+	var hunt := OpeningHunt.new()
+	add_child_autofree(hunt)
+	Gameplay.inventory.add(&"arrow_ash", 1)
+	Gameplay.inventory.add(&"arrow_wood", 2)
+	feyre.bow_controller.set_physics_process(false)
+	hunt._watch_first_nock(feyre)
+	assert_false(hunt.arrows_shown, "not before an arrow is on the string")
+	feyre.bow_controller.update_bow(1.0 / 60.0, false, true)
+	assert_true(feyre.bow_controller.is_nocked)
+	hunt._queued.clear()
+	hunt._watch_first_nock(feyre)
+	assert_true(hunt.arrows_shown)
+	assert_true(hunt._queued == [&"three_arrows"] or hunt._queued.is_empty(), "queued for the journal (or dropped with no journal in Auto)")
+	assert_eq(hunt.save_state().arrows, true, "saved, so never twice")
+	var thread := load(OpeningHunt.THOUGHTS[&"three_arrows"]) as GuideThread
+	assert_eq(thread.lines[0], "Three arrows. Only one I'd trust against something that isn't an animal.")
+
+
 func test_the_rabbit_wears_a_brown_coat_that_reads_on_snow() -> void:
 	var hunt := OpeningHunt.new()
 	add_child_autofree(hunt)
