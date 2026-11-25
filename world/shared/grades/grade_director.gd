@@ -53,6 +53,15 @@ const NIGHT_FOG_INJECT := 0.4
 var sight := 0.0
 var _sight_target := 0.0
 const SIGHT_SECONDS := 6.0
+## The one glow in the game (owner, 2026-11-25: "normal", no glow over
+## everything). Only real light sources bloom: flames, lamps, faelights, eyes,
+## sparkles (emission well above white). No grade sets glow, so the look never
+## hazes in a region, a mood or at night. A sunlit pastel peaks near 2.0 raw
+## (sun 1.8 x albedo cap 0.88 + ambient), so it stays crisp under THRESHOLD.
+const GLOW_THRESHOLD := 2.2
+const GLOW_INTENSITY := 0.6
+## Tight halos (levels 2-4), no wide level-5+ haze.
+const GLOW_LEVELS := [0.0, 0.6, 1.0, 0.4, 0.0, 0.0, 0.0]
 
 
 func _ready() -> void:
@@ -65,7 +74,23 @@ func _ready() -> void:
 	current = load_preset(start_grade)
 	_from = current
 	_to = current
+	if environment and environment.environment:
+		light_source_glow(environment.environment)
 	apply(current)
+
+
+## Sets `env` to the game's light-source-only glow.
+static func light_source_glow(env: Environment) -> void:
+	env.glow_enabled = true
+	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_ADDITIVE
+	env.glow_normalized = false
+	env.glow_intensity = GLOW_INTENSITY
+	env.glow_strength = 1.0
+	env.glow_bloom = 0.0
+	env.glow_hdr_threshold = GLOW_THRESHOLD
+	env.glow_hdr_scale = 2.0
+	for i in GLOW_LEVELS.size():
+		env.set_glow_level(i, GLOW_LEVELS[i])
 
 
 func _process(delta: float) -> void:
@@ -160,7 +185,6 @@ func apply(base: GradePreset) -> void:
 	env.fog_height_density = p.fog_height_density
 	env.fog_aerial_perspective = p.fog_aerial_perspective
 	env.volumetric_fog_anisotropy = p.volumetric_anisotropy
-	env.glow_hdr_threshold = p.glow_hdr_threshold
 	env.volumetric_fog_density = p.volumetric_density + weather_fog
 	env.volumetric_fog_albedo = p.volumetric_albedo
 	env.volumetric_fog_ambient_inject = fog_ambient_inject(p.volumetric_ambient_inject, night)
@@ -170,8 +194,6 @@ func apply(base: GradePreset) -> void:
 	env.adjustment_contrast = p.contrast
 	env.adjustment_brightness = p.brightness
 	env.adjustment_color_correction = p.lut
-	env.glow_intensity = p.glow_intensity
-	env.glow_bloom = p.glow_bloom
 	if sun != null:
 		sun.light_color = p.sun_color.lerp(p.golden_sun_color, golden)
 		sun.light_volumetric_fog_energy = p.volumetric_light_energy
@@ -241,7 +263,7 @@ static func dread_look(p: GradePreset, night_weight: float) -> GradePreset:
 
 ## `p` as she sees it once the glamour on her senses is gone (canon ch23:
 ## "richer, clearer", a near-invisible rainbow on the brook, leaf edges
-## shimmering): more colour and clarity, a little more bloom and warm light,
+## shimmering): more colour and clarity, a little more warm light,
 ## and the world's magic shimmer turned up. Dread still drains it (applied after).
 static func with_true_sight(p: GradePreset, amount: float) -> GradePreset:
 	if amount <= 0.0:
@@ -252,8 +274,6 @@ static func with_true_sight(p: GradePreset, amount: float) -> GradePreset:
 	s.saturation = p.saturation * (1.0 + 0.16 * amount)
 	s.contrast = p.contrast * (1.0 + 0.05 * amount)
 	s.exposure = p.exposure * (1.0 + 0.04 * amount)
-	s.glow_intensity = p.glow_intensity + 0.12 * amount
-	s.glow_bloom = p.glow_bloom + 0.03 * amount
 	s.ambient_color = p.ambient_color.lerp(Color(1.0, 0.9, 0.86), 0.12 * amount)
 	s.fog_density = p.fog_density * (1.0 - 0.25 * amount)
 	s.magic = minf(1.0, p.magic + 0.25 * amount)
@@ -269,12 +289,9 @@ static func _sleepy(p: GradePreset, amount: float) -> GradePreset:
 	var s := GradePreset.mix(p, p, 0.0)
 	s.lut = p.lut
 	# A dreamy fade, not a dropout: about 1.3 stops down at full sleep, colour
-	# drained and a soft bloom haze, so horse, rider and path still read.
+	# drained and a thicker fog, so horse, rider and path still read.
 	s.exposure = p.exposure * (1.0 - 0.6 * amount)
 	s.saturation = p.saturation * (1.0 - 0.5 * amount)
-	s.glow_intensity = p.glow_intensity + 0.9 * amount
-	s.glow_bloom = p.glow_bloom + 0.18 * amount
-	s.glow_hdr_threshold = lerpf(p.glow_hdr_threshold, 0.7, amount)
 	s.fog_density = p.fog_density * (1.0 + 1.5 * amount)
 	return s
 

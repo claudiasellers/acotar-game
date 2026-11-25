@@ -21,8 +21,6 @@ exposure = 0.85
 saturation = 0.55
 contrast = 1.08
 brightness = 0.97
-glow_intensity = 0.25
-glow_bloom = 0.02
 snow_cover = 1.0
 magic = 0.0
 golden_sky_top = Color(0.38, 0.45, 0.66, 1)
@@ -35,7 +33,6 @@ fog_height_density = 0.02
 fog_aerial_perspective = 0.6
 volumetric_anisotropy = 0.6
 volumetric_light_energy = 1.5
-glow_hdr_threshold = 0.9
 ; Overcast winter sky over the human lands.
 cloud_cover = 0.78
 cloud_color = Color(0.86, 0.88, 0.92, 1)
