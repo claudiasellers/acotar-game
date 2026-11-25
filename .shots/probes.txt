@@ -1,0 +1,3 @@
+from lane/l83-monsters
+quality look
+shot bush_row res://tools/creatures/bush_row_shot.tscn {out} bush_row
