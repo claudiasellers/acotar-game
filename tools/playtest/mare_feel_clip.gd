@@ -82,7 +82,7 @@ func _play() -> void:
 	for i in 30:
 		_turn_camera_to(feyre.global_position + Vector3(-6.0, 1.0, -8.0))
 		await get_tree().physics_frame
-	_record("whistle")
+	_record("z_whistle")
 	await _wait(0.5)
 	if not director.whistle():
 		_stop_recording()
@@ -104,7 +104,7 @@ func _play() -> void:
 	for i in 20:
 		_turn_camera_to(m.global_position + Vector3.UP * 1.3)
 		await get_tree().physics_frame
-	_record("mount")
+	_record("z_mount")
 	await _wait(0.4)
 	if not director.mount(feyre):
 		_stop_recording()
@@ -127,7 +127,7 @@ func _play() -> void:
 	_begin("tips", "first time up: the riding key hints, each gone once its key is used (KeyHints)")
 	var hints := KeyHints.of(get_tree())
 	hints.forget_taught()
-	_record("tips")
+	_record("a_tips")
 	var shown: Array[String] = []
 	await _wait(2.0)
 	shown.append(String(hints.current))
@@ -154,7 +154,7 @@ func _play() -> void:
 
 	_begin("ride", "a canter then a gallop with turns past the stables, Feyre's own chase camera")
 	director.autopilot = _loop_pilot
-	_record("ride")
+	_record("z_ride")
 	await _wait(12.0)
 	director.autopilot = func() -> Array: return [Vector3.ZERO, false]
 	await _until(func() -> bool: return director.mare.speed < 0.3, 6.0)
@@ -163,7 +163,7 @@ func _play() -> void:
 	_pass()
 
 	_begin("dismount", "hold E: the slide down her near side")
-	_record("dismount")
+	_record("z_dismount")
 	await _wait(0.4)
 	director.dismount()
 	var dm := director.motion
@@ -180,7 +180,7 @@ func _play() -> void:
 	Gameplay.inventory.add(&"ing_spider_silk", 6)
 	Gameplay.inventory.add(&"ing_manor_fruit", 2)
 	# Her own key, as a player presses it (not E, which rides).
-	_record("tend")
+	_record("b_tend")
 	await _wait(0.6)
 	var tkey := InputEventAction.new()
 	tkey.action = MountDirector.TEND_ACTION
