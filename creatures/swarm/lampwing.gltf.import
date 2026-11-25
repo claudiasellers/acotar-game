@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://blxeraqq5gyyd"
-path="res://.godot/imported/lampwing.gltf-5537363c84bda958284a52044ab64008.scn"
+path="res://.godot/imported/lampwing.gltf-90f8d3da24e43ed06743a77fd952795d.scn"
 
 [deps]
 
-source_file="res://creatures/models/fae/lampwing.gltf"
-dest_files=["res://.godot/imported/lampwing.gltf-5537363c84bda958284a52044ab64008.scn"]
+source_file="res://creatures/swarm/lampwing.gltf"
+dest_files=["res://.godot/imported/lampwing.gltf-90f8d3da24e43ed06743a77fd952795d.scn"]
 
 [params]
 

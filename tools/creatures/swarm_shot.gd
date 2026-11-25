@@ -7,7 +7,7 @@
 extends Node
 
 const SIZE := Vector2i(1920, 1080)
-const MODEL := preload("res://creatures/models/fae/lampwing.gltf")
+const MODEL := preload("res://creatures/swarm/lampwing.gltf")
 const MATERIAL := preload("res://creatures/materials/lampwing.tres")
 ## [name, fold, rate, mouth, light, turn (degrees), pitch]
 const POSES: Array[Array] = [["flutter", 0.0, 1.0, 0.0, 0.0, 200.0, 20.0], ["flutter", 0.0, 1.0, 0.0, 0.0, 160.0, -15.0],

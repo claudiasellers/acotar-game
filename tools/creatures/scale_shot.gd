@@ -44,7 +44,7 @@ func _run() -> void:
 			anim.seek(0.0, true)
 			anim.pause()
 	# a few lampwings at her shoulder
-	var moth_path := FAE + "lampwing.gltf"
+	var moth_path := "res://creatures/swarm/lampwing.gltf"
 	if not one and ResourceLoader.exists(moth_path):
 		for i in 5:
 			var moth := (load(moth_path) as PackedScene).instantiate() as Node3D

@@ -1,4 +1,4 @@
-# lampwing poses (creatures/models/fae/lampwing.gltf, creatures/materials/lampwing.gdshader). Written by tools/blender/monsters/lampwing.py.
+# lampwing poses (creatures/swarm/lampwing.gltf, creatures/materials/lampwing.gdshader). Written by tools/blender/monsters/lampwing.py.
 # name fold rate mouth light duration_s   # what it shows   ('-' = holds or loops)
 roost 1.00 0.00 0.00 0.00 -   # wings shut upright over the back, grey undersides out, light out
 feed 0.00 0.12 0.00 1.00 -   # wings slowly opening and closing

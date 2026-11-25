@@ -1,4 +1,4 @@
-"""The lampwing (bestiary §8): creatures/models/fae/lampwing.gltf and
+"""The lampwing (bestiary §8): creatures/swarm/lampwing.gltf and
 lampwing_albedo.webp, one small moth for a MultiMesh swarm.
 
 It has no skeleton: forty to eighty of them are drawn as one MultiMesh, so
@@ -27,7 +27,7 @@ import numpy as np  # noqa: E402
 import kit  # noqa: E402
 
 NAME = "lampwing"
-OUT = os.path.join(kit.ROOT, "creatures", "models", "fae")
+OUT = os.path.join(kit.ROOT, "creatures", "swarm")       # not creatures/models: a swarm mesh has no skeleton
 STATES = os.path.join(kit.ROOT, "data", "animation", "creatures", "lampwing_states.txt")
 SIZE = 512
 
@@ -303,7 +303,7 @@ ROWS = (("roost", 1.0, 0.0, 0.0, 0.0, "-", "wings shut upright over the back, gr
 def write_states():
     os.makedirs(os.path.dirname(STATES), exist_ok=True)
     with open(STATES, "w") as f:
-        f.write(f"# lampwing poses (creatures/models/fae/{NAME}.gltf, creatures/materials/lampwing.gdshader). Written by tools/blender/monsters/lampwing.py.\n")
+        f.write(f"# lampwing poses (creatures/swarm/{NAME}.gltf, creatures/materials/lampwing.gdshader). Written by tools/blender/monsters/lampwing.py.\n")
         f.write("# name fold rate mouth light duration_s   # what it shows   ('-' = holds or loops)\n")
         for name, fold, rate, mouth, light, dur, note in ROWS:
             f.write(f"{name} {fold:.2f} {rate:.2f} {mouth:.2f} {light:.2f} {dur}   # {note}\n")
