@@ -70,7 +70,7 @@ func refresh() -> void:
 	var top := HBoxContainer.new()
 	top.add_theme_constant_override(&"separation", 10)
 	rows.add_child(top)
-	note = BookKit.label(_said if _said != "" else "Press a key's cap to change it.", &"SatchelSmall")
+	note = BookKit.label(_said if _said != "" else "Press a key's cap to change it.", &"SatchelSmall", true)
 	note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(note)
 	var reset := BookKit.chip("Reset keys", false)
@@ -148,10 +148,18 @@ func _input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 	var action := listening
 	listening = &""
+	# The row that has this key now, and will take the listening row's.
+	var had := &""
+	for other: StringName in changeable():
+		if other != action and InputSettings.board_events(other).any(func(e: InputEvent) -> bool:
+				return InputSettings.signature(e) == InputSettings.signature(event)):
+			had = other
 	if key != null and key.physical_keycode == KEY_ESCAPE:
 		_said = ""
 	elif InputSettings.rebind(action, event, changeable()):
 		_said = "%s is now %s." % [_what(action), KeyPrompt.board_word(action)]
+		if had != &"":
+			_said += " %s moved to %s." % [_what(had), KeyPrompt.board_word(had)]
 	else:
 		_said = "That key moves her."
 	refresh()
