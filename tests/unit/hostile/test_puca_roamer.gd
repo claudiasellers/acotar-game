@@ -265,7 +265,9 @@ func test_it_leads_her_into_a_camps_leash_and_is_gone() -> void:
 		m.set_physics_process(false)
 	var her := _her(Vector3(0, 0, 10))
 	var p := _puca(her)
-	_think(p, DT)
+	# The first tick is nightfall (it appears); the second is its first lure.
+	p._think(DT)
+	p._think(DT)
 	assert_false(site.is_settled, "the test's camp is live")
 	assert_eq(p.lure_site, site, "it leads toward the nearest camp")
 	assert_gt(p.move_direction.normalized().dot(Vector3(0, 0, -1)), 0.9, "toward the camp, away from her")
