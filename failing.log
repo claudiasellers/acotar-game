@@ -1,0 +1,65 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+---  GUT  ---
+[INFO]:  using [/Users/claudiasellers/Documents/acotar-game/.git/mq/batches/1795614208/gate/scratch/gut_tests_unit_hostile_test_naga_roamer_body.gd/Library/Application Support/Godot/app_userdata/ACOTAR- The Spring Court] for temporary output.
+Godot version:  4.7.2
+GUT version:  9.7.1
+
+
+res://tests/unit/hostile/test_naga_roamer_body.gd
+* test_two_throat_arrows_kill
+* test_six_body_arrows_kill
+* test_frost_slows_for_ten_seconds_times_its_row
+* test_a_wound_wakes_it_fully
+* test_camp_alert_sends_it_searching
+* test_death_takes_its_dread_with_it
+ERROR: Error calling deferred method: 'GDScript::range_body': Cannot convert argument 1 from Object to Object.
+   at: _call_function (core/object/message_queue.cpp:220)
+ERROR: Error calling deferred method: 'GDScript::range_body': Cannot convert argument 1 from Object to Object.
+   at: _call_function (core/object/message_queue.cpp:220)
+ERROR: Error calling deferred method: 'GDScript::range_body': Cannot convert argument 1 from Object to Object.
+   at: _call_function (core/object/message_queue.cpp:220)
+ERROR: Error calling deferred method: 'GDScript::range_body': Cannot convert argument 1 from Object to Object.
+   at: _call_function (core/object/message_queue.cpp:220)
+ERROR: Error calling deferred method: 'GDScript::range_body': Cannot convert argument 1 from Object to Object.
+   at: _call_function (core/object/message_queue.cpp:220)
+    [Failed]:  Unexpected Errors:
+    [1] <engine-0>Error calling deferred method: 'GDScript::range_body': Cannot convert argument 1 from Object to Object.
+    [2] <engine-0>Error calling deferred method: 'GDScript::range_body': Cannot convert argument 1 from Object to Object.
+    [3] <engine-0>Error calling deferred method: 'GDScript::range_body': Cannot convert argument 1 from Object to Object.
+    [4] <engine-0>Error calling deferred method: 'GDScript::range_body': Cannot convert argument 1 from Object to Object.
+    [5] <engine-0>Error calling deferred method: 'GDScript::range_body': Cannot convert argument 1 from Object to Object.
+      at line 65
+5/6 passed.
+
+
+
+
+==============================================
+= Run Summary
+==============================================
+
+res://tests/unit/hostile/test_naga_roamer_body.gd
+- test_death_takes_its_dread_with_it
+    [Failed]:  Unexpected Errors:
+    [1] <engine-0>Error calling deferred method: 'GDScript::range_body': Cannot convert argument 1 from Object to Object.
+    [2] <engine-0>Error calling deferred method: 'GDScript::range_body': Cannot convert argument 1 from Object to Object.
+    [3] <engine-0>Error calling deferred method: 'GDScript::range_body': Cannot convert argument 1 from Object to Object.
+    [4] <engine-0>Error calling deferred method: 'GDScript::range_body': Cannot convert argument 1 from Object to Object.
+    [5] <engine-0>Error calling deferred method: 'GDScript::range_body': Cannot convert argument 1 from Object to Object.
+          at line 65
+
+Totals
+------
+Scripts               1
+Tests                 6
+Passing Tests         5
+Failing Tests         1
+Asserts           10/11
+Time              0.422s
+
+
+---- 1 failing tests ----
+
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
