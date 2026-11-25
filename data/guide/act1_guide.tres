@@ -9,7 +9,7 @@ id = &"hunt"
 require_flags = PackedStringArray()
 done_flags = PackedStringArray("wolf_killed")
 priority = 40
-lines = PackedStringArray("Last loaf\'s gone. If I come back with nothing, we don\'t eat.", "Deer come down the trail past our door at first light. Quiet feet. Patience.", "Up the deer trail from the door, then the fresh tracks into the trees, before the snow fills them.")
+lines = PackedStringArray("Last loaf\'s gone. If I come back with nothing, we don\'t eat.", "Deer come down the trail past our door at first light. Quiet feet. Patience.", "Fresh deer tracks on the trail by our door. If I follow them into the woods now, I\'ll find her before the snow covers them.")
 voice_ids = PackedStringArray("H1_hunger", "", "")
 forbidden_words = PackedStringArray("beast", "faerie", "fae", "tamlin", "lucien", "prythian", "murderer", "high lord", "spring court", "wolf", "wall", "mercenary", "village")
 

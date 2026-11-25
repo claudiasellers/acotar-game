@@ -20,7 +20,7 @@ const THREADS: Array[Dictionary] = [
 		"lines": [
 			"Last loaf's gone. If I come back with nothing, we don't eat.",
 			"Deer come down the trail past our door at first light. Quiet feet. Patience.",
-			"Up the deer trail from the door, then the fresh tracks into the trees, before the snow fills them.",
+			"Fresh deer tracks on the trail by our door. If I follow them into the woods now, I'll find her before the snow covers them.",
 		],
 		"voice": ["H1_hunger", "", ""],
 		"forbid": ["wolf", "wall", "mercenary", "village"],
