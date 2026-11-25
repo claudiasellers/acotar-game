@@ -39,7 +39,7 @@ const BONDS: Array[Dictionary] = [
 				"then": "He came home bloodied from hunting the Bogge. I bound his hand, and he asked where I had learned how.",
 				"now": "Gentler when he is tired. He offered to help me with my letters, and I said no."},
 			{"flag": "naga_survived", "canon": "C15",
-				"then": "He came for me in the western woods and tore the naga apart. Then he healed my arm."},
+				"then": "He came for me in the western woods and tore the naga apart. Then he healed my face and arm."},
 			{"flag": "summer_faerie_comforted", "canon": "C17",
 				"then": "I held the dying faerie's hand. He carried him out and buried him himself."},
 			{"flag": "starlight_pool_found", "canon": "C18",
@@ -148,8 +148,8 @@ const BONDS: Array[Dictionary] = [
 	{
 		"id": &"father", "kind": PERSON, "met": "", "called": "Father",
 		"moments": [
-			{"flag": "", "canon": "C1-3",
-				"then": "His creditors broke his leg, and he has carved wood by the fire ever since.",
+			{"flag": "", "canon": "A",
+				"then": "A creditor's men smashed his knee, and he has carved wood by the fire ever since.",
 				"now": "He lets me do the hunting."},
 		],
 	},
