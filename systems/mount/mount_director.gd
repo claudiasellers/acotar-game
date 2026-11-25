@@ -95,11 +95,18 @@ var _far_voice: AudioStreamPlayer3D
 var _last_yaw: float = NAN
 var _bank: float = 0.0
 
-## Her own key beside her: brush, treats, dress-up, her page (not E, which rides).
+## Her own key beside her (T; project.godot, R14 OK 2026-11-25): brush,
+## treats, dress-up, her page. Not E, which rides.
 const TEND_ACTION := &"tend_mount"
+## On the pad, hold X this long beside her to tend her instead of mounting (s).
+const HOLD_TEND := 0.4
 const TEND_HINT := "Press %s beside her to brush her, feed her and dress her up."
 
 var tending: MareTendingView
+var _use_held: float = -1.0
+var _use_user: Node
+## The last interact press came from a pad (hold X tends there).
+var _pad_use: bool = false
 
 ## The whistle gesture's length (s), and when she answers after it (s).
 const GESTURE_TIME := 0.95
@@ -137,7 +144,6 @@ var _gust: AudioStreamPlayer
 
 func _ready() -> void:
 	name = "MountDirector"
-	ensure_tend_action()
 	_whistle = AudioStreamPlayer.new()
 	_whistle.stream = WHISTLE
 	_whistle.volume_db = -6.0
@@ -433,26 +439,31 @@ func _out_of_sight(p: Node3D, dist: float) -> Vector3:
 
 # ------------------------------------------------------------------ saddle
 
-## E on her mounts. Tending has its own key (TEND_ACTION), so E does one thing here.
+## E on her mounts; the keyboard tends with its own key (TEND_ACTION). The pad
+## has no free button, so there a tap of X mounts and a hold tends (director,
+## 2026-11-25), decided on release or at HOLD_TEND.
 func _on_used(user: Node) -> void:
 	if riding or motion or tending:
 		return
-	mount(user)
-
-
-## The tending key (T, the pad's D-pad up). The story/core lane owns the input
-## map (R14) and is asked to add it to project.godot; until it does, it's
-## registered here, the way the journal and guide keys are.
-static func ensure_tend_action() -> void:
-	if InputMap.has_action(TEND_ACTION):
+	if not _pad_use or not Input.is_action_pressed(&"interact"):
+		mount(user)
 		return
-	InputMap.add_action(TEND_ACTION)
-	var key := InputEventKey.new()
-	key.physical_keycode = KEY_T
-	InputMap.action_add_event(TEND_ACTION, key)
-	var pad := InputEventJoypadButton.new()
-	pad.button_index = JOY_BUTTON_DPAD_UP
-	InputMap.action_add_event(TEND_ACTION, pad)
+	_use_held = 0.0
+	_use_user = user
+
+
+func _tick_use(delta: float) -> void:
+	if _use_held < 0.0:
+		return
+	if Input.is_action_pressed(&"interact"):
+		_use_held += delta
+		if _use_held >= HOLD_TEND:
+			_use_held = -1.0
+			if open_tending():
+				KeyHints.of(get_tree()).learn(&"tend")
+	else:
+		_use_held = -1.0
+		mount(_use_user)
 
 
 ## Close enough, on foot, to tend her.
@@ -644,6 +655,8 @@ func _place_rider(delta: float) -> void:
 # ------------------------------------------------------------------ input and frame
 
 func _input(event: InputEvent) -> void:
+	if event.is_action_pressed(&"interact"):
+		_pad_use = event is InputEventJoypadButton
 	if event is InputEventMouseMotion and (event as InputEventMouseMotion).relative.length() > 0.5:
 		_since_look = 0.0
 
@@ -706,6 +719,7 @@ func _process(delta: float) -> void:
 	if p == null:
 		return
 	_tick_gesture(p, delta)
+	_tick_use(delta)
 	if _answer_in >= 0.0:
 		_answer_in -= delta
 		if _answer_in < 0.0:

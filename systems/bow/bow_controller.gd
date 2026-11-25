@@ -149,14 +149,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	# An open screen owns the mouse and the keys (ScreenStack): a screen that
-	# doesn't pause the game (the mare's tending screen) must not loose an
-	# arrow with the click that brushes her. Polled input stops here, for all.
-	var play := ScreenStack.is_empty()
 	# A click shorter than a tick is still a click.
-	update_bow(delta, play and Input.is_action_pressed(&"aim"),
-		play and (Input.is_action_pressed(&"fire") or Input.is_action_just_pressed(&"fire")),
-		play and Input.is_action_pressed(&"focus"))
+	update_bow(delta, Input.is_action_pressed(&"aim"),
+		Input.is_action_pressed(&"fire") or Input.is_action_just_pressed(&"fire"),
+		Input.is_action_pressed(&"focus"))
 
 
 ## One tick of the bow, separated from input so tests can drive it. `delta` is
