@@ -1,0 +1,16 @@
+# suriel clips (creatures/models/fae/suriel.gltf), 30 fps. Written by tools/blender/monsters/suriel.py.
+# name native_speed_mps duration_s loop(0/1) contact_s travel_m   ('-' = does not apply)
+idle - 5.000 1 - -
+stalk 0.600 1.000 1 - -
+snared - 1.500 1 - -
+scream - 1.600 0 - -
+sit_down - 1.500 0 - -
+sit_idle - 6.000 1 - -
+notice - 2.000 0 - -
+head_cock - 0.267 0 - -
+speak - 2.000 1 - -
+laugh - 1.000 0 - -
+warn - 1.000 0 - -
+burst - 0.600 0 - -
+hit_l - 0.267 0 - -
+hit_r - 0.267 0 - -
