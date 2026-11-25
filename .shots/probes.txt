@@ -1,0 +1,4 @@
+from ui-frame
+quality look
+shot brew_recipes res://tools/chemistry/brew_shot.tscn recipes {out}/brew_recipes.png
+shot book res://tools/ui/menu_open_probe.tscn shots {out} p3_house
