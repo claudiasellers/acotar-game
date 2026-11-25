@@ -64,7 +64,6 @@ func _ready() -> void:
 	Gameplay.listen(&"story_item_granted", _on_story_item_granted)
 	Gameplay.collection.discovered.connect(_on_discovered)
 	Gameplay.collection.reward_earned.connect(_on_reward)
-	_ensure_actions()
 	# The collection book is a page of the menu shell, opened with J.
 	CollectionTab.ensure(get_tree())
 	var windows := Timer.new()
@@ -403,17 +402,3 @@ func _on_reward(reward: CollectionReward) -> void:
 	if is_inside_tree():
 		PickupLog.of(get_tree()).reward(reward)
 		Juice.burst(feyre, &"unlock")
-
-
-## J / gamepad Back opens the collection book (added in code, R14).
-func _ensure_actions() -> void:
-	for spec in [[&"open_collection", KEY_J, JOY_BUTTON_BACK]]:
-		if InputMap.has_action(spec[0]):
-			continue
-		InputMap.add_action(spec[0])
-		var key := InputEventKey.new()
-		key.physical_keycode = spec[1]
-		InputMap.action_add_event(spec[0], key)
-		var pad := InputEventJoypadButton.new()
-		pad.button_index = spec[2]
-		InputMap.action_add_event(spec[0], pad)

@@ -138,7 +138,6 @@ var _gust: AudioStreamPlayer
 
 func _ready() -> void:
 	name = "MountDirector"
-	_ensure_action()
 	_whistle = AudioStreamPlayer.new()
 	_whistle.stream = WHISTLE
 	_whistle.volume_db = -6.0
@@ -174,18 +173,6 @@ func _ready() -> void:
 	_gust.volume_db = -14.0
 	add_child(_gust)
 	_add_thoughts.call_deferred()
-
-
-static func _ensure_action() -> void:
-	if InputMap.has_action(ACTION):
-		return
-	InputMap.add_action(ACTION)
-	var key := InputEventKey.new()
-	key.physical_keycode = KEY_H
-	InputMap.action_add_event(ACTION, key)
-	var pad := InputEventJoypadButton.new()
-	pad.button_index = JOY_BUTTON_MISC1
-	InputMap.action_add_event(ACTION, pad)
 
 
 ## True once the first dinner is eaten: the mare is in the stables.
