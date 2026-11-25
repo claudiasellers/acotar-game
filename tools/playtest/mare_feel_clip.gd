@@ -156,6 +156,8 @@ func _play() -> void:
 	director.autopilot = _loop_pilot
 	_record("ride")
 	await _wait(12.0)
+	var offered := UsePrompt.of(get_tree()).offered()
+	_note("use prompt while riding: %s (should be none: no \"E   ride\" on her back)" % [offered])
 	director.autopilot = func() -> Array: return [Vector3.ZERO, false]
 	await _until(func() -> bool: return director.mare.speed < 0.3, 6.0)
 	await _wait(0.6)

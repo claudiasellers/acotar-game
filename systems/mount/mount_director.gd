@@ -484,6 +484,8 @@ func open_tending() -> MareTendingView:
 		return null
 	if block_reason(p.global_position) == &"story":
 		return null
+	UsePrompt.of(get_tree()).offer(self, "")
+	KeyHints.of(get_tree()).hold(self, &"")
 	tending = MareTendingView.open(self, mare, p, Gameplay.inventory)
 	tending.closed.connect(func() -> void:
 		tending = null
@@ -509,6 +511,7 @@ func mount(user: Node = null, instant: bool = false) -> bool:
 	riding = true
 	_tips = RideTips.attach(self)  # the riding keys she hasn't used yet (KeyHints)
 	KeyHints.of(get_tree()).hold(self, &"")  # not the tending key while she rides
+	UsePrompt.of(get_tree()).offer(self, "")  # and not "E   ride" while she's up
 	var first := not unlocked()
 	if p is CharacterBody3D:
 		(p as CharacterBody3D).velocity = Vector3.ZERO
