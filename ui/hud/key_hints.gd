@@ -30,6 +30,8 @@ const ROWS := {
 	&"sleep": [[&"interact", "sleep until night"]],
 	&"snare": [[&"interact", "check the snare"]],
 	&"retrieve": [[&"interact", "pick up the arrow"]],
+	&"whorl_mark": [[&"interact", "trace the whorl and paint your mark"], [&"", "marked stones carry you to one another"]],
+	&"whorl_ride": [[&"interact", "ride to another pair you have marked"], [&"map_open", "marked stones show on the map"]],
 	&"focus": [[&"focus", "steady your breath"]],
 	&"ash": [[&"cycle_arrow", "ash arrow"]],
 	&"draw": [[&"fire", "hold to draw, let go to shoot"], [&"aim", "steady your aim"]],
