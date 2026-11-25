@@ -104,7 +104,7 @@ publish_rej() { # key diag-file full-file batch-file
 	tree=$(GIT_INDEX_FILE="$idx" git write-tree); rm -rf "$d" "$idx"
 	commit=$(GIT_AUTHOR_NAME="ACOTAR build lane" GIT_AUTHOR_EMAIL="mq@localhost" GIT_COMMITTER_NAME="ACOTAR build lane" \
 		GIT_COMMITTER_EMAIL="mq@localhost" git commit-tree "$tree" -m "rejection log $key") || return 0
-	if mq_timeout "$NET" git push -q -f "$REMOTE" "$commit:refs/heads/mq/rej-$key" 2>/dev/null; then
+	if mq_timeout "$NET" git push -q "$REMOTE" "$commit:refs/heads/mq/rej-$key" 2>/dev/null; then
 		"$here/mark.sh" add remote_branch "mq/rej-$key" 1209600 "rejection log for $key"
 		echo "Full log: git fetch origin mq/rej-$key && git show FETCH_HEAD:failing.log"
 	fi
