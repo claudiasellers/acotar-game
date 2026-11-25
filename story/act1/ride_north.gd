@@ -225,6 +225,10 @@ func _find_path() -> Path3D:
 
 
 func _mount(_space: SceneSpace) -> void:
+	# The manor is where the ride ends: it streams in while she rides, not
+	# when she reaches its gate beside a neighbour still building.
+	if WorldStreamer.get_region(MANOR):
+		WorldStreamer.hold(MANOR)
 	_rider = player()
 	if _rider:
 		_rider.set_physics_process(false)
@@ -245,6 +249,7 @@ func _mount(_space: SceneSpace) -> void:
 
 
 func _dismount(_space: SceneSpace) -> void:
+	WorldStreamer.let_go(MANOR)
 	if _rider and is_instance_valid(_rider):
 		if _rider is CharacterBody3D:
 			(_rider as CharacterBody3D).velocity = Vector3.ZERO
