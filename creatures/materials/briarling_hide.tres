@@ -1,0 +1,19 @@
+[gd_resource type="ShaderMaterial" load_steps=5 format=3]
+
+[ext_resource type="Shader" path="res://creatures/materials/briar_hide.gdshader" id="1_hide"]
+[ext_resource type="Texture2D" path="res://creatures/models/fae/briarling_albedo.webp" id="2_albedo"]
+[ext_resource type="Texture2D" path="res://creatures/models/fae/briarling_normal.webp" id="3_normal"]
+[ext_resource type="Texture2D" path="res://creatures/models/fae/briarling_orm.webp" id="4_orm"]
+
+[resource]
+shader = ExtResource("1_hide")
+shader_parameter/albedo_tex = ExtResource("2_albedo")
+shader_parameter/normal_tex = ExtResource("3_normal")
+shader_parameter/orm_tex = ExtResource("4_orm")
+shader_parameter/normal_depth = 1.0
+shader_parameter/roughness_scale = 1.0
+shader_parameter/specular = 0.3
+shader_parameter/rim_color = Color(0.55, 0.75, 0.4, 1)
+shader_parameter/rim_amount = 0.12
+shader_parameter/rim_power = 3.5
+shader_parameter/backlight = 0.3

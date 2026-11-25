@@ -1,0 +1,31 @@
+# briarling clips (creatures/models/fae/briarling.gltf), 30 fps. Written by tools/blender/monsters/briarling.py.
+# name native_speed_mps duration_s loop(0/1) contact_s travel_m   ('-' = does not apply)
+bush - 1.000 1 - -
+leaves_turn - 0.800 0 - -
+thorns_lift - 0.600 0 - -
+unfold - 1.200 0 - -
+fold - 1.000 0 - -
+idle - 2.000 1 - -
+walk 1.500 0.333 1 - -
+run 6.000 0.133 1 - -
+pick - 1.600 1 - -
+weave - 2.000 1 - -
+squabble - 1.000 0 - -
+carry - 1.000 1 - -
+snatch - 0.500 0 0.260 -
+telegraph_briarling_lash - 0.400 0 - -
+attack_briarling_lash - 0.400 0 0.100 -
+telegraph_briarling_snare - 0.600 0 - -
+attack_briarling_snare - 0.400 0 0.200 -
+snare_hold - 1.000 1 - -
+snare_cut - 0.600 0 - -
+hit_l - 0.267 0 - -
+hit_r - 0.267 0 - -
+stagger - 0.800 0 - -
+sleep_fall - 1.000 0 - -
+sleep - 3.000 1 - -
+wake - 0.800 0 - -
+burn - 0.800 1 - -
+death_l - 1.400 0 - -
+death_r - 1.400 0 - -
+death_heart_knot - 1.200 0 - -
