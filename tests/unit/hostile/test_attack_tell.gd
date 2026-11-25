@@ -119,10 +119,26 @@ func test_contact_is_not_a_cancel() -> void:
 
 func test_pose_kinds_follow_the_rows_damage_kind() -> void:
 	for attack in _rows():
-		var k := AttackTable.resolve(attack).damage_kind
-		var expected := k if AttackTell.POSES.has(k) else &"claw"
-		assert_eq(AttackTell.pose_kind(attack), expected, String(attack))
+		assert_eq(AttackTell.pose_kind(attack), AttackTable.resolve(attack).damage_kind, String(attack))
 	assert_eq(AttackTell.pose_kind(NagaRoamer.CLAW), &"claw")
+	assert_eq(AttackTell.pose_kind(NagaRoamer.LUNGE_ATTACK), &"blunt")
+	assert_eq(AttackTell.pose_kind(NagaRoamer.COIL), &"grab", "the coil is a hold (vitals.md): a grab")
+
+
+## No borrowed pose: every row that telegraphs (windup_s > 0), any family,
+## has its own damage_kind's pose.
+func test_every_telegraphed_rows_kind_has_a_pose() -> void:
+	var seen := 0
+	for f in DirAccess.get_files_at(AttackTable.DIR):
+		var path := AttackTable.DIR + f.trim_suffix(".remap")
+		if not path.ends_with(".tres"):
+			continue
+		var row := load(path) as AttackData
+		if row == null or row.windup_s <= 0.0:
+			continue
+		seen += 1
+		assert_true(AttackTell.POSES.has(row.damage_kind), "%s (%s) has a pose" % [row.id, row.damage_kind])
+	assert_gt(seen, 10, "the rows were read")
 
 
 func test_weight_eases_in_then_holds() -> void:

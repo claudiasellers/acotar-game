@@ -28,10 +28,10 @@ const VOICE_DUCK_DB := -7.0
 ## an amplify that drops and a low-pass that closes (bow design §5.3).
 const AMBIENCE_BUS := &"Ambience"
 ## Wind-up sounds by family (health-interactions §3.5 items 4, 5, 13): played
-## where the tell starts, so a coil from behind is heard behind her. Plays on
-## the WindUp bus once the mixer has one (the Ambience sidechain), else the default.
+## where the tell starts, so a coil from behind is heard behind her. They go on
+## the Sound bus like every cue (GameSettings); the WindUp bus and its Ambience
+## sidechain come with the audio request.
 const WINDUP_CUES := {&"naga": &"naga_hiss"}
-const WINDUP_BUS := &"WindUp"
 const HUSH_OPEN_HZ := 20000.0
 const HUSH_CLOSED_HZ := 800.0
 
@@ -680,9 +680,7 @@ func _on_hostile_windup(_id: StringName, kind: StringName, _attack: StringName, 
 	var cue_id: StringName = WINDUP_CUES.get(kind, &"")
 	if cue_id == &"":
 		return
-	var p := play(cue_id, at)
-	if p and AudioServer.get_bus_index(WINDUP_BUS) != -1:
-		p.set(&"bus", WINDUP_BUS)
+	play(cue_id, at)
 
 
 func _on_creature_killed(_id: StringName, kind: StringName, _cause: StringName, at: Vector3) -> void:

@@ -38,8 +38,7 @@ Signal `struck(kind, target)`: `&"knife"`, `&"sneak"`, `&"finisher"`,
 
 ## Hints (L81 G20)
 
-Strike asks KeyHints for two rows, the UI lane's to define: `strike_bash` the
-first time an engaged hostile is in reach while the bow is raised, and
-`strike_cut_free` on the first grab (`EventBus.player_grabbed`). It asks only
-once `KeyHints.ROWS` has the row, so neither is marked learnt before it can
-show. The grab ring's "cut free" line is the UI lane's, on `player_grabbed`.
+Strike will nudge two KeyHints rows, the UI lane's to define: `strike_bash`
+the first time an engaged hostile is in reach while the bow is raised, and
+`strike_cut_free` on the first grab. The nudges land once those rows are in
+main, called with no check, so a missing row fails rather than passes.
