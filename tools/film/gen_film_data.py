@@ -43,12 +43,15 @@ FILMS = {
             # Keeper 2026-11-25, the owner's telling (v3 file) [A], ch 2 and ch 18: the
             # mother, then the fall; the fine house sits under "when she was alive".
             ("op_14", 125.0, 8.4, "", "C", "When I was eight, my mother died. On her deathbed, she made me promise to keep our family together, and to look after them."),
-            ("op_15", 133.8, 25.8, "", "A", "She never lived to see us lose everything. My father was a merchant, and when she was alive, we were rich. Three years after she died, he spent every coin we had sending three ships across the sea to trade for spices and cloth. All three sank. The men he owed money took our house, and we fled to a cottage in a poor village. One of them found us there anyway. His men smashed my father's knee. He has walked with a cane ever since."),
-            ("op_16", 160.0, 6.0, "", "C", "This winter is the worst yet. We are starving. My father can't hunt. My sisters won't."),
-            ("op_17", 166.4, 2.2, "", "C", "So I hunt."),
-            ("op_18", 168.4, 3.0, "", "C", "They say some of them are getting through the Wall now, into these woods. Out of Prythian."),
+            # Three captions, so each can be read (40 words or fewer): the loss, the ships, the creditors.
+            ("op_15", 133.8, 7.0, "", "A", "She never lived to see us lose everything. My father was a merchant, and when she was alive, we were rich."),
+            ("op_16", 141.0, 8.4, "", "A", "Three years after she died, he spent every coin we had sending three ships across the sea to trade for spices and cloth. All three sank."),
+            ("op_17", 149.6, 10.0, "", "A", "The men he owed money took our house, and we fled to a cottage in a poor village. One of them found us there anyway. His men smashed my father's knee. He has walked with a cane ever since."),
+            ("op_18", 160.0, 6.0, "", "C", "This winter is the worst yet. We are starving. My father can't hunt. My sisters won't."),
+            ("op_19", 166.4, 2.2, "", "C", "So I hunt."),
+            ("op_20", 168.4, 3.0, "", "C", "They say some of them are getting through the Wall now, into these woods. Out of Prythian."),
             # Carried over the cut to the dark wood: the eye opens under it.
-            ("op_19", 171.3, 2.0, "", "C", "If I meet one, I'll kill it."),
+            ("op_21", 171.3, 2.0, "", "C", "If I meet one, I'll kill it."),
         ],
     ),
     # Cutscene A (scripts.md section 2): the glamour lifts in the glen (ch 23).
