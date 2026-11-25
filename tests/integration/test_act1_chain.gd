@@ -196,6 +196,7 @@ func test_act_one_plays_through_to_the_grounds() -> void:
 	assert_true(WorldState.has_flag("fact.ash_arrow_burned"))
 	assert_eq(Gameplay.inventory.count(&"arrow_ash"), 0, "he burns her ash arrow")
 
+	assert_false(beast.running, "the cottage scene ends (his 'Now', her father's goodbye) before she goes out")
 	# The ride and the wall: no cut. She walks out to the mare, gets up (E) and
 	# rides behind him; the test moves the mare along his road as she would.
 	assert_true(ride.start())

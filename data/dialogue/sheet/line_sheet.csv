@@ -99,6 +99,10 @@ A1_17_beast_worth,tamlin_beast,The beast,How much is your daughter's life worth 
 A1_18_feyre_when,feyre,Feyre,When do we go?,V,,scene,beast_door.when,,p0_winter p1_wolf_and_crossing,"quiet, resigned, steady, drained",audio/voice/A1_18_feyre_when.ogg
 A1_19_beast_now,tamlin_beast,The beast,Now.,V,,scene,beast_door.now,,p0_winter p1_wolf_and_crossing,"one low word, flat, final",audio/voice/A1_19_beast_now.ogg
 A1_22_father_name,father,Father,"You were always too good for here, Feyre. You go somewhere new, and you make a name for yourself.",A,,scene,beast_door.goodbye,,p0_winter p1_wolf_and_crossing,"trembling, tender, too late; voice cracking",audio/voice/A1_22_father_name.ogg
+rn_follow,feyre,,I need to follow the beast.,X,yes,scene,ride_north.follow,,p1_wolf_and_crossing p2_grounds,inner voice: resolve over fear,audio/voice/rn_follow.ogg
+rn_mount_order,tamlin_beast,The beast,The mare. Get on.,X,,scene,ride_north.mount_order,,p1_wolf_and_crossing p2_grounds,"low, flat, a command; he doesn't look away from her",audio/voice/rn_mount_order.ogg
+rn_mare_waits,feyre,,"A white mare. Unbound, and waiting, as if she knew.",A,yes,scene,ride_north.mare_waits,,p1_wolf_and_crossing p2_grounds,"inner voice: stunned, a breath",audio/voice/rn_mare_waits.ogg
+rn_mount_now,tamlin_beast,The beast,"Now, human.",X,,scene,ride_north.mount_now,,p1_wolf_and_crossing p2_grounds,"snarled, close",audio/voice/rn_mount_now.ogg
 rn_look_back,feyre,,I didn't dare look back.,A,yes,scene,ride_north.mounted,,p1_wolf_and_crossing p2_grounds,"inner voice: quiet, close, riding",audio/voice/rn_look_back.ogg
 rn_still,feyre,,I'd never seen the forest so still.,V,yes,scene,ride_north.still,,p1_wolf_and_crossing p2_grounds,"inner voice: quiet, close, riding",audio/voice/rn_still.ogg
 rn_father,feyre,,"I could see my father limping through town, pleading for coppers.",A,yes,scene,ride_north.village,,p1_wolf_and_crossing p2_grounds,"inner voice: aching, past the dark houses",audio/voice/rn_father.ogg

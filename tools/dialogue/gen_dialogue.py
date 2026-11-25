@@ -347,6 +347,13 @@ def ride(lid, b, text, canon="X", speaker="feyre", delivery="inner voice: quiet,
          once=False, cd=0.0, **kw)
 
 
+# Sent out of the broken door (owner 2026-11-25): her choice, then his order at the mare.
+ride("rn_follow", "follow", "I need to follow the beast.", delivery="inner voice: resolve over fear")
+ride("rn_mount_order", "mount_order", "The mare. Get on.", speaker="tamlin_beast", who=BEAST,
+     beast_delivery="low, flat, a command; he doesn't look away from her")
+ride("rn_mare_waits", "mare_waits", "A white mare. Unbound, and waiting, as if she knew.", canon="A",
+     delivery="inner voice: stunned, a breath")
+ride("rn_mount_now", "mount_now", "Now, human.", speaker="tamlin_beast", who=BEAST, beast_delivery="snarled, close")
 ride("rn_look_back", "mounted", "I didn't dare look back.", canon="A")
 ride("rn_still", "still", "I'd never seen the forest so still.", canon="V")
 ride("rn_father", "village", "I could see my father limping through town, pleading for coppers.", canon="A",

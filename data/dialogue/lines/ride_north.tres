@@ -6,6 +6,98 @@
 
 [sub_resource type="Resource" id="L0"]
 script = ExtResource("1")
+id = &"rn_follow"
+speaker = &"feyre"
+who = ""
+text = "I need to follow the beast."
+canon = "X"
+trigger = 6
+where = &"ride_north.follow"
+deed = &""
+phases = PackedStringArray("p1_wolf_and_crossing", "p2_grounds")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: resolve over fear"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L1"]
+script = ExtResource("1")
+id = &"rn_mount_order"
+speaker = &"tamlin_beast"
+who = "The beast"
+text = "The mare. Get on."
+canon = "X"
+trigger = 6
+where = &"ride_north.mount_order"
+deed = &""
+phases = PackedStringArray("p1_wolf_and_crossing", "p2_grounds")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "low, flat, a command; he doesn't look away from her"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L2"]
+script = ExtResource("1")
+id = &"rn_mare_waits"
+speaker = &"feyre"
+who = ""
+text = "A white mare. Unbound, and waiting, as if she knew."
+canon = "A"
+trigger = 6
+where = &"ride_north.mare_waits"
+deed = &""
+phases = PackedStringArray("p1_wolf_and_crossing", "p2_grounds")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: stunned, a breath"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L3"]
+script = ExtResource("1")
+id = &"rn_mount_now"
+speaker = &"tamlin_beast"
+who = "The beast"
+text = "Now, human."
+canon = "X"
+trigger = 6
+where = &"ride_north.mount_now"
+deed = &""
+phases = PackedStringArray("p1_wolf_and_crossing", "p2_grounds")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "snarled, close"
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L4"]
+script = ExtResource("1")
 id = &"rn_look_back"
 speaker = &"feyre"
 who = ""
@@ -27,7 +119,7 @@ follow_up = &""
 delivery = "inner voice: quiet, close, riding"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L1"]
+[sub_resource type="Resource" id="L5"]
 script = ExtResource("1")
 id = &"rn_still"
 speaker = &"feyre"
@@ -50,7 +142,7 @@ follow_up = &""
 delivery = "inner voice: quiet, close, riding"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L2"]
+[sub_resource type="Resource" id="L6"]
 script = ExtResource("1")
 id = &"rn_father"
 speaker = &"feyre"
@@ -73,7 +165,7 @@ follow_up = &""
 delivery = "inner voice: aching, past the dark houses"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L3"]
+[sub_resource type="Resource" id="L7"]
 script = ExtResource("1")
 id = &"rn_live"
 speaker = &"feyre"
@@ -96,7 +188,7 @@ follow_up = &""
 delivery = "inner voice: a vow, steadying"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L4"]
+[sub_resource type="Resource" id="L8"]
 script = ExtResource("1")
 id = &"rn_ash"
 speaker = &"feyre"
@@ -119,7 +211,7 @@ follow_up = &""
 delivery = "inner voice: searching the trees, flat"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L5"]
+[sub_resource type="Resource" id="L9"]
 script = ExtResource("1")
 id = &"rn_what"
 speaker = &"feyre"
@@ -142,7 +234,7 @@ follow_up = &""
 delivery = "aloud, to his back; no answer comes"
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L6"]
+[sub_resource type="Resource" id="L10"]
 script = ExtResource("1")
 id = &"rn_lamb"
 speaker = &"feyre"
@@ -165,7 +257,7 @@ follow_up = &""
 delivery = "inner voice: small, bitter"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L7"]
+[sub_resource type="Resource" id="L11"]
 script = ExtResource("1")
 id = &"H1_metal"
 speaker = &"feyre"
@@ -188,7 +280,7 @@ follow_up = &""
 delivery = "inner voice: dry and close, slurring, then a sharp pull back"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L8"]
+[sub_resource type="Resource" id="L12"]
 script = ExtResource("1")
 id = &"rn_birds"
 speaker = &"feyre"
@@ -211,7 +303,7 @@ follow_up = &""
 delivery = "inner voice: disbelief, almost a whisper"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L9"]
+[sub_resource type="Resource" id="L13"]
 script = ExtResource("1")
 id = &"rn_warm"
 speaker = &"feyre"
@@ -234,7 +326,7 @@ follow_up = &""
 delivery = "inner voice: sweating, wary"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L10"]
+[sub_resource type="Resource" id="L14"]
 script = ExtResource("1")
 id = &"rn_name"
 speaker = &"feyre"
@@ -257,7 +349,7 @@ follow_up = &""
 delivery = "aloud, careful, to his back"
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L11"]
+[sub_resource type="Resource" id="L15"]
 script = ExtResource("1")
 id = &"rn_name_beast"
 speaker = &"tamlin_beast"
@@ -280,7 +372,7 @@ follow_up = &""
 delivery = "a low growl of annoyance; he doesn't turn"
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L12"]
+[sub_resource type="Resource" id="L16"]
 script = ExtResource("1")
 id = &"rn_gate"
 speaker = &"feyre"
@@ -303,7 +395,7 @@ follow_up = &""
 delivery = "inner voice: as the gate swings open on its own"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L13"]
+[sub_resource type="Resource" id="L17"]
 script = ExtResource("1")
 id = &"rn_magic"
 speaker = &"feyre"
@@ -326,7 +418,7 @@ follow_up = &""
 delivery = "inner voice: wonder and dread together"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L14"]
+[sub_resource type="Resource" id="L18"]
 script = ExtResource("1")
 id = &"rn_paint"
 speaker = &"feyre"
@@ -349,7 +441,7 @@ follow_up = &""
 delivery = "inner voice: soft, overwhelmed"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L15"]
+[sub_resource type="Resource" id="L19"]
 script = ExtResource("1")
 id = &"rn_fool"
 speaker = &"feyre"
@@ -372,7 +464,7 @@ follow_up = &""
 delivery = "inner voice: the mare won't move; reasoning herself down"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L16"]
+[sub_resource type="Resource" id="L20"]
 script = ExtResource("1")
 id = &"rn_food"
 speaker = &"feyre"
@@ -395,7 +487,7 @@ follow_up = &""
 delivery = "inner voice: decided, low"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L17"]
+[sub_resource type="Resource" id="L21"]
 script = ExtResource("1")
 id = &"rn_stray_mare"
 speaker = &"feyre"
@@ -418,7 +510,7 @@ follow_up = &""
 delivery = "inner voice: the reins useless, rising fear"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L18"]
+[sub_resource type="Resource" id="L22"]
 script = ExtResource("1")
 id = &"rn_stray_growl"
 speaker = &"feyre"
@@ -441,7 +533,7 @@ follow_up = &""
 delivery = "inner voice: a whisper, frozen"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L19"]
+[sub_resource type="Resource" id="L23"]
 script = ExtResource("1")
 id = &"rn_stray_roar"
 speaker = &"feyre"
@@ -464,7 +556,7 @@ follow_up = &""
 delivery = "inner voice: shaking, after the roar"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L20"]
+[sub_resource type="Resource" id="L24"]
 script = ExtResource("1")
 id = &"rn_stray_block"
 speaker = &"tamlin_beast"
@@ -487,7 +579,7 @@ follow_up = &""
 delivery = "very close, fangs at her face; quiet menace"
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L21"]
+[sub_resource type="Resource" id="L25"]
 script = ExtResource("1")
 id = &"rn_stray_not_here"
 speaker = &"feyre"
@@ -513,5 +605,5 @@ emotion = &"guarded"
 [resource]
 script = ExtResource("3")
 area = &"ride_north"
-lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20"), SubResource("L21")])
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20"), SubResource("L21"), SubResource("L22"), SubResource("L23"), SubResource("L24"), SubResource("L25")])
 places = Array[ExtResource("2")]([])

@@ -174,9 +174,13 @@ func test_the_ride_is_played_from_the_cottage_road_to_the_steps() -> void:
 	assert_gt(ride._mark(&"birds"), ride.seam_at())
 	for beat: StringName in [&"mounted", &"still", &"village", &"live", &"ash", &"faerie", &"lamb", &"smell_metal",
 			&"birds", &"warm", &"name", &"gate", &"magic", &"paint", &"stairs",
-			&"stray_mare", &"stray_growl", &"stray_roar", &"stray_block"]:
+			&"stray_mare", &"stray_growl", &"stray_roar", &"stray_block",
+			&"follow", &"mount_order", &"mare_waits", &"mount_now"]:
 		assert_false(director._of(DialogueLine.Trigger.SCENE, StringName("ride_north.%s" % beat)).is_empty(), "lines for %s" % beat)
-	assert_eq((director.by_id[&"rn_stray_block"] as DialogueLine).speaker, &"tamlin_beast", "the block is his one line")
+	assert_eq((director.by_id[&"rn_stray_block"] as DialogueLine).speaker, &"tamlin_beast", "the block is his line")
+	assert_eq((director.by_id[&"rn_mount_order"] as DialogueLine).speaker, &"tamlin_beast", "outside, he sends her to the mare")
+	assert_true((director.by_id[&"rn_follow"] as DialogueLine).inner, "her choice is a thought")
+	assert_false(ride._marks.any(func(m: Array) -> bool: return m[0] == &"live"), "'Live, not die' is said at the door, not on the road")
 	var drive := RideNorth.drive_points()
 	var last := drive[drive.size() - 1]
 	var door := Vector2(ManorSitePlan.FRONT_DOOR.x, ManorSitePlan.FRONT_DOOR.z)

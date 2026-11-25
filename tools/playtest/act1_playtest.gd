@@ -608,7 +608,7 @@ func _play() -> void:
 	if not await _until(func() -> bool: return ride.step == RideNorth.Step.RIDING, 8.0):
 		return _fail("E at the mare didn't put her up (step %s, %.1f m from her)" % [ride.step, _flat(ride.horse.global_position)])
 	# Rides behind him; once, past the village, she tries to break away east.
-	var bolt := {"from": ride._mark(&"live"), "until": -1.0, "max": 0.0, "tier": 0}
+	var bolt := {"from": ride._mark(&"ash"), "until": -1.0, "max": 0.0, "tier": 0}
 	ride.autopilot = func() -> Array:
 		var at := ride.horse.global_position
 		if ride.progress >= float(bolt["from"]) and float(bolt["until"]) < 0.0:
@@ -619,7 +619,7 @@ func _play() -> void:
 		if bolting:
 			var road := ride.pose_at(ride.progress)
 			return [road.basis.x.normalized(), true]
-		var to := ride.pose_at(ride.progress + 9.0).origin - at
+		var to := ride.heading() - at
 		to.y = 0.0
 		return [to.normalized() if to.length() > 0.1 else Vector3.ZERO, ride.progress < ride.beast_at - 6.0]
 	var t_ride := _sim_seconds()

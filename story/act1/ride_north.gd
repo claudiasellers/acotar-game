@@ -33,6 +33,24 @@ const MANOR := &"manor_estate"
 const MARE_DATA := preload("res://data/mount/white_mare.tres")
 ## Metres along the road where the mare waits, past the cottage's yard.
 const MARE_AT := 34.0
+## Outside her door (the act1_cottage_door anchor, whose +Z is outdoors and
+## whose -X side is the cottage's road end): the mare this far out and along
+## the front toward the road, he at the corner facing the door. His road starts
+## in the cottage and leaves past its back, so from the door she is led round
+## that corner (YARD_TURN, door frame: out, side) before the road takes over.
+const MARE_OUT := 3.5
+const MARE_SIDE := 4.0
+const BEAST_OUT := 3.0
+const BEAST_SIDE := 8.5
+const YARD_TURN := [Vector2(2.5, 9.0), Vector2(-6.35, 9.3)]
+## Out of the yard: past this far along the road, or this far from its corner.
+const YARD_DONE := 10.0
+const YARD_LOST := 30.0
+## On foot and not yet up: the mare stamps and snorts, then he snarls at her.
+const FOOT_NUDGE := [14.0, 32.0]
+## The dread the cottage left (1.0, two stops down at night) eases to this
+## outside, so the yard reads by moonlight; straying raises it again.
+const YARD_DREAD := 0.15
 ## On foot, this far from the mare is still the yard and her way to the mare.
 const FOOT_FREE := 30.0
 ## Metres along the road he keeps ahead of her.
@@ -74,7 +92,6 @@ const STOP_REACH := 1.0
 const THOUGHTS_SOUTH := [
 	[&"still", Vector2(20.0, 2205.0)],
 	[&"village", Vector2(330.0, 2245.0)],
-	[&"live", Vector2(260.0, 2080.0)],
 	[&"ash", Vector2(180.0, 1985.0)],
 	[&"faerie", Vector2(95.0, 1860.0)],
 	[&"lamb", Vector2(40.0, 1760.0)],
@@ -116,6 +133,13 @@ var autopilot: Callable
 var said: Array[StringName] = []
 
 var _rider: Node3D
+var _foot_t: float = 0.0
+var _foot_nudged: int = 0
+var _outside: bool = false
+## Lines on foot wait their turn, one after another (none is dropped).
+var _queued: Array[StringName] = []
+## Round the cottage to his road (world points), passed one by one.
+var _yard: Array[Vector3] = []
 var _pose: RidePose
 var _motion: MountMotion
 var _beast_walk: float = -1.0
@@ -346,6 +370,33 @@ func locate(at: Vector3) -> Vector2:
 
 # ------------------------------------------------------------------ start and end
 
+## Not while the cottage scene still runs: he says "Now", her father says
+## goodbye, and only then is she sent out to the mare.
+func can_start() -> bool:
+	return super.can_start() and not _cottage_busy()
+
+
+func _cottage_busy() -> bool:
+	if not is_inside_tree():
+		return false
+	for n in get_tree().get_nodes_in_group(&"story_space_live"):
+		# A finished space stays in the group, so only a running one counts.
+		if n != self and StringName(n.get_meta(&"story_space_id", &"")) == &"beast_door" \
+				and bool(n.get(&"running")):
+			return true
+	return false
+
+
+## The broken door of the cottage (world), or null (greybox and tests).
+func _door() -> Node3D:
+	if not is_inside_tree():
+		return null
+	for anchor in get_tree().get_nodes_in_group(&"story_anchor"):
+		if StringName(anchor.get_meta(&"anchor_id", anchor.name)) == &"act1_cottage_door":
+			return anchor as Node3D
+	return null
+
+
 func _begin(_space: SceneSpace) -> void:
 	StoryControl.hold(self, StoryControl.Mode.WALK, PackedStringArray(["interact"]))
 	_rider = player()
@@ -358,22 +409,51 @@ func _begin(_space: SceneSpace) -> void:
 		WorldStreamer.hold(MANOR)
 	_wall = get_tree().root.find_child("WallBarrier", true, false) as WallBarrier
 	var at := pose_at(MARE_AT)
+	var beast_pose := pose_at(MARE_AT + 6.0)
+	var door := _door()
+	if door:
+		# The white mare waits right outside her door, facing his road.
+		var out := door.global_basis.z
+		out.y = 0.0
+		out = out.normalized()
+		var side := out.cross(Vector3.UP)
+		_yard.clear()
+		for p in YARD_TURN:
+			_yard.append(door.global_position + out * (p as Vector2).x + side * (p as Vector2).y)
+		var ahead := _yard[0]
+		var mare_at := door.global_position + out * MARE_OUT + side * MARE_SIDE
+		mare_at.y = _yard_y(mare_at, door)
+		ahead.y = mare_at.y
+		at = Transform3D(Basis(), mare_at).looking_at(ahead, Vector3.UP) if ahead.distance_to(mare_at) > 0.5 \
+				else Transform3D(Basis(), mare_at)
+		var him := door.global_position + out * BEAST_OUT + side * BEAST_SIDE
+		him.y = _yard_y(him, door)
+		var face := door.global_position
+		face.y = him.y
+		beast_pose = Transform3D(Basis(), him).looking_at(face, Vector3.UP)
 	horse = MareMount.new()
 	horse.data = MARE_DATA
 	add_child(horse)
 	horse.global_transform = at
 	horse.used.connect(_on_mare_used)
 	# He leads from the door he broke, out to the mare and on.
-	beast = request_actor(&"tamlin_beast", pose_at(MARE_AT + 6.0), StandIns.beast)
-	beast_at = MARE_AT + 6.0
+	beast = request_actor(&"tamlin_beast", beast_pose, StandIns.beast)
+	beast_at = locate(beast_pose.origin).x if door else MARE_AT + 6.0
 	if beast is BeastActor:
 		var actor := beast as BeastActor
 		actor.door = null
 		actor.outdoors = true
 		_beast_walk = actor.walk_speed
 		actor.walk_speed = 2.2
-	_lead(beast_at)
+	if door:
+		_hold_by_the_mare()
+	else:
+		_lead(beast_at)
 	StoryControl.set_focus(beast)
+	# The cottage's dread (full, at night) would leave the yard black.
+	EventBus.mood_requested.emit(&"dread", YARD_DREAD, 3.0)
+	# His ultimatum still ringing: she chooses.
+	_queued.append_array([&"live", &"follow"])
 
 
 func _end(_space: SceneSpace) -> void:
@@ -433,7 +513,10 @@ func _seated() -> void:
 	if _pose:
 		_pose.amount = 1.0
 	_place_rider()
-	_say(&"mounted")
+	# His orders to get up are spent; her own thoughts from the door still come.
+	for spent: StringName in [&"mount_order", &"mare_waits", &"mount_now"]:
+		_queued.erase(spent)
+	_queued.append(&"mounted")
 	# Her first time in the saddle: the riding key hints (the mare lane's
 	# RideTips holds the first row she hasn't used and learns it as she does).
 	if is_inside_tree():
@@ -487,6 +570,11 @@ func _down() -> void:
 	if horse and is_instance_valid(horse):
 		horse.go_home()
 	step = Step.DONE
+
+
+func _yard_y(at: Vector3, door: Node3D) -> float:
+	var y := _ground_at(at.x, at.z)
+	return door.global_position.y if is_nan(y) else y
 
 
 func _ground_at(x: float, z: float) -> float:
@@ -578,7 +666,27 @@ func _on_foot(delta: float) -> void:
 	# On foot it is the mare she must go to: the yard and the road to her are hers.
 	_measure(Vector2(here.x, maxf(to_mare.length() - FOOT_FREE, 0.0)), delta, false)
 	if tier < 2:
-		_lead(MARE_AT + 6.0)
+		if _door():
+			_hold_by_the_mare()
+		else:
+			_lead(MARE_AT + 6.0)
+	# Out of the door: he tells her what to do, once.
+	if not _outside and to_mare.length() < MARE_OUT + 2.5:
+		_outside = true
+		_queued.append(&"mount_order")
+	_foot_t += delta
+	if _foot_nudged < FOOT_NUDGE.size() and _foot_t >= float(FOOT_NUDGE[_foot_nudged]):
+		_foot_nudged += 1
+		if _foot_nudged == 1:
+			horse.snort()
+			_queued.append(&"mare_waits")
+		else:
+			if beast is BeastActor:
+				(beast as BeastActor).menace(1, _rider.global_position)
+			SoundDirector.cue(&"beast_snarl", beast.global_position if beast else _rider.global_position)
+			_say(&"mount_now", true)
+	if not _queued.is_empty() and not _speaking():
+		_say(_queued.pop_front(), true)
 	UsePrompt.of(get_tree()).offer(self, "ride" if to_mare.length() <= MountDirector.PROMPT_RADIUS else "")
 	# Past the last tier she is held at its edge, as the Wall holds her.
 	if stray > HARD and _rider is CharacterBody3D and to_mare.length() > 0.1:
@@ -591,6 +699,15 @@ func _ride(delta: float) -> void:
 	# Never a jump to another stretch of road that happens to pass near.
 	progress = here.x
 	reached = maxf(reached, progress)
+	if not _queued.is_empty() and not _speaking():
+		_say(_queued.pop_front(), true)
+	if _in_yard():
+		# Round the cottage: no straying yet, he walks ahead to the road.
+		stray = 0.0
+		_steer_mare(here, delta)
+		_lead_round()
+		_thoughts()
+		return
 	_measure(here, delta)
 	_steer_mare(here, delta)
 	if tier < 4:
@@ -640,7 +757,7 @@ func _steer_mare(here: Vector2, delta: float) -> void:
 		horse.gallop = false
 		horse.speed = minf(horse.speed, 1.0)
 		return
-	var road := pose_at(minf(here.x + 8.0, path_length())).origin - horse.global_position
+	var road := heading() - horse.global_position
 	road.y = 0.0
 	road = road.normalized() if road.length() > 0.1 else Vector3.ZERO
 	if stray > DRIFT:
@@ -760,6 +877,50 @@ func _settle() -> void:
 ## He keeps `to` metres along the road, never back, at her pace; when she
 ## has fallen far behind he stops and looks back for her. Past the drive's end
 ## he goes up the steps.
+## On foot: he stands beyond the mare and watches her, waiting.
+## Where the mare is making for: the next corner of the yard, then his road.
+func heading() -> Vector3:
+	if not _yard.is_empty():
+		return _yard[0]
+	return pose_at(minf(progress + 8.0, path_length())).origin
+
+
+## Still being led round the cottage; passes corners as she reaches them.
+func _in_yard() -> bool:
+	if _yard.is_empty():
+		return false
+	var at := horse.global_position
+	var lost := Vector2(at.x - _yard[0].x, at.z - _yard[0].z).length() > YARD_LOST
+	while not _yard.is_empty() and (progress >= YARD_DONE or lost
+			or Vector2(at.x - _yard[0].x, at.z - _yard[0].z).length() < 2.5):
+		_yard.pop_front()
+	if _yard.is_empty():
+		# On his road now: his place on it is where he walks.
+		reached = progress
+		if beast and is_instance_valid(beast):
+			beast_at = maxf(locate(beast.global_position).x, progress + 4.0)
+		return false
+	return true
+
+
+## In the yard he walks a corner ahead of her, then on to his road.
+func _lead_round() -> void:
+	if beast == null or not is_instance_valid(beast):
+		return
+	var to := _yard[1] if _yard.size() > 1 else pose_at(YARD_DONE + 6.0).origin
+	if beast is BeastActor:
+		var actor := beast as BeastActor
+		actor.walk_speed = clampf(horse.speed + 1.5, 2.2, MARE_DATA.gallop_speed + 2.0)
+		actor.lead(to)
+	else:
+		beast.global_position = to
+
+
+func _hold_by_the_mare() -> void:
+	if beast is BeastActor and _rider:
+		(beast as BeastActor).wait_for(_rider.global_position)
+
+
 func _lead(to: float) -> void:
 	if beast == null or not is_instance_valid(beast):
 		return
