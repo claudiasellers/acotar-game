@@ -17,6 +17,10 @@ const RAIN_AT := 0.3
 const RAIN_HEARING := 0.7
 const RAIN_SCENT := 0.5
 const TICK := 0.2
+## A bow's release is heard this long (s) after it, plus her distance at this
+## pace (m/s, a little under an arrow's): see emit_release.
+const RELEASE_HEAD_START := 0.15
+const RELEASE_ARROW_PACE := 30.0
 
 @export var sight_range: float = 45.0
 @export var fov_degrees: float = 250.0
@@ -62,6 +66,21 @@ static func emit_noise(tree: SceneTree, at: Vector3, loudness: float) -> void:
 		return
 	for node in tree.get_nodes_in_group(GROUP):
 		(node as CreatureSenses).hear(at, loudness)
+
+
+## The twang of a bow at `at`. Each creature hears it only once an arrow
+## loosed at it has had time to arrive (RELEASE_HEAD_START and
+## RELEASE_ARROW_PACE), so prey that has not noticed her is still standing
+## where she aimed; a miss is heard where it lands.
+static func emit_release(tree: SceneTree, at: Vector3, loudness: float) -> void:
+	if tree == null:
+		return
+	for node in tree.get_nodes_in_group(GROUP):
+		var senses := node as CreatureSenses
+		var wait := RELEASE_HEAD_START + senses.global_position.distance_to(at) / RELEASE_ARROW_PACE
+		tree.create_timer(wait, false).timeout.connect(func() -> void:
+			if is_instance_valid(senses):
+				senses.hear(at, loudness))
 
 
 func hear(at: Vector3, loudness: float) -> void:
@@ -129,7 +148,7 @@ func _hook_player(player: Node3D) -> void:
 	var tree := get_tree()
 	if player.has_signal(&"bow_released"):
 		player.connect(&"bow_released", func(at: Vector3, loudness: float) -> void:
-			CreatureSenses.emit_noise(tree, at, loudness))
+			CreatureSenses.emit_release(tree, at, loudness))
 	elif player.has_signal(&"arrow_fired"):
 		player.connect(&"arrow_fired", func(arrow: Node3D) -> void:
 			CreatureSenses.emit_noise(tree, arrow.global_position, 0.35))

@@ -135,7 +135,6 @@ peddler_ash,peddler,,"Ash, cut at the border. The one wood they fear, so the sto
 peddler_border,peddler,,Border towns are emptying. Folk say things come over the Wall at night.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/peddler_border.ogg
 peddler_trinkets,peddler,,"Ribbons, needles, a mirror that only lies a little. For you, a bargain.",X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/peddler_trinkets.ogg
 d_pelt_sold,feyre,,"She paid more than it was worth. Someone did the same for her once, she said.",A,yes,deed,,pelt_sold,p0_winter p1_wolf_and_crossing,"inner voice, just after the deed",audio/voice/d_pelt_sold.ogg
-bow_let_down,feyre,,Too soon. Draw the string farther back.,A,yes,scene,bow.let_down,,,"inner voice: patient with herself, under her breath",audio/voice/bow_let_down.ogg
 hf_snow,feyre,,The snow's already covering the blood. Good.,X,yes,region,hunting_forest,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/hf_snow.ogg
 hf_oak,feyre,,My oak. I've waited out half a winter in those branches.,X,yes,place,waiting_oak,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/hf_oak.ogg
 hf_ash,feyre,,"Ash trees. If the stories are true, this is all they fear.",A,yes,place,ash_grove,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/hf_ash.ogg

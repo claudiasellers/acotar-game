@@ -1,9 +1,10 @@
 ## Contract for the bow's shot cycle and Focus (plans/combat/bow-combat-design.md
-## §13 B1). Fire alone raises the bow and draws; letting go looses, weaker the
-## earlier it is let go; aim is an optional steadier, closer view; the bow
-## stays up a moment after a draw for the next arrow; Focus slows the world
-## through TimeScale only while held, at a known stamina cost. Drives the bow's
-## own code (update_bow), never a key or button.
+## §13 B1). Fire alone raises the bow and draws; every arrow leaves at full
+## power, when she lets go at full draw or, if she let go sooner, the moment
+## the draw is complete; aim is an optional closer view; the bow stays up a
+## moment after a draw for the next arrow; Focus slows the world through
+## TimeScale only while held, at a known stamina cost. Drives the bow's own
+## code (update_bow), never a key or button.
 extends GutTest
 
 const TEST_SET := preload("res://data/phases/m0_test_phases.tres")
@@ -95,48 +96,74 @@ func test_left_mouse_alone_raises_draws_and_shoots() -> void:
 	assert_false(bow.is_aiming, "though nothing is held")
 
 
-func test_an_early_release_is_a_weaker_arrow_never_nothing() -> void:
+## Ticks with nothing held until an arrow leaves (2 s at most): the arrow and
+## the real seconds it took.
+func _wait_for_arrow() -> Array:
+	var waited := 0.0
+	var arrow: Arrow = null
+	while arrow == null and waited < 2.0:
+		arrow = _tick(false, false)
+		waited += TICK
+	return [arrow, waited]
+
+
+func test_an_early_release_is_remembered_and_flies_at_full_power_when_the_draw_is_full() -> void:
 	watch_signals(bow)
 	_hold(bow.bow.draw_time * 0.3, false, true)
-	var drawn := bow.draw_amount
-	assert_between(drawn, 0.2, 0.4)
-	var arrow := _tick(false, false)
-	assert_not_null(arrow, "it flies")
+	assert_between(bow.draw_amount, 0.2, 0.4)
+	assert_null(_tick(false, false), "nothing leaves a half-drawn string")
+	assert_true(bow.is_drawing and bow.is_up(), "her hand finishes the draw")
+	var got := _wait_for_arrow()
+	var arrow: Arrow = got[0]
+	assert_not_null(arrow, "and then it flies")
+	assert_almost_eq(float(got[1]), bow.bow.draw_time * 0.7, 0.04, "the moment the draw is complete")
 	assert_signal_not_emitted(bow, "let_down")
-	assert_signal_emitted(bow, "loosed_short")
 	if arrow:
-		assert_almost_eq(arrow.linear_velocity.length(), bow.bow.max_speed * bow.power(drawn), 0.01)
-		assert_lt(arrow.linear_velocity.length(), bow.bow.max_speed * 0.7, "well short of full power")
+		assert_almost_eq(arrow.linear_velocity.length(), bow.bow.max_speed, 0.01, "at full power")
+	assert_eq(fired.size(), 1)
+	_hold(1.0, false, false)
+	assert_eq(fired.size(), 1, "one click, one arrow")
 
 
-func test_power_runs_from_the_floor_to_full_with_the_draw() -> void:
-	assert_eq(bow.power(0.0), bow.tuning.min_power)
-	assert_eq(bow.power(1.0), 1.0)
-	assert_gt(bow.power(0.6), bow.power(0.3))
-	# The quickest click there is still shoots.
+func test_the_quickest_click_is_a_full_power_shot_a_draw_later() -> void:
 	_tick(false, true)
-	var arrow := _tick(false, false)
+	var got := _wait_for_arrow()
+	var arrow: Arrow = got[0]
 	assert_not_null(arrow, "one tick of fire is a shot")
+	assert_almost_eq(float(got[1]), bow.bow.draw_time, 0.04, "0.3 s on the hunting bow")
 	if arrow:
-		assert_almost_eq(arrow.linear_velocity.length(), bow.bow.max_speed * bow.tuning.min_power, bow.bow.max_speed * 0.08)
+		assert_almost_eq(arrow.linear_velocity.length(), bow.bow.max_speed, 0.01, "never a weak arrow")
 
 
-func test_right_mouse_is_precision_not_a_gate() -> void:
+func test_a_click_in_the_follow_through_is_the_next_arrow() -> void:
+	_hold(bow.bow.draw_time + 0.05, false, true)
+	assert_not_null(_tick(false, false), "the first arrow")
+	_tick(false, true)
+	var got := _wait_for_arrow()
+	assert_not_null(got[0], "the click is not lost")
+	assert_almost_eq(float(got[1]), bow.tuning.follow_through_s + bow.bow.draw_time, 0.05)
+	assert_eq(fired.size(), 2)
+
+
+func test_an_owed_arrow_is_dropped_when_the_bow_is_taken_from_her() -> void:
+	_tick(false, true)
+	_tick(false, false)
+	StoryControl.hold(self, StoryControl.Mode.LOOK)
+	_hold(1.0, false, false)
+	StoryControl.release(self)
+	_hold(1.0, false, false)
+	assert_eq(fired.size(), 0, "nothing flies after the scene hands the bow back")
+
+
+func test_right_mouse_is_a_closer_view_not_a_gate() -> void:
 	_hold(0.2, true, false)
 	assert_true(bow.is_aiming and bow.is_precise and bow.is_nocked)
 	assert_false(bow.is_drawing, "aim alone draws nothing")
-	var precise := bow.sway_degrees()
-	_tick(false, false)
-	_tick(false, true)
-	bow._settle = 1.0
-	var hip := bow.sway_degrees()
-	_tick(true, true)
-	bow._settle = 1.0
-	assert_almost_eq(hip, bow.sway_degrees() * bow.tuning.hip_sway, 0.001, "from the hip the ring is wider")
-	assert_gt(precise, 0.0)
 	assert_eq(bow.fov_offset(), bow.tuning.fov_raised, "aim held narrows the view")
 	_tick(false, true)
-	assert_eq(bow.fov_offset(), 0.0, "the hip does not")
+	assert_true(bow.is_drawing, "fire alone draws")
+	assert_eq(bow.fov_offset(), 0.0, "and the view stays wide")
+	assert_eq(bow.sway_degrees(), 0.0, "as steady from the hip as aimed, while she is calm")
 
 
 func test_the_bow_stays_raised_and_the_second_arrow_follows_in_time() -> void:
@@ -259,7 +286,8 @@ func test_a_blow_breaks_focus() -> void:
 func test_the_old_bow_is_gone() -> void:
 	var source := FileAccess.get_file_as_string("res://systems/bow/bow_controller.gd")
 	for gone in ["Engine.time_scale =", "_spent", "_fire_queued", "_fire_pressed", "_ensure_actions",
-			"SLOW_TIME", "_apply_sway", "nock_time", "const TUNING_"]:
+			"SLOW_TIME", "_apply_sway", "nock_time", "const TUNING_", "min_power", "loosed_short", "_settle",
+			"hip_sway", "func power", "predict_impact"]:
 		assert_false(source.contains(gone), "%s is gone from the bow" % gone)
 	assert_true(BowController.TUNING is BowTuning, "the feel numbers load from data/bows/bow_tuning.tres")
 	for file in DirAccess.get_files_at("res://systems/bow"):
