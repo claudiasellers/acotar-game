@@ -426,7 +426,7 @@
    "tris_worn": 918
   },
   {
-   "bytes": 100584,
+   "bytes": 107140,
    "family": "hob",
    "file": "wpn_shepherds_crook.glb",
    "group": "weapon",
@@ -447,18 +447,18 @@
    ],
    "rest_lift_m": 0.029,
    "size_m": [
-    0.058,
+    0.053,
     1.793,
-    0.188
+    0.171
    ],
    "tip": [
     0,
     0.8628,
     -0.0989
    ],
-   "tris": 1372,
-   "tris_lod1": 686,
-   "tris_worn": 1302
+   "tris": 1512,
+   "tris_lod1": 756,
+   "tris_worn": 1342
   },
   {
    "bytes": 117720,

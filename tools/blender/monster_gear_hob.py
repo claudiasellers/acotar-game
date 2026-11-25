@@ -22,7 +22,7 @@ from monster_gear_kit import R, S, T, h1, wob  # noqa: E402
 OAK_ROOT = G.grim(0.27, 0.19, 0.13)
 TOOTH = G.grim(0.64, 0.59, 0.46)
 TOOTH_STAIN = G.grim(0.38, 0.30, 0.20)
-WOOL = (0.80, 0.77, 0.70)
+WOOL = (0.72, 0.69, 0.62)
 COAT = G.grim(0.22, 0.20, 0.30)
 STRAW = G.grim(0.62, 0.52, 0.24)
 PLANK = G.grim(0.34, 0.26, 0.19)
@@ -65,9 +65,10 @@ def shepherds_crook(p, worn):
     if worn:
         hook, rad = hook[:-4], rad[:-4]
     p.add(K.tube(hook, rad, 6), G.IRON, "satin", shade=GL._iron(5.0, 0.7 if worn else 0.4))
-    for i in range(2 if worn else 5):                # wool caught in the hook
-        q = hook[4 + 2 * i] if 4 + 2 * i < len(hook) else hook[-1]
-        p.add(G.stone(0.02 + 0.012 * h1(i, 2.0), 9.0 + i, 0.8, 1), WOOL, "fabric", T(0.004 * (i % 2), q[1], q[2] - 0.012))
+    for i in range(1 if worn else 3):                # wisps of wool snagged in the bend
+        q = hook[5 + i]
+        p.add(G.stone(0.011 + 0.005 * h1(i, 2.0), 9.0 + i, 0.6, 2), WOOL, "fabric", T(0.003 * (i % 2), q[1], q[2] - 0.008) @ S(0.7, 1.5, 1.0),
+              shade=G.mottle(WOOL, K.darker(WOOL, 0.3), 160.0, i))
     p.add(G.lash(0.019, -0.07, 0.07, 5, 0.0045, 4), G.HIDE, "fabric")
     p.add(G.lash(0.018, 0.40, 0.48, 4, 0.0045, 4), G.HIDE, "fabric")
     if worn:
