@@ -11,7 +11,6 @@ var page: SettingsTab
 
 func before_each() -> void:
 	SatchelHud.pad_active = false
-	SatchelHud.ensure_actions()
 	MenuShell.close_all(get_tree())
 	page = SettingsTab.new()
 	add_child_autofree(page)

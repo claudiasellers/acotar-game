@@ -470,7 +470,6 @@ func camera_rise() -> float:
 
 
 func _build_components() -> void:
-	CrouchMotor.ensure_action()
 	QUIVER_LOADOUTS.carry(Gameplay.inventory, PhaseManager.current_phase)
 	QUIVER_LOADOUTS.fill(Gameplay.inventory, PhaseManager.current_phase)
 	Gameplay.listen(&"phase_changed", _on_phase_changed)

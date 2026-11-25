@@ -37,21 +37,6 @@ var amount: float = 0.0
 var _t: float = 0.0
 
 
-## Registers the crouch action (Left Ctrl, gamepad B) when the input map lacks
-## it. Like the bow and interaction keys this is added in code (R14); the
-## story/core lane can move it into project.godot without changing anything here.
-static func ensure_action() -> void:
-	if InputMap.has_action(ACTION):
-		return
-	InputMap.add_action(ACTION)
-	var key := InputEventKey.new()
-	key.physical_keycode = KEY_CTRL
-	InputMap.action_add_event(ACTION, key)
-	var pad := InputEventJoypadButton.new()
-	pad.button_index = JOY_BUTTON_B
-	InputMap.action_add_event(ACTION, pad)
-
-
 ## Crouches if standing on the ground, stands if crouched. Returns the new stance.
 func toggle(on_floor: bool) -> bool:
 	if crouched:
