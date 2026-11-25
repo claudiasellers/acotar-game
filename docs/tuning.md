@@ -211,7 +211,12 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | `draw_time` | data/bows/*.tres (BowData) | hunting 0.3 s; fae 0.2, gilded 0.25, yew 0.4, warbow 0.55 | 0.1–0.8 s | Seconds of holding fire (LMB / RT) to draw the string. Releasing at full draw looses a full-power arrow; earlier lets the string down. No weak shots | L80 |
 | `kick_degrees` | data/bows/*.tres (BowData) | hunting 0.35; yew 0.35, fae 0.2, warbow 0.6, gilded 0.3 | 0–1 | Camera kick on release; off under Reduced Effects | L80 |
 | `follow_through_s` | data/bows/bow_tuning.tres (BowTuning) | 0.25 | 0.15–0.4 | Seconds after a shot before the next draw can start: shot-to-shot rhythm | L80 |
-| `release_buffer_s` | bow_tuning.tres | 0.15 | 0.1–0.2 | A release this close to full draw still looses, at full draw | L80 |
+| `min_power` | bow_tuning.tres | 0.35 | 0.25–0.5 | The share of the bow's speed an arrow leaves at with no draw; a full draw is 1.0 | L80 |
+| `short_draw` | bow_tuning.tres | 0.5 | 0.3–0.7 | A shot let go under this much draw counts as short (her one thought about drawing farther) | L80 |
+| `stay_up_s` | bow_tuning.tres | 1.6 | 1–3 | Seconds the bow stays in her hands after the last shot or hold | L80 |
+| `hip_sway` | bow_tuning.tres | 1.3 | 1.2–2.5 | Sway without aim held, against 1.0 with it | L80 |
+| `FeyreCamera.HIP_SHOULDER` | characters/feyre/camera/feyre_camera.gd | 0.85 m (aim held: `AIM_SHOULDER` 0.55) | 0.7–1.1 | How far over her right shoulder the lens sits with the bow up and no aim held, on the full arm; it shrinks to the aim offset on a short arm. Sets how far the ring stands from her body | L80 |
+| `HIP_RING_CLEAR_PX` | tests/unit/characters/test_hip_framing.gd | 64 px at 1080 high (measured 93–104; was 41–47 at 0.55) | 48–96 | The least distance on screen between her capsule's right edge and the ring from the hip, at rest, at full draw and looking down | L80 |
 | `settle_s` / `settle_floor` | bow_tuning.tres | 0.6 / 0.35 | 0.3–1.0 / 0.2–0.6 | Sway falls from 1.0 to the floor over this long held still: the reward for patience | L80 |
 | `settle_reset_turn_dps` / `unsettle_rate` | bow_tuning.tres | 30 / 3.0 | 15–60 / 1–6 | Turning faster than this (deg/s) or moving unsettles the aim, at this rate per second | L80 |
 | `settle_after_shot` | bow_tuning.tres | 0.7 | 0.35–1.0 | A shot's recoil leaves the aim at least this unsettled | L80 |
@@ -334,6 +339,18 @@ over (`docs/contracts/creature_motion.md`, "People: clips without a rebuild").
 | `RIM_ENERGY`, `RIM_BACK`, `RIM_UP` | story/staging/wolf_hunt_lighting.gd | 12, 1.6 m, 2.4 m | — | Cold rim behind the doe and the great wolf, opposite the camera; the only light the hunt adds. | L18 |
 | `size_by_phase` / `Inventory.FULL_QUIVER` | data/bows/quiver_loadouts.tres; systems/inventory/inventory.gd | 3, 3, 10, 20, then 30 | — | Arrows her quiver holds by phase (bow design §8.1): three in her hand through the wolf, 10 on the grounds, 20 from the house and woods, 30 after. It only grows. | L80 |
 | `COMBO_PITCH`, `COMBO_MAX` | systems/interaction/interactor.gd | 0.06, 8 | 0.03–0.1 | Each further arrow pulled from one body in one press chimes this much higher, up to this many steps. | L80 |
-| `HitStop.FRAMES`, `WEAK_SPOT_FRAMES`, `KILL_FRAMES`, `SCALE` | systems/feedback/hit_stop.gd | 4 / 6 / 9, +3, 10, at 0.05 | — | Frames (at 60) the world holds on a light, medium or heavy hit, the extra for a weak spot, and a kill; the time scale it holds at (health-interactions §3.5 #6). Reduced Effects halves the frames. | L80 |
+| `HitStop.FRAMES`, `WEAK_SPOT_FRAMES`, `KILL_FRAMES`, `SCALE` | systems/feedback/hit_stop.gd | 4 / 6 / 9, +3, 10, at 0.05 | — | Frames (at 60) the world holds on a light, medium or heavy hit, the extra for a weak spot, and a kill; the time scale it holds at (health-interactions §3.5 #6). The Hit-stop setting (Full, Half, Off) is the one thing that shortens it. | L80 |
 | `SidestepMotor.DISTANCE`, `TIME`, `IFRAMES`, `IFRAMES_GENTLE`, `STAMINA`, `COOLDOWN`, `BUFFER` | characters/feyre/movement/sidestep_motor.gd | 2.2 m, 0.25 s, 0.2 s, 0.3 s, 12, 0.45 s, 0.15 s | — | The sidestep (health-interactions §3.5 #9): how far and how fast, how long nothing can hurt her (from its second frame), its stamina, the wait before the next, and how long a press waits for its moment. | L80 |
 | `draw_kept_when_sidestepping` | data/bows/bow_tuning.gd | 0.5 | 0.3–0.7 | The share of her draw a sidestep keeps. | L80 |
+| `SoftAim.CONE_DEG`, `RANGE` | systems/bow/soft_aim.gd | 4°, 35 m | 3–6°, 25–45 m | How close her aim must be to a hostile that is hunting her, and how far off it may be, for soft aim to help (pad only; health-interactions §3.5 #14). | L80 |
+| `SoftAim.MODES` light / strong | systems/bow/soft_aim.gd | turn speed kept 0.6 / 0.45; bend 1.5° / 3.5° | 0.4–0.8; 1–4° | The stick's turn speed kept inside the cone, and the most a shot that would miss may bend toward the body (never the weak spot). Light helps without aiming for her (72% of 50 seeded shots at 25 m against 18% off); strong is the nine-in-ten setting. | L80 |
+| `SoftAim.NEAR`, `PULL_BACK` | systems/bow/soft_aim.gd | 12 m, 0.6 m | — | A hostile after her this close steps the camera back by this much. | L80 |
+
+## Hostile checks (L75, hostile-fae plan §8.4)
+
+Numbers the slice tests hold the game to, derived from the systems' own rates.
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| `REED_FIRE_CLEAR_S` | tests/unit/hostile/test_naga_slice1.gd | 3.0 s | 2.5–5 s | Slice 1 (c): after a fire arrow lights a lured camp's reed bed, every naga has fled or died within this. From the fire's numbers: a lured naga stands within 1 m of the lure (`_go_to` stop) and fears flame within `fire_fear_radius` 3 m, so it sees it on its first `Creature.FIRE_SCAN` (0.3 s); one that wandered to 5 m waits for the front to cross 2 m at about 1 / `ElementField.HEAT_RATE` (1.1 s) a metre at calm: 0.3 + 2.2 = 2.5 s, rounded up. | L75 |
+| `LOSE_WITHIN_S` | tests/unit/hostile/test_naga_slice1.gd | 20 s, 9 of 10 seeded runs | — | Slice 1 (b): a pack trailing her by scent past the leash loses her once she drinks a hush draught (quiet 2, scent_scale 0.5 = `NagaRoamer.HUSH_SCALE`), and keeps her without it. | L75 |
