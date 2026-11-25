@@ -5,7 +5,10 @@ Owner: the fast-travel lane (L74). Paths: `systems/fast_travel/`,
 `tools/blender/whorl_stones.py`, `tests/unit/fast_travel/`, this file.
 Outside: `add_child(WhorlStones.new())` in `story/act1/act1_game.gd`, and
 one `WhorlMapMarks.draw_all(...)` call each in L07's `ui/map/full_map.gd` and
-`ui/map/minimap.gd` (owner ask, 2026-11-17: "set a marker for them on the map").
+`ui/map/minimap.gd` (owner ask, 2026-11-17: "set a marker for them on the map"),
+and two rows, `whorl_mark` and `whorl_ride`, in the UI lane's `KeyHints.ROWS`
+(`ui/hud/key_hints.gd`; owner ask, 2026-11-25: "i need another tip set for
+when im around those").
 
 ## Canon
 
@@ -31,8 +34,16 @@ the white mare, ch 20). No Cauldron or Mother shrines (the book has none).
   inside its map place, off path/riverbed/rock, ≥ 12 m from region landmarks).
 - `WhorlStone` is a `StaticBody3D` on collision layer 1 (two cylinders), in
   group `station` with `station_id = &"whorl_stone"` and `use(user)`, so
-  Feyre's Interactor (E) reaches it within 2.5 m. A soft "E" glyph shows within
-  3 m in free play.
+  Feyre's Interactor (E) reaches it within 2.5 m. Within 3 m in free play it
+  offers its verb on `UsePrompt` ("trace the whorl", or "ride the stones" when
+  there is somewhere to ride).
+- **Tips:** within 14 m in free play a pair holds a corner tip on `KeyHints`
+  (R18: the game's one hint system): `whorl_mark` at an unmarked pair ("E
+  trace the whorl and paint your mark · marked stones carry you to one
+  another"), `whorl_ride` at a marked pair with somewhere to ride ("E ride to
+  another pair you have marked · M marked stones show on the map"). Painting
+  a mark learns `whorl_mark`; opening the card learns `whorl_ride`. Taught
+  once, off with Key hints off, back with Show tips again.
 - Models: `art/fast_travel/whorl_stones.glb`, `whorl_stones_blight.glb`,
   `whorl_mark.glb` (her rose, modelled in the pair's space) from
   `tools/blender/whorl_stones.py`. 2,444 tris (LOD1 1,222); prop_kit finishes

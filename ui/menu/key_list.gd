@@ -20,7 +20,7 @@ const ROWS: Array[Array] = [
 	[&"crouch", "Crouch", "", ""],
 	[&"interact", "Use, pick up, talk", "", ""],
 	[&"fire", "Draw and loose: hold, let go", "", ""],
-	[&"aim", "Steady your aim (optional)", "", ""],
+	[&"aim", "A closer view, bow up (optional)", "", ""],
 	[&"focus", "Steady your breath, bow up", "", ""],
 	[&"strike", "Knife", "", ""],
 	[&"cycle_arrow", "Next kind of arrow", "", ""],

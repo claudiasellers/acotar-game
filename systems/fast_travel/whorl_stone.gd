@@ -24,10 +24,17 @@ const PROMPT_RADIUS := 3.0
 ## Where she stands on arrival: on the way between the stones, a step south.
 const ARRIVE_OFFSET := Vector3(0.0, 0.0, 2.2)
 
+## Within this many metres the corner tip for the pair shows (the use prompt
+## itself waits for arm's length).
+const TIP_RADIUS := 14.0
+const TIP_MARK := &"whorl_mark"
+const TIP_RIDE := &"whorl_ride"
+
 @export var station_id: StringName = STATION_ID
 
 var def: WhorlStoneDef
 var mark_node: MeshInstance3D
+var _tip: StringName = &""
 
 
 static func make(stone_def: WhorlStoneDef) -> WhorlStone:
@@ -107,16 +114,36 @@ func _process(_delta: float) -> void:
 	elif near and WhorlStones.can_travel() and not WhorlStones.destinations(def.id).is_empty():
 		verb = "ride the stones"
 	UsePrompt.of(get_tree()).offer(self, verb)
+	_hold_tip(p)
+
+
+## The corner tips (KeyHints) while she is within sight of a pair, before
+## she is in reach: what tracing the whorl does at an unmarked pair, and how
+## to ride at a marked one. Each is taught once (learnt on use).
+func _hold_tip(p: Node3D) -> void:
+	var tip := &""
+	if p != null and StoryControl.mode == StoryControl.Mode.FULL \
+			and Vector2(p.global_position.x - global_position.x, p.global_position.z - global_position.z).length() <= TIP_RADIUS:
+		if not marked():
+			tip = TIP_MARK
+		elif WhorlStones.can_travel() and not WhorlStones.destinations(def.id).is_empty():
+			tip = TIP_RIDE
+	if tip != _tip:
+		_tip = tip
+		KeyHints.of(get_tree()).hold(self, tip)
 
 
 ## Interactor: E. First time: trace, paint, celebrate. After: the travel card.
 func use(user: Node) -> void:
 	if not marked():
 		paint_mark()
+		KeyHints.of(get_tree()).learn(TIP_MARK)
 		if user is Node3D and (user as Node3D).is_inside_tree():
 			Juice.bounce(user as Node3D)
 		return
 	WhorlStones.open_card(get_tree(), def, user)
+	if WhorlTravelCard.is_open():
+		KeyHints.of(get_tree()).learn(TIP_RIDE)
 
 
 ## Traces the whorl and paints her mark: the mark grows on with a little
