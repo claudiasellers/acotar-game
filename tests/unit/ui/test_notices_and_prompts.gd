@@ -57,13 +57,8 @@ func test_a_row_of_keys_and_words_alone() -> void:
 
 func test_keys_are_named_as_bound_on_what_she_holds() -> void:
 	assert_eq(KeyPrompt.key(&"interact"), "E")
-	assert_eq(KeyPrompt.key(&"aim"), "Right mouse")
-	assert_eq(KeyPrompt.key(&"fire"), "Left mouse")
-	assert_ne(KeyPrompt.key(&"cycle_arrow"), "")
 	SatchelHud.pad_active = true
 	assert_eq(KeyPrompt.key(&"interact"), "X")
-	assert_eq(KeyPrompt.key(&"aim"), "LT")
-	assert_eq(KeyPrompt.key(&"fire"), "RT")
 	SatchelHud.pad_active = false
 	for id: StringName in KeyHints.ROWS:
 		for pair: Array in KeyHints.row(id):

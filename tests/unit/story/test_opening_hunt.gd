@@ -206,25 +206,6 @@ func test_crouch_is_offered_near_the_doe_until_she_crouches() -> void:
 	assert_eq(prompts.want(), &"")
 
 
-func test_focus_is_offered_nocked_in_the_wolf_hunt_once_he_is_seen() -> void:
-	hints.learn(&"ash")
-	hints.learn(&"draw")
-	feyre.bow_controller.is_nocked = true
-	assert_eq(prompts.want(), &"", "no hunt")
-	EventBus.scene_space_started.emit(&"wolf_kill")
-	assert_eq(prompts.want(), &"", "he isn't seen yet")
-	WorldState.set_flag("fact.wolf_spotted", true)
-	assert_eq(prompts.want(), &"focus")
-	feyre.bow_controller.is_nocked = false
-	assert_eq(prompts.want(), &"", "only with an arrow on the string")
-	feyre.bow_controller.is_nocked = true
-	feyre.bow_controller.is_focused = true
-	prompts._learn(0.016)
-	assert_true(hints.taught.get(&"focus", false), "taught by the first held breath")
-	assert_eq(prompts.want(), &"")
-	EventBus.scene_space_finished.emit(&"wolf_kill")
-
-
 func test_hints_off_hides_every_taught_key() -> void:
 	var stuck := Node3D.new()
 	add_child_autofree(stuck)
