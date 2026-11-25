@@ -7,7 +7,7 @@
 ##   Ctrl crouch        standing, within 70 m of the doe clearing
 ##   Shift steady your breath  nocked in the wolf hunt once he's seen (Focus)
 ##   Q  ash arrow       the doe or the great wolf is near and the ash arrow isn't nocked
-##   RMB aim, LMB draw and let go  prey is near or the hunt is on, until her first shot
+##   LMB draw and let go, RMB steady  prey is near or the hunt is on, until her first shot
 ##   E  skin            standing over the great wolf's carcass
 ##   E  sell the pelt   at the fur stall with Andras's pelt
 ##   E  sleep           at the ironwood bed once the pelt is sold, by day
