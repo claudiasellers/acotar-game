@@ -332,3 +332,12 @@ over (`docs/contracts/creature_motion.md`, "People: clips without a rebuild").
 | `SoftAim.CONE_DEG`, `RANGE` | systems/bow/soft_aim.gd | 4°, 35 m | 3–6°, 25–45 m | How close her aim must be to a hostile that is hunting her, and how far off it may be, for soft aim to help (pad only; health-interactions §3.5 #14). | L80 |
 | `SoftAim.MODES` light / strong | systems/bow/soft_aim.gd | turn speed kept 0.6 / 0.45; bend 1.5° / 3.5° | 0.4–0.8; 1–4° | The stick's turn speed kept inside the cone, and the most a shot that would miss may bend toward the body (never the weak spot). Light helps without aiming for her (72% of 50 seeded shots at 25 m against 18% off); strong is the nine-in-ten setting. | L80 |
 | `SoftAim.NEAR`, `PULL_BACK` | systems/bow/soft_aim.gd | 12 m, 0.6 m | — | A hostile after her this close steps the camera back by this much. | L80 |
+
+## Hostile checks (L75, hostile-fae plan §8.4)
+
+Numbers the slice tests hold the game to, derived from the systems' own rates.
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| `REED_FIRE_CLEAR_S` | tests/unit/hostile/test_naga_slice1.gd | 3.0 s | 2.5–5 s | Slice 1 (c): after a fire arrow lights a lured camp's reed bed, every naga has fled or died within this. From the fire's numbers: a lured naga stands within 1 m of the lure (`_go_to` stop) and fears flame within `fire_fear_radius` 3 m, so it sees it on its first `Creature.FIRE_SCAN` (0.3 s); one that wandered to 5 m waits for the front to cross 2 m at about 1 / `ElementField.HEAT_RATE` (1.1 s) a metre at calm: 0.3 + 2.2 = 2.5 s, rounded up. | L75 |
+| `LOSE_WITHIN_S` | tests/unit/hostile/test_naga_slice1.gd | 20 s, 9 of 10 seeded runs | — | Slice 1 (b): a pack trailing her by scent past the leash loses her once she drinks a hush draught (quiet 2, scent_scale 0.5 = `NagaRoamer.HUSH_SCALE`), and keeps her without it. | L75 |
