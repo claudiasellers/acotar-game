@@ -362,13 +362,13 @@ func _hold_sidestep_hint() -> void:
 func _hold_jump_hint() -> void:
 	var hints := KeyHints.of(get_tree())
 	if not hints.teaches(&"jump"):
-		hints.hold(jump_hint, &"")
+		hints.hold(movement_feel, &"")
 		return
 	if jump_motor.jumps_used > 0 or is_mantling:
 		hints.learn(&"jump")
 		return
 	var ledge := is_on_floor() and not _bow_raised() and StoryControl.can_move() and not mantle.find_ledge().is_empty()
-	hints.hold(jump_hint, &"jump" if ledge else &"")
+	hints.hold(movement_feel, &"jump" if ledge else &"")
 
 
 ## The way the stick points, or straight back from her aim.

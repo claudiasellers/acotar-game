@@ -163,3 +163,31 @@ func test_its_key_is_named_while_the_bow_is_up_and_one_is_after_her() -> void:
 	await wait_until(func() -> bool: return feyre.sidestep.active, 1.0)
 	await wait_frames(2)
 	assert_ne(hints.wanted(), &"sidestep", "used once, it is learnt")
+
+
+## UX review G4j: the jump key is named at the first ledge she could climb,
+## and never again once she has jumped.
+func test_the_jump_key_is_named_at_a_ledge_until_she_jumps() -> void:
+	var hints := KeyHints.of(get_tree())
+	hints.forget_taught()
+	GameSettings.set_value(&"key_hints", true)
+	await wait_frames(3)
+	assert_ne(hints.wanted(), &"jump", "open ground")
+	var block := StaticBody3D.new()
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(3, 1.2, 3)
+	shape.shape = box
+	block.add_child(shape)
+	hill.add_child(block)
+	var forward := -feyre.model.global_basis.z
+	block.global_position = feyre.global_position + forward * 2.0 + Vector3.UP * 0.6
+	await wait_physics_frames(3)
+	await wait_frames(2)
+	assert_false(feyre.mantle.find_ledge().is_empty(), "a ledge in reach")
+	assert_eq(hints.wanted(), &"jump")
+	Input.action_press(&"jump")
+	await wait_physics_frames(3)
+	await wait_frames(2)
+	assert_false(hints.teaches(&"jump"), "learnt with her first jump")
+	assert_ne(hints.wanted(), &"jump")

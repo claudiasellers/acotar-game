@@ -63,6 +63,16 @@ func test_the_stick_slows_across_it_by_mode() -> void:
 	assert_eq(SoftAim.friction(get_tree(), FROM, _aim(8.0), &"light"), 1.0, "nothing to slow for")
 
 
+func test_the_setting_picks_the_mode_on_a_pad() -> void:
+	assert_eq(GameSettings.SOFT_AIM_LEVELS.size(), SoftAim.LEVELS.size())
+	var saved: Variant = GameSettings.get_value(SoftAim.SETTING)
+	for i in SoftAim.LEVELS.size():
+		GameSettings.set_value(SoftAim.SETTING, i)
+		assert_eq(SoftAim.mode(), SoftAim.LEVELS[i])
+	GameSettings.set_value(SoftAim.SETTING, saved)
+	assert_eq(SoftAim.LEVELS[int(GameSettings.DEFAULTS[SoftAim.SETTING])], &"light", "light unless she says otherwise")
+
+
 func test_a_mouse_gets_none() -> void:
 	SatchelHud.pad_active = false
 	assert_eq(SoftAim.mode(), &"off")

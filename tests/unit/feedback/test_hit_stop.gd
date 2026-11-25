@@ -13,6 +13,7 @@ var strike: StrikeController
 func before_each() -> void:
 	TimeScale.reset()
 	GameSettings.set_value(&"reduced_effects", false)
+	GameSettings.set_value(HitStop.SETTING, 0)
 	vitals = VitalsState.new()
 	add_child_autofree(vitals)
 	strike = StrikeController.new()
@@ -27,6 +28,7 @@ func before_each() -> void:
 
 func after_each() -> void:
 	GameSettings.set_value(&"reduced_effects", false)
+	GameSettings.set_value(HitStop.SETTING, 0)
 	TimeScale.reset()
 
 
@@ -140,6 +142,17 @@ func test_reduced_effects_halves_it() -> void:
 	GameSettings.set_value(&"reduced_effects", true)
 	stop.hit(&"medium")
 	await _held(3, "half of six")
+
+
+func test_the_setting_is_full_half_or_off() -> void:
+	assert_eq(GameSettings.HIT_STOP_LEVELS, ["Full", "Half", "Off"] as Array[String])
+	GameSettings.set_value(HitStop.SETTING, 1)
+	stop.hit(&"heavy")
+	await _held(4, "half of nine")
+	GameSettings.set_value(HitStop.SETTING, 2)
+	stop.hit(&"heavy", true)
+	assert_false(stop.active(), "off")
+	assert_eq(Engine.time_scale, 1.0)
 
 
 func test_leaving_the_tree_lets_time_go() -> void:
