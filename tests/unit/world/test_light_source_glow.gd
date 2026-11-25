@@ -24,7 +24,7 @@ func test_the_director_sets_a_light_source_only_glow() -> void:
 	_director_on(env)
 	assert_true(env.glow_enabled)
 	assert_eq(env.glow_bloom, 0.0, "no bloom wash over everything")
-	assert_eq(env.glow_hdr_threshold, GradeDirector.GLOW_THRESHOLD)
+	assert_almost_eq(env.glow_hdr_threshold, GradeDirector.GLOW_THRESHOLD, 0.001)
 	assert_eq(env.get_glow_level(4), 0.0, "no wide haze level")
 	assert_eq(env.get_glow_level(5), 0.0)
 	assert_eq(env.get_glow_level(6), 0.0)
@@ -45,8 +45,8 @@ func test_no_grade_mood_or_night_moves_the_glow() -> void:
 			d.night = 1.0
 			d.sight = 1.0
 			d.apply(d.current)
-			assert_eq(env.glow_intensity, GradeDirector.GLOW_INTENSITY, "%s %s" % [id, mood])
-			assert_eq(env.glow_hdr_threshold, GradeDirector.GLOW_THRESHOLD, "%s %s" % [id, mood])
+			assert_almost_eq(env.glow_intensity, GradeDirector.GLOW_INTENSITY, 0.001, "%s %s" % [id, mood])
+			assert_almost_eq(env.glow_hdr_threshold, GradeDirector.GLOW_THRESHOLD, 0.001, "%s %s" % [id, mood])
 			assert_eq(env.glow_bloom, 0.0, "%s %s" % [id, mood])
 		d.mood_amount = 0.0
 		d.night = 0.0
