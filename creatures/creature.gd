@@ -140,7 +140,12 @@ func _ready() -> void:
 	if data.draw_distance > 0.0:
 		# Deferred, so the face and a carried weapon (added in a subclass's
 		# _ready) are ranged with the body.
-		Creature.range_body.call_deferred(model, data.draw_distance)
+		# Bound to self, so a creature freed first takes the call with it.
+		_range_model.call_deferred()
+
+
+func _range_model() -> void:
+	Creature.range_body(model, data.draw_distance)
 
 
 ## Every mesh under `body` stops drawing past `distance` m, fading over the last
