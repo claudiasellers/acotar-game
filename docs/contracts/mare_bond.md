@@ -30,7 +30,7 @@ needs the director's OK (R13). The riding itself is `docs/contracts/mount.md`.
   camera frames the mare from the side Feyre is not standing on (so Feyre
   never blocks her), and a loose page of the journal sits on the right.
   Esc, T, E or Done close it. The screen itself is the UI lane's
-  (`docs/contracts/ui-frame.md` step 8u): her coat and her Closeness as
+  (`docs/contracts/ui-frame.md` step 8w): her coat and her Closeness as
   `MeterRow` meters, picture tabs in two groups (Care: brush and treats, her
   page; Dress her: one per `MareTack` slot), treats as the satchel's
   pictures, pieces with enamel colour swatches, a brush under the pointer
