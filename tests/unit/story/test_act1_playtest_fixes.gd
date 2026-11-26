@@ -187,9 +187,7 @@ func test_leading_he_never_stands_stuck_on_a_doorstep() -> void:
 	add_child_autofree(beast)
 	beast.lead(Vector3(0, 0, -12))
 	var moved_straight := false
-	for i in 120:
-		var before := beast.global_position
-		beast.global_position = before  # something holds him in place (a path baked short)
+	for i in 120:  # two seconds held in place (a path baked short of the hall)
 		moved_straight = beast._lead_stuck(1.0 / 60.0)
 	assert_true(moved_straight, "after standing in place for LEAD_STUCK_AFTER he takes the straight line")
 	beast.lead(Vector3(5, 0, -12))
