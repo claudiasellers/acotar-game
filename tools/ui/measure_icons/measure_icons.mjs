@@ -1,8 +1,9 @@
-// The five bond measures' glyphs (BondBook.MEASURES), in the chosen icon style
-// (Cute, thin plum line; tools/ui/icon_style/README.md). Each is drawn in its
+// The five bond measures' glyphs (BondBook.MEASURES), in the game's icon style
+// (Gilded Enamel: tools/ui/icon_style/ge_icons.mjs, as gefull.mjs draws the
+// item icons). Each is drawn in its
 // measure's own paint, the same colour as its meter (JournalTheme.MEASURE_PAINTS).
-// Writes ui/theme/icons/measures/<id>.png at 128 px; measure_icons.py turns
-// them into .webp and removes the .png.
+// Writes ui/theme/icons/measures/<id>.png; measure_icons.py turns them into
+// 128 px .webp and removes the .png.
 //
 //   PW=/opt/node-tools/node_modules/playwright/index.js node tools/ui/measure_icons/measure_icons.mjs
 //   python3 tools/ui/measure_icons/measure_icons.py
@@ -11,14 +12,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { C, circ, rr } from '../icon_style/icons.mjs';
 import { CUTE } from '../icon_style/icons_cute.mjs';
-import { icon, FILTERS } from '../icon_style/styles.mjs';
+import { FILTERS } from '../icon_style/styles.mjs';
+import { geIcon, geDefsAll } from '../icon_style/ge_icons.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const OUT = path.resolve(HERE, '../../../ui/theme/icons/measures');
-const SIZE = 128;
-const CUTEO = { set: 'cute', noDetail: true, goo: true, lw: 3.6, dk: 2.8, dkf: 2.4 };
-// Heavier than the item icons' line: these are read at 22 px beside a meter.
-const PLUM = { color: '#3A2444', w: 1.4 };
+const SIZE = 128, MARGIN = 5;
 
 const f = n => +n.toFixed(2);
 const B = (d, fc, o = {}) => ({ k: 'B', d, f: fc, ...o });
@@ -66,19 +65,18 @@ export const MEASURES = {
   ] },
 };
 
-Object.assign(CUTE, MEASURES);
-
 const PW = process.env.PW || '/opt/node-tools/node_modules/playwright/index.js';
 const pw = await import(PW);
 const chromium = pw.chromium || pw.default.chromium;
 fs.mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: SIZE + 64, height: SIZE + 64 }, deviceScaleFactor: 1 });
+// Drawn at twice the size and scaled down by measure_icons.py, as gefull.mjs does.
+const page = await browser.newPage({ viewport: { width: SIZE, height: SIZE }, deviceScaleFactor: 2 });
+const inner = +(SIZE * 48 / (48 + 2 * MARGIN)).toFixed(3), pad = (SIZE - inner) / 2;
 for (const id of Object.keys(MEASURES)) {
-  const pad = SIZE * 0.08;
-  const svg = icon(id, 'flat', { ...CUTEO, size: SIZE - 2 * pad, x: pad, y: pad, outline: PLUM });
-  const html = `<!doctype html><html><body style="margin:0;background:transparent">${FILTERS}<svg id="i" width="${SIZE}" height="${SIZE}" viewBox="0 0 ${SIZE} ${SIZE}" stroke-linecap="round" stroke-linejoin="round">${svg}</svg></body></html>`;
+  const html = `<!doctype html><html><head><style>*{box-sizing:border-box}html,body{margin:0;background:transparent}svg{display:block}</style></head><body>${FILTERS}<div id="i" style="width:${SIZE}px;height:${SIZE}px;padding:${pad}px">${geIcon(MEASURES[id].parts, inner)}</div>${geDefsAll()}</body></html>`;
   await page.setContent(html);
+  await page.waitForTimeout(150);
   await page.locator('#i').screenshot({ path: path.join(OUT, `${id}.png`), omitBackground: true });
 }
 await browser.close();
