@@ -57,7 +57,7 @@
 #define CANDY_BOUNCE_DEFAULT 0.35
 #endif
 
-// 1 in the court, 0 under dread (GradeDirector).
+// The grade's magic, 0..1 (GradePreset.magic, set by GradeDirector).
 global uniform float magic_amount;
 
 group_uniforms candy_light;
@@ -156,7 +156,7 @@ void light() {
 		DIFFUSE_LIGHT += alb * back * lc * 0.6;
 	}
 	if (rim_strength > 0.0) {
-		// Lit, never glowing: the light's colour and shadow scale it; withdrawn under dread.
+		// Lit, never glowing: the light's colour and shadow scale it; faint where the grade has no magic.
 		float rim_amt = candy_fresnel(NORMAL, VIEW, rim_power) * rim_strength * mix(0.25, 1.0, clamp(magic_amount, 0.0, 1.0));
 #ifdef CANDY_RIM_SCALE
 		rim_amt *= CANDY_RIM_SCALE;

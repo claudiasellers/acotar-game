@@ -109,9 +109,9 @@ func update_dread(x: float, z: float) -> float:
 	if bus == null:
 		return d
 	if d <= 0.0:
-		bus.mood_requested.emit(&"calm", 0.0, 3.0)
+		bus.mood_requested.emit(self, &"calm", 0.0, 3.0)
 	else:
-		bus.mood_requested.emit(&"dread", d * WOODS_DREAD, 1.5)
+		bus.mood_requested.emit(self, &"dread", d * WOODS_DREAD, 1.5)
 	dread_sent = d
 	return d
 

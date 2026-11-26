@@ -1,5 +1,5 @@
 extends GutTest
-## Lane L55: the beast at the door is lit so he reads under the dread grade
+## Lane L55: the beast at the door is lit so he reads on a dark winter night
 ## (BeastDoorLighting): moon through the door from outside, the hearth turned
 ## up, a rim behind his head; lights only, all gone again after the scene.
 

@@ -22,23 +22,11 @@ const STALL := Vector3(160, 0, 20)
 const BED := Vector3(-2.2, 0, -1.6)
 const INTERACT_REACH := 3.0
 
-## The cold human-realm grade and the spring grade past the wall.
-const WINTER := {"sky_top": Color(0.42, 0.48, 0.56), "horizon": Color(0.70, 0.73, 0.77),
-		"fog": Color(0.66, 0.70, 0.76), "sun": Color(0.80, 0.85, 0.95), "sun_energy": 0.7,
-		"saturation": 0.55}
-const SPRING := {"sky_top": Color(0.40, 0.62, 0.92), "horizon": Color(1.0, 0.86, 0.80),
-		"fog": Color(1.0, 0.88, 0.86), "sun": Color(1.0, 0.90, 0.74), "sun_energy": 1.35,
-		"saturation": 1.25}
-
 var feyre: Feyre
-var env: Environment
-var sky_mat: ProceduralSkyMaterial
-var sun: DirectionalLight3D
-var hearth_light: OmniLight3D
+## The look, as in the World: GradeDirector over this scene's environment and sun.
+var grades: GradeDirector
 var rng := RandomNumberGenerator.new()
 
-var _grade: float = 0.0  # 0 winter, 1 spring
-var _dread: float = 0.0
 var _food_days: float = 2.0
 var _has_pelt: bool = false
 var _pelt_sold: bool = false
@@ -49,7 +37,9 @@ func _ready() -> void:
 	rng.seed = 1817
 	if PhaseManager.phase_set == null:
 		PhaseManager.start(PHASES)
-	_build_environment()
+	# The game's look: the World's environment and sun under a GradeDirector,
+	# so the story's grade requests (winter to spring at the wall) and moods land here too.
+	grades = GradeDirector.light(self, &"human_winter")
 	_build_ground()
 	_build_cottage()
 	_build_forest()
@@ -70,26 +60,9 @@ func _ready() -> void:
 	add_child(hud)
 	add_child(SettingsTab.new())
 	PlayerPlacement.attach.call_deferred(feyre)
-	EventBus.grade_swap_requested.connect(_on_grade_swap)
-	EventBus.mood_requested.connect(_on_mood)
+	grades.focus = feyre
 	EventBus.creature_killed.connect(_stub_on_creature_killed)
 	EventBus.food_stock_changed.emit.call_deferred(_food_days)
-
-
-func _process(_delta: float) -> void:
-	var angle := (Clock.time_of_day - 0.25) * TAU
-	sun.rotation = Vector3(-sin(angle) * deg_to_rad(70.0) - 0.05, deg_to_rad(-35.0), 0.0)
-	var day_light := clampf(sin(angle) * 1.6, 0.05, 1.0)
-	var g := _grade_values()
-	sun.light_color = g["sun"]
-	sun.light_energy = day_light * float(g["sun_energy"]) * (1.0 - 0.7 * _dread)
-	sky_mat.sky_top_color = g["sky_top"]
-	sky_mat.sky_horizon_color = g["horizon"]
-	env.fog_light_color = g["fog"]
-	env.adjustment_saturation = float(g["saturation"]) * (1.0 - 0.4 * _dread)
-	env.fog_density = lerpf(0.004, 0.0015, _grade) + 0.006 * _dread
-	# The fire gutters when the beast is near.
-	hearth_light.light_energy = (1.6 + 0.25 * sin(Time.get_ticks_msec() * 0.011)) * (1.0 - 0.75 * _dread)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -103,32 +76,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		_stub_sell_pelt()
 	elif at.distance_to(BED) < INTERACT_REACH:
 		_stub_sleep_until_night()
-
-
-func _grade_values() -> Dictionary:
-	var out := {}
-	for key in WINTER:
-		var a: Variant = WINTER[key]
-		var b: Variant = SPRING[key]
-		out[key] = (a as Color).lerp(b, _grade) if a is Color else lerpf(a, b, _grade)
-	return out
-
-
-# --- Fallbacks for the world lane's GradeDirector and the mood layer --------
-
-func _on_grade_swap(to_grade: StringName, seconds: float) -> void:
-	if get_tree().get_first_node_in_group(&"grade_director"):
-		return
-	var target := 1.0 if to_grade == &"spring" else 0.0
-	create_tween().tween_property(self, ^"_grade", target, seconds) \
-			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-
-
-func _on_mood(mood: StringName, intensity: float, seconds: float) -> void:
-	var target := intensity if mood == &"dread" else 0.0
-	if mood == &"enchanted_sleep":
-		target = 0.95 * intensity
-	create_tween().tween_property(self, ^"_dread", target, maxf(seconds, 0.05))
 
 
 # --- Stubs for systems/creatures until those lanes merge ---------------------
@@ -200,28 +147,6 @@ func _box(parent: Node3D, size: Vector3, at: Vector3, color: Color, solid: bool 
 	return body
 
 
-func _build_environment() -> void:
-	env = Environment.new()
-	env.background_mode = Environment.BG_SKY
-	var sky := Sky.new()
-	sky_mat = ProceduralSkyMaterial.new()
-	sky.sky_material = sky_mat
-	env.sky = sky
-	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	env.tonemap_mode = Environment.TONE_MAPPER_AGX
-	env.glow_enabled = true
-	env.fog_enabled = true
-	env.adjustment_enabled = true
-	var world_env := WorldEnvironment.new()
-	world_env.environment = env
-	add_child(world_env)
-	sun = DirectionalLight3D.new()
-	sun.name = "Sun"
-	sun.shadow_enabled = true
-	sun.directional_shadow_max_distance = 150.0
-	add_child(sun)
-
-
 func _build_ground() -> void:
 	# Snow south of the wall, meadow north of it.
 	_box(self, Vector3(900, 1, 600), Vector3(0, -0.5, -80), Color(0.86, 0.89, 0.93))
@@ -254,8 +179,9 @@ func _build_cottage() -> void:
 				Color(0.36, 0.26, 0.18), false)
 	# Hearth, bed, table.
 	_box(cottage, Vector3(1.6, 1.0, 0.8), Vector3(0, 0.5, -2.4), Color(0.25, 0.22, 0.20))
-	hearth_light = OmniLight3D.new()
+	var hearth_light := OmniLight3D.new()
 	hearth_light.light_color = Color(1.0, 0.62, 0.32)
+	hearth_light.light_energy = 1.6
 	hearth_light.omni_range = 9.0
 	hearth_light.position = Vector3(0, 1.0, -1.8)
 	cottage.add_child(hearth_light)

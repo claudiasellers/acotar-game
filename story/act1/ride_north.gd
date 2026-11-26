@@ -55,8 +55,8 @@ const STEPS_NUDGE := [10.0, 24.0]
 ## of sight (or Feyre is indoors), and in any case after this long.
 const MARE_LEAVES_AFTER := 3.0
 const MARE_GONE_BY := 30.0
-## The dread the cottage left (1.0, two stops down at night) eases to this
-## outside, so the yard reads by moonlight; straying raises it again.
+## The dread the cottage left (1.0) eases to this outside, so the yard's
+## sound comes back; straying raises it again.
 const YARD_DREAD := 0.15
 ## On foot, this far from the mare is still the yard and her way to the mare.
 const FOOT_FREE := 30.0
@@ -467,8 +467,8 @@ func _begin(_space: SceneSpace) -> void:
 	else:
 		_lead(beast_at)
 	StoryControl.set_focus(beast)
-	# The cottage's dread (full, at night) would leave the yard black.
-	EventBus.mood_requested.emit(&"dread", YARD_DREAD, 3.0)
+	# Out of the cottage, her fear eases.
+	EventBus.mood_requested.emit(self, &"dread", YARD_DREAD, 3.0)
 	# His ultimatum still ringing: she chooses.
 	_queued.append_array([&"live", &"follow"])
 
@@ -784,15 +784,15 @@ func _ride(delta: float) -> void:
 	if not _estate and progress >= _mark(&"gate") and WorldStreamer.get_region(MANOR):
 		_estate = true
 		# Spring was the crossing's; on the estate the manor grade takes over.
-		GradeDirector.release_story_holds(get_tree())
+		EventBus.grade_swap_requested.emit(self, &"", 2.0)
 	if progress >= path_length() - STOP_REACH:
 		_at_the_stairs()
 
 
 func _cross() -> void:
 	_crossed.fire()
-	EventBus.grade_swap_requested.emit(&"spring", grade_seconds)
-	EventBus.mood_requested.emit(&"calm", 0.0, grade_seconds)
+	EventBus.grade_swap_requested.emit(self, &"spring", grade_seconds)
+	EventBus.mood_requested.emit(self, &"calm", 0.0, grade_seconds)
 	# Through the gap it is morning, the sun already high (ch5): his magic,
 	# not a cut. The Clock advances so everything time-driven still fires.
 	Clock.advance(fposmod(SPRING_HOUR / 24.0 - Clock.time_of_day, 1.0) * Clock.DAY_LENGTH_SECONDS)
@@ -899,7 +899,7 @@ func _escalate(to: int) -> void:
 					(beast as BeastActor).menace(2, feyre)
 				SoundDirector.cue(&"beast_roar", beast.global_position if beast else feyre)
 				SoundDirector.cue(&"beast_heartbeat", feyre)
-				EventBus.mood_requested.emit(&"dread", 0.8, 0.6)
+				EventBus.mood_requested.emit(self, &"dread", 0.8, 0.6)
 				StoryControl.shake = 0.7
 				_say(&"stray_roar", true)
 			4:
@@ -935,7 +935,7 @@ func _settle() -> void:
 	_tier_t = 0.0
 	SoundDirector.stop_cue(&"beast_snarl", 2.0)
 	SoundDirector.stop_cue(&"beast_heartbeat", 3.0)
-	EventBus.mood_requested.emit(&"calm", 0.0, 3.0)
+	EventBus.mood_requested.emit(self, &"calm", 0.0, 3.0)
 
 
 ## He keeps `to` metres along the road, never back, at her pace; when she

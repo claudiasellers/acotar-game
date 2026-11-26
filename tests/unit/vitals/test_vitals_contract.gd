@@ -209,7 +209,7 @@ func test_every_status_tag_has_a_name_and_a_line() -> void:
 
 func test_a_chip_is_taught_once_then_named_on_hover() -> void:
 	var path := "user://test_status_taught.cfg"
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	var row := VitalsStatusRow.new()
 	row.settings_path = path
@@ -230,7 +230,7 @@ func test_a_chip_is_taught_once_then_named_on_hover() -> void:
 
 func test_a_gauge_is_taught_when_it_bites_and_meters_on_offer() -> void:
 	var path := "user://test_gauge_taught.cfg"
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	var row := VitalsStatusRow.new()
 	row.settings_path = path
@@ -254,7 +254,7 @@ func test_a_gauge_is_taught_when_it_bites_and_meters_on_offer() -> void:
 func test_slips_wait_out_a_staged_moment_and_dread_ends_ease() -> void:
 	var path := "user://test_status_hushed.cfg"
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	var row := VitalsStatusRow.new()
 	row.settings_path = path
 	add_child_autofree(row)
@@ -272,10 +272,10 @@ func test_slips_wait_out_a_staged_moment_and_dread_ends_ease() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	v.ease_pulse = 0.8
 	assert_true(v.statuses().any(func(s: Dictionary) -> bool: return s.tag == &"at_ease"))
-	EventBus.mood_requested.emit(&"dread", 0.6, 0.0)
+	EventBus.mood_changed.emit(&"dread", 0.6, 0.0)
 	assert_eq(v.ease_pulse, 0.0, "fear ends the moment of ease")
 	assert_false(v.statuses().any(func(s: Dictionary) -> bool: return s.tag == &"at_ease"))
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 
 
 func test_she_has_a_thought_on_waking() -> void:
@@ -361,7 +361,7 @@ func test_ease_raises_max_stamina_and_dread_follows_mood() -> void:
 	v.ease = 0.4
 	v.step(0.1)
 	assert_almost_eq(player.max_stamina, 120.0, 0.01)
-	EventBus.mood_requested.emit(&"dread", 0.8, 1.0)
+	EventBus.mood_changed.emit(&"dread", 0.8, 1.0)
 	v.step(1.0)
 	assert_gt(v.dread, 0.1)
 

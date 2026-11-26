@@ -37,7 +37,7 @@ the white mare, ch 20). No Cauldron or Mother shrines (the book has none).
   Feyre's Interactor reaches it within `use_reach` (3 m) and names its
   `use_verb` on the use prompt ("trace the whorl", or "ride the stones" when
   there is somewhere to ride), on E or, beside a second thing, on whichever
-  key its rank gives it (ui-frame step 8t).
+  key its rank gives it (ui-frame step 8u).
 - **Tips:** within 14 m in free play a pair holds a corner tip on `KeyHints`
   (R18: the game's one hint system): `whorl_mark` at an unmarked pair ("E
   trace the whorl and paint your mark · marked stones carry you to one

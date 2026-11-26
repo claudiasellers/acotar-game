@@ -56,7 +56,7 @@ func test_ambient_life_goes_silent_in_the_naga_reeds() -> void:
 func test_dread_mood_follows_distance_to_the_naga() -> void:
 	var life := region.get_node("AmbientLife") as AmbientLife
 	var moods: Array = []
-	var log_mood := func(mood: StringName, amount: float, _s: float) -> void: moods.append([mood, amount])
+	var log_mood := func(_source: Object, mood: StringName, amount: float, _s: float) -> void: moods.append([mood, amount])
 	EventBus.mood_requested.connect(log_mood)
 	var n := SurielGladeTerrain.NAGA_BACKWATER
 	life.update_dread(SurielGladeTerrain.SNARE_SITE.x, SurielGladeTerrain.SNARE_SITE.y)

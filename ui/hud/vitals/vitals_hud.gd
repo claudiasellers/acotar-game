@@ -231,7 +231,6 @@ func _update_edges(delta: float) -> void:
 	var v := _vitals
 	var body := _player.get(&"body_state") as BodyState
 	var t := edge_fx.target
-	t[&"dread"] = clampf((v.dread - 0.2) / 0.8, 0.0, 1.0)
 	t[&"low_health"] = clampf((30.0 - v.health) / 30.0, 0.0, 1.0) * 0.8 + (0.2 if v.health < 30.0 and not v.is_down else 0.0)
 	t[&"venom"] = clampf((v.affliction(&"venom") - 0.5) / 0.5, 0.0, 1.0)
 	t[&"cold"] = clampf((body.cold - 0.5) / 0.5, 0.0, 1.0) if body else 0.0

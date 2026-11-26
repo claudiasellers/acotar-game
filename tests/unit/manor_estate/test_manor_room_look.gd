@@ -1,6 +1,5 @@
-## The château pass (experience bar §2.6) and the dread response (§1.5):
-## boiserie in state rooms, painted skies in grand ones, one lit hero per room,
-## a mirrored dressing room, and lights that dim and cool under dread.
+## The château pass (experience bar §2.6): boiserie in state rooms, painted
+## skies in grand ones, one lit hero per room, and a mirrored dressing room.
 extends GutTest
 
 static var _rooms: Dictionary = {}
@@ -79,26 +78,6 @@ func test_dressing_room_is_a_jewel_box() -> void:
 	assert_gte(mirrors.size(), 8, "mirror wall plus cheval mirrors")
 	assert_true(ManorRoomLook.has_sky(r))
 	assert_eq(ManorRoomLook.hero_of(r).prop_id, &"vanity_table")
-
-
-func test_lights_dim_and_cool_under_dread_then_recover() -> void:
-	var house := Node3D.new()
-	var lamp := OmniLight3D.new()
-	lamp.light_energy = 2.0
-	lamp.light_color = Color(1.0, 0.8, 0.7)
-	house.add_child(lamp)
-	var mood := ManorMoodLights.new()
-	house.add_child(mood)
-	mood.collect()
-	assert_eq(mood.light_count(), 1)
-	mood._on_mood_requested(&"dread", 1.0, 1.0)
-	mood._process(1.0)
-	assert_almost_eq(lamp.light_energy, 2.0 * ManorMoodLights.DIM, 0.001)
-	assert_lt(lamp.light_color.b, lamp.light_color.r * 0.8, "burns down to ember-warm candle pools")
-	mood._on_mood_requested(&"calm", 0.0, 0.5)
-	mood._process(0.5)
-	assert_almost_eq(lamp.light_energy, 2.0, 0.001)
-	house.free()
 
 
 func test_act2_rooms_have_coffered_ceilings_not_open_sky() -> void:

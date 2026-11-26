@@ -34,7 +34,7 @@ func _run() -> void:
 	get_tree().current_scene = estate
 	_feyre = estate.get(&"feyre") as Feyre
 	if _feyre == null:
-		ShotLook.dress(estate, &"manor_interior")
+		GradeDirector.light(estate, &"manor_interior")
 		_feyre = (load(FEYRE) as PackedScene).instantiate() as Feyre
 		estate.add_child(_feyre)
 	var room: ManorRoomDef = null

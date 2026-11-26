@@ -36,7 +36,7 @@ signal player_grabbed(source_id: StringName, break_presses: int, hold_seconds: f
 signal player_released(source_id: StringName)
 ```
 
-`mood_requested(&"dread", intensity, seconds)` (existing, sent by DreadField) is also read as Feyre's ambient dread target. No new signal is needed for that.
+`mood_changed(&"dread", intensity, seconds)` (GradeDirector's settled mood, DreadField's among the requests) is also read as Feyre's ambient dread target.
 
 ### Outbound: Feyre announces these. Hostiles, story, HUD and audio listen.
 

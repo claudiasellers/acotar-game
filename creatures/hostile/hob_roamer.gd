@@ -39,6 +39,10 @@ const STIR_CLIP := &"charm_cut_stir"
 ## `obj_hob_charm_1..8`). Two are dress-up jewellery (the circlet, the pearl).
 const CHARMS: Array[String] = ["Iron horseshoe", "Child's iron bracelet", "Pewter locket",
 		"Little bell", "Bone comb", "Rose-gold circlet", "Pearl", "Ribbon"]
+## Each charm is a keepsake she keeps (data/collectibles), in cord order.
+const CHARM_ITEMS: Array[StringName] = [&"col_hob_horseshoe", &"col_hob_iron_bracelet",
+		&"col_hob_pewter_locket", &"col_hob_little_bell", &"col_hob_bone_comb", &"col_hob_rose_circlet",
+		&"col_hob_pearl", &"col_hob_ribbon"]
 const CHARM_FLAG := "fact.hob_charm.%d"
 ## How many were gone at its last count (the dusk count notices the rest).
 const COUNTED_FLAG := "fact.hob_charms_counted"
@@ -48,6 +52,10 @@ const STIR_AWARENESS := 0.1
 const SEARCH_SECONDS := 40.0
 ## Her once-line on the first charm (the Keeper's to tune).
 const CUT_LINE := &"hob_charm_cut"
+## Her once-thought the first time she comes within FIRST_SIGHT_M of it
+## asleep (G29): it points at the necklace, so robbing it is an idea she has.
+const SIGHT_LINE := &"hob_first_sight"
+const FIRST_SIGHT_M := 25.0
 const CUT_NOTE := "Cut from its necklace: %s."
 
 var _throw_ready: float = 0.0
@@ -125,7 +133,10 @@ func take_strike(kind: StringName, _by: Node3D) -> bool:
 	if animator:
 		animator.play_oneshot(STIR_CLIP)
 	if is_inside_tree():
-		PickupLog.of(get_tree()).note(CUT_NOTE % CHARMS[n - 1])
+		# The keepsake goes in her bag; the collection book's find shows it. With
+		# no room, the log says what she cut.
+		if Gameplay.inventory == null or Gameplay.inventory.add(CHARM_ITEMS[n - 1]) == 0:
+			PickupLog.of(get_tree()).note(CUT_NOTE % CHARMS[n - 1])
 		HostileRoamer.say_once(get_tree(), CUT_LINE)
 	# Robbed of every charm, asleep: the hollow settles (plan §4).
 	if HobRoamer.next_charm() == 0 and site and is_instance_valid(site) and not site.is_settled:
@@ -202,9 +213,20 @@ func _think(delta: float) -> void:
 	_was_routine = routine
 	if _search_left > 0.0:
 		_search_left -= delta
+	_first_sight()
 	if animator == null:
 		return
 	_pose()
+
+
+## G29: asleep, with her near enough to make out the necklace, she thinks of
+## the charms once.
+func _first_sight() -> void:
+	if not is_sleeping() or not is_inside_tree() or WorldState.has_flag("dlg.%s" % SIGHT_LINE):
+		return
+	var her := _player()
+	if her and Creature.flat_distance(global_position, her.global_position) <= FIRST_SIGHT_M:
+		HostileRoamer.say_once(get_tree(), SIGHT_LINE)
 
 
 func _on_woke() -> void:

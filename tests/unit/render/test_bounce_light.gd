@@ -1,7 +1,7 @@
 extends GutTest
 ## Contract for soft bounce light (render program T3a, L60): outdoor grades take
 ## 70% of their ambient from the sky, candy_lit throws the ground's light back
-## up at 0.35 by default, and SSIL follows the graphics profile.
+## up at 0.35 by default, and GradeDirector's SSIL follows the graphics profile.
 # gate: needs:terrain
 # gate: when:world/shared/grades/*,world/shared/world/*,world/shared/shaders/candy_lit*,systems/settings/*
 
@@ -38,21 +38,22 @@ func test_candy_lit_throws_the_ground_light_back_up() -> void:
 
 func test_ssil_follows_the_profile() -> void:
 	var env := Environment.new()
-	BounceLight.apply(env, &"high")
+	GradeDirector.screen_space_bounce(env, &"high")
 	assert_true(env.ssil_enabled, "high profile: SSIL on")
 	assert_true(env.ssao_enabled)
 	assert_almost_eq(env.ssao_radius, 1.0, 0.001)
 	assert_almost_eq(env.ssao_intensity, 1.2, 0.001)
-	BounceLight.apply(env, &"mac")
+	GradeDirector.screen_space_bounce(env, &"mac")
 	assert_false(env.ssil_enabled, "Mac profile: SSIL off")
 	assert_true(env.ssao_enabled, "SSAO stays on every profile")
 
 	var we := WorldEnvironment.new()
 	we.environment = Environment.new()
-	var node := BounceLight.new()
-	node.environment = we
 	add_child_autofree(we)
-	add_child_autofree(node)
+	var director := GradeDirector.new()
+	director.environment = we
+	director.start_grade = &"spring"
+	add_child_autofree(director)
 	var before: String = GameSettings.shadow_profile
 	GameSettings.shadow_profile = "mac"
 	assert_false(we.environment.ssil_enabled, "switching to mac turns SSIL off")

@@ -62,6 +62,10 @@ func _go() -> void:
 		for flag: String in SHOT_PAST:
 			Clock.day = SHOT_PAST[flag]
 			WorldState.set_flag(flag, true)
+		for bond: StringName in Relationships.defs():
+			Relationships.check(bond)
+		Relationships.deed(&"tamlin", &"ate_at_table")
+		Relationships.deed(&"tamlin", &"bound_hand")
 		await _shots(args[1])
 	else:
 		for page in _pages():

@@ -94,9 +94,10 @@ func test_wear_reads_sound_then_scuffed_then_cracking() -> void:
 
 func test_a_steep_shows_in_its_slot() -> void:
 	rack.add(SHEARS)
-	assert_eq(Array(WeaponWords.steeps(rack.carried[0].imbue)), [WeaponWords.EMPTY_SLOT, WeaponWords.EMPTY_SLOT])
+	assert_eq(Array(WeaponWords.steeps(rack.carried[0].imbue)), [WeaponWords.EMPTY_SLOT, WeaponWords.EMPTY_SLOT, WeaponWords.STEEP_HOW],
+			"where a steep is made is said once")
 	assert_true(rack.imbue(0, &"ember", 1))
-	assert_eq(Array(WeaponWords.steeps(rack.carried[0].imbue)), [WeaponWords.ELEMENTS[&"ember"], WeaponWords.EMPTY_SLOT])
+	assert_eq(Array(WeaponWords.steeps(rack.carried[0].imbue)), [WeaponWords.ELEMENTS[&"ember"], WeaponWords.EMPTY_SLOT, WeaponWords.STEEP_HOW])
 	assert_eq(Array(WeaponWords.steeps(ImbueSlots.new(0))), [WeaponWords.NO_SLOTS])
 
 

@@ -7,8 +7,10 @@ extends RefCounted
 
 
 static func all() -> void:
-	# Lingering dread: HudLayout (and anyone else listening) hears calm.
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	# Lingering dread: any GradeDirector drops every request, and HudLayout
+	# (and anyone else following the mood) hears calm.
+	EventBus.mood_requested.emit(null, &"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	# Every StoryControl hold.
 	var control: Node = Engine.get_main_loop().root.get_node_or_null("StoryControl")
 	if control != null:
