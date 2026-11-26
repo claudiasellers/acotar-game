@@ -216,14 +216,14 @@ func _play() -> void:
 	await _wait(1.6)
 	for id: StringName in [&"garland_lilac", &"bows_lilac", &"cloth_lilac"]:
 		var piece := MareTack.piece(id)
-		v._show(MareTack.SLOT_NAMES[piece.slot])
+		v._show(piece.slot)
 		await _wait(0.5)
 		if not MareTack.owned(id) and not MareTack.make(piece, Gameplay.inventory):
 			_note("  could not make %s" % id)
 			continue
 		MareTack.wear(piece)
 		v._apply(true)
-		v._show(MareTack.SLOT_NAMES[piece.slot])
+		v._show(piece.slot)
 		await _wait(1.2)
 	_note("shine %.2f, worn %s, hung %s" % [MareCare.shine(), MareTack.worn(), MareLook.hung(director.mare.horse)])
 	v.close()

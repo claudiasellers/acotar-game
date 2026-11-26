@@ -6,7 +6,7 @@
 ## her since (`now`), what she calls them from then on (`called`) and which
 ## portrait is theirs from then on (`face`, an Icons.BONDS id; their own id
 ## until a moment says otherwise). Every bond is also read by one set of
-## measures (`MEASURES`, `measures(bond)`), drawn as marks. Nobody
+## measures (`MEASURES`, `measures(bond)`), drawn as meters. Nobody
 ## is listed before the flag that brings them into her life (`met`).
 ##
 ## This only reads flags and keeps the day each moment came (WorldDeltas
@@ -187,9 +187,10 @@ const BONDS: Array[Dictionary] = [
 ]
 
 ## The one set of measures every bond is read by (owner, 2026-11-26), in the
-## order the page draws them, each with the legend's line. A measure that
-## does not apply to someone (`of` 0 and no word) is drawn faint. They are
-## marks and words, never a figure: regard itself stays inside Relationships.
+## order the page draws them, each with the legend's line. Each is a meter
+## (`filled` of `of`) and may have a word; one that does not apply to someone
+## (`applies` false) is drawn faint and empty. Regard itself stays inside
+## Relationships.
 const CLOSENESS := &"closeness"
 const WARMTH := &"warmth"
 const DEEDS := &"deeds"
@@ -292,40 +293,48 @@ static func these_days(bond: Dictionary) -> String:
 
 
 ## A bond read by every measure, in MEASURES' order: each `id`, `name`,
-## `filled` of `of` marks (`of` 0: no marks) and a `word` ("" for none).
+## `applies`, a meter of `filled` of `of`, and a `word` ("" for none).
 ## Closeness and Deeds are the bond engine's (Relationships: the stage
 ## reached on its ladder, the deeds counted of those it knows), so they apply
 ## to whoever has a ladder there. Warmth is the engine's attitude, or for the
 ## others the last `warmth` a reached moment gave (the bond's own until then);
-## the mare has none. Memories and Since apply to everyone.
+## the mare has none. Memories and Since apply to everyone; Since's meter is
+## the share of the book's days they have been in her life.
 static func measures(bond: Dictionary) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	var def := Relationships.def(bond.id)
 	var on_ladder := def != null and Relationships.stage(bond.id) >= 0
 	for m in MEASURES:
-		var row := {"id": m.id, "name": m.name, "filled": 0, "of": 0, "word": ""}
+		var row := {"id": m.id, "name": m.name, "applies": false, "filled": 0, "of": 1, "word": ""}
 		match m.id:
 			CLOSENESS:
 				if on_ladder:
+					row.applies = true
 					row.filled = Relationships.stage(bond.id) + 1
 					row.of = def.stages.size()
 			WARMTH:
 				var at := warmth(bond)
 				if at != &"":
+					row.applies = true
 					row.filled = WARMTH_STEPS.find(at) + 1
 					row.of = WARMTH_STEPS.size()
 					row.word = COOL_FOR_NOW if on_ladder and Relationships.mood(bond.id) == Relationships.COOL else String(WARMTH_WORDS[at])
 			DEEDS:
 				if on_ladder:
+					row.applies = true
 					row.of = def.deeds.size()
 					for d in def.deeds:
 						if Relationships.done(bond.id, d.id):
 							row.filled += 1
 			MEMORIES:
+				row.applies = true
 				row.filled = moments(bond).size()
 				row.of = all_moments(bond).size()
 			SINCE:
 				var day := day_of(String(bond.met))
+				row.applies = true
+				row.of = maxi(Clock.day, 1)
+				row.filled = clampi(row.of - day + 1, 0, row.of) if day > 0 else row.of
 				row.word = ALWAYS if bond.met == "" else ("Day %d" % day if day > 0 else BEFORE)
 		out.append(row)
 	return out
