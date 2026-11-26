@@ -1,0 +1,2 @@
+WHY: your branch conflicts with main in: docs/contracts/ui-frame.md 
+DO:  merge origin/main into your branch and resolve those files; if a file was deleted on main by a cleanup task, accept the deletion unless you're rewriting it.
