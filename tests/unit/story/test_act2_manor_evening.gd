@@ -118,6 +118,7 @@ func test_he_changes_at_the_chair_when_she_comes_into_the_dining_room() -> void:
 	WorldState.set_flag("wall_crossed")
 	feyre.global_position = arrival().mark(&"front_door") + Vector3(0, 0, 3)
 	assert_true(_tick_all(1.0, func() -> bool: return arrival().running))
+	assert_true(_tick_all(5.0, func() -> bool: return arrival().current_beat_label().begins_with("lead")), "he pads ahead")
 	_follow(arrival(), &"tamlin_beast", 60.0)
 	# She stops in the hall, short of the doors; he goes on to the head chair.
 	feyre.global_position = arrival().mark(&"hall_east")
@@ -146,6 +147,7 @@ func test_sit_and_her_chair_slides_out_then_eat() -> void:
 	WorldState.set_flag("wall_crossed")
 	feyre.global_position = arrival().mark(&"front_door") + Vector3(0, 0, 3)
 	assert_true(_tick_all(1.0, func() -> bool: return arrival().running))
+	assert_true(_tick_all(5.0, func() -> bool: return arrival().current_beat_label().begins_with("lead")), "he pads ahead")
 	_follow(arrival(), &"tamlin_beast", 60.0)
 	feyre.global_position = arrival().mark(&"dining_inside")
 	assert_true(_tick_all(30.0, func() -> bool: return arrival().current_beat_label() == "say chair"))
