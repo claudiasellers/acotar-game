@@ -40,5 +40,14 @@ func _run() -> void:
 	for i in 12:
 		await get_tree().process_frame
 	get_viewport().get_texture().get_image().save_png("%s/tend_made.png" % out)
+	for id: StringName in v._tabs:
+		v._show(id)
+		for i in 3:
+			await get_tree().process_frame
+		print("TEND tray %s: %d tall, clear above %d" % [id, int(v.tin.tray.size.y), int(v.tin.clear_height())])
+	v._show(MareTendingView.HER)
+	for i in 6:
+		await get_tree().process_frame
+	get_viewport().get_texture().get_image().save_png("%s/tend_her.png" % out)
 	print("TEND worn garland: %s, hung %s" % [MareTack.worn_in(&"garland").id if MareTack.worn_in(&"garland") else "none", MareLook.hung(m.horse)])
 	get_tree().quit()

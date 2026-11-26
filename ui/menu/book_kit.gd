@@ -79,7 +79,12 @@ static func slot_badge(text: String = "") -> Label:
 
 ## She has not looked at this yet: a gold ribbon that says NEW.
 static func new_badge() -> Label:
-	var badge := _badge("new", JournalTheme.NEW_BADGE)
+	return ribbon("new")
+
+
+## A gold ribbon with a word on it: NEW on a find, ON HER on what the mare wears.
+static func ribbon(text: String) -> Label:
+	var badge := _badge(text, JournalTheme.NEW_BADGE)
 	badge.uppercase = true
 	return badge
 

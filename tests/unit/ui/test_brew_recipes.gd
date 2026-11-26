@@ -1,4 +1,4 @@
-# gate: when:ui/chemistry/*,systems/chemistry/*,data/chemistry/*,data/stations/*,ui/menu/loose_page.gd
+# gate: when:ui/chemistry/*,systems/chemistry/*,data/chemistry/*,data/stations/*,ui/menu/open_tin.gd
 ## The brewing page lists the recipes she knows beside her bags (owner,
 ## 2026-11-25): picking one lays its makings in the pot and sets how to work
 ## it, one she lacks something for says what, one worked elsewhere says

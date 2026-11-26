@@ -1,12 +1,13 @@
-# gate: when:ui/menu/loose_page.gd,ui/menu/book_kit.gd,ui/theme/*,ui/chemistry/brew_menu.gd,ui/market/market_menu.gd,ui/studio/studio_ui.gd,ui/mare/mare_tending_view.gd,systems/fast_travel/whorl_travel_card.gd,systems/fast_travel/whorl_ride.gd,ui/ui_style.gd
+# gate: when:ui/menu/loose_page.gd,ui/menu/book_kit.gd,ui/theme/*,ui/market/market_menu.gd,ui/studio/studio_ui.gd,systems/fast_travel/whorl_travel_card.gd,systems/fast_travel/whorl_ride.gd,ui/ui_style.gd
 extends GutTest
-## The stations she opens with E are loose pages of the journal: one kit lays
-## the paper, the heading and the key caps, and no station frames itself.
+## The stations where she reads or chooses are loose pages of the journal:
+## one kit lays the paper, the heading and the key caps, and no station frames
+## itself. (Where she works with her hands, the mare and a brewing bench, it
+## is her open tin: test_open_tin.gd.)
 
 const STATIONS: Array[String] = [
-	"res://ui/chemistry/brew_menu.gd", "res://ui/market/market_menu.gd", "res://ui/studio/studio_ui.gd",
-	"res://ui/mare/mare_tending_view.gd", "res://systems/fast_travel/whorl_travel_card.gd",
-	"res://systems/fast_travel/whorl_ride.gd",
+	"res://ui/market/market_menu.gd", "res://ui/studio/studio_ui.gd",
+	"res://systems/fast_travel/whorl_travel_card.gd", "res://systems/fast_travel/whorl_ride.gd",
 ]
 
 
