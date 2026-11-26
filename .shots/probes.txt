@@ -1,0 +1,4 @@
+from ui-frame
+quality look
+shot book res://tools/ui/menu_open_probe.tscn shots {out} p3_house
+shot tend res://tools/mount/mare_tend_shot.tscn {out}
