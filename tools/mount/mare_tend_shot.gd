@@ -28,11 +28,11 @@ func _run() -> void:
 	var v := director.open_tending()
 	MareCare.brush(4.5)
 	v._apply(false)
-	v._show("Care")
+	v._show(MareTendingView.CARE)
 	for i in 8:
 		await get_tree().process_frame
 	get_viewport().get_texture().get_image().save_png("%s/tend_care.png" % out)
-	v._show("Garland")
+	v._show(&"garland")
 	for i in 4:
 		await get_tree().process_frame
 	get_viewport().get_texture().get_image().save_png("%s/tend_garland.png" % out)

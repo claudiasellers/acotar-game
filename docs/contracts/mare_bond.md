@@ -27,8 +27,14 @@ needs the director's OK (R13). The riding itself is `docs/contracts/mount.md`.
   (`MareTendingView`, `ui/mare/`); a tap of E still mounts. It's taught once
   after a dismount (a card note, WorldDeltas `mount/tend_taught`).
 - The screen keeps the world running (no pause): Feyre's physics is off, a
-  camera frames the mare's near side on the left, the satchel-themed panel
-  sits on the right. Esc, E or Done close it.
+  camera frames the mare from the side Feyre is not standing on (so Feyre
+  never blocks her), and a loose page of the journal sits on the right.
+  Esc, T, E or Done close it. The screen itself is the UI lane's
+  (`docs/contracts/ui-frame.md` step 8u): her coat and her Closeness as
+  `MeterRow` meters, picture tabs in two groups (Care: brush and treats, her
+  page; Dress her: one per `MareTack` slot), treats as the satchel's
+  pictures, pieces with enamel colour swatches, a brush under the pointer
+  and a soft rising chime as it strokes.
 - **Care** (`MareCare`): stroke her coat with the brush (hold the mouse and
   drag over her, or hold A and move the stick). `BRUSH_TO_FULL` (9 screen
   widths of stroke) takes her from dull to gleaming; the shine is pearl on
