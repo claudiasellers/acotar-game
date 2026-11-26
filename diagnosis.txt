@@ -1,0 +1,2 @@
+WHY: the 'parse' check failed (parse error, stale generated file or similar); the file is named in the log below.
+DO:  fix that file; tools/mq/parse.sh <file> checks one. Run tools/mq/precheck.sh before pushing.
