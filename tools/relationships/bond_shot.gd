@@ -36,7 +36,7 @@ func _run() -> void:
 	get_tree().root.add_child(estate)
 	get_tree().current_scene = estate
 	if estate.get(&"feyre") == null:
-		ShotLook.dress(estate, &"manor_interior")
+		GradeDirector.light(estate, &"manor_interior")
 		estate.call(&"_spawn_feyre")
 	StoryDirector.attach_all(estate)
 	feyre = estate.get(&"feyre") as Node3D

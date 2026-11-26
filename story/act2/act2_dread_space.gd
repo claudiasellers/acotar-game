@@ -161,7 +161,7 @@ func abort(fail_fact: String = "") -> void:
 	_must_leave = true
 	silence()
 	StoryControl.release(self)
-	EventBus.mood_requested.emit(&"calm", 0.0, 2.0)
+	EventBus.mood_requested.emit(self, &"calm", 0.0, 2.0)
 	EventBus.scene_space_finished.emit(space_id)
 	failed.emit(fail_fact)
 

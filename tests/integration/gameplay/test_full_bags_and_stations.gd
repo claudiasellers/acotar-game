@@ -23,7 +23,7 @@ func before_each() -> void:
 	add_child_autofree(hill)
 	feyre = hill.feyre
 	feyre.set_physics_process(false)
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	await wait_physics_frames(5)
 
 

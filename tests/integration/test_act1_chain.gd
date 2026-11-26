@@ -84,7 +84,7 @@ func _on_cue(actor: StringName, cue: StringName) -> void:
 	cues.append([actor, cue])
 
 
-func _on_grade(to_grade: StringName, seconds: float) -> void:
+func _on_grade(_source: Object, to_grade: StringName, seconds: float) -> void:
 	grade_requests.append([to_grade, seconds])
 
 

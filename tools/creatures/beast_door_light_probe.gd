@@ -102,7 +102,7 @@ func _run() -> void:
 		_sheets.append(Image.create(TILE.x * 2, TILE.y * 2, false, Image.FORMAT_RGB8))
 	await _settle(2.0)
 	# As BeastDoor plays it: dread builds, then full dread as the door breaks.
-	EventBus.mood_requested.emit(&"dread", 1.0, 0.2)
+	EventBus.mood_requested.emit(self, &"dread", 1.0, 0.2)
 	await _settle(0.4)
 	StoryControl.set_mode(StoryControl.Mode.WALK)
 	EventBus.story_actor_cue.emit(&"tamlin_beast", &"enter")

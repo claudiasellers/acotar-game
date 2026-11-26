@@ -11,7 +11,8 @@
 //     (T3a; directional lights only, out of the lit band, so lit pixels are unchanged)
 //   + the candy rim: rim_color * candy_fresnel * rim_strength, LIT by each light
 //     (scaled by its colour and shadowing), never an additive glow
-//   + Godot's own light rim (CANDY_LOBES), clearcoat (CANDY_COAT) and GGX specular.
+//   + the light rim (CANDY_LOBES; Godot's curve, but attenuated and shadowed like the
+//     light it comes from), clearcoat (CANDY_COAT) and GGX specular.
 //
 // Optional defines, set before the #include:
 //   CANDY_LOBES          per-pixel specular + light rim; call candy_lobes(spec, rim, rim_tint)
@@ -164,8 +165,11 @@ void light() {
 	}
 #ifdef CANDY_LOBES
 	if (v_rim > 0.0) {
+		// Lit, never glowing: the rim reaches as far as its light does and stops at
+		// its shadow. Without ATTENUATION every lamp in range rimmed a surface at
+		// full energy whatever the distance, so a room of candles self-lit its props.
 		float rim_light = candy_fresnel(NORMAL, VIEW, max(0.0, (1.0 - ROUGHNESS) * 16.0));
-		DIFFUSE_LIGHT += rim_light * v_rim * mix(vec3(1.0), ALBEDO, v_rim_tint) * LIGHT_COLOR;
+		DIFFUSE_LIGHT += rim_light * v_rim * mix(vec3(1.0), ALBEDO, v_rim_tint) * LIGHT_COLOR * ATTENUATION;
 	}
 #endif
 #if defined(CANDY_SOFT_SPEC)

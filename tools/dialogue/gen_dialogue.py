@@ -396,6 +396,8 @@ ride("rn_paint", "paint", "To paint it would be useless.", canon="A", delivery="
 ride("rn_fool", "stairs", "Only a fool would run with no food, no strength.", canon="V",
      delivery="inner voice: the mare won't move; reasoning herself down")
 ride("rn_food", "stairs", "Food first. Then run.", canon="A", delivery="inner voice: decided, low")
+# Still in the saddle at his doors (owner 2026-11-26): he waits, looking back.
+ride("rn_get_down", "get_down", "He's waiting at the doors. Get down.", delivery="inner voice: steeling herself")
 # Straying (Keeper's tiers): the mare first, then his growl, his roar, the block.
 ride("rn_stray_mare", "stray_mare", "She won't go. She's his.", delivery="inner voice: the reins useless, rising fear")
 ride("rn_stray_growl", "stray_growl", "Live, not die.", canon="V", delivery="inner voice: a whisper, frozen")
@@ -1114,6 +1116,11 @@ moment("hostile_glint_grab", "hostile_packs", "Greedy things. Anything that shin
 # The first charm she cuts from the sleeping Hollow Hob's necklace (bestiary
 # §10; the first on the cord is an iron horseshoe [C: iron does nothing to
 # them]). Canon X, once per save; the Keeper's to tune.
+# G29: the first time she comes within 25 m of it asleep, she sees what it
+# wears (bestiary §10.3). Canon X, once per save; the Keeper's to tune.
+moment("hob_first_sight", "hollow_hob",
+       "Iron, pewter, a child's bracelet. Mortal things, strung round that neck. And it's asleep.",
+       canon="X", once=True)
 moment("hob_charm_cut", "hollow_hob", "Iron. Someone thought this would keep them safe.", canon="X", once=True)
 
 # =============================================================================

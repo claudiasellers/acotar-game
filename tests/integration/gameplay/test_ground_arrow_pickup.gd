@@ -10,7 +10,7 @@ var feyre: Feyre
 
 
 func before_each() -> void:
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)  # no dread left by an earlier test: it holds the log
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)  # no dread left by an earlier test: it holds the log
 	WorldState.clear()
 	Gameplay.reset()
 	PhaseManager.start(TEST_SET)

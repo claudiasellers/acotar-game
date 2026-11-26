@@ -1,11 +1,13 @@
-## Owns the World scene's look: WorldEnvironment, sky, sun and the shader
-## globals. Blends between GradePresets on EventBus.grade_swap_requested (story
-## controls the wall crossing) and on RegionGrade areas, and drives the sun from
-## Clock.
+## Owns the World scene's look: WorldEnvironment, sky, sun, glow, the
+## screen-space bounce light and the shader globals. Blends between GradePresets
+## on EventBus.grade_swap_requested (story controls the wall crossing) and on
+## RegionGrade areas, and drives the sun from Clock. Nothing else writes the
+## game's environment (tests/unit/world/test_one_lighting_authority.gd).
 class_name GradeDirector
 extends Node
 
 const PRESET_DIR := "res://world/shared/grades/"
+const WORLD_SCENE := "res://world/shared/world/world.tscn"
 
 @export var environment: WorldEnvironment
 @export var sun: DirectionalLight3D
@@ -29,13 +31,27 @@ var _from: GradePreset
 var _to: GradePreset
 var _t := 1.0
 var _seconds := 0.0
-## While a story swap is in effect, region grades don't override it.
-var _story_hold := false
-var _region_grade: StringName = &""
+## The one lighting authority (owner, 2026-11-26: one working version, no
+## fallbacks). What she sees is decided here, in this order:
+## 1. An indoor RegionGrade she is in (the manor rooms) always wins.
+## 2. Otherwise the newest story grade still held (EventBus.grade_swap_requested
+##    by a source; it lasts until that source sends &"" or leaves the tree).
+## 3. Otherwise the highest-priority RegionGrade she is in.
+## The fear overlay is the strongest mood request still held, one per source
+## (until it sends calm or leaves the tree); ambient fear (creature dread
+## fields, the woods) doesn't reach indoors. Everyone else follows the result
+## on EventBus.mood_changed.
+## Story grades by source id: [source WeakRef, grade], oldest first.
+var _holds: Array = []
+var _shown: StringName = &""
 var _region: RegionGrade
+## True while the winning area is an indoor one.
+var indoors := false
+## Mood requests by source id: [mood, intensity, outdoor_only].
+var _moods: Dictionary = {}
 ## Story mood overlay (EventBus.mood_requested): "dread" drops the light about
 ## two stops, drains colour and pools low fog (experience bar §1.5); "enchanted_sleep" fades to a soft, foggy dark (the carriage
-## farewell, the solstice night); "calm" eases whatever is on back to 0.
+## farewell, the solstice night); "calm" from a source ends that source's request.
 var mood: StringName = &"dread"
 var mood_amount := 0.0
 var _mood_target := 0.0
@@ -65,6 +81,19 @@ const GLOW_INTENSITY := 0.35
 const GLOW_LUMINANCE_CAP := 3.5
 ## Tight halos (levels 2-4), no wide level-5+ haze.
 const GLOW_LEVELS := [0.0, 0.6, 1.0, 0.4, 0.0, 0.0, 0.0]
+## Soft bounce light (render program T3a, L60): half-resolution SSAO on every
+## graphics profile, low-quality half-resolution SSIL (screen-space colour
+## bleed) only where it is affordable. The profile is
+## GameSettings.shadow_profile_name() ("high", or "mac" on Apple silicon).
+## Ambient and reflections come from the sky (world.tscn); the light the lit
+## ground throws back up is candy_lit's ground_bounce term. For the Mac perf
+## pass, BOUNCE_SSIL=0|1 forces SSIL and BOUNCE_SDFGI=1 turns SDFGI on
+## (GradePreset has no GI switch, so no grade turns it off again).
+const SSIL_PROFILES: Array[StringName] = [&"high"]
+const SSAO_RADIUS := 1.0
+const SSAO_INTENSITY := 1.2
+const SSIL_RADIUS := 5.0
+const SSIL_INTENSITY := 1.0
 
 
 func _ready() -> void:
@@ -72,14 +101,67 @@ func _ready() -> void:
 	EventBus.flag_changed.connect(_on_flag_changed)
 	_sight_target = 1.0 if WorldState.has_flag(GlamourLayer.FLAG) else 0.0
 	sight = _sight_target
-	if EventBus.has_signal(&"mood_requested"):
-		EventBus.connect(&"mood_requested", _on_mood_requested)
+	EventBus.mood_requested.connect(_on_mood_requested)
 	current = load_preset(start_grade)
+	_shown = start_grade
 	_from = current
 	_to = current
+	GameSettings.shadow_profile_changed.connect(func(_profile: String) -> void: _apply_bounce())
 	if environment and environment.environment:
 		light_source_glow(environment.environment)
+		_apply_bounce()
 	apply(current)
+
+
+func _apply_bounce() -> void:
+	if environment == null or environment.environment == null:
+		return
+	var env := environment.environment
+	screen_space_bounce(env, StringName(GameSettings.shadow_profile_name()))
+	var force := OS.get_environment("BOUNCE_SSIL")
+	if force in ["0", "1"]:
+		env.ssil_enabled = force == "1"
+	if OS.get_environment("BOUNCE_SDFGI") == "1":
+		env.sdfgi_enabled = true
+
+
+static func ssil_for_profile(profile: StringName) -> bool:
+	return profile in SSIL_PROFILES
+
+
+## Sets `env` to the game's bounce light for a graphics `profile`.
+static func screen_space_bounce(env: Environment, profile: StringName) -> void:
+	env.ssao_enabled = true
+	env.ssao_radius = SSAO_RADIUS
+	env.ssao_intensity = SSAO_INTENSITY
+	env.ssil_enabled = ssil_for_profile(profile)
+	env.ssil_radius = SSIL_RADIUS
+	env.ssil_intensity = SSIL_INTENSITY
+	# Quality is global to the renderer; these are Godot's project defaults
+	# apart from the quality level and half size.
+	RenderingServer.environment_set_ssao_quality(RenderingServer.ENV_SSAO_QUALITY_MEDIUM, true, 0.5, 2, 50.0, 300.0)
+	RenderingServer.environment_set_ssil_quality(RenderingServer.ENV_SSIL_QUALITY_LOW, true, 0.5, 4, 50.0, 300.0)
+
+
+## Lights a scene that has no World (a region played or shot on its own) the
+## way the game does: the World's own environment and sun, under a director on
+## `grade`. Returns the director; set its focus to let RegionGrades pick.
+static func light(root: Node3D, grade: StringName = &"manor") -> GradeDirector:
+	var world := (load(WORLD_SCENE) as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_DISABLED)
+	var env := world.get_node("WorldEnvironment") as WorldEnvironment
+	var sun := world.get_node("Sun") as DirectionalLight3D
+	world.remove_child(env)
+	world.remove_child(sun)
+	world.free()
+	root.add_child(env)
+	root.add_child(sun)
+	var director := GradeDirector.new()
+	director.name = "GradeDirector"
+	director.environment = env
+	director.sun = sun
+	director.start_grade = grade
+	root.add_child(director)
+	return director
 
 
 ## Sets `env` to the game's light-source-only glow.
@@ -300,51 +382,118 @@ static func _sleepy(p: GradePreset, amount: float) -> GradePreset:
 	return s
 
 
-func _on_mood_requested(requested: StringName, intensity: float, seconds: float) -> void:
-	if requested == &"calm":
-		_mood_target = 0.0
+## Ambient fear from the world (every creature's dread field, sent as the
+## DreadField class, and the woods' AmbientLife) stays outdoors: it never
+## darkens the rooms. A staged scene's dread reaches wherever she is.
+static func outdoor_only(source: Object) -> bool:
+	return source == DreadField or source is AmbientLife
+
+
+func _on_mood_requested(source: Object, requested: StringName, intensity: float, seconds: float) -> void:
+	if source == null and requested == &"calm":
+		_moods.clear()   # a load or a reset: every request ends
 	else:
-		if requested != mood and mood_amount > 0.0:
-			mood_amount = 0.0
-		mood = requested
-		_mood_target = clampf(intensity, 0.0, 1.0)
+		var key := source.get_instance_id() if source != null else 0
+		if requested == &"calm" or intensity <= 0.0:
+			_moods.erase(key)
+		else:
+			_moods[key] = [requested, clampf(intensity, 0.0, 1.0), outdoor_only(source)]
+			# A scene that ends without calm takes its fear with it.
+			var drop := _drop_mood.bind(key)
+			if source is Node and not (source as Node).tree_exiting.is_connected(drop):
+				(source as Node).tree_exiting.connect(drop, CONNECT_ONE_SHOT)
+	_resolve_mood(seconds)
+
+
+func _drop_mood(key: int) -> void:
+	if _moods.erase(key):
+		_resolve_mood(2.0)
+
+
+## The strongest request that applies where she is becomes the overlay.
+func _resolve_mood(seconds: float) -> void:
+	var best_mood := mood
+	var best := 0.0
+	for key: int in _moods:
+		var r: Array = _moods[key]
+		if indoors and r[2]:
+			continue
+		if float(r[1]) > best:
+			best = r[1]
+			best_mood = r[0]
+	if best_mood == mood and is_equal_approx(best, _mood_target):
+		return
+	if best_mood != mood and mood_amount > 0.0:
+		mood_amount = 0.0
+	mood = best_mood
+	_mood_target = best
 	_mood_rate = absf(_mood_target - mood_amount) / maxf(seconds, 0.001)
+	EventBus.mood_changed.emit(mood if best > 0.0 else &"calm", _mood_target, seconds)
 
 
-func _on_grade_swap_requested(to_grade: StringName, seconds: float) -> void:
-	_story_hold = true
-	_region_grade = &""
-	swap_to(to_grade, seconds)
+## A story grade from `source`, held until the source sends &"" or leaves the
+## tree. Indoors the rooms still win.
+## A null source's &"" ends every hold (a load or a reset).
+func _on_grade_swap_requested(source: Object, to_grade: StringName, seconds: float) -> void:
+	if source == null:
+		_holds.clear()
+		_retarget(seconds)
+		return
+	_drop_hold(source)
+	if to_grade != &"":
+		_holds.append([weakref(source), to_grade])
+		var left := _on_hold_source_left.bind(source)
+		if source is Node and not (source as Node).tree_exiting.is_connected(left):
+			(source as Node).tree_exiting.connect(left, CONNECT_ONE_SHOT)
+	_retarget(seconds)
+
+
+func _on_hold_source_left(source: Object) -> void:
+	_drop_hold(source)
+	_retarget(2.0)
+
+
+func _drop_hold(source: Object) -> void:
+	for i in range(_holds.size() - 1, -1, -1):
+		var held: Object = (_holds[i][0] as WeakRef).get_ref()
+		if held == null or held == source:
+			_holds.remove_at(i)
 
 
 func _update_region_grade() -> void:
-	if focus == null or _story_hold or is_blending():
+	if focus == null or is_blending():
 		return
-	# The highest-priority area she is in (the first of equals) owns the look.
+	_retarget(-1.0)
+
+
+## Picks what she should see now (see the order at the top) and blends to it.
+## seconds < 0 uses the areas' own blend times.
+func _retarget(seconds: float) -> void:
+	_drop_hold(null)
 	var rg: RegionGrade = null
-	for node in get_tree().get_nodes_in_group(RegionGrade.GROUP):
-		var here := node as RegionGrade
-		if (rg == null or here.priority > rg.priority) and here.contains(focus.global_position):
-			rg = here
-	if rg and rg.grade != _region_grade:
-		var leaving := _region.leave_seconds if is_instance_valid(_region) else 0.0
-		_region_grade = rg.grade
+	if focus != null:
+		for node in get_tree().get_nodes_in_group(RegionGrade.GROUP):
+			var here := node as RegionGrade
+			if (rg == null or here.priority > rg.priority) and here.contains(focus.global_position):
+				rg = here
+	var was_indoors := indoors
+	indoors = rg != null and rg.indoor
+	var want: StringName = _shown
+	var blend := seconds
+	if indoors or (_holds.is_empty() and rg != null):
+		want = rg.grade
+		if blend < 0.0:
+			var leaving := _region.leave_seconds if is_instance_valid(_region) else 0.0
+			blend = leaving if leaving > 0.0 else rg.blend_seconds
 		_region = rg
-		swap_to(rg.grade, leaving if leaving > 0.0 else rg.blend_seconds)
-
-
-## Story swaps hold until the story (or a test) releases them.
-func release_story_hold() -> void:
-	_story_hold = false
-
-
-## Hands the look back to the region grades. Every scene that swaps the grade
-## calls this when it's done with it; a hold left on hides every region's grade.
-static func release_story_holds(tree: SceneTree) -> void:
-	if tree == null:
-		return
-	for node in tree.root.find_children("*", "GradeDirector", true, false):
-		(node as GradeDirector).release_story_hold()
+	elif not _holds.is_empty():
+		want = _holds.back()[1]
+		_region = null
+	if indoors != was_indoors:
+		_resolve_mood(1.0)
+	if want != _shown and want != &"":
+		_shown = want
+		swap_to(want, maxf(blend, 0.0))
 
 
 func _update_sun() -> void:

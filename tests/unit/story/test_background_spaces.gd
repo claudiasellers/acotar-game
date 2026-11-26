@@ -68,7 +68,7 @@ func test_background_moments_do_not_block_a_save() -> void:
 
 func test_background_moments_do_not_hush_the_dread_sting() -> void:
 	_start_background()
-	EventBus.mood_requested.emit(&"dread", 0.8, 0.05)
+	EventBus.mood_changed.emit(&"dread", 0.8, 0.05)
 	assert_eq(int(director.played.get(&"horror_wrong", 0)), 1)
 
 
@@ -76,5 +76,5 @@ func test_a_scene_that_holds_her_controls_still_stops_both() -> void:
 	var spaces := _start_background()
 	StoryControl.hold(spaces[0], StoryControl.Mode.NONE)
 	assert_false(SaveSystem.can_autosave())
-	EventBus.mood_requested.emit(&"dread", 0.8, 0.05)
+	EventBus.mood_changed.emit(&"dread", 0.8, 0.05)
 	assert_false(director.played.has(&"horror_wrong"), "a real scene brings its own horror")

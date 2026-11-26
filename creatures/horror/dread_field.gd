@@ -4,7 +4,8 @@
 ## naga, the Attor, wolves, or (as dread_field.tscn) a blighted place.
 ##
 ## Fields never touch other nodes: swarms and birds ask `withdrawal_at()`,
-## and the grade director hears EventBus.mood_requested.
+## and the grade director hears EventBus.mood_requested, sent by the DreadField
+## class for every field at once (the strongest pull), and kept outdoors.
 class_name DreadField
 extends Node3D
 
@@ -120,9 +121,9 @@ static func _send_mood() -> void:
 	if absf(total - _sent) < 0.08 and not (total == 0.0 and _sent > 0.0):
 		return
 	if total <= 0.0:
-		EventBus.mood_requested.emit(&"calm", 0.0, 2.5)
+		EventBus.mood_requested.emit(DreadField, &"calm", 0.0, 2.5)
 	else:
-		EventBus.mood_requested.emit(&"dread", total, 1.5)
+		EventBus.mood_requested.emit(DreadField, &"dread", total, 1.5)
 	_sent = total
 
 

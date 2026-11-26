@@ -122,7 +122,7 @@ func _ready() -> void:
 	Gameplay.listen(&"player_startled", _on_startled)
 	Gameplay.listen(&"player_grabbed", _on_grabbed)
 	Gameplay.listen(&"player_released", _on_released)
-	Gameplay.listen(&"mood_requested", _on_mood_requested)
+	Gameplay.listen(&"mood_changed", _on_mood_changed)
 	Gameplay.listen(&"celebration_requested", _on_celebration)
 	Gameplay.listen(&"deed_performed", _on_deed)
 	Gameplay.listen(&"flag_changed", _on_flag_changed)
@@ -341,7 +341,7 @@ func _end_grab() -> void:
 	released.emit(source)
 
 
-func _on_mood_requested(mood: StringName, intensity: float, _seconds: float) -> void:
+func _on_mood_changed(mood: StringName, intensity: float, _seconds: float) -> void:
 	if mood == &"dread":
 		dread_target = clampf(intensity, 0.0, 1.0)
 		if intensity > 0.0:

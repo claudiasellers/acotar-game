@@ -232,7 +232,7 @@ func begin_new(slot: String) -> void:
 ## narrows her controls, and no dread it raised lingers.
 func _settle_story_control() -> void:
 	StoryControl.release()
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_requested.emit(null, &"calm", 0.0, 0.0)
 
 
 func delete_save(slot: String) -> void:
