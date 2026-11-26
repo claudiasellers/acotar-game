@@ -1,0 +1,15 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+Metal 4.0 - Forward+ - Using Device #0: Apple - Apple M4 (Apple9)
+
+ERROR: This function should never be used outside the editor, it can severely damage performance.
+   at: global_shader_parameter_get_list (servers/rendering/renderer_rd/storage_rd/material_storage.cpp:1848)
+   GDScript backtrace (most recent call first):
+       [0] ensure_wetness_global (res://world/shared/weather/spring_weather.gd:87)
+       [1] _ready (res://world/shared/weather/spring_weather.gd:59)
+       [2] _ready (res://systems/props/touch_world.gd:27)
+       [3] _run (res://tools/creatures/beast_door_light_probe.gd:43)
+focus guard: handed focus back 1x, render held it 173 ms
+LIGHT gain 1.0 frame 0 door bursts: shot door, mean 26.9, dark<30 72%, beast box [P: (479, 249), S: (663, 623)] mean 28.2
+LIGHT gain 1.0 frame 1 fills the room: shot low, mean 27.5, dark<30 66%, beast box [P: (0, 0), S: (1920, 1080)] mean 27.5
+LIGHT gain 1.0 frame 2 throw window: shot window, mean 30.7, dark<30 58%, beast box [P: (45, 0), S: (1445, 1080)] mean 28.6
+LIGHT gain 1.0 frame 3 father pleads: shot plead, mean 29.1, dark<30 63%, beast box [P: (0, 0), S: (1116, 1080)] mean 30.4
