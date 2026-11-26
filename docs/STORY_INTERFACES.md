@@ -38,7 +38,7 @@ Emitted by story, heard by other lanes:
 | `story_spawn_requested(spawn_id, transform)` | creatures | `great_wolf`, `doe`, `tamlin_beast`. Story spawns capsule stand-ins only if nobody answers. |
 | `story_actor_cue(actor, cue)` | creatures | Beast: `enter`, `loom`, `speak`, `leave`. Family: `gather`, `release` (gather at the node in group `hearth`). |
 | `scene_space_started(id)` / `scene_space_finished(id)` | anyone | |
-| `grade_swap_requested(to_grade, seconds)` | world (GradeDirector) | `spring`, 2.0 at the wall; `human_winter` on the way back. |
+| `grade_swap_requested(source, to_grade, seconds)` | world (GradeDirector) | `spring`, 2.0 at the wall; `human_winter` on the way back. Held for `source` until it sends `&""` or leaves the tree; indoor rooms always win. |
 
 ## Story flags
 
@@ -78,6 +78,10 @@ broken door). `GlamourLayer` is the glamour swap (docs/contracts/glamour.md).
 Act I spaces live in `story/act1/`; the greybox (`story/act1/greybox/`) is the
 main scene until real regions land.
 
-`EventBus.mood_requested(mood, intensity, seconds)`: `dread` for the wolf and
-the beast (silence, guttering fire, cold low light, camera shake through
-`StoryControl.shake`), `calm` when a scene ends. World and audio listen.
+`EventBus.mood_requested(source, mood, intensity, seconds)`: `dread` for the
+wolf and the beast (silence, guttering fire, cold low light, camera shake
+through `StoryControl.shake`), `calm` to end that source's request (every
+SceneSpace sends it when it ends). Only GradeDirector listens: it keeps the
+strongest request (ambient dread fields stay outdoors) and announces the result
+as `EventBus.mood_changed(mood, intensity, seconds)`, which sound, the HUD,
+vitals and the house lights follow.

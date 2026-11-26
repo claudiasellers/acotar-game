@@ -21,7 +21,7 @@ func after_each() -> void:
 	EventBus.mood_requested.disconnect(_on_mood)
 
 
-func _on_mood(mood: StringName, intensity: float, _s: float) -> void:
+func _on_mood(_source: Object, mood: StringName, intensity: float, _s: float) -> void:
 	moods.append([mood, intensity])
 
 

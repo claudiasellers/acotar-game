@@ -43,7 +43,7 @@ func _run() -> void:
 func _view(id: String, path: String) -> void:
 	var view: Array = VIEWS[id]
 	# Each view starts calm: a mood holds until a scene lifts it.
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_requested.emit(null, &"calm", 0.0, 0.0)
 	PhaseManager.current_phase = view[0]
 	Clock.paused = true
 	Clock.time_of_day = view[3]
@@ -83,7 +83,7 @@ func _view(id: String, path: String) -> void:
 			EventBus.player_hit.emit(&"shot", &"briarling_lash", 1.0, _feyre.global_position + Vector3(4, 0, 0))
 		"spring_dusk":
 			v.ease = 0.2
-			EventBus.mood_requested.emit(&"dread", 0.6, 1.0)
+			EventBus.mood_requested.emit(self, &"dread", 0.6, 1.0)
 			EventBus.player_status_applied.emit(&"shot", &"venom", 0.7, 1.0)
 			EventBus.player_status_applied.emit(&"shot", &"drowsy", 0.75, 1.0)
 			EventBus.player_hit.emit(&"shot", &"martax_roar", 1.0, _feyre.global_position + Vector3(-6, 0, -6))

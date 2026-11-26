@@ -43,12 +43,19 @@ signal line_spoken(actor: StringName, text: String, emotion: StringName, seconds
 ## Story: an anchored scene space began or ended.
 signal scene_space_started(space_id: StringName)
 signal scene_space_finished(space_id: StringName)
-## Story to world: blend the colour grade (the wall crossing, cold to spring).
-signal grade_swap_requested(to_grade: StringName, seconds: float)
-## Story to world/audio: set a scene mood. &"dread" (the wolf, the beast) means
-## silence the ambience, gutter the fire, cold low light; &"calm" restores.
-## intensity 0..1, blended over `seconds`.
-signal mood_requested(mood: StringName, intensity: float, seconds: float)
+## Story to world: hold a colour grade for `source` (the wall crossing, cold to
+## spring) until the source sends &"" or leaves the tree. GradeDirector decides
+## what shows; an indoor room always wins.
+signal grade_swap_requested(source: Object, to_grade: StringName, seconds: float)
+## Story/world to GradeDirector: `source` asks for a scene mood. &"dread" (the
+## wolf, the beast) means cold low light, silenced ambience, guttering fire;
+## &"calm" ends that source's request (a null source's calm ends them all).
+## intensity 0..1, blended over `seconds`. Nobody else listens: the mood that
+## counts is the one GradeDirector settles on (mood_changed).
+signal mood_requested(source: Object, mood: StringName, intensity: float, seconds: float)
+## GradeDirector to sound, vitals, HUD and the house lights: the mood now in
+## force, the strongest request that applies where she is.
+signal mood_changed(mood: StringName, intensity: float, seconds: float)
 ## Creatures: an arrow or blade struck a creature without (yet) killing it.
 ## part: &"side", &"eye", &"leg"... as the creatures lane resolves it.
 signal creature_hit(creature_id: StringName, kind: StringName, cause: StringName, part: StringName)

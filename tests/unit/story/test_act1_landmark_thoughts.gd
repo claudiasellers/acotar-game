@@ -8,7 +8,7 @@ func before_each() -> void:
 	WorldState.clear()
 	StoryControl.release()
 	# The card waits out dread (UiMode.quiet); clear any an earlier script left.
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 
 
 func _walk(thoughts: Act1LandmarkThoughts, from: Vector2, to: Vector2, raised: Array) -> void:

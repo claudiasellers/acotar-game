@@ -6,7 +6,7 @@ extends GutTest
 func _dressed() -> Node3D:
 	var estate := Node3D.new()
 	add_child_autofree(estate)
-	ShotLook.dress(estate)
+	GradeDirector.light(estate)
 	return estate
 
 

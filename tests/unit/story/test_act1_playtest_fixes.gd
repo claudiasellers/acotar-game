@@ -20,7 +20,7 @@ func after_each() -> void:
 	StoryControl.release()
 	# A scene stopped mid-run never sends its closing calm (the beast door
 	# leaves dread up for HudLayout.DREAD_LAPSE_MS), which hushes later cards.
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	var ride := Act1Anchors.find_ride(get_tree())
 	if ride:
 		ride.free()

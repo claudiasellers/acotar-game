@@ -236,7 +236,7 @@ static func quiet(tree: SceneTree) -> bool
 | `CONTROLS` | yes | yes | yes | no | no |
 
 `quiet()` is true in any mode but `PLAY`, and while dread is in the air: a
-`mood_requested(&"dread", > 0)` that has not been calmed and is under 30 s old
+`mood_changed(&"dread", > 0)` (GradeDirector's settled mood) that has not been calmed and is under 30 s old
 (`HudLayout.dread()`). Celebration cards and Feyre's thoughts queue while it
 is quiet and ask again (R3: a pastel card never lands on the Suriel). Chapter
 cards are not celebrations and do not wait.

@@ -23,7 +23,7 @@ func test_presets_load_with_expected_mood() -> void:
 
 
 func test_wall_swap_reaches_spring_in_two_seconds() -> void:
-	EventBus.grade_swap_requested.emit(&"spring", 2.0)
+	EventBus.grade_swap_requested.emit(self, &"spring", 2.0)
 	assert_true(director.is_blending())
 	director._process(1.0)
 	assert_between(director.current.saturation, 0.56, 1.34, "half-way at 1 s")
@@ -41,10 +41,10 @@ func test_a_story_swap_holds_off_the_region_grade_until_released() -> void:
 	region.grade = &"manor"
 	region.bounds = Rect2(-10.0, -10.0, 20.0, 20.0)
 	add_child_autofree(region)
-	EventBus.grade_swap_requested.emit(&"spring", 0.0)
+	EventBus.grade_swap_requested.emit(self, &"spring", 0.0)
 	director._process(0.1)
 	assert_eq(director.target_id(), &"spring", "the story's grade wins while it holds")
-	GradeDirector.release_story_holds(get_tree())
+	EventBus.grade_swap_requested.emit(self, &"", 2.0)
 	director._process(0.1)
 	assert_eq(director.target_id(), &"manor", "released, the region's grade takes over")
 
@@ -111,7 +111,7 @@ func test_sun_is_up_at_noon_and_down_at_midnight() -> void:
 
 
 func test_dread_darkens_and_desaturates_then_calm_restores() -> void:
-	director._on_mood_requested(&"dread", 1.0, 1.0)
+	director._on_mood_requested(self, &"dread", 1.0, 1.0)
 	director._process(1.0)
 	assert_almost_eq(director.mood_amount, 1.0, 0.001)
 	var base := GradeDirector.load_preset(&"human_winter")
@@ -119,13 +119,13 @@ func test_dread_darkens_and_desaturates_then_calm_restores() -> void:
 	assert_lt(dark.saturation, base.saturation)
 	assert_lt(dark.exposure, base.exposure)
 	assert_gt(dark.fog_density, base.fog_density)
-	director._on_mood_requested(&"calm", 0.0, 0.5)
+	director._on_mood_requested(self, &"calm", 0.0, 0.5)
 	director._process(0.5)
 	assert_almost_eq(director.mood_amount, 0.0, 0.001)
 
 
 func test_enchanted_sleep_fades_down() -> void:
-	director._on_mood_requested(&"enchanted_sleep", 1.0, 2.5)
+	director._on_mood_requested(self, &"enchanted_sleep", 1.0, 2.5)
 	director._process(2.5)
 	var base := GradeDirector.load_preset(&"human_winter")
 	var sleepy := GradeDirector.with_mood(base, director.mood_amount, director.mood)

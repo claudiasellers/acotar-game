@@ -25,7 +25,7 @@ func before_each() -> void:
 	add_child_autofree(hill)
 	feyre = hill.feyre
 	bow = feyre.bow_controller
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	await wait_until(func() -> bool: return feyre.is_on_floor(), 5.0)
 	await wait_physics_frames(5)
 	# The test ticks her and her bow by hand.

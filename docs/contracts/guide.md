@@ -11,7 +11,7 @@ One row, "Feyre's thoughts", three choices from `GuideSettings.LABELS`:
 - `GuideJournal.new()` is added by `story/act1/act1_game.gd` beside SettingsTab.
 - Input: `guide_open` = physical G + d-pad down, registered in code (J and Back belong to the collection book; pad Y is her knife strike, the owner, 2026-11-24). The bookmark's key cap is named from the input map (`KeyPrompt.key`).
 - Reads only: `WorldState.has_flag`, `StoryControl.mode`, `EventBus.flag_changed / deed_performed / mood_requested`. It never writes flags.
-- Silent while `StoryControl.mode != FULL` or after `mood_requested(&"dread", >0)` until a non-dread mood.
+- Silent while `StoryControl.mode != FULL` or after `mood_changed(&"dread", >0)` until a non-dread mood.
 
 ## For content
 - Threads: `data/guide/act1_guide.tres`, built by `tools/guide/gen_act1_guide.gd`. Add an act by adding a generator and a .tres; no code.
