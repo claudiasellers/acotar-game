@@ -1,0 +1,40 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+---  GUT  ---
+[INFO]:  using [/Users/claudiasellers/Documents/acotar-game/.git/mq/batches/1795664708/gate/scratch/gut_tests_unit_render_test_bounce_light.gd/Library/Application Support/Godot/app_userdata/ACOTAR- The Spring Court] for temporary output.
+Godot version:  4.7.2
+GUT version:  9.7.1
+
+
+res://tests/unit/render/test_bounce_light.gd
+* test_outdoor_grades_take_their_ambient_from_the_sky
+    [Failed]:  [0.29999999999999998890] expected to equal [0.7] +/- [0.001]:  human_winter_night.tres: sky share of the ambient
+      at line 21
+* test_candy_lit_throws_the_ground_light_back_up
+* test_ssil_follows_the_profile
+2/3 passed.
+
+
+
+
+==============================================
+= Run Summary
+==============================================
+
+res://tests/unit/render/test_bounce_light.gd
+- test_outdoor_grades_take_their_ambient_from_the_sky
+    [Failed]:  [0.29999999999999998890] expected to equal [0.7] +/- [0.001]:  human_winter_night.tres: sky share of the ambient
+          at line 21
+
+Totals
+------
+Scripts               1
+Tests                 3
+Passing Tests         2
+Failing Tests         1
+Asserts           34/35
+Time              0.439s
+
+
+---- 1 failing tests ----
+
