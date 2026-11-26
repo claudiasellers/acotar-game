@@ -100,6 +100,10 @@ func test_next_corner_never_turns_back_to_the_start() -> void:
 	to = NavMover.next_corner(longer, 0, Vector3(0, 0, -1.2), 1.0)
 	assert_lt(to.z, 0.0, "on along the path, never back to its start: %s" % to)
 	assert_almost_eq(to.z, -1.8, 0.001, "to the next corner ahead")
+	# Past the path's end at the mesh's edge (the front door), on toward a goal
+	# beyond it: the end is behind him, not a corner to go back to.
+	to = NavMover.next_corner(path, 0, Vector3(0, 8.9, -28.1), 0.3)
+	assert_eq(to, Vector3.ZERO, "nothing behind him to turn back to: he goes on straight")
 
 
 func _through_wall(a: Vector3, b: Vector3) -> bool:

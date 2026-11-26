@@ -79,7 +79,8 @@ func steer(goal: Vector3) -> Vector3:
 ## own feet and jittered there (the beast on the manor's front step, L86-29).
 ## Nor may a corner already behind him count: the path's start, a metre back
 ## once he has set off, turned him round, step for step, on the manor's front
-## steps when the arrival started him there (L86-31).
+## steps when the arrival started him there (L86-31); and the path's end at
+## the mesh's edge, once he has walked past it toward a goal beyond (L86-32).
 static func next_corner(path: PackedVector3Array, index: int, from: Vector3, reach: float) -> Vector3:
 	var start := maxi(index, 0)
 	if start >= path.size():
@@ -92,12 +93,21 @@ static func next_corner(path: PackedVector3Array, index: int, from: Vector3, rea
 			nearest = d
 			on = i
 	var first := on + 1 if path.size() > 1 else on
+	# Out past the end of that segment (off the mesh's edge at a door, the
+	# path ending short of the goal): its end corner is behind him too.
+	if first < path.size() and first > on and _past_end(from, path[on], path[first]):
+		first += 1
 	for i in range(first, path.size()):
 		var to := path[i] - from
 		to.y = 0.0
 		if to.length() > reach:
 			return to
 	return Vector3.ZERO
+
+
+static func _past_end(p: Vector3, a: Vector3, b: Vector3) -> bool:
+	var ab := Vector2(b.x - a.x, b.z - a.z)
+	return ab.length_squared() > 1e-6 and Vector2(p.x - a.x, p.z - a.z).dot(ab) > ab.length_squared()
 
 
 static func _ground_distance_to_segment(p: Vector3, a: Vector3, b: Vector3) -> float:
