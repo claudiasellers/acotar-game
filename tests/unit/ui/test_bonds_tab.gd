@@ -1,6 +1,7 @@
 # gate: when:systems/bonds/*,ui/bonds/*,data/mount/mare_page.tres,systems/mount/mare_bond.gd,data/phases/*,ui/menu/menu_tab.gd
 ## The Bonds page (owner, 2026-11-25): who Feyre knows and what has passed
-## between them, told as dated moments in her hand and never as a number.
+## between them, told as dated moments in her hand, and read by one set of
+## measures drawn as marks (owner, 2026-11-26); no figure is written in a line.
 ## BondBook reads story flags; nobody is listed before they come into her
 ## life; the mare's memories are her own page's.
 extends GutTest
@@ -110,7 +111,7 @@ func test_no_line_is_a_number_and_every_story_flag_is_a_real_one() -> void:
 		assert_gt((b.moments as Array).size(), 0, "%s has a first moment" % b.id)
 		for m: Dictionary in BondBook.all_moments(b):
 			for key in ["then", "now"]:
-				assert_null(digits.search(String(m.get(key, ""))), "%s: a bond is never a number (R2)" % m.flag)
+				assert_null(digits.search(String(m.get(key, ""))), "%s: her lines carry no figure" % m.flag)
 			assert_ne(String(m.then), "")
 			if m.flag != "" and not String(m.flag).begins_with("fact."):
 				assert_string_contains(phases, "\"%s\"" % m.flag, "a phase flag that exists")
@@ -144,3 +145,68 @@ func test_a_flag_coming_up_in_play_is_stamped_by_the_page() -> void:
 	Clock.day = 7
 	WorldState.set_flag("stranger_met", true)
 	assert_eq(BondBook.day_of("stranger_met"), 7)
+
+
+func _measure(id: StringName, what: StringName) -> Dictionary:
+	for m in BondBook.measures(BondBook.get_bond(id)):
+		if m.id == what:
+			return m
+	return {}
+
+
+func test_everyone_is_read_by_the_same_measures_in_the_same_order() -> void:
+	var legend := BondBook.MEASURES.map(func(m: Dictionary) -> StringName: return m.id)
+	for b in BondBook.BONDS:
+		var read := BondBook.measures(b).map(func(m: Dictionary) -> StringName: return m.id)
+		assert_eq(read, legend, "%s: one legend for every bond" % b.id)
+		for m in BondBook.measures(b):
+			assert_between(int(m.filled), 0, int(m.of), "%s %s: never more marks than there are" % [b.id, m.id])
+	for m in BondBook.MEASURES:
+		assert_ne(String(m.says), "", "%s is explained in the legend" % m.id)
+
+
+func test_her_family_has_warmth_memories_and_since_and_no_ladder() -> void:
+	assert_eq(_measure(&"nesta", BondBook.CLOSENESS).of, 0, "no ladder: the measure does not apply")
+	assert_eq(_measure(&"nesta", BondBook.DEEDS).of, 0)
+	assert_eq(_measure(&"nesta", BondBook.WARMTH).word, "Cold")
+	assert_eq(_measure(&"nesta", BondBook.SINCE).word, BondBook.ALWAYS)
+	assert_eq([_measure(&"nesta", BondBook.MEMORIES).filled, _measure(&"nesta", BondBook.MEMORIES).of], [1, 2])
+	_raise("nesta_truth_heard", 40)
+	assert_eq(_measure(&"nesta", BondBook.WARMTH).word, "Civil", "a moment can change how she is with me")
+	assert_eq(_measure(&"nesta", BondBook.MEMORIES).filled, 2)
+	assert_eq(_measure(&"elain", BondBook.WARMTH).filled, BondBook.WARMTH_STEPS.size())
+
+
+func test_a_ladder_bond_shows_its_stage_its_deeds_and_a_passing_mood() -> void:
+	_raise("beast_claim_accepted", 2)
+	Relationships.check(&"tamlin")
+	var tamlin := Relationships.def(&"tamlin")
+	assert_eq([_measure(&"tamlin", BondBook.CLOSENESS).filled, _measure(&"tamlin", BondBook.CLOSENESS).of], [1, tamlin.stages.size()])
+	assert_eq(_measure(&"tamlin", BondBook.SINCE).word, "Day 2")
+	assert_eq([_measure(&"tamlin", BondBook.DEEDS).filled, _measure(&"tamlin", BondBook.DEEDS).of], [0, tamlin.deeds.size()])
+	_raise("first_dinner_eaten", 3)
+	Relationships.check(&"tamlin")
+	assert_true(Relationships.deed(&"tamlin", &"ate_at_table"))
+	assert_eq(_measure(&"tamlin", BondBook.CLOSENESS).filled, 2, "the next stage is one more mark")
+	assert_eq(_measure(&"tamlin", BondBook.DEEDS).filled, 1)
+	assert_eq(_measure(&"tamlin", BondBook.WARMTH).word, "Civil")
+	assert_true(Relationships.start_mood(&"tamlin", Relationships.COOL, Clock.day))
+	assert_eq(_measure(&"tamlin", BondBook.WARMTH).word, BondBook.COOL_FOR_NOW, "a bad day, said as one")
+	assert_eq(_measure(&"tamlin", BondBook.CLOSENESS).filled, 2, "and it costs no closeness")
+	assert_eq(_measure(&"mare", BondBook.WARMTH).of, 0, "the mare has no warmth to read")
+
+
+func test_the_page_draws_every_measure_as_marks() -> void:
+	_raise("beast_claim_accepted", 2)
+	Relationships.check(&"tamlin")
+	var tab := BondsTab.new()
+	add_child_autofree(tab)
+	await wait_process_frames(2)
+	tab._shown()
+	for id: StringName in [&"tamlin", &"father"]:
+		tab.show_bond(id)
+		assert_eq(tab._measures.get_child_count(), BondBook.MEASURES.size(), "%s: the same rows for everyone" % id)
+		for m in BondBook.measures(BondBook.get_bond(id)):
+			var line := tab._measures.get_node(String(m.id))
+			var marks := line.get_children().filter(func(c: Node) -> bool: return c is TextureRect)
+			assert_eq(marks.size(), int(m.of), "%s %s: a mark for each step" % [id, m.id])

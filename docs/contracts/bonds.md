@@ -7,8 +7,30 @@ Owner: the UI lane (L77). Paths: `systems/bonds/`, `ui/bonds/`,
 
 ## The rule
 
-A bond is never a number, a bar or a tier on screen (R2, plan section 0.3).
-It is told as **moments** in Feyre's hand, each with the day it happened.
+A bond is told two ways on its page (owner, 2026-11-26, replacing "never a
+bar or a tier on screen"):
+
+- as **moments** in Feyre's hand, each with the day it happened;
+- by **one set of measures**, the same for everyone, drawn as dabs of paint
+  with a word, and explained once in the page's legend.
+
+No figure is written for a measure except the day of Since, and regard (the
+weighted sum inside `Relationships`) is still never shown or read here.
+
+## The measures (`BondBook.MEASURES`, `BondBook.measures(bond)`)
+
+| measure | what it reads | applies to |
+|---|---|---|
+| Closeness | `Relationships.stage(id) + 1` of the ladder's stages. Never drops | whoever has a `BondDef` (Tamlin, Lucien, the mare) |
+| Warmth | one of four steps, Cold, Sharp, Civil, Warm (`cool`, `baiting`, `neutral`, `warm`): `Relationships.attitude(id)` for a ladder bond ("Cold, for now" during a cool mood); for the others the last `warmth` a reached moment gave, the bond's own `warmth` until then | everyone but the mare |
+| Deeds | the `BondDef`'s deeds that are done, of those it knows | ladder bonds |
+| Memories | `moments(bond)` of `all_moments(bond)` | everyone |
+| Since | the day `met` came up: "Day N", "Always" for her family | everyone |
+
+A measure that does not apply to someone is still drawn, faint, with no
+marks: the legend is the same on every page. A new person gets these five
+by being in `BondBook.BONDS` (and a `BondDef` if they have a ladder); a new
+measure is a row in `MEASURES` and a branch in `measures()`, for everyone.
 
 ## `BondBook` (`systems/bonds/bond_book.gd`)
 
@@ -19,11 +41,12 @@ It is told as **moments** in Feyre's hand, each with the day it happened.
 | `id`, `kind` | `PERSON` or `MARE` |
 | `met` | the flag that brings them into her life; `""` is from the start (her family). Nobody is listed before it |
 | `called` | what she calls them at first |
-| `moments` | rows of `flag`, `then` (what passed), and optionally `now` (how they are with her since), `called` (what she calls them from then on), `canon` |
+| `moments` | rows of `flag`, `then` (what passed), and optionally `now` (how they are with her since), `called` (what she calls them from then on), `warmth` (a `Relationships` attitude from then on, for a bond with no ladder), `canon` |
+| `warmth` | for a bond with no ladder, how they are with her at first (a `Relationships` attitude) |
 
 - A moment shows once its flag is up. The flag is a story flag or a `fact.`
   flag raised by a deed elsewhere. **BondBook never sets a flag and holds no
-  regard.** A lane that adds a deed adds its flag's row to the table; nothing
+  regard**: it reads `Relationships` (`def`, `stage`, `attitude`, `mood`, `done`). A lane that adds a deed adds its flag's row to the table; nothing
   else changes.
 - `BondBook.stamp` (on `EventBus.flag_changed`, connected by `BondsTab`) keeps
   the day a moment's flag first came up, in WorldDeltas region `bonds`
@@ -50,13 +73,12 @@ It is told as **moments** in Feyre's hand, each with the day it happened.
 
 Tab `bonds` in the journal, after the map. Left sheet: who she knows, each
 with the last thing that passed. Right sheet: the one she turned to
-(`show_bond(id)`): name, "These days", and "What has passed between us",
-oldest first. `has_news()` marks the tab when `BondBook.count()` has grown
+(`show_bond(id)`): portrait, name and the five measures beside it, "These
+days", and "What has passed between us", oldest first. The left sheet ends
+with the legend, "How I read a bond": each measure's dab, name and line. `has_news()` marks the tab when `BondBook.count()` has grown
 since she last opened the page (WorldDeltas `bonds/seen`).
 
 ## Not built yet
 
 - Sketchbook portraits (plan section 1.4), the drawn-in event pages, are
   the story journal's and are not this page's.
-- Regard and mood (plan section 1.1) have no engine yet. When one exists it
-  raises `fact.` flags; this page only ever reads flags.
