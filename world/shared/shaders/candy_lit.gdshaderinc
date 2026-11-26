@@ -73,6 +73,10 @@ uniform float ground_bounce : hint_range(0.0, 1.0) = CANDY_BOUNCE_DEFAULT;
 // Mean albedo of the terrain textures (tools/lighting/terrain_albedo_average.gd).
 uniform vec4 ground_bounce_color : source_color = vec4(0.523, 0.548, 0.545, 1.0);
 uniform float backlight_strength : hint_range(0.0, 4.0) = CANDY_BACKLIGHT_DEFAULT;
+// Toon shadow fill: this colour (times alpha) lights whatever the sun does not
+// reach (the dark bands and cast shadow), so shade reads plum or indigo instead
+// of grey. Alpha 0 = off.
+uniform vec4 shadow_fill : source_color = vec4(0.0);
 group_uniforms candy_rim;
 uniform vec4 rim_color : source_color = CANDY_RIM_COLOR_DEFAULT;
 uniform float rim_strength : hint_range(0.0, 2.0) = CANDY_RIM_STRENGTH_DEFAULT;
@@ -136,6 +140,10 @@ void light() {
 	vec3 alb = mix(vec3(1.0), ALBEDO, light_albedo_mix);
 	vec3 tint = mix(shade_tint.rgb, vec3(1.0), band);
 	DIFFUSE_LIGHT += alb * tint * band * burley * lc * diffuse_gain * coat_att;
+	if (shadow_fill.a > 0.0 && LIGHT_IS_DIRECTIONAL) {
+		float sun_reach = band * dot(vec3(ATTENUATION), vec3(1.0 / 3.0));
+		DIFFUSE_LIGHT += alb * shadow_fill.rgb * shadow_fill.a * (1.0 - sun_reach) * LIGHT_COLOR / PI;
+	}
 	if (ground_bounce > 0.0 && LIGHT_IS_DIRECTIONAL) {
 		// The ground this light reaches (its height over the horizon), seen by faces
 		// that look down (1) or sideways (0.5). The surface's own shadow doesn't block
