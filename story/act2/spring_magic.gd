@@ -56,6 +56,11 @@ class ChairSlide:
 		t = minf(t + delta, seconds) if seconds > 0.0 else 1.0
 		var k := t / seconds if seconds > 0.0 else 1.0
 		chair.global_position = from.lerp(to, 0.5 - 0.5 * cos(k * PI))
+		# Its collider goes with it now, not at the end of the frame: Feyre
+		# set on her mark in the same frame as the chair goes home would
+		# otherwise be pushed out of where it stood (half a metre off).
+		for body in chair.find_children("*", "CollisionObject3D", true, false):
+			(body as Node3D).force_update_transform()
 		return k >= 1.0
 
 
