@@ -45,7 +45,8 @@ direct highlight), `CANDY_LOBES`/`CANDY_COAT` (per-pixel light rim and clearcoat
 | `GameSettings.shadow_profile` | systems/settings/game_settings.gd:SHADOW_PROFILES (`--shadow-profile=` user arg) | auto (mac on Apple silicon: 2048 atlas / 2 splits / 160 m; high: 4096 / 4 splits / 220 m) | high, mac | Sun shadow crispness and reach on world-scale suns (shadow distance ≥150 m) | L57 |
 | `manor_interior` fog/volumetric density, ambient_color, saturation | world/shared/grades/manor_interior.tres | fog 0, volumetric 0, ambient (0.92, 0.90, 0.88), saturation 1.05 | volumetric 0..0.008 | Clear indoor air; raise volumetric_density for haze | T075 |
 | `manor_interior` ambient / tone mapper | world/shared/grades/manor_interior.tres | no GI; ambient_color (0.92, 0.90, 0.88) flat (sky contribution 0.0), energy 0.25 (was 1.1: the dining hall clipped 37–39% of pixels, L18-12/13; nothing in the rooms self-lights any more), contrast 1.05; tonemap = the manor's (ACES) so nothing pops at a doorway | energy 0.15..0.6 | The ambient is a fill; windows, lamps and hero lights model the rooms. Check greyscale clipping (>235) before raising it. SDFGI is never on indoors (T117) | T117, L18 |
-| `night_look` / `manor_interior_night` | grade_preset.gd; world/shared/grades/manor_interior_night.tres | manor_interior → manor_interior_night by GradeDirector.night; night ambient (0.9, 0.8, 0.78) × 0.13, glow 0.45 / threshold 1.0 | preset id or empty | After dark the rooms' lamps carry the light (pools, falloff) instead of the day's fill; outdoor grades have none | L18 |
+| `night_look` / `manor_interior_night` | grade_preset.gd; world/shared/grades/manor_interior_night.tres | manor_interior → manor_interior_night by GradeDirector.night; night ambient (0.9, 0.8, 0.78) × 0.13, glow 0.45 / threshold 1.0 | preset id or empty | After dark the rooms' lamps carry the light (pools, falloff) instead of the day's fill; Spring's outdoor grades have none | L18 |
+| `human_winter_night` | world/shared/grades/human_winter_night.tres | human_winter → human_winter_night by GradeDirector.night; ambient (0.42, 0.5, 0.72) × 0.22, sky contribution 0.7 (the outdoor contract; the dark sky brings it down to a flat ~0.12), sky horizon (0.075, 0.09, 0.135); exposure, saturation, contrast unchanged | ambient 0.08–0.2 | The human winter after dark: a cold low ambient and a dark overcast sky, so the cottage at night is lit by the hearth and the moon, not by the day (R3). Light only, never a darker screen. | L89 |
 
 ## Bounce light (render program T3a, L60)
 
@@ -348,11 +349,12 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | `BREAK_ENERGY`, `BREAK_ANGLE`, `BREAK_FROM` | story/staging/wolf_hunt_lighting.gd | 8, 24°, (-6, 34, 14) | — | The break in the overcast over the doe's clearing (shadowed, shows in the fog). | L18 |
 | `RIM_ENERGY`, `RIM_BACK`, `RIM_UP` | story/staging/wolf_hunt_lighting.gd | 18, 1.6 m, 2.4 m | — | Cold rim behind the doe and the great wolf, opposite the camera. | L18 |
 
-## Beast at the door light (L55, rescaled L89)
+## Beast at the door light (L55, night relit L89)
 
 | Tunable | Where | Default | Range | What it does | Lane |
 |---|---|---|---|---|---|
-| `MOON_ENERGY`, `FIRE_GAIN`, `FIRE_FLARE`, `RIM_ENERGY`, `GLOW_ENERGY` | story/staging/beast_door_lighting.gd | 8, 3, 5, 6.5, 1.6 (were 35, 14, 22, 30, 7 under the dread grade, scaled ×0.22 when fear stopped darkening the screen) | — | Moon through the broken door, the hearth turned up, the rim and back glow on the beast, on a winter night at the grade's own exposure. | L89 |
+| `MOON_ENERGY`, `FIRE_GAIN`, `FIRE_FLARE`, `RIM_ENERGY`, `GLOW_ENERGY` | story/staging/beast_door_lighting.gd | 4, 3.5, 6, 6.5, 0.8 | — | Moon through the broken door (deep blue `MOON_COLOR` 0.45, 0.58, 1.0, never clipping), the hearth turned up as the warm key, the rim and back glow on the beast, under the winter night look at the grade's own exposure. Target frame mean luma 0.15–0.2 with faces readable by the fire. | L89 |
+| `FIRE_ATTENUATION` | story/staging/beast_door_lighting.gd | 2.4 (the hearth's own is 1.2) | 1.5–3 | The hearth light's falloff while the scene runs: higher keeps the warmth on the faces by the fire and drops the corners to dark. | L89 |
 
 ## Standing arms (owner, 2026-11-24: "arms out so far to the sides")
 
