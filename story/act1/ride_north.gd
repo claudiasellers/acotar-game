@@ -48,6 +48,13 @@ const YARD_DONE := 10.0
 const YARD_LOST := 30.0
 ## On foot and not yet up: the mare stamps and snorts, then he snarls at her.
 const FOOT_NUDGE := [14.0, 32.0]
+## At the manor doors, still in the saddle: he huffs and looks back, then her
+## thought tells her to get down (seconds after the mare stops).
+const STEPS_NUDGE := [10.0, 24.0]
+## Once she is down the mare walks off toward the stables; she is gone once out
+## of sight (or Feyre is indoors), and in any case after this long.
+const MARE_LEAVES_AFTER := 3.0
+const MARE_GONE_BY := 30.0
 ## The dread the cottage left (1.0, two stops down at night) eases to this
 ## outside, so the yard reads by moonlight; straying raises it again.
 const YARD_DREAD := 0.15
@@ -145,6 +152,9 @@ var _foot_nudged: int = 0
 var _outside: bool = false
 ## Lines on foot wait their turn, one after another (none is dropped).
 var _queued: Array[StringName] = []
+var _steps_t := 0.0
+var _steps_nudged := 0
+var _down_t := 0.0
 ## Round the cottage to his road (world points), passed one by one.
 var _yard: Array[Vector3] = []
 var _pose: RidePose
@@ -473,13 +483,26 @@ func _end(_space: SceneSpace) -> void:
 		d.hold(space_id, false)
 	SoundDirector.stop_cue(&"beast_heartbeat", 2.0)
 	StoryControl.shake = 0.0
-	# He goes on up to the steps and waits there to lead her in (ManorArrival).
+	# He goes on up to the steps and waits there to lead her in (ManorArrival),
+	# unless the arrival has already taken him: it starts while she is still
+	# sliding down, and sending him back to the steps would undo its one order
+	# to pad down the hall (he stood at the doors for good).
 	if beast is BeastActor and is_instance_valid(beast):
 		var actor := beast as BeastActor
 		if _beast_walk > 0.0:
 			actor.walk_speed = _beast_walk
 		actor.outdoors = false
-		actor.lead(beast_steps() if WorldStreamer.get_region(MANOR) else actor.global_position)
+		if not _arrival_running():
+			actor.lead(beast_steps() if WorldStreamer.get_region(MANOR) else actor.global_position)
+
+
+func _arrival_running() -> bool:
+	if not is_inside_tree():
+		return false
+	for n in get_tree().get_nodes_in_group(&"story_space_live"):
+		if n != self and StringName(n.get_meta(&"story_space_id", &"")) == &"manor_arrival" and bool(n.get(&"running")):
+			return true
+	return false
 
 
 # ------------------------------------------------------------------ the mare
@@ -537,7 +560,19 @@ func _at_the_stairs() -> void:
 		_tips.get_down = true
 	horse.stand()
 	horse.speed = 0.0
+	_steps_t = 0.0
+	_steps_nudged = 0
 	_say(&"stairs", true)
+	_look_back()
+	UsePrompt.of(get_tree()).offer(self, "get down")
+
+
+## He stops at the doors and turns his head back to her, with a huff.
+func _look_back() -> void:
+	if beast is BeastActor and is_instance_valid(beast) and _rider:
+		(beast as BeastActor).wait_for(_rider.global_position)
+	if beast and is_instance_valid(beast):
+		SoundDirector.cue(&"beast_huff", beast.global_position)
 
 
 ## E at the stairs: she slides down on the door side.
@@ -576,6 +611,7 @@ func _down() -> void:
 	_tips = null
 	if horse and is_instance_valid(horse):
 		horse.go_home()
+	_down_t = 0.0
 	step = Step.DONE
 
 
@@ -605,11 +641,27 @@ func _process(_delta: float) -> void:
 	elif step == Step.DONE and horse and is_instance_valid(horse) and _rider and is_instance_valid(_rider):
 		# Someone sees to her once Feyre is inside: she walks off toward the
 		# stables and is gone from the drive (the stables keep their own mare).
+		_down_t += _delta
 		var gone := horse.global_position.distance_to(_rider.global_position) > 45.0 \
-				or horse.state == MareMount.State.STANDING
+				or horse.state == MareMount.State.STANDING or _down_t >= MARE_GONE_BY \
+				or (_down_t >= MARE_LEAVES_AFTER and (not _in_view(horse.global_position) or _indoors(_rider.global_position)))
 		if gone:
 			horse.queue_free()
 			horse = null
+
+
+func _in_view(at: Vector3) -> bool:
+	var cam := get_viewport().get_camera_3d() if is_inside_tree() and get_viewport() else null
+	return cam != null and cam.is_position_in_frustum(at + Vector3.UP)
+
+
+## A roof over her: she has gone in.
+func _indoors(at: Vector3) -> bool:
+	var space := get_viewport().world_3d.direct_space_state if is_inside_tree() and get_viewport() and get_viewport().world_3d else null
+	if space == null:
+		return false
+	var from := at + Vector3.UP * 2.6
+	return not space.intersect_ray(PhysicsRayQueryParameters3D.create(from, from + Vector3.UP * 12.0, 1)).is_empty()
 
 
 func _place_rider() -> void:
@@ -653,8 +705,13 @@ func follow(delta: float) -> bool:
 			horse.steer = Vector3.ZERO
 			horse.gallop = false
 			_lead(path_length() + LEAD)
-			if not _speaking():
-				UsePrompt.of(get_tree()).offer(self, "get down")
+			UsePrompt.of(get_tree()).offer(self, "get down")
+			_steps_t += delta
+			if _steps_nudged < STEPS_NUDGE.size() and _steps_t >= float(STEPS_NUDGE[_steps_nudged]):
+				_steps_nudged += 1
+				_look_back()
+				if _steps_nudged == 1:
+					_say(&"get_down", true)
 		Step.DISMOUNTING:
 			if _motion == null or not _motion.tick(delta):
 				_down()

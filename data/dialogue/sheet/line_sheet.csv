@@ -126,6 +126,7 @@ rn_magic,feyre,,"Of course it would be magic, because it was spring here.",V,yes
 rn_paint,feyre,,To paint it would be useless.,A,yes,scene,ride_north.paint,,p1_wolf_and_crossing p2_grounds,"inner voice: soft, overwhelmed",audio/voice/rn_paint.ogg
 rn_fool,feyre,,"Only a fool would run with no food, no strength.",V,yes,scene,ride_north.stairs,,p1_wolf_and_crossing p2_grounds,inner voice: the mare won't move; reasoning herself down,audio/voice/rn_fool.ogg
 rn_food,feyre,,Food first. Then run.,A,yes,scene,ride_north.stairs,,p1_wolf_and_crossing p2_grounds,"inner voice: decided, low",audio/voice/rn_food.ogg
+rn_get_down,feyre,,He's waiting at the doors. Get down.,X,yes,scene,ride_north.get_down,,p1_wolf_and_crossing p2_grounds,inner voice: steeling herself,audio/voice/rn_get_down.ogg
 rn_stray_mare,feyre,,She won't go. She's his.,X,yes,scene,ride_north.stray_mare,,p1_wolf_and_crossing p2_grounds,"inner voice: the reins useless, rising fear",audio/voice/rn_stray_mare.ogg
 rn_stray_growl,feyre,,"Live, not die.",V,yes,scene,ride_north.stray_growl,,p1_wolf_and_crossing p2_grounds,"inner voice: a whisper, frozen",audio/voice/rn_stray_growl.ogg
 rn_stray_roar,feyre,,I wouldn't get half a mile before he caught me.,A,yes,scene,ride_north.stray_roar,,p1_wolf_and_crossing p2_grounds,"inner voice: shaking, after the roar",audio/voice/rn_stray_roar.ogg

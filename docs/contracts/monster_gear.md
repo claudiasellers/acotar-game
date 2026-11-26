@@ -41,6 +41,20 @@ swap (L76/L77) write these slots; they don't build a second system.
   `HOSTILE_ELEMENT` maps a weapon element to its hostile element row: ember to
   fire, rime to frost, glimmer to light, hush to sleep.
 
+## Steeping a weapon (`WeaponSteep`, `systems/weapons/weapon_steep.gd`)
+Until the Imbue Codex and its stations take the slots over (catalogue §1.4):
+- At a hearth (StationData `hearth`) or a lit camp fire (`campfire`,
+  `rite_cave_fire`), the brewing screen offers one button per steeped arrow she
+  carries that the held weapon would take: "Steep my <weapon> with a <arrow>".
+- `steep(rack, station, arrow)` uses one arrow and calls
+  `rack.imbue(held, element, 1, FOREVER)`: the element holds at Tier I in the
+  first free slot until the weapon breaks. Fire arrows give Ember, frost Rime,
+  light Glimmer. Sleep arrows don't steep a blade: Hush has no Tier I.
+- It notes "The <weapon> drinks the <element>." in the pickup log, with
+  sparkle, chime and bounce on her (`Juice.burst(her, &"unlock")`).
+- It refuses (and keeps the arrow) with the boot knife, no free slot, no fire,
+  or an arrow that won't take.
+
 ## The rack (`WeaponRack`, a child of the player; `WeaponRack.of(player)`)
 - It carries up to `CAPACITY` (5) instances: `{id, left, imbue: ImbueSlots}`.
   `held` is an index, or -1 for the boot knife.

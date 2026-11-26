@@ -102,6 +102,16 @@ func test_nothing_before_the_first_dinner() -> void:
 	assert_false(director.whistle())
 
 
+func test_in_the_stables_from_the_arrival_but_not_ridden_before_dinner() -> void:
+	WorldState.set_flag("fact.manor_arrived", true)
+	assert_true(director.present(), "the mare that carried her north waits in the stables")
+	assert_false(director.available(), "riding still waits for the first dinner")
+	assert_eq(director.block_reason(rider.global_position), &"not_yet")
+	var m := director.spawn_mare(Vector3(12, 0.05, 10), 0.0)
+	assert_false(director.mount(rider), "she can't be ridden yet")
+	assert_true(is_instance_valid(m))
+
+
 func test_first_ride_is_a_deed_and_unlocks_the_whistle() -> void:
 	var m := _ready_mare()
 	assert_true(m.is_in_group(&"station"), "E on her mounts")
