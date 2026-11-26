@@ -13,6 +13,10 @@ const MIN_DISTANCE := 2.0
 const ON_MESH := 1.2
 ## Re-path only when the goal moves this far.
 const RETARGET := 0.75
+## A path corner this close on the ground counts as passed (next_corner).
+## Small, so he never cuts the corner of a doorway: at path_desired_distance
+## (1 m) he skipped a door's corners and walked through its wall.
+const CORNER_REACH := 0.3
 
 var _goal := Vector3.INF
 var _host: Node3D
@@ -56,8 +60,13 @@ func steer(goal: Vector3) -> Vector3:
 		target_position = goal
 	if is_navigation_finished():
 		return straight
-	get_next_path_position()  # keeps the agent's own path and index current
-	var next := next_corner(get_current_navigation_path(), get_current_navigation_path_index(), from, path_desired_distance)
+	get_next_path_position()  # keeps the agent's own path current
+	# From the path's start, not the agent's index: the agent passes a corner
+	# within path_desired_distance in 3D, so on flat ground it was already past
+	# a doorway's corners a metre early and he cut through the jamb; with feet
+	# above the mesh it never passed them at all. Where he is on the path
+	# decides instead (next_corner).
+	var next := next_corner(get_current_navigation_path(), 0, from, CORNER_REACH)
 	return next if next.length_squared() > 0.0004 else straight
 
 
