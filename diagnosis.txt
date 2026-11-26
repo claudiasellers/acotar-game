@@ -1,0 +1,3 @@
+WHY: an existing test on main fails (gut:tests/unit/story/test_act2_manor_evening.gd).
+DO:  if you changed this behaviour on purpose, update this test in your branch (tests check outcomes, not today's details); otherwise it's a regression, so fix your code.
+     (your branch edits this test file itself.)

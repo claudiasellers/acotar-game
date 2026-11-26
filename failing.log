@@ -1,0 +1,56 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+---  GUT  ---
+[INFO]:  using [/Users/claudiasellers/Documents/acotar-game/.git/mq/batches/1795663042/gate/scratch/gut_tests_unit_story_test_act2_manor_evening.gd/Library/Application Support/Godot/app_userdata/ACOTAR- The Spring Court] for temporary output.
+Godot version:  4.7.2
+GUT version:  9.7.1
+
+
+res://tests/unit/story/test_act2_manor_evening.gd
+* test_the_arrival_leads_her_to_the_table_and_up_to_alis
+* test_he_changes_at_the_chair_when_she_comes_into_the_dining_room
+* test_sit_and_her_chair_slides_out_then_eat
+    [Failed] 
+      at line 151
+    [Failed]:  [0.0] expected to be > than [0.5]:  slid out, away from the table
+      at line 153
+    [Failed]:  then Eat.
+      at line 154
+    [Failed] 
+      at line 155
+* test_alis_bathes_her_and_dresses_her_in_the_tunic
+* test_the_curtain_trap_rigs_at_night_and_trips_alis_at_dawn
+4/5 passed.
+
+
+
+
+==============================================
+= Run Summary
+==============================================
+
+res://tests/unit/story/test_act2_manor_evening.gd
+- test_sit_and_her_chair_slides_out_then_eat
+    [Failed]:  
+          at line 151
+    [Failed]:  [0.0] expected to be > than [0.5]:  slid out, away from the table
+          at line 153
+    [Failed]:  then Eat.
+          at line 154
+    [Failed]:  
+          at line 155
+
+Totals
+------
+Scripts               1
+Tests                 5
+Passing Tests         4
+Failing Tests         1
+Asserts           67/71
+Time              1.53s
+
+
+---- 1 failing tests ----
+
+WARNING: 15 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
