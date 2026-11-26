@@ -4,10 +4,20 @@
 ## only nudge toward bed (X). Starts when she sits (fact.evening.sat_down,
 ## CottageEvening's chair) and raises fact.evening.supper_eaten. Feyre can
 ## only look while they talk; each beat waits until it is said.
+## The talk (Nesta's news and her father) offers the film's skip (FilmSkip,
+## same ring, same keys; owner, T164): skipping takes those lines as heard and
+## goes straight to "Rest, Feyre", so the beat after the talk still plays.
 class_name CottageSupper
 extends SceneSpace
 
 const SCENE := &"cottage_evening"
+## The beats a skip takes as heard, and the label the skip jumps to.
+const TALK := [&"supper", &"father"]
+const OFFER_ENDS := "offer ends"
+
+var skip_control: FilmSkip
+var skipped: bool = false
+var _skip_layer: CanvasLayer
 
 
 func _init() -> void:
@@ -28,11 +38,71 @@ func _build_beats() -> Array:
 	] + _line(&"supper", &"nesta") + [
 		Beats.run(func(_s: SceneSpace) -> void:
 			StoryControl.set_focus(CottageEvening.family(get_tree(), &"father")), "her father"),
-	] + _line(&"father", &"father") + _line(&"rest", &"father") + [
+	] + _line(&"father", &"father") + [
+		Beats.run(func(_s: SceneSpace) -> void: _close_offer(), OFFER_ENDS),
+	] + _line(&"rest", &"father") + [
 		Beats.cue(&"family", &"release"),
 		Beats.raise(CottageEvening.SUPPER),
 		Beats.run(func(_s: SceneSpace) -> void: StoryControl.release(self), "free"),
 	]
+
+
+func start() -> bool:
+	if not super.start():
+		return false
+	_open_offer()
+	return true
+
+
+func _finish() -> void:
+	_close_offer()
+	super._finish()
+
+
+func _open_offer() -> void:
+	if _skip_layer != null:
+		return
+	_skip_layer = CanvasLayer.new()
+	_skip_layer.name = "SupperSkip"
+	_skip_layer.layer = UiLayers.FILM + 4
+	add_child(_skip_layer)
+	skip_control = FilmSkip.new()
+	skip_control.skip.connect(skip_talk)
+	_skip_layer.add_child(skip_control)
+
+
+func _close_offer() -> void:
+	if _skip_layer != null:
+		_skip_layer.queue_free()
+		_skip_layer = null
+		skip_control = null
+
+
+func _input(event: InputEvent) -> void:
+	if skip_control != null and FilmSkip.is_skip_press(event):
+		skip_control.press()
+		get_viewport().set_input_as_handled()
+
+
+## Skips the talk: its lines are taken as heard and the scene goes on to
+## "Rest, Feyre". Only while the talk is on.
+func skip_talk() -> void:
+	if not running or skip_control == null:
+		return
+	var target := -1
+	for i in beats.size():
+		if (beats[i] as SceneBeat).label == OFFER_ENDS:
+			target = i
+	if target < 0 or beat_index >= target:
+		return
+	skipped = true
+	var d := DialogueDirector.of(get_tree())
+	if d:
+		d.skim_beats(SCENE, TALK)
+	(beats[beat_index] as SceneBeat).exit(self)
+	beat_index = target - 1
+	_advance()
+	tick(0.0)
 
 
 ## A beat of the evening's lines, then held until it is said.
