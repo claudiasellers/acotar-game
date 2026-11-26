@@ -55,8 +55,8 @@ const STEPS_NUDGE := [10.0, 24.0]
 ## of sight (or Feyre is indoors), and in any case after this long.
 const MARE_LEAVES_AFTER := 3.0
 const MARE_GONE_BY := 30.0
-## The dread the cottage left (1.0, two stops down at night) eases to this
-## outside, so the yard reads by moonlight; straying raises it again.
+## The dread the cottage left (1.0) eases to this outside, so the yard's
+## sound comes back; straying raises it again.
 const YARD_DREAD := 0.15
 ## On foot, this far from the mare is still the yard and her way to the mare.
 const FOOT_FREE := 30.0
@@ -467,7 +467,7 @@ func _begin(_space: SceneSpace) -> void:
 	else:
 		_lead(beast_at)
 	StoryControl.set_focus(beast)
-	# The cottage's dread (full, at night) would leave the yard black.
+	# Out of the cottage, her fear eases.
 	EventBus.mood_requested.emit(self, &"dread", YARD_DREAD, 3.0)
 	# His ultimatum still ringing: she chooses.
 	_queued.append_array([&"live", &"follow"])

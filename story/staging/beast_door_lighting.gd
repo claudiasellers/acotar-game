@@ -1,8 +1,7 @@
 ## The beast at the door, lit so he reads (lane L55). A child of the BeastDoor
-## space, like BeastDoorStaging. The dread grade takes the exposure down more
-## than two stops and crushes the ambient, which is right for the room but
-## left the cottage black: the user "couldn't see anything". This rig gives
-## the scene three motivated lights, so the dark between them stays dark:
+## space, like BeastDoorStaging. The winter night is dark in the cottage; this
+## rig gives the scene three motivated lights, so the dark between them stays
+## dark:
 ##
 ## - Moon through the broken door: a cold shadowed spot from outside, so the
 ##   doorway becomes a pale shaft and his body comes through it in silhouette.
@@ -18,25 +17,24 @@ class_name BeastDoorLighting
 extends Node
 
 const MOON_COLOR := Color(0.68, 0.78, 1.0)
-const MOON_ENERGY := 35.0
+## Energies were measured under the old dread grade (exposure 0.19 against the
+## winter grade's 0.85) and scaled by that ratio (x0.22) when fear stopped
+## darkening the screen (owner, 2026-11-26), so the frame keeps its balance.
+const MOON_ENERGY := 8.0
 const MOON_RANGE := 14.0
 const MOON_ANGLE := 30.0
 ## How far outside, and how high, the moon spot hangs from the door.
 const MOON_BACK := 4.5
 const MOON_UP := 3.4
-## The hearth's FireLight is multiplied by this while the scene runs. The dread
-## grade's exposure is 0.19 against the winter grade's 0.85 (x0.22) and its
-## ambient is near black, so the fire must burn far hotter to carry the room:
-## measured on the Mac (Forward+, beast_door_light_probe), without the back glow
-## he was 3-6 of 255; with the full rig he reads at 19-31 (eyes, horns and mane against
-## a pale moonlit wall), 58-96% of each frame stays near black, and under 1% of
-## pixels pass 235. The door-burst shot stays a silhouette on purpose.
-const FIRE_GAIN := 14.0
+## The hearth's FireLight is multiplied by this while the scene runs: the fire
+## burns high with the gust and carries the room (beast_door_light_probe
+## measures it on the Mac). The door-burst shot stays a silhouette on purpose.
+const FIRE_GAIN := 3.0
 ## The gust through the broken door: the fire leaps to this, then settles.
-const FIRE_FLARE := 22.0
+const FIRE_FLARE := 5.0
 const FLARE_SECONDS := 0.9
 const RIM_COLOR := Color(0.72, 0.8, 1.0)
-const RIM_ENERGY := 30.0
+const RIM_ENERGY := 6.5
 const RIM_RANGE := 3.2
 ## A narrow cone aimed at his head from behind, so it never lights the wall
 ## around the door (an omni there blew that wall to white on the Mac, L55-1).
@@ -45,9 +43,9 @@ const RIM_ANGLE := 30.0
 const RIM_BACK := 1.0
 ## The moonlit glow behind him: a soft omni at the rim's spot that lights the
 ## wall around the doorway, so he stands as a dark shape against it. On the
-## Mac a 60-energy omni there clipped that wall to white (L55-1); this level
+## Mac a bright omni there clipped that wall to white (L55-1); this level
 ## keeps it a pale glow.
-const GLOW_ENERGY := 7.0
+const GLOW_ENERGY := 1.6
 const GLOW_RANGE := 5.0
 const RIM_UP := 0.7
 const FADE_IN := 0.3
@@ -106,7 +104,7 @@ func light_up() -> void:
 		moon.spot_angle = MOON_ANGLE
 		moon.spot_attenuation = 0.6
 		moon.shadow_enabled = true
-		# A faint shaft in the dread fog; more would fog the room white.
+		# A faint shaft in the night fog; more would fog the room white.
 		moon.light_volumetric_fog_energy = 0.5
 		moon.light_energy = 0.0
 		parent.add_child(moon)

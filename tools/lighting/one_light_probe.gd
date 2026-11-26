@@ -1,11 +1,10 @@
 ## Mac look check for the one lighting authority (L89; docs/SHOTS.md):
 ##   godot res://tools/lighting/one_light_probe.tscn -- <out_dir>
 ## The manor entrance hall at noon with the ride's spring grade still held and
-## a wolf's dread outside, the way it was (hall_before: the held grade and the
-## dread both reach the hall) and the way GradeDirector decides it now
-## (hall_after: the rooms' own look, the dread left outside). Then the front
-## lawn with that dread (lawn_dread) and with every request released
-## (lawn_calm). Prints what the director chose and each frame's mean luminance.
+## a wolf's full dread (hall: the rooms' own look; fear never darkens). Then
+## the front lawn with that hold and dread (lawn_dread: the held grade, no
+## darkening) and with every request released (lawn_calm). Prints what the
+## director chose and each frame's mean luminance.
 extends Node
 
 const ESTATE := "res://world/spring_court/manor_estate/manor_estate.tscn"
@@ -50,22 +49,7 @@ func _run() -> void:
 	var hall_eye := Vector3(lo.x, y + EYE, lo.y)
 	var hall_aim := Vector3(aim.x, y + 0.9, aim.y)
 
-	# Before: one story hold froze every region grade and any dread reached
-	# every room (simulated: no focus, the spring grade and full dread forced).
 	_place(hall_eye, hall_aim)
-	_director.focus = null
-	_director.swap_to(&"spring", 0.0)
-	_director.mood = &"dread"
-	_director.mood_amount = 1.0
-	_director._mood_target = 1.0
-	EventBus.mood_changed.emit(&"dread", 1.0, 0.0)
-	_director.apply(_director.current)
-	await _shot("hall_before")
-
-	# After: the same requests, decided by GradeDirector.
-	_director.mood_amount = 0.0
-	_director._mood_target = 0.0
-	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	_director.focus = _focus
 	var ride := Node.new()
 	ride.name = "RideStandIn"
@@ -74,25 +58,20 @@ func _run() -> void:
 	EventBus.mood_requested.emit(DreadField, &"dread", 1.0, 0.0)
 	await _frames(4)
 	_director.swap_to(_director.target_id(), 0.0)
-	await _shot("hall_after")
+	await _shot("hall")
 
-	# Outside on the front lawn, looking at the house: the held grade and the
-	# wolf's dread both land out here.
+	# Outside on the front lawn, looking at the house: the held grade lands.
 	var lawn := ManorSitePlan.SPAWN
 	var lawn_y := WorldHeight.height_at(lawn.x, lawn.z)
 	_place(Vector3(lawn.x, lawn_y + EYE, lawn.z), Vector3(0.0, lawn_y + 6.0, -50.0))
 	await _frames(4)
 	_director.swap_to(_director.target_id(), 0.0)
-	_director.mood_amount = _director._mood_target
-	_director.apply(_director.current)
 	await _shot("lawn_dread")
 
 	EventBus.mood_requested.emit(DreadField, &"calm", 0.0, 0.0)
 	EventBus.grade_swap_requested.emit(ride, &"", 0.0)
 	await _frames(4)
 	_director.swap_to(_director.target_id(), 0.0)
-	_director.mood_amount = 0.0
-	_director.apply(_director.current)
 	await _shot("lawn_calm")
 	get_tree().quit()
 
@@ -118,7 +97,7 @@ func _shot(label: String) -> void:
 	var path := _out.path_join(label + ".png")
 	img.save_png(path)
 	print("PROBE %-11s grade %-16s indoors %-5s mood %s %.2f  luma %.3f  %s" % [label,
-			_director.current.id, _director.indoors, _director.mood, _director.mood_amount,
+			_director.current.id, _director.indoors, _director.mood, _director.mood_strength,
 			_luma(img), path])
 
 

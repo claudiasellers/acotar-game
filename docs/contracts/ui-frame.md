@@ -29,7 +29,7 @@ here and from nowhere else.
 
 | Constant | Value | What draws there |
 |---|---|---|
-| `EDGE` | 1 | screen-edge effects (venom, low health, frost, dread, stealth) |
+| `EDGE` | 1 | screen-edge effects (venom, low health, frost, stealth) |
 | `FILM` | 3 | the film stack: the grade at `FILM - 1`, inserts at `FILM`, a staged lens's letterbox at `FILM + 1`, the film's veil at `FILM + 3`, its text at `FILM + 4` |
 | `HUD` | 10 | `HudLayout`, the only HUD layer (the hunt demo's label shares the number) |
 | `BACKDROP` | 17 | the dim behind an open screen |

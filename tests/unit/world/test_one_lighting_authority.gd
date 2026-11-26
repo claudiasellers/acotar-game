@@ -1,8 +1,8 @@
 extends GutTest
 ## GradeDirector is the one lighting authority (owner, 2026-11-26: one working
 ## version, no fallbacks). Rooms win indoors, a story grade lasts only as long
-## as the scene that asked for it, fear is combined per source, ambient fear
-## stays outdoors, and everyone else follows the mood it settles on.
+## as the scene that asked for it, moods are combined per source, and everyone
+## else follows the mood it settles on.
 
 var director: GradeDirector
 var focus: Node3D
@@ -95,12 +95,12 @@ func test_fear_is_the_strongest_request_and_calm_ends_only_its_own() -> void:
 	var b := _scene()
 	EventBus.mood_requested.emit(a, &"dread", 0.4, 0.0)
 	EventBus.mood_requested.emit(b, &"dread", 0.9, 0.0)
-	assert_almost_eq(director._mood_target, 0.9, 0.001)
+	assert_almost_eq(director.mood_strength, 0.9, 0.001)
 	EventBus.mood_requested.emit(b, &"calm", 0.0, 0.0)
-	assert_almost_eq(director._mood_target, 0.4, 0.001, "a's fear is still asked for")
+	assert_almost_eq(director.mood_strength, 0.4, 0.001, "a's fear is still asked for")
 	EventBus.mood_requested.emit(a, &"calm", 0.0, 0.0)
-	assert_eq(director._mood_target, 0.0)
-	assert_eq(changes.back(), [&"calm", 0.0], "the house, sound and HUD hear calm")
+	assert_eq(director.mood_strength, 0.0)
+	assert_eq(changes.back(), [&"calm", 0.0], "sound, the HUD and her vitals hear calm")
 	a.free()
 	b.free()
 
@@ -109,26 +109,7 @@ func test_a_scene_that_leaves_takes_its_fear_with_it() -> void:
 	var a := _scene()
 	EventBus.mood_requested.emit(a, &"dread", 0.8, 0.0)
 	a.free()
-	assert_eq(director._mood_target, 0.0)
-
-
-func test_ambient_dread_stays_outdoors_and_a_scene_reaches_in() -> void:
-	_rooms()
-	director._process(0.1)
-	assert_true(director.indoors)
-	EventBus.mood_requested.emit(DreadField, &"dread", 1.0, 0.0)
-	assert_eq(director._mood_target, 0.0, "a wolf outside never darkens the rooms")
-	var bite := _scene()
-	EventBus.mood_requested.emit(bite, &"dread", 0.7, 0.0)
-	assert_almost_eq(director._mood_target, 0.7, 0.001, "a staged scene's fear reaches indoors")
-	EventBus.mood_requested.emit(bite, &"calm", 0.0, 0.0)
-	director._process(5.0)   # the blend into the rooms finishes
-	focus.position = Vector3(30.0, 0.0, 0.0)
-	director._process(0.1)
-	assert_false(director.indoors)
-	assert_almost_eq(director._mood_target, 1.0, 0.001, "out on the grounds the wolf's dread lands")
-	EventBus.mood_requested.emit(DreadField, &"calm", 0.0, 0.0)
-	bite.free()
+	assert_eq(director.mood_strength, 0.0)
 
 
 func test_a_null_calm_ends_every_request() -> void:
@@ -136,30 +117,8 @@ func test_a_null_calm_ends_every_request() -> void:
 	EventBus.mood_requested.emit(a, &"dread", 0.8, 0.0)
 	EventBus.mood_requested.emit(DreadField, &"dread", 0.5, 0.0)
 	EventBus.mood_requested.emit(null, &"calm", 0.0, 0.0)
-	assert_eq(director._mood_target, 0.0)
+	assert_eq(director.mood_strength, 0.0)
 	a.free()
-
-
-func test_the_house_lights_follow_the_settled_mood() -> void:
-	var house := Node3D.new()
-	add_child_autofree(house)
-	var candle := OmniLight3D.new()
-	candle.light_energy = 2.0
-	house.add_child(candle)
-	var lights := ManorMoodLights.new()
-	house.add_child(lights)
-	lights.collect()
-	_rooms()
-	director._process(0.1)
-	EventBus.mood_requested.emit(DreadField, &"dread", 1.0, 0.0)
-	lights._process(1.0)
-	assert_almost_eq(candle.light_energy, 2.0, 0.001, "ambient dread outside leaves the candles alone")
-	var scene := _scene()
-	EventBus.mood_requested.emit(scene, &"dread", 1.0, 0.1)
-	lights._process(1.0)
-	assert_lt(candle.light_energy, 2.0, "a scene's dread gutters them")
-	EventBus.mood_requested.emit(DreadField, &"calm", 0.0, 0.0)
-	scene.free()
 
 
 ## Only GradeDirector lights the game: no other game script builds an

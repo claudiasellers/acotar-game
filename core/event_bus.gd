@@ -48,13 +48,14 @@ signal scene_space_finished(space_id: StringName)
 ## what shows; an indoor room always wins.
 signal grade_swap_requested(source: Object, to_grade: StringName, seconds: float)
 ## Story/world to GradeDirector: `source` asks for a scene mood. &"dread" (the
-## wolf, the beast) means cold low light, silenced ambience, guttering fire;
-## &"calm" ends that source's request (a null source's calm ends them all).
-## intensity 0..1, blended over `seconds`. Nobody else listens: the mood that
-## counts is the one GradeDirector settles on (mood_changed).
+## wolf, the beast) means silenced ambience and her fear, never a darker screen;
+## &"enchanted_sleep" is the soft fade into sleep; &"calm" ends that source's
+## request (a null source's calm ends them all). intensity 0..1, blended over
+## `seconds`. Nobody else listens: the mood that counts is the one
+## GradeDirector settles on (mood_changed).
 signal mood_requested(source: Object, mood: StringName, intensity: float, seconds: float)
-## GradeDirector to sound, vitals, HUD and the house lights: the mood now in
-## force, the strongest request that applies where she is.
+## GradeDirector to sound, vitals and the HUD: the mood now in force, the
+## strongest request.
 signal mood_changed(mood: StringName, intensity: float, seconds: float)
 ## Creatures: an arrow or blade struck a creature without (yet) killing it.
 ## part: &"side", &"eye", &"leg"... as the creatures lane resolves it.

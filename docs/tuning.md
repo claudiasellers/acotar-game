@@ -341,10 +341,14 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 
 | Tunable | Where | Default | Range | What it does | Lane |
 |---|---|---|---|---|---|
-| `dread_day_look` | grade_preset.gd (set in human_winter.tres) | `&"dread_winter_day"` | preset id or empty | The look dread blends toward while the sun is up; empty = the night `dread` preset. Night always takes `dread`, so the beast at the door (L55) is unchanged. | L18 |
-| `dread_winter_day` exposure / sky / fog | world/shared/grades/dread_winter_day.tres | 0.56 / grey overcast / 0.016 | — | Winter-day horror: drained colour, the fog closing in pale (ambient_inject 0.6), the overcast and snow as the light. | L18 |
 | `BREAK_ENERGY`, `BREAK_ANGLE`, `BREAK_FROM` | story/staging/wolf_hunt_lighting.gd | 8, 24°, (-6, 34, 14) | — | The break in the overcast over the doe's clearing (shadowed, shows in the fog). | L18 |
 | `RIM_ENERGY`, `RIM_BACK`, `RIM_UP` | story/staging/wolf_hunt_lighting.gd | 18, 1.6 m, 2.4 m | — | Cold rim behind the doe and the great wolf, opposite the camera. | L18 |
+
+## Beast at the door light (L55, rescaled L89)
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| `MOON_ENERGY`, `FIRE_GAIN`, `FIRE_FLARE`, `RIM_ENERGY`, `GLOW_ENERGY` | story/staging/beast_door_lighting.gd | 8, 3, 5, 6.5, 1.6 (were 35, 14, 22, 30, 7 under the dread grade, scaled ×0.22 when fear stopped darkening the screen) | — | Moon through the broken door, the hearth turned up, the rim and back glow on the beast, on a winter night at the grade's own exposure. | L89 |
 
 ## Standing arms (owner, 2026-11-24: "arms out so far to the sides")
 
@@ -358,7 +362,6 @@ over (`docs/contracts/creature_motion.md`, "People: clips without a rebuild").
 | `POSTURE["idle"]["arms"]` | tools/blender/feyre_moves/retarget_moves.py | -2 (was 3) | -4–3 | Degrees the player Feyre's arms are moved out from the captured standing pose; negative brings them in. | arms-rest |
 | `ARM_CLEAR` / `arm_clear` | tools/blender/cast/cast_<id>.py; `DESIGNS` rows in cast_minor.py, cast_village.py | 0; Alis 8, Elain 10; 2 to 10 on 20 court and village rows | 0–10 | Degrees one body's arms hang further out, for what it wears at the hip. Measured, not chosen: the least that keeps `arm_clip_probe.gd` under 5 mm. Bring a skirt in, or pose the hands on it, before lowering one. | arms-rest |
 | `arm_out` | tools/blender/fae_people.py `CAST` rows, default in person_rig.py `animate()` | -0.03 rad (was 0.06); fox, greenbrown, gardener_1 0.0; stag 0.04 | -0.06–0.06 | Added to the older fae figures' bind pose, which holds the arms about 11 degrees out. | arms-rest |
-| `dread_winter_day` exposure / sky / fog | world/shared/grades/dread_winter_day.tres | 0.8 / grey overcast / 0.012 | — | Winter-day horror that darkens little (L18-14): drained colour, pale fog closing in (ambient_inject 0.6), the overcast and snow as the light. | L18 |
 | `RIM_ENERGY`, `RIM_BACK`, `RIM_UP` | story/staging/wolf_hunt_lighting.gd | 12, 1.6 m, 2.4 m | — | Cold rim behind the doe and the great wolf, opposite the camera; the only light the hunt adds. | L18 |
 | `size_by_phase` / `Inventory.FULL_QUIVER` | data/bows/quiver_loadouts.tres; systems/inventory/inventory.gd | 3, 3, 10, 20, then 30 | — | Arrows her quiver holds by phase (bow design §8.1): three in her hand through the wolf, 10 on the grounds, 20 from the house and woods, 30 after. It only grows. | L80 |
 | `COMBO_PITCH`, `COMBO_MAX` | systems/interaction/interactor.gd | 0.06, 8 | 0.03–0.1 | Each further arrow pulled from one body in one press chimes this much higher, up to this many steps. | L80 |

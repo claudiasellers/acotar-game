@@ -14,8 +14,8 @@
 const float ALBEDO_CAP = 0.85;
 
 uniform float glow_energy : hint_range(0.0, 8.0) = 2.4;
-// magic_amount (declared by candy_lit) is 1 in the court, 0 under dread: the
-// glow of flames and faelights withdraws with it (experience bar §1.5).
+// magic_amount (declared by candy_lit) is the grade's magic, 0..1: the
+// glow of flames and faelights follows it.
 
 varying flat int finish;
 

@@ -185,8 +185,6 @@ func _build_cottage() -> void:
 	hearth_light.omni_range = 9.0
 	hearth_light.position = Vector3(0, 1.0, -1.8)
 	cottage.add_child(hearth_light)
-	# The fire gutters when the beast is near, like the manor's.
-	cottage.add_child(ManorMoodLights.new())
 	_box(cottage, Vector3(2.0, 0.5, 1.4), BED + Vector3(0, 0.25, 0), Color(0.48, 0.44, 0.38))
 	_box(cottage, Vector3(1.4, 0.8, 0.9), Vector3(2.2, 0.4, 0.2), Color(0.40, 0.31, 0.22))
 	# Feyre's painted vines: the only saturated colour in the house.
