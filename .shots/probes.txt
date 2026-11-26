@@ -1,0 +1,4 @@
+from feyre-vitals
+quality look
+shot vitals res://tools/vitals/vitals_hud_shot.tscn -- {out} spring_noon,human_winter
+shot pages res://tools/ui/menu_open_probe.tscn -- shots {out}
