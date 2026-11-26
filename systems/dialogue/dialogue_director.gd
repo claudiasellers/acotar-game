@@ -231,6 +231,34 @@ func say_beat(scene_id: StringName, beat: StringName, node: Node = null) -> Arra
 	return out
 
 
+## Skips a scene's talk: what is still queued or on screen is cut off (voice
+## and slip too), and every line of `beats` that fits and was not said is
+## taken as heard, with what saying it records (the log, its cooldown, its
+## heard flag), so a skip lands where playing it through would. Follow-ups of
+## skipped lines are dropped: they answer a line nobody heard.
+func skim_beats(scene_id: StringName, beats: Array) -> void:
+	_scene_queue.clear()
+	_follow = null
+	_follow_at = -1.0
+	_busy_until = _now
+	_speaking = null
+	if _voice and _voice.playing:
+		_voice.stop()
+	if _voice_flat and _voice_flat.playing:
+		_voice_flat.stop()
+	if is_inside_tree():
+		LinePresenter.of(get_tree()).clear()
+	var ctx := _ctx()
+	for beat: StringName in beats:
+		for line: DialogueLine in _of(DialogueLine.Trigger.SCENE, StringName("%s.%s" % [scene_id, beat])):
+			if spoken_log.has(line.id) or not DialogueRules.fits(line, ctx):
+				continue
+			spoken_log.append(line.id)
+			if line.once:
+				WorldState.set_flag(line.heard_flag(), true)
+			_said_at[line.id] = _now
+
+
 ## True while a scene beat still has lines to say.
 func beat_speaking() -> bool:
 	return not _scene_queue.is_empty() or _now < _busy_until
