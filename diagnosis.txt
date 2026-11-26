@@ -1,0 +1,2 @@
+WHY: an existing test on main fails (gut:tests/integration/play/test_play_sit.gd).
+DO:  if you changed this behaviour on purpose, update this test in your branch (tests check outcomes, not today's details); otherwise it's a regression, so fix your code.
