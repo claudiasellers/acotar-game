@@ -38,8 +38,7 @@ const TAB_ICON := 40.0
 const TREAT_ICON := 52.0
 const SWATCH := 26.0
 const NEED_ICON := 24.0
-## How faint a making she is short of, and a treat she likes but Feyre has none of.
-const SHORT_ALPHA := 0.55
+## How faint a treat she likes but Feyre has none of.
 const WISHED_ALPHA := 0.45
 ## The brush under the pointer, and the chime as it strokes: how often, how
 ## quiet, and how far its pitch climbs as her coat comes up.
@@ -60,7 +59,6 @@ var _tabs: Dictionary = {}  # tab id -> Button
 var _body: VBoxContainer
 var _meters: VBoxContainer
 var _coat: HBoxContainer
-var _hint: Label
 var _brushing: bool = false
 var _brush_at: Vector2 = Vector2.ZERO
 var _sparkles: CPUParticles2D
@@ -192,10 +190,7 @@ func _build() -> void:
 	var foot := HBoxContainer.new()
 	foot.add_theme_constant_override(&"separation", 12)
 	col.add_child(foot)
-	_hint = BookKit.label("", &"SatchelWhere", true)
-	_hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_hint.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	foot.add_child(_hint)
+	foot.alignment = BoxContainer.ALIGNMENT_END
 	foot.add_child(BookKit.key_hint(KeyPrompt.key(MountDirector.TEND_ACTION), ""))
 	var done := LoosePage.button("Done")
 	done.pressed.connect(close)
@@ -243,7 +238,6 @@ func _show(tab: StringName) -> void:
 	for c in _body.get_children():
 		_body.remove_child(c)
 		c.queue_free()
-	_hint.text = ""
 	_refresh_meters()
 	if tab == CARE:
 		_build_care()
@@ -278,7 +272,8 @@ func _refresh_shine() -> void:
 
 
 func _build_care() -> void:
-	_hint.text = "Hold the mouse on her and stroke to brush her coat."
+	_body.add_child(BookKit.section("Brushing"))
+	_body.add_child(BookKit.label("Hold the mouse on her and stroke to brush her coat.", &"SatchelBody", true))
 	_body.add_child(BookKit.section("Treats"))
 	var have := MareCare.treats_in(inventory)
 	if MareCare.full():
@@ -425,8 +420,6 @@ func _need(key: String, label: String, have: int, need: int) -> HBoxContainer:
 	var said := BookKit.label("%s  %d / %d" % [label, mini(have, need), need], &"SatchelSmall", true)
 	said.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	line.add_child(said)
-	if have < need:
-		line.modulate.a = SHORT_ALPHA
 	return line
 
 
@@ -449,13 +442,13 @@ func _card(p: MareDecor, wearing: bool) -> Control:
 	row.add_child(name)
 	if p.blurb != "":
 		col.add_child(BookKit.label(p.blurb, &"SatchelSmall", true))
+	if wearing:
+		col.add_child(BookKit.label("She's wearing it", &"SatchelBody", true))
+		return card
 	var b := Button.new()
 	b.theme_type_variation = &"SatchelSlot"
 	b.focus_mode = Control.FOCUS_ALL
-	if wearing:
-		b.text = "She's wearing it"
-		b.disabled = true
-	elif MareTack.owned(p.id):
+	if MareTack.owned(p.id):
 		b.text = "Put it on her"
 		b.pressed.connect(_wear.bind(p))
 	else:
