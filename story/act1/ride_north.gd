@@ -62,6 +62,11 @@ const YARD_DREAD := 0.15
 ## so he looms over her even in the saddle (owner 2026-11-26; docs/tuning.md).
 ## ManorArrival puts him back to 1 when he turns into Tamlin.
 const BEAST_SCALE := 1.5
+## He leaves the cottage at the door scene's size and takes the ride's size the
+## first moment he is outdoors and out of her sight. If she keeps him in view
+## once she is riding, he swells this much per second instead, too slowly to
+## read as a pop.
+const BEAST_GROW_RATE := 0.08
 ## On foot, this far from the mare is still the yard and her way to the mare.
 const FOOT_FREE := 30.0
 ## Metres along the road he keeps ahead of her.
@@ -464,7 +469,6 @@ func _begin(_space: SceneSpace) -> void:
 		var actor := beast as BeastActor
 		actor.door = null
 		actor.outdoors = true
-		actor.body_scale = BEAST_SCALE
 		_beast_walk = actor.walk_speed
 		actor.walk_speed = 2.2
 	if door:
@@ -641,6 +645,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(_delta: float) -> void:
+	if running:
+		_grow_beast(_delta)
 	if running and (step == Step.RIDING or step == Step.AT_STEPS):
 		_place_rider()
 	elif step == Step.DONE and horse and is_instance_valid(horse) and _rider and is_instance_valid(_rider):
@@ -653,6 +659,23 @@ func _process(_delta: float) -> void:
 		if gone:
 			horse.queue_free()
 			horse = null
+
+
+## The door scene's beast fits the cottage; the ride's looms over the saddle.
+## The change never happens where she can watch it pop.
+func _grow_beast(delta: float) -> void:
+	if not (beast is BeastActor) or not is_instance_valid(beast):
+		return
+	var actor := beast as BeastActor
+	if actor.body_scale >= BEAST_SCALE:
+		return
+	var at := actor.global_position
+	if _indoors(at):
+		return
+	if not _in_view(at):
+		actor.body_scale = BEAST_SCALE
+	elif step == Step.RIDING:
+		actor.body_scale = minf(actor.body_scale + BEAST_GROW_RATE * delta, BEAST_SCALE)
 
 
 func _in_view(at: Vector3) -> bool:

@@ -398,4 +398,5 @@ Numbers the slice tests hold the game to, derived from the systems' own rates.
 
 | Tunable | Where | Default | Range | What it does | Lane |
 |---|---|---|---|---|---|
-| `BEAST_SCALE` | story/act1/ride_north.gd | 1.5 | 1.0–1.7 | Uniform size of the beast from the yard to the manor's dining room (model, blocking box, stride; the animation slows to match). 2.6 m tall at 1.0 with horns; the manor's front door is 3.4 m. Back to 1.0 when he turns into Tamlin; the cottage scene is unchanged. | L86-29 |
+| `BEAST_SCALE` | story/act1/ride_north.gd | 1.5 | 1.0–1.7 | Uniform size of the beast once he is out in the yard (see BEAST_GROW_RATE), on to the manor's dining room (model, blocking box, stride; the animation slows to match). 2.6 m tall at 1.0 with horns; the manor's front door is 3.4 m. Back to 1.0 when he turns into Tamlin; the cottage scene is unchanged. | L86-29 |
+| `BEAST_GROW_RATE` | story/act1/ride_north.gd | 0.08 /s | 0.05–0.15 | He leaves the cottage at 1.0 and snaps to BEAST_SCALE the first moment he is outdoors and out of her view; if she keeps him in view while riding he swells at this rate instead. | L86-30 |

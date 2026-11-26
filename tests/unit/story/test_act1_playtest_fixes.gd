@@ -163,6 +163,29 @@ func test_the_ridden_mare_is_gone_from_the_manor_once_she_is_down() -> void:
 	assert_null(ride.horse, "then gone from the drive: the only mare is the one in the stables")
 
 
+func test_he_grows_to_the_rides_size_only_out_of_her_sight() -> void:
+	var ride := RideNorth.new()
+	ride.auto_tick = false
+	add_child(ride)  # after_each frees the ride
+	var cam := Camera3D.new()
+	add_child_autofree(cam)
+	cam.global_position = Vector3.ZERO  # looks down -Z
+	cam.make_current()
+	var beast := BeastActor.new()
+	add_child_autofree(beast)
+	ride.beast = beast
+	beast.global_position = Vector3(0, 0, -10)
+	ride.step = RideNorth.Step.TO_MARE
+	ride._grow_beast(1.0)
+	assert_eq(beast.body_scale, 1.0, "the door scene's size while she watches him in the yard")
+	ride.step = RideNorth.Step.RIDING
+	ride._grow_beast(1.0)
+	assert_almost_eq(beast.body_scale, 1.0 + RideNorth.BEAST_GROW_RATE, 0.001, "riding with him in view, he only swells slowly")
+	beast.global_position = Vector3(0, 0, 10)
+	ride._grow_beast(0.016)
+	assert_eq(beast.body_scale, RideNorth.BEAST_SCALE, "out of her sight he takes the ride's size at once")
+
+
 func test_the_rides_end_leaves_him_to_the_arrival() -> void:
 	var ride := RideNorth.new()
 	ride.auto_tick = false
