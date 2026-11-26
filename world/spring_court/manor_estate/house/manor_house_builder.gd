@@ -27,6 +27,23 @@ const FACADE := Color(0.99, 0.94, 0.94)
 ## and the node name they get (a direct child of the room node, origin at the
 ## prop's base centre, its long axis along local X).
 const LOOSE := {&"dining_hall": {&"table_dining_long": "DiningTable", &"chair_head_dining": "HeadChair"}}
+## One prop of a kind that the room has many of, kept loose by where it stands
+## (room-local position): node name -> [prop id, position]. Her chair at the
+## foot of the table, which his magic pulls out for her (ch6-7, L86-31).
+const LOOSE_AT := {&"dining_hall": {"FootChair": [&"chair_dining", Vector3(15.4, 0.0, 10.0)]}}
+
+
+## The node name a room's prop is kept loose under, or "" when it is merged.
+static func loose_name_of(room_id: StringName, prop_id: StringName, at: Vector3) -> String:
+	var by_kind: String = LOOSE.get(room_id, {}).get(prop_id, "")
+	if by_kind != "":
+		return by_kind
+	var placed: Dictionary = LOOSE_AT.get(room_id, {})
+	for node_name: String in placed:
+		var spec: Array = placed[node_name]
+		if spec[0] == prop_id and (spec[1] as Vector3).distance_to(at) < 0.05:
+			return node_name
+	return ""
 
 
 ## World height of a level's finished floor.
@@ -231,7 +248,7 @@ static func _build_room(house: Node3D, room: ManorRoomDef, all: ManorHouseIndex,
 		prop.rotation.y = deg_to_rad(p.yaw_deg)
 		if p.scale != 1.0:
 			prop.scale = Vector3.ONE * p.scale
-		var loose_name: String = LOOSE.get(room.id, {}).get(p.prop_id, "")
+		var loose_name := loose_name_of(room.id, p.prop_id, p.position)
 		if loose_name != "" and node.get_node_or_null(NodePath(loose_name)) == null:
 			# kept out of the merge so a scene can move it (L45: the table Tamlin
 			# shrinks, ch22; the head chair he throws over, ch26)

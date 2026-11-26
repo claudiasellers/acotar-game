@@ -86,7 +86,20 @@ func test_next_corner_skips_one_underfoot() -> void:
 	var to := NavMover.next_corner(path, 1, Vector3(0, 0, 0), 1.0)
 	assert_almost_eq(to.x, 4.0, 0.001, "the corner right below him counts as passed")
 	assert_eq(to.y, 0.0, "flat")
-	assert_eq(NavMover.next_corner(path, 0, Vector3(4, 0, 0), 1.0), Vector3(-4, 0, 0), "from the far end, the start is the next one out")
+	assert_eq(NavMover.next_corner(path, 0, Vector3(4, 0, 0), 1.0), Vector3.ZERO, "at the far end nothing is ahead, not even the start")
+
+
+## L86-31: set off from the path's start, a metre on, the start is behind him
+## (more than `reach` back on the ground) and must never turn him round.
+func test_next_corner_never_turns_back_to_the_start() -> void:
+	# The manor's front steps: the path from where he stood, to the door.
+	var path := PackedVector3Array([Vector3(0, 8.25, -25.63), Vector3(0, 8.25, -27.75)])
+	var to := NavMover.next_corner(path, 0, Vector3(0, 8.9, -26.8), 1.0)
+	assert_eq(to, Vector3.ZERO, "the door's corner is within reach and the start is behind: nothing to turn to")
+	var longer := PackedVector3Array([Vector3(0, 0, 0), Vector3(0, 0, -3), Vector3(5, 0, -3)])
+	to = NavMover.next_corner(longer, 0, Vector3(0, 0, -1.2), 1.0)
+	assert_lt(to.z, 0.0, "on along the path, never back to its start: %s" % to)
+	assert_almost_eq(to.z, -1.8, 0.001, "to the next corner ahead")
 
 
 func _through_wall(a: Vector3, b: Vector3) -> bool:

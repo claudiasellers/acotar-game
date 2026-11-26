@@ -400,3 +400,14 @@ Numbers the slice tests hold the game to, derived from the systems' own rates.
 |---|---|---|---|---|---|
 | `BEAST_SCALE` | story/act1/ride_north.gd | 1.5 | 1.0–1.7 | Uniform size of the beast once he is out in the yard (see BEAST_GROW_RATE), on to the manor's dining room (model, blocking box, stride; the animation slows to match). 2.6 m tall at 1.0 with horns; the manor's front door is 3.4 m. Back to 1.0 when he turns into Tamlin; the cottage scene is unchanged. | L86-29 |
 | `BEAST_GROW_RATE` | story/act1/ride_north.gd | 0.08 /s | 0.05–0.15 | He leaves the cottage at 1.0 and snaps to BEAST_SCALE the first moment he is outdoors and out of her view; if she keeps him in view while riding he swells at this rate instead. | L86-30 |
+
+## His magic at the manor's table, and the way to the bath (L86-31)
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| `GREEN` / `PALE` | story/act2/spring_magic.gd | (0.45, 1.0, 0.55) / (0.85, 1.0, 0.75) | greens only | Colour of Tamlin's visible magic (owner [X]; Keeper: green, never gold, which reads as his shift). | L86-31 |
+| `PULL` | story/act2/spring_magic.gd | 0.55 m | 0.4–0.7 | How far her chair at the foot of the table slides out at "Sit." | L86-31 |
+| `PULL_SECONDS` | story/act2/spring_magic.gd | 0.7 s | 0.4–1.2 | How long the slide takes. | L86-31 |
+| `RISEN_SECONDS` | story/act2/first_dinner.gd | 0.35 s | 0.2–0.6 | She is on her feet this long before the green hands press her back down. | L86-31 |
+| `WHERE_AFTER` | story/act2/alis_welcome.gd | 8 s | 5–15 | Quiet seconds after Alis shows her the bath door before she points again (was 12). | L86-31 |
+| `ALIS_PACE` | story/act2/alis_welcome.gd | 2.0 m/s | 1.4–2.6 | Alis's walk to the bathing chamber's door. | L86-31 |

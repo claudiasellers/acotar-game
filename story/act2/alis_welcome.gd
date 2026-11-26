@@ -5,8 +5,11 @@
 ## and a dark blue tunic with scratchy gold thread on the lapels. Then dinner.
 ##
 ## Hangs on feyre_bedroom_window (Act2Spaces.EXTRA). Starts when she is in her
-## room after the arrival. Play: walk to the steaming bath (Alis points the
-## way if she lingers) and press E (the "E   step in" card; Alis says go on
+## room after the arrival. Play: Alis says the bath is drawn and walks to
+## the bathing chamber's door, turns and shows her in ("This way."), steam
+## curling out of the doorway (owner, L86-31: the bath is through a door in
+## the east wall, out of sight from where she stands). Walk to the steaming
+## bath (Alis points the way again if she lingers) and press E (the "E   step in" card; Alis says go on
 ## if she stands there); the tunic goes on with the outfit sparkle. Fact:
 ## fact.alis_bathed (FirstDinner's gate).
 class_name AlisWelcome
@@ -20,12 +23,16 @@ const TROUSERS := &"spring_trousers_cream"
 const ROOM_RADIUS := 6.0
 ## Quiet seconds before Alis points her to the bath, and, at the bath, tells
 ## her to get in (L34-6: the player never wonders what the room wants).
-const WHERE_AFTER := 12.0
+const WHERE_AFTER := 8.0
+## Alis's pace to the bathing chamber's door (m/s).
+const ALIS_PACE := 2.0
 const GO_ON_AFTER := 6.0
 
 var bathed: bool = false
 ## Steam off the hot water until she's in (soft white wisps, no glow).
 var steam: GPUParticles3D
+## Wisps curling out of the bathing chamber's doorway into the bedroom.
+var door_steam: GPUParticles3D
 
 
 func _init() -> void:
@@ -49,9 +56,13 @@ func _build_beats() -> Array:
 			StoryControl.hold(self, StoryControl.Mode.WALK, PackedStringArray(["interact"]))
 			StoryControl.set_focus(actor(&"alis")), "Alis waits"),
 		say(&"alis_bath_drawn"),
+		Beats.run(func(_s: SceneSpace) -> void: _steam_the_bath(), "the bath steams"),
+		# She shows her the way: to the bathing chamber's door, then turns to her.
+		lead_along(&"alis", [&"bath_door"], 0.0, ALIS_PACE),
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_focus(null)
-			_steam_the_bath(), "free to look"),
+			cast(&"alis", &"bath_door", &"feyre_start"), "Alis at the bath door"),
+		say(&"alis_this_way"),
+		Beats.run(func(_s: SceneSpace) -> void: StoryControl.set_focus(null), "free to look"),
 		reach_nudged(&"bath", 2.2, &"alis_bath_where", WHERE_AFTER),
 		Beats.run(func(_s: SceneSpace) -> void: aside(&"bath_prompt"), "at the bath"),
 		wait_press("step in", &"alis_go_on", GO_ON_AFTER, &"bath", 2.8, "until she steps in"),
@@ -73,9 +84,7 @@ func _build_beats() -> Array:
 
 func _bathe() -> void:
 	bathed = true
-	if steam and is_instance_valid(steam):
-		steam.queue_free()
-	steam = null
+	_clear_steam()
 	place_feyre(mark(&"after_bath"))
 	var alis := actor(&"alis")
 	if alis:
@@ -89,12 +98,24 @@ func _steam_the_bath() -> void:
 	steam = BathSteam.make()
 	add_child(steam)
 	steam.global_position = mark(&"bath") + Vector3.UP * 0.7
+	if stage and stage.has_mark(&"bath_doorway"):
+		door_steam = BathSteam.make()
+		door_steam.name = "DoorSteam"
+		door_steam.amount = 14
+		add_child(door_steam)
+		door_steam.global_position = mark(&"bath_doorway") + Vector3.UP * 1.4
+
+
+func _clear_steam() -> void:
+	for wisps: GPUParticles3D in [steam, door_steam]:
+		if wisps and is_instance_valid(wisps):
+			wisps.queue_free()
+	steam = null
+	door_steam = null
 
 
 func _finish() -> void:
-	if steam and is_instance_valid(steam):
-		steam.queue_free()
-	steam = null
+	_clear_steam()
 	super._finish()
 
 

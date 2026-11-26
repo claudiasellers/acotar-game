@@ -1,16 +1,21 @@
 ## The first dinner, ch7 (Keeper, [C]): back in the dining room after Alis's
-## bath. Tamlin and Lucien have eaten and sip from gold goblets. Tamlin seats
-## her at the far end with meat and sauce and bread and pale sparkling wine.
-## She won't touch it (the first rule). When she shoots up, invisible hands
-## clap on her arms and shove her back, once; her legs and middle stay bound
-## until she eats. She sniffs (no metallic stench; faeries can't lie), stabs
-## chicken first, clears the plate in silence, reaches for seconds of torte,
-## and the food vanishes; the bonds loosen. Deed: first_dinner_eaten.
-## (Keeper canon checks 2026-11-01; plans/canon-corrections.md.)
+## bath. Tamlin and Lucien have eaten and sip from gold goblets. "Sit.": her
+## chair at the far end slides out for her (his magic, green: [A]/[X] owner),
+## with meat and sauce and bread and pale sparkling wine. What does he plan to
+## do with her? Nothing. So she's not to be his slave? "I don't keep slaves."
+## She won't touch the food (the first rule). When she shoots up, hands of
+## green light clap on her arms and shove her back, once (canon: invisible,
+## the tang of magic only; the glow is the owner's [X]); "Do not do whatever
+## it was you were contemplating", and she is going to sit at this table and
+## eat. Her legs and middle stay bound until she eats. She sniffs (no metallic
+## stench; faeries can't lie), stabs chicken first, clears the plate in
+## silence, reaches for seconds of torte, and the food vanishes; the bonds
+## loosen. Deed: first_dinner_eaten.
+## (Keeper canon checks 2026-11-01 and L86-31; plans/canon-corrections.md.)
 ##
 ## Play: walk to her chair. Seated, the camera is hers. A move press (or her
-## temper, after a few seconds) brings the one invisible shove; from then on
-## E takes a bite and moving does nothing until the plate is clear.
+## temper, after a few seconds) brings the one shove; from then on E takes a
+## bite and moving does nothing until the plate is clear.
 class_name FirstDinner
 extends Act2Space
 
@@ -22,6 +27,8 @@ const RISE_AFTER := 4.0
 const BITES_TO_CLEAR := 3
 ## Quiet seconds before a nudge at each wait on her (L34-6).
 const NUDGE_AFTER := 15.0
+## She is on her feet this long before the green hands press her back down.
+const RISEN_SECONDS := 0.35
 
 var table: DinnerTable
 ## While she's held: an over-the-shoulder view down the table to Tamlin, with
@@ -41,6 +48,10 @@ var _refused: bool = false
 var _seen_presses: int = 0
 var _seen_nudges: int = 0
 var _shake_left: float = 0.0
+## Counting down while she is up out of the chair, before the hands land.
+var _risen_left: float = 0.0
+## Her chair at the foot of the table, which his magic slides out at "Sit."
+var chair := SpringMagic.FootChair.new()
 
 
 func _build_beats() -> Array:
@@ -56,18 +67,24 @@ func _build_beats() -> Array:
 			StoryControl.hold(self, StoryControl.Mode.WALK)
 			StoryControl.set_focus(actor(&"tamlin")), "walk to her chair"),
 		say(&"sit"),
+		Beats.run(_pull_out_her_chair, "her chair slides out"),
 		reach_nudged(&"feyre_chair", 1.3, &"chair_where", NUDGE_AFTER),
 		Beats.run(_sit, "she sits"),
 		say(&"lucien_tunic"),
 		say(&"feyre_dress"),
+		# What the slaves line answers (Keeper L86-31, ch7 [V]).
+		say(&"plan_for_me"),
+		say(&"plan_nothing"),
+		say(&"not_slave"),
 		say(&"no_slaves"),
-		say(&"not_enchanted"),
-		# She shoots up in anger (or the player tries to leave first).
+		say(&"first_rule"),
+		# She shoots up (or the player tries to leave first).
 		Beats.run(func(_s: SceneSpace) -> void: _seated_for = 0.0, "her temper rises"),
 		Beats.until(func() -> bool: return nudges() > _seen_nudges or _seated_for >= RISE_AFTER, "until she rises"),
-		Beats.run(func(_s: SceneSpace) -> void: _shove(), "invisible hands"),
+		Beats.run(func(_s: SceneSpace) -> void: _shove(), "green hands"),
 		say(&"held"),
 		say(&"contemplating"),
+		say(&"not_enchanted"),
 		say(&"no_bite"),
 		Beats.run(func(_s: SceneSpace) -> void: _eat_card(true), "E eats"),
 		nudged(func() -> bool: return bites >= 1, &"so_hungry", NUDGE_AFTER, "until her first bite"),
@@ -111,7 +128,13 @@ func _set_the_scene(_s: SceneSpace) -> void:
 		})
 
 
+## "Sit.": her chair slides out from the table by itself, glittering green.
+func _pull_out_her_chair(_s: SceneSpace) -> void:
+	chair.pull(self, mark(&"table"))
+
+
 func _sit(_s: SceneSpace) -> void:
+	chair.tuck(0.5)
 	_seat_her()
 	seated = true
 	_seen_presses = presses()
@@ -156,6 +179,7 @@ func _seat_her() -> void:
 
 func tick(delta: float) -> void:
 	super.tick(delta)
+	chair.step(delta)
 	if not running or not seated:
 		return
 	_seated_for += delta
@@ -173,18 +197,29 @@ func tick(delta: float) -> void:
 		if not _refused:
 			_refused = true
 			aside(&"first_rule")
+	if _risen_left > 0.0:
+		_risen_left -= delta
+		if _risen_left <= 0.0:
+			_seat_her()
+			var p := player()
+			var model: Variant = p.get(&"model") if p else null
+			SpringMagic.press_down(model as Node3D if model is Node3D else p)
 	if _shake_left > 0.0:
 		_shake_left -= delta
 		StoryControl.shake = 0.25 if _shake_left > 0.0 else 0.0
 
 
-## Invisible hands (Keeper: nothing to see, only the tang of magic): a jolt
-## of the camera and she is back in the seat, held there until she eats.
+## She is up out of the chair for a moment; then hands of green light (owner
+## [X]; canon has nothing to see, only the tang of magic) land on her arms, a
+## jolt of the camera, and she is back in the seat, held there until she eats.
+## Her body is held on the seat at once; only her model stands, briefly.
 func _shove() -> void:
 	shoves += 1
 	_seat_her()
+	unseat_feyre()
+	_risen_left = RISEN_SECONDS
 	_seen_nudges = nudges()
-	_shake_left = SHOVE_SECONDS
+	_shake_left = SHOVE_SECONDS + RISEN_SECONDS
 	held = true
 
 
@@ -218,6 +253,7 @@ func _eat_card(on: bool) -> void:
 
 
 func _clear_the_scene(_s: SceneSpace) -> void:
+	chair.tuck(0.0)
 	dismiss(&"tamlin")
 	dismiss(&"lucien")
 	if table and is_instance_valid(table):
@@ -228,6 +264,8 @@ func _clear_the_scene(_s: SceneSpace) -> void:
 func _finish() -> void:
 	if seated:
 		unseat_feyre()
+	chair.tuck(0.0)
+	_risen_left = 0.0
 	held = false
 	seated = false
 	_use_seat_camera(false)

@@ -144,8 +144,47 @@ func test_three_bites_then_the_torte_vanishes_and_the_deed() -> void:
 
 
 func test_lines_come_from_the_stage_and_tag_inventions() -> void:
-	for id in [&"sit", &"no_slaves", &"not_enchanted", &"held", &"contemplating", &"sniff", &"lucien_tunic",
+	for id in [&"sit", &"plan_for_me", &"plan_nothing", &"not_slave", &"no_slaves", &"not_enchanted", &"held", &"contemplating", &"sniff", &"lucien_tunic",
 			&"feyre_dress", &"first_rule", &"vanished", &"thanks", &"stay_for_wine", &"go_rest", &"laugh_growl"]:
 		assert_false(space.stage.line(id).is_empty(), "line %s" % id)
 	for id in space.stage.invented:
 		assert_true(space.stage.lines.has(id), "invented %s is a real line" % id)
+
+
+## Keeper L86-31 (ch7 [V]): the slaves line answers her, so it means something.
+func test_the_slaves_line_answers_her_question() -> void:
+	var order: Array[String] = []
+	for beat: SceneBeat in space._build_beats():
+		if beat.label.begins_with("say "):
+			order.append(beat.label.trim_prefix("say "))
+	var at := order.find("no_slaves")
+	assert_gt(at, 2)
+	assert_eq(order.slice(at - 3, at + 1), ["plan_for_me", "plan_nothing", "not_slave", "no_slaves"] as Array[String],
+			"her question, his answer, then the line: %s" % [order])
+	assert_gt(order.find("first_rule"), at, "then the first rule, before she rises")
+	assert_gt(order.find("not_enchanted"), order.find("contemplating"), "his close after the push")
+
+
+## "Sit.": the chair at the foot slides out for her and tucks back in under her.
+## The hands that shove her back are green (owner [X]): sparkles land on her.
+func test_her_chair_slides_out_and_green_hands_hold_her() -> void:
+	var chair := Node3D.new()
+	chair.name = "FootChair"
+	root.add_child(chair)
+	chair.global_position = space.mark(&"feyre_seat")
+	var home := chair.global_position
+	WorldState.set_flag("wall_crossed")
+	WorldState.set_flag("fact.alis_bathed")
+	assert_true(space.start())
+	assert_true(_until("reach feyre_chair"))
+	_run(1.0)
+	assert_gt(chair.global_position.x - home.x, SpringMagic.PULL - 0.05, "slid out, away from the table")
+	feyre.global_position = space.mark(&"feyre_chair")
+	assert_true(_until("until she rises"))
+	assert_true(chair.global_position.is_equal_approx(home), "tucked back in under her")
+	var before := get_tree().root.find_children("SpringMagic*", "GPUParticles3D", true, false).size()
+	space.nudge()
+	_run(FirstDinner.RISEN_SECONDS + 0.2)
+	assert_eq(space.shoves, 1)
+	assert_gt(get_tree().root.find_children("SpringMagic*", "GPUParticles3D", true, false).size(), before,
+			"green light lands on her arms")

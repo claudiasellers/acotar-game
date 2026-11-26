@@ -14,6 +14,8 @@ const KINDS := {
 	&"outfit": {"colors": [Color(1.0, 0.7, 0.85), Color(1.0, 0.92, 0.6), Color(0.8, 0.85, 1.0)], "notes": [1046.5, 1318.5, 1568.0, 2093.0], "amount": 60},
 	# A few notes at the manor's instruments (StationUses "play"); a pitch step each press.
 	&"pianoforte": {"colors": [Color(1.0, 0.95, 0.85), Color(0.85, 0.8, 1.0)], "notes": [523.3, 659.3, 784.0], "amount": 14},
+	# Tamlin's magic at the manor's table (SpringMagic): green, like his eyes.
+	&"spring_magic": {"colors": [Color(0.85, 1.0, 0.75), Color(0.45, 1.0, 0.55)], "notes": [880.0, 1174.7, 1568.0], "amount": 30},
 	&"harp": {"colors": [Color(1.0, 0.9, 0.55), Color(1.0, 0.8, 0.92)], "notes": [784.0, 880.0, 1046.5, 1174.7, 1318.5], "amount": 20},
 }
 
@@ -195,6 +197,12 @@ static func _sparkles(spec: Dictionary) -> GPUParticles3D:
 	ramp.gradient = grad
 	mat.color_ramp = ramp
 	p.process_material = mat
+	p.draw_pass_1 = sparkle_mesh()
+	return p
+
+
+## The shared twinkle quad every burst draws (built once).
+static func sparkle_mesh() -> QuadMesh:
 	if _sparkle_mesh == null:
 		_sparkle_mesh = QuadMesh.new()
 		_sparkle_mesh.size = Vector2(0.09, 0.09)
@@ -206,8 +214,7 @@ static func _sparkles(spec: Dictionary) -> GPUParticles3D:
 		m.albedo_texture = _star_texture()
 		m.albedo_color = Color(1.6, 1.5, 1.6)
 		_sparkle_mesh.material = m
-	p.draw_pass_1 = _sparkle_mesh
-	return p
+	return _sparkle_mesh
 
 
 ## A soft four-point twinkle (glow core + cross rays), so sparkles read as

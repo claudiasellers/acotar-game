@@ -97,7 +97,7 @@ func _arrive() -> void:
 	assert_not_null(arrival().actor(&"tamlin_beast"), "the beast waits in the hall")
 	_follow(arrival(), &"tamlin_beast", 60.0)
 	feyre.global_position = arrival().mark(&"dining_inside")
-	assert_true(_tick_all(5.0, func() -> bool: return arrival().actor(&"tamlin") != null), "he becomes Tamlin")
+	assert_true(_tick_all(10.0, func() -> bool: return arrival().actor(&"tamlin") != null), "he becomes Tamlin")
 	assert_null(arrival().actor(&"tamlin_beast"), "the beast is gone")
 	assert_true(_tick_all(60.0, func() -> bool: return not arrival().running))
 
@@ -112,11 +112,57 @@ func test_the_arrival_leads_her_to_the_table_and_up_to_alis() -> void:
 	assert_false(dinner().can_start(), "no dinner before the bath")
 
 
+## Owner, L86-31: he changes at the head chair once she comes through the
+## dining room doors, never on her walking into him.
+func test_he_changes_at_the_chair_when_she_comes_into_the_dining_room() -> void:
+	WorldState.set_flag("wall_crossed")
+	feyre.global_position = arrival().mark(&"front_door") + Vector3(0, 0, 3)
+	assert_true(_tick_all(1.0, func() -> bool: return arrival().running))
+	_follow(arrival(), &"tamlin_beast", 60.0)
+	# She stops in the hall, short of the doors; he goes on to the head chair.
+	feyre.global_position = arrival().mark(&"hall_east")
+	assert_true(_tick_all(20.0, func() -> bool: return arrival().current_beat_label() == "until she is in the dining room"),
+			"he reaches the chair: %s" % arrival().current_beat_label())
+	var beast := arrival().actor(&"tamlin_beast")
+	assert_not_null(beast, "still the beast while she's in the hall")
+	assert_lt(Vector2(beast.global_position.x, beast.global_position.z).distance_to(
+			Vector2(arrival().mark(&"head_chair").x, arrival().mark(&"head_chair").z)), 0.7, "at the head chair")
+	_tick_all(3.0)
+	assert_null(arrival().actor(&"tamlin"), "no change while she waits out in the hall")
+	# Through the doors, a long way from him: that is enough.
+	feyre.global_position = arrival().mark(&"dining_door") + Vector3(0.8, 0, 0)
+	assert_gt(feyre.global_position.distance_to(beast.global_position), 4.0)
+	assert_true(_tick_all(1.0, func() -> bool: return arrival().actor(&"tamlin") != null), "he becomes Tamlin as she comes in")
+
+
+## "Sit.": her chair at the foot of the table slides out by itself, and is
+## back in its place for the dinner.
+func test_sit_and_her_chair_slides_out_then_eat() -> void:
+	var chair := Node3D.new()
+	chair.name = "FootChair"
+	root.add_child(chair)
+	chair.global_position = dining.global_position + Vector3(4.4, 0, -6.5)
+	var home := chair.global_position
+	WorldState.set_flag("wall_crossed")
+	feyre.global_position = arrival().mark(&"front_door") + Vector3(0, 0, 3)
+	assert_true(_tick_all(1.0, func() -> bool: return arrival().running))
+	_follow(arrival(), &"tamlin_beast", 60.0)
+	feyre.global_position = arrival().mark(&"dining_inside")
+	assert_true(_tick_all(30.0, func() -> bool: return arrival().current_beat_label() == "say chair"))
+	_tick_all(1.0)
+	assert_gt(chair.global_position.x - home.x, SpringMagic.PULL - 0.05, "slid out, away from the table")
+	assert_true(_tick_all(10.0, func() -> bool: return arrival().current_beat_label() == "say eat"), "then Eat.")
+	assert_true(_tick_all(60.0, func() -> bool: return not arrival().running))
+	assert_true(chair.global_position.is_equal_approx(home), "back at the table for the dinner")
+
+
 func test_alis_bathes_her_and_dresses_her_in_the_tunic() -> void:
 	_arrive()
 	assert_true(_tick_all(2.0, func() -> bool: return welcome().running), "Alis is waiting in her room")
 	assert_not_null(welcome().actor(&"alis"))
-	assert_true(_tick_all(10.0, func() -> bool: return welcome().current_beat_label() == "reach bath"))
+	assert_true(_tick_all(15.0, func() -> bool: return welcome().current_beat_label() == "reach bath"))
+	assert_lt(welcome().actor(&"alis").global_position.distance_to(welcome().mark(&"bath_door")), 0.3,
+			"Alis has shown her to the bathing chamber's door")
 	feyre.global_position = welcome().mark(&"bath")
 	assert_true(_tick_all(2.0, func() -> bool: return welcome().current_beat_label() == "until she steps in"))
 	welcome().press_interact()

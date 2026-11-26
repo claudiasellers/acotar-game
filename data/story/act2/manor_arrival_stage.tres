@@ -22,13 +22,18 @@ marks = {
 }
 lines = {
 "beast_waits": {"text": "Those doors swung wider. A command to follow.", "who": ""},
+"call_in": {"text": "In here.", "who": "The beast"},
+"chair": {"text": "At the far end of the table, an empty chair slid out by itself.", "who": ""},
+"eat": {"text": "Eat.", "who": "Tamlin"},
+"eat_something": {"text": "You should eat something.", "who": "Tamlin"},
+"follow_in": {"text": "He padded inside without looking back. I followed him in.", "who": ""},
 "alis_bath": {"text": "Come along, then. You'll want a bath.", "who": "Alis"},
 "doors": {"text": "The doors swung open on silent hinges. A faint, metallic smell: magic.", "who": ""},
 "first_rule": {"text": "Faerie food. The first rule: never eat their food.", "who": ""},
 "lucien_andras": {"text": "So this is the girl who killed Andras.", "who": "Lucien"},
-"sit_eat": {"text": "Sit. Eat.", "who": "Tamlin"},
+"sit": {"text": "Sit.", "who": "Tamlin"},
 "transform": {"text": "He plopped into the chair, the wood groaning, and in a flash of white light turned into a golden-haired man.", "who": ""}
 }
 extra_require = PackedStringArray()
-invented = PackedStringArray("alis_bath", "lucien_andras")
-canon = "Ch6 (Keeper 2026-11-01, [C]): doors on silent hinges, a faint metallic smell of magic; the beast pads down a long hall, through polished wooden doors, to the long table laden with steaming food; plops into the oversized head chair, the wood groaning, and in a flash of white light turns into a golden-haired man (green tunic, baldric, gold mask). She presses against the panelled wall by the door. Sit. Eat. She refuses (first rule). Lucien strides in past her to the head of the table, furious a scrawny girl killed Andras. Alis takes her off to bathe. Invented (X): Lucien's and Alis's wording. Marks are in manor_dining_table's frame (anchor at world 21, floor, -31.5)."
+invented = PackedStringArray("alis_bath", "lucien_andras", "call_in", "chair", "follow_in")
+canon = "Ch6 (Keeper 2026-11-01, [C]): doors on silent hinges, a faint metallic smell of magic; the beast pads down a long hall, through polished wooden doors, to the long table laden with steaming food; plops into the oversized head chair, the wood groaning, and in a flash of white light turns into a golden-haired man (green tunic, baldric, gold mask). She presses against the panelled wall by the door. His first words after the change: You should eat something. Sit. Eat. (Keeper L86-31 [V]). An empty seat had been pulled out [V]; his magic sliding it out, green, is [A]/[X] owner. She refuses (first rule). The call into the dining room is wordless in canon (a growl, the doors swing wider); "In here." is [X]. Lucien strides in past her to the head of the table, furious a scrawny girl killed Andras. Alis takes her off to bathe. Invented (X): Lucien's and Alis's wording, the beast's "In here.", the chair line, the follow cue. Marks are in manor_dining_table's frame (anchor at world 21, floor, -31.5)."

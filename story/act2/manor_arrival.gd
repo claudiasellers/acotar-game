@@ -1,10 +1,18 @@
 ## The arrival, ch6 (Keeper, [C]): the oak doors open by themselves on silent
-## hinges; the beast pads ahead down the long hall, through polished wooden
-## doors, to a long table laden with steaming food. He plops into the head
-## chair, the wood groaning, and in a flash of white light turns into a
-## golden-haired man in a gold mask. She presses against the panelled wall by
-## the door. "Sit. Eat." She refuses: faerie food is the first rule. Lucien
-## strides in past her to the head of the table. Alis takes her off to bathe.
+## hinges; the beast pads ahead down the long hall to the polished wooden
+## doors of the dining room, and calls her in (canon: a growl, the doors
+## swinging wider; "In here." is [X]). At the head of the long table laden
+## with steaming food he drops into the chair, the wood groaning, and in a
+## flash of white light becomes a golden-haired man in a gold mask. "You
+## should eat something." "Sit." Her chair at the far end slides out by
+## itself (canon: an empty seat had been pulled out; his green magic doing it
+## is [A]/[X] owner). "Eat." She refuses: faerie food is the first rule, and
+## she stays by the panelled wall. Lucien strides in past her to the head of
+## the table. Alis takes her off to bathe.
+##
+## The change waits for her: he reaches the head chair, and only when she
+## steps through the dining room doors does he drop into it (owner, L86-31:
+## never on her walking into him).
 ##
 ## Hangs on manor_dining_table (Act2Spaces.EXTRA); every mark is in that
 ## anchor's frame, the front door included. Starts when Feyre comes within
@@ -23,8 +31,15 @@ const DOOR_RADIUS := 6.0
 const FOLLOW_NUDGE_AFTER := 15.0
 ## The beast's pace down the hall to the dining room (m/s).
 const LEAD_SPEED := 2.2
+## The dining room, in the anchor's frame (ManorHouse dining_hall: world x 10
+## to 32, z -48 to -28, the anchor at 21, -31.5). She is in once she is
+## through its doors, a little past the door line.
+const ROOM_MIN := Vector2(-10.6, -16.5)
+const ROOM_MAX := Vector2(11.0, 3.5)
 
 var flash: OmniLight3D
+## Her chair at the foot of the table, which his magic slides out at "Sit."
+var chair := SpringMagic.FootChair.new()
 
 
 func _init() -> void:
@@ -47,18 +62,28 @@ func _build_beats() -> Array:
 			StoryControl.set_focus(_marker(&"front_door_glow"))
 			delight(&"unlock", &"front_door_glow")
 			aside(&"doors"), "the doors open by themselves"),
-		Beats.wait(2.0),
+		Beats.wait(3.0),
 		Beats.run(func(_s: SceneSpace) -> void:
 			# He waits on the front steps, where the ride left him (RideNorth.beast_steps).
 			cast(&"tamlin_beast", &"beast_steps", &"hall_mid")
 			StoryControl.hold(self, StoryControl.Mode.WALK)
-			StoryControl.set_focus(actor(&"tamlin_beast")), "the beast pads ahead"),
-		lead_along(&"tamlin_beast", [&"hall_mid", &"hall_east", &"dining_door", &"dining_inside", &"head_chair"], 8.0,
+			StoryControl.set_focus(actor(&"tamlin_beast"))
+			aside(&"follow_in"), "the beast pads ahead"),
+		lead_along(&"tamlin_beast", [&"hall_mid", &"hall_east", &"dining_door"], 8.0,
 			LEAD_SPEED, &"beast_waits", FOLLOW_NUDGE_AFTER),
-		reach_nudged(&"dining_inside", 3.5, &"beast_waits", FOLLOW_NUDGE_AFTER),
+		Beats.run(_call_her_in, "he calls her in"),
+		say(&"call_in"),
+		# On to the head chair, without waiting: the room's doors are open to her.
+		lead_along(&"tamlin_beast", [&"dining_inside", &"head_chair"], 0.0, LEAD_SPEED),
+		nudged(in_dining_room, &"beast_waits", FOLLOW_NUDGE_AFTER, "until she is in the dining room"),
 		Beats.run(_transform, "a flash of white light"),
 		say(&"transform"),
-		say(&"sit_eat"),
+		say(&"eat_something"),
+		say(&"sit"),
+		Beats.run(_pull_out_her_chair, "her chair slides out"),
+		say(&"chair"),
+		Beats.run(func(_s: SceneSpace) -> void: StoryControl.set_focus(actor(&"tamlin")), "back to him"),
+		say(&"eat"),
 		say(&"first_rule"),
 		Beats.run(func(_s: SceneSpace) -> void: cast(&"lucien", &"dining_door", &"lucien_seat"), "Lucien strides in"),
 		lead_along(&"lucien", [&"lucien_seat"], 0.0, 2.6),
@@ -75,6 +100,43 @@ func _build_beats() -> Array:
 	] + fade_time(BATH_HOUR, _up_to_her_room, "up to her room") + [
 		Beats.run(func(_s: SceneSpace) -> void: StoryControl.release(self), "her room"),
 	]
+
+
+## The sheet names him "The beast" until he changes.
+func speaker_of(who: String) -> StringName:
+	return &"tamlin_beast" if who == "The beast" else &""
+
+
+## Through the dining room doors (in the room's floor rectangle).
+func in_dining_room() -> bool:
+	var p := player()
+	if p == null:
+		return false
+	var at := global_transform.affine_inverse() * p.global_position
+	return at.x >= ROOM_MIN.x and at.x <= ROOM_MAX.x and at.z >= ROOM_MIN.y and at.z <= ROOM_MAX.y
+
+
+## At the dining room doors he turns his head back to her, with a growl.
+func _call_her_in(_s: SceneSpace) -> void:
+	var beast := actor(&"tamlin_beast")
+	var p := player()
+	if beast is BeastActor and p:
+		(beast as BeastActor).wait_for(p.global_position)
+	if beast and is_inside_tree():
+		SoundDirector.cue(&"beast_huff", beast.global_position)
+
+
+## "Sit.": her chair at the far end slides out from the table by itself,
+## glittering green, and the view goes to it.
+func _pull_out_her_chair(_s: SceneSpace) -> void:
+	chair.pull(self, mark(&"table"))
+	if chair.chair:
+		StoryControl.set_focus(chair.chair)
+
+
+func tick(delta: float) -> void:
+	super.tick(delta)
+	chair.step(delta)
 
 
 ## The beast in the head chair becomes Tamlin: a white flash, then the man.
@@ -110,6 +172,7 @@ func _transform(_s: SceneSpace) -> void:
 func _up_to_her_room() -> void:
 	for id: StringName in [&"tamlin", &"lucien", &"alis"]:
 		dismiss(id)
+	chair.tuck(0.0)
 	var room := find_anchor(&"feyre_bedroom_window")
 	var welcome := room.get_node_or_null(^"AlisWelcome") as Act2Space if room else null
 	if welcome:
@@ -125,3 +188,8 @@ func _marker(mark_name: StringName) -> Node3D:
 		add_child(m)
 	m.global_position = mark(mark_name)
 	return m
+
+
+func _finish() -> void:
+	chair.tuck(0.0)
+	super._finish()

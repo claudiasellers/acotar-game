@@ -61,19 +61,43 @@ func steer(goal: Vector3) -> Vector3:
 	return next if next.length_squared() > 0.0004 else straight
 
 
-## Flat direction from `from` to the first corner of `path` (from `index` on)
-## that is more than `reach` away on the ground; ZERO when none is. The agent
-## counts a corner reached by 3D distance, so on steps, where the mover's feet
-## ride the treads and the mesh's corner sits on the ramp below, a corner right
-## under him was never reached: he steered at his own feet and jittered there
-## (the beast on the manor's front step, L86-29).
+## Flat direction from `from` to the first corner of `path` ahead of him that
+## is more than `reach` away on the ground; ZERO when none is. "Ahead" means
+## past the path segment he is on (the one nearest him on the ground, from
+## `index` on). The agent counts a corner reached by 3D distance, so on steps,
+## where the mover's feet ride the treads and the mesh's corner sits on the
+## ramp below, a corner right under him was never reached: he steered at his
+## own feet and jittered there (the beast on the manor's front step, L86-29).
+## Nor may a corner already behind him count: the path's start, a metre back
+## once he has set off, turned him round, step for step, on the manor's front
+## steps when the arrival started him there (L86-31).
 static func next_corner(path: PackedVector3Array, index: int, from: Vector3, reach: float) -> Vector3:
-	for i in range(maxi(index, 0), path.size()):
+	var start := maxi(index, 0)
+	if start >= path.size():
+		return Vector3.ZERO
+	var on := start
+	var nearest := INF
+	for i in range(start, path.size() - 1):
+		var d := _ground_distance_to_segment(from, path[i], path[i + 1])
+		if d < nearest - 0.001:
+			nearest = d
+			on = i
+	var first := on + 1 if path.size() > 1 else on
+	for i in range(first, path.size()):
 		var to := path[i] - from
 		to.y = 0.0
 		if to.length() > reach:
 			return to
 	return Vector3.ZERO
+
+
+static func _ground_distance_to_segment(p: Vector3, a: Vector3, b: Vector3) -> float:
+	var p2 := Vector2(p.x, p.z)
+	var a2 := Vector2(a.x, a.z)
+	var b2 := Vector2(b.x, b.z)
+	var ab := b2 - a2
+	var t := clampf((p2 - a2).dot(ab) / ab.length_squared(), 0.0, 1.0) if ab.length_squared() > 1e-6 else 0.0
+	return p2.distance_to(a2 + ab * t)
 
 
 ## True when a baked navmesh lies under `point`.
