@@ -191,7 +191,7 @@ func _build() -> void:
 	foot.add_theme_constant_override(&"separation", 12)
 	col.add_child(foot)
 	foot.alignment = BoxContainer.ALIGNMENT_END
-	foot.add_child(BookKit.key_hint(KeyPrompt.key(MountDirector.TEND_ACTION), ""))
+	foot.add_child(BookKit.key_hint(KeyPrompt.key(&"interact_alt"), ""))
 	var done := LoosePage.button("Done")
 	done.pressed.connect(close)
 	foot.add_child(done)
