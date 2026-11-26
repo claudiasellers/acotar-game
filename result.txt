@@ -1,0 +1,12 @@
+status ok
+request L86-dinner-1
+commit 15bf0fc03f758e895c741ba9a6f1660db1a3fea2
+machine Claudias-Mac-mini
+godot 4.7.2.stable.official.ed1daf0bf
+quality look
+size 1920x1080
+renderer project default
+prep ok 35s: import 6s, generated content 29s (levels.sh)
+note focus guard: handed focus back 3x, render held it 558 ms
+shot dinner ok exit=0 279s files=14
+answered 2026-11-26T03:42:30Z after 317s
