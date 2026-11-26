@@ -48,7 +48,6 @@ func use(_user: Node) -> void:
 
 
 func _process(_delta: float) -> void:
-	update_prompt()
 	var t := Time.get_ticks_msec() * 0.002
 	for i in glints.size():
 		glints[i].rotation.y = t + i

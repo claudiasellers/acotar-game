@@ -1,12 +1,12 @@
 # gate: needs:terrain
-# gate: when:systems/mount/*,data/mount/*,ui/mare/*,story/framework/scene_space.gd,story/framework/moment_space.gd,data/story/moments/*,core/story_control.gd,characters/feyre/feyre.gd,systems/interaction/*,tests/integration/play/play_harness.gd
+# gate: when:systems/mount/*,data/mount/*,ui/mare/*,story/framework/scene_space.gd,story/framework/moment_space.gd,data/story/moments/*,core/story_control.gd,characters/feyre/feyre.gd,systems/interaction/*,tests/integration/play/play_harness.gd,ui/hud/use_prompt.gd,project.godot
 ## Play test (T148): the white mare from where a real player stands after the
 ## first dinner and the curtain trap, the mare never ridden. The background
 ## moments that wait on deeds all act (the hall marks, the manor map) are
 ## running, as they are from fact.alis_tripped on; they hold nothing and must
 ## never stop her. Real key and pad events: E mounts her the first time (and
-## teaches the whistle), the stick rides, E gets down, H brings her, T (her own
-## key, tend_mount) opens tending, the pad's brush (hold A, move the stick) brings her to a gleam (a bond deed).
+## teaches the whistle), the stick rides, E gets down, H brings her, T (the second
+## interact key, interact_alt) opens tending, a held X on the pad does too, the pad's brush (hold A, move the stick) brings her to a gleam (a bond deed).
 extends GutTest
 
 const PlayHarness := preload("res://tests/integration/play/play_harness.gd")
@@ -111,7 +111,7 @@ func test_3_t_tends_her_and_brushing_bonds() -> void:
 	if not booted or not _mare_standing_near(8.0):
 		return
 	await _up_to_her()
-	await h.press(MountDirector.TEND_ACTION)
+	await h.press(&"interact_alt")
 	var opened := await h.wait_until(func() -> bool: return md.tending != null, 120)
 	assert_true(opened, "T beside her opens tending (can_tend %s, blocked: %s)"
 			% [md.can_tend(), md.block_reason(h.feyre.global_position)])
@@ -137,3 +137,30 @@ func test_3_t_tends_her_and_brushing_bonds() -> void:
 	assert_true(MareBond.done(&"gleam"), "the gleam is a bond deed")
 	await h.press(&"interact")
 	assert_true(await h.wait_until(func() -> bool: return md.tending == null, 60), "E closes tending")
+
+
+func test_4_a_held_x_on_the_pad_tends_her() -> void:
+	if not booted or not _mare_standing_near(8.0):
+		return
+	await _up_to_her()
+	assert_true(await h.wait_until(func() -> bool: return UsePrompt.of(get_tree()).offered().size() == 2, 60),
+			"beside her the prompt names two keys: %s" % [UsePrompt.of(get_tree()).offered()])
+	var x := InputEventJoypadButton.new()
+	for bound in InputMap.action_get_events(&"interact"):
+		if bound is InputEventJoypadButton:
+			x.button_index = (bound as InputEventJoypadButton).button_index
+	x.device = PlayHarness.PAD_DEVICE
+	x.pressed = true
+	x.pressure = 1.0
+	Input.parse_input_event(x)
+	var opened := await h.wait_until(func() -> bool: return md.tending != null, 120)
+	var up := x.duplicate() as InputEventJoypadButton
+	up.pressed = false
+	up.pressure = 0.0
+	Input.parse_input_event(up)
+	await h.settle()
+	assert_true(opened, "holding X beside her opens tending (can_tend %s)" % md.can_tend())
+	assert_false(md.riding, "the hold tends; it never mounts her")
+	if opened:
+		await h.press(&"interact")
+		assert_true(await h.wait_until(func() -> bool: return md.tending == null, 60), "E closes tending")

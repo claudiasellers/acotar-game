@@ -65,8 +65,11 @@ func use(_user: Node) -> void:
 
 
 func _process(_delta: float) -> void:
-	set_prompt(flat_distance_to_player() <= PROMPT_RADIUS)
 	_refresh()
+
+
+func shows_prompt() -> bool:
+	return true
 
 
 func _refresh() -> void:

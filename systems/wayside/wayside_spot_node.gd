@@ -1,8 +1,8 @@
 ## Base for every wayside spot's node: knows its WaysideSpot, the director,
 ## whether it was found, and the shared beats (Feyre's thought on the find
 ## card, items into the satchel with sparkle + chime + bounce, a sketch).
-## Kinds that take the interact key join group "station" (Interactor picks
-## the nearest within reach) and show a small key glyph only within reach.
+## Kinds that take the interact key join group "station" (Interactor ranks
+## them with everything else in reach) and name their verb through use_verb.
 class_name WaysideSpotNode
 extends Node3D
 
@@ -64,7 +64,6 @@ func complete(value: Variant = true, line_override: String = "") -> PackedString
 		Gameplay.sketchbook.add(StringName("wayside_%s" % spot.id), sketch)
 	if director:
 		director.spot_found.emit(spot.id, spot.kind)
-	set_prompt(false)
 	return given
 
 
@@ -79,10 +78,12 @@ func give(items: PackedStringArray) -> PackedStringArray:
 	return given
 
 
-## What E does here, said by the one use prompt while she is within reach.
-func set_prompt(on: bool) -> void:
-	if is_inside_tree():
-		UsePrompt.of(get_tree()).offer(self, prompt_verb() if on else "")
+## Interactor's reach for a kind with the interact key, and what the use
+## prompt says there (Interactor reads both).
+var use_reach: float = PROMPT_RADIUS
+var use_verb: String:
+	get:
+		return prompt_verb() if shows_prompt() else ""
 
 
 ## The verb a kind's prompt says; kinds say their own.
@@ -90,9 +91,10 @@ func prompt_verb() -> String:
 	return "look closer"
 
 
-## Kinds with the interact key call this from _process.
-func update_prompt() -> void:
-	set_prompt(not found() and flat_distance_to_player() <= PROMPT_RADIUS)
+## Whether the prompt names E here: until it is found; a kind that is used
+## again and again (the snare) says so always.
+func shows_prompt() -> bool:
+	return not found()
 
 
 ## A model under this node: a CourtAssets id (the court's model library) or

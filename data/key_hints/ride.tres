@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="KeyHintSet" load_steps=9 format=3]
+[gd_resource type="Resource" script_class="KeyHintSet" load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://ui/hud/key_hint_row.gd" id="1"]
 [ext_resource type="Script" path="res://ui/hud/key_hint_set.gd" id="2"]
@@ -43,14 +43,6 @@ keys = Array[StringName]([&"call_mount"])
 says = PackedStringArray("whistle for her")
 always = false
 
-[sub_resource type="Resource" id="tend"]
-script = ExtResource("1")
-id = &"tend"
-priority = 200
-keys = Array[StringName]([&"tend_mount"])
-says = PackedStringArray("tend her")
-always = false
-
 [resource]
 script = ExtResource("2")
-rows = Array[ExtResource("1")]([SubResource("ride_steer"), SubResource("ride_gallop"), SubResource("ride_leap"), SubResource("ride_off"), SubResource("whistle"), SubResource("tend")])
+rows = Array[ExtResource("1")]([SubResource("ride_steer"), SubResource("ride_gallop"), SubResource("ride_leap"), SubResource("ride_off"), SubResource("whistle")])

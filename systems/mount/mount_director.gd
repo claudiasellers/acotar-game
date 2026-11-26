@@ -95,18 +95,11 @@ var _far_voice: AudioStreamPlayer3D
 var _last_yaw: float = NAN
 var _bank: float = 0.0
 
-## Her own key beside her (T; project.godot, R14 OK 2026-11-25): brush,
-## treats, dress-up, her page. Not E, which rides.
-const TEND_ACTION := &"tend_mount"
-## On the pad, hold X this long beside her to tend her instead of mounting (s).
-const HOLD_TEND := 0.4
+## Tending her (brush, treats, dress-up, her page) is her second action, so
+## it is on the second interact key (T, a hold of X; Interactor); E rides.
 const TEND_HINT := "Press %s beside her to brush her, feed her and dress her up."
 
 var tending: MareTendingView
-var _use_held: float = -1.0
-var _use_user: Node
-## The last interact press came from a pad (hold X tends there).
-var _pad_use: bool = false
 
 ## The whistle gesture's length (s), and when she answers after it (s).
 const GESTURE_TIME := 0.95
@@ -237,6 +230,7 @@ func spawn_mare(at: Vector3, yaw: float) -> MareMount:
 	mare.global_position = at
 	mare.rotation.y = yaw
 	mare.used.connect(_on_used)
+	mare.tend_asked.connect(_on_tend_asked)
 	return mare
 
 
@@ -427,31 +421,17 @@ func _out_of_sight(p: Node3D, dist: float) -> Vector3:
 
 # ------------------------------------------------------------------ saddle
 
-## E on her mounts; the keyboard tends with its own key (TEND_ACTION). The pad
-## has no free button, so there a tap of X mounts and a hold tends (director,
-## 2026-11-25), decided on release or at HOLD_TEND.
+## Her first action (E, a tap of X) mounts her.
 func _on_used(user: Node) -> void:
 	if riding or motion or tending:
 		return
-	if not _pad_use or not Input.is_action_pressed(&"interact"):
-		mount(user)
-		return
-	_use_held = 0.0
-	_use_user = user
+	mount(user)
 
 
-func _tick_use(delta: float) -> void:
-	if _use_held < 0.0:
-		return
-	if Input.is_action_pressed(&"interact"):
-		_use_held += delta
-		if _use_held >= HOLD_TEND:
-			_use_held = -1.0
-			if open_tending():
-				KeyHints.of(get_tree()).learn(&"tend")
-	else:
-		_use_held = -1.0
-		mount(_use_user)
+## Her second action (T, a hold of X) tends her.
+func _on_tend_asked(_user: Node) -> void:
+	if can_tend():
+		open_tending()
 
 
 ## Close enough, on foot, to tend her.
@@ -472,8 +452,6 @@ func open_tending() -> MareTendingView:
 		return null
 	if block_reason(p.global_position) == &"story":
 		return null
-	UsePrompt.of(get_tree()).offer(self, "")
-	KeyHints.of(get_tree()).hold(self, &"")
 	tending = MareTendingView.open(self, mare, p, Gameplay.inventory)
 	tending.closed.connect(func() -> void:
 		tending = null
@@ -498,8 +476,6 @@ func mount(user: Node = null, instant: bool = false) -> bool:
 	feyre = p
 	riding = true
 	_tips = RideTips.attach(self)  # the riding keys she hasn't used yet (KeyHints)
-	KeyHints.of(get_tree()).hold(self, &"")  # not the tending key while she rides
-	UsePrompt.of(get_tree()).offer(self, "")  # and not "E   ride" while she's up
 	var first := not unlocked()
 	if p is CharacterBody3D:
 		(p as CharacterBody3D).velocity = Vector3.ZERO
@@ -592,7 +568,7 @@ func _finish_dismount(at: Vector3, face_mare: bool = true) -> void:
 		PickupLog.of(get_tree()).note(HINT % KeyPrompt.key(ACTION))
 	elif unlocked() and not WorldDeltas.get_region_value(DELTAS, "tend_taught", false):
 		WorldDeltas.set_region_value(DELTAS, "tend_taught", true)
-		PickupLog.of(get_tree()).note(TEND_HINT % KeyPrompt.key(TEND_ACTION))
+		PickupLog.of(get_tree()).note(TEND_HINT % UsePrompt.key_for(&"interact_alt"))
 	dismounted.emit()
 
 
@@ -646,8 +622,6 @@ func _place_rider(delta: float) -> void:
 # ------------------------------------------------------------------ input and frame
 
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"interact"):
-		_pad_use = event is InputEventJoypadButton
 	if event is InputEventMouseMotion and (event as InputEventMouseMotion).relative.length() > 0.5:
 		_since_look = 0.0
 
@@ -656,11 +630,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(ACTION) and not event.is_echo():
 		whistle()
 		get_viewport().set_input_as_handled()
-		return
-	if event.is_action_pressed(TEND_ACTION) and not event.is_echo() and can_tend():
-		if open_tending():
-			KeyHints.of(get_tree()).learn(&"tend")
-			get_viewport().set_input_as_handled()
 		return
 	if not riding:
 		return
@@ -710,7 +679,6 @@ func _process(delta: float) -> void:
 	if p == null:
 		return
 	_tick_gesture(p, delta)
-	_tick_use(delta)
 	if _answer_in >= 0.0:
 		_answer_in -= delta
 		if _answer_in < 0.0:
@@ -1004,12 +972,12 @@ func _meet(p: Node3D, far: float) -> void:
 	mare.nicker()
 
 
-## "E   ride": said by the one use prompt while she stands by the mare.
+## "E   ride   T   tend": her two actions while she stands by the mare, which
+## Interactor ranks and the one use prompt names.
 func _update_prompt(p: Node3D) -> void:
 	if mare == null or not is_instance_valid(mare):
 		return
 	var d := Vector2(mare.global_position.x - p.global_position.x, mare.global_position.z - p.global_position.z).length()
 	var on := d <= PROMPT_RADIUS and mare.state == MareMount.State.STANDING and not riding and not tending
-	UsePrompt.of(get_tree()).offer(self, "ride" if on else "")
-	# Her own key, named beside the ride prompt until she's used it (KeyHints).
-	KeyHints.of(get_tree()).hold(self, &"tend" if on and unlocked() else &"")
+	mare.use_verb = "ride" if on else ""
+	mare.alt_verb = "tend" if on and unlocked() else ""

@@ -157,7 +157,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(CrouchMotor.ACTION) and StoryControl.can_move() and not is_mantling:
 		crouch.toggle(is_on_floor())
 	if event.is_action_pressed(&"interact") and StoryControl.can_interact():
-		interactor.interact()
+		interactor.press(event is InputEventJoypadButton)
+	elif event.is_action_released(&"interact"):
+		interactor.release()
+	if event.is_action_pressed(&"interact_alt") and StoryControl.can_interact() and interactor.interact_alt():
+		# The screen it opens (the mare's tending) closes on this key: not this press.
+		get_viewport().set_input_as_handled()
 
 
 func _process(delta: float) -> void:

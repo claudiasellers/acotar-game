@@ -4,7 +4,8 @@
 ## marked pair opens the stones she can ride to. Spawned by WhorlStones under
 ## its region's root, so it frees with the region.
 ##
-## Station shape (Interactor): group "station", station_id, use(user).
+## Station shape (Interactor): group "station", station_id, use(user),
+## use_verb, use_reach.
 class_name WhorlStone
 extends StaticBody3D
 
@@ -103,18 +104,21 @@ func marked() -> bool:
 	return WhorlStones.is_marked(def.id)
 
 
+## Interactor's reach for the pair, and what the use prompt says there: only
+## while E would do something. Tracing is always hers; riding waits for a
+## second marked pair and for the story to let her travel.
+var use_reach: float = PROMPT_RADIUS
+var use_verb: String:
+	get:
+		if not marked():
+			return "trace the whorl"
+		if WhorlStones.can_travel() and not WhorlStones.destinations(def.id).is_empty():
+			return "ride the stones"
+		return ""
+
+
 func _process(_delta: float) -> void:
-	var p := get_tree().get_first_node_in_group(&"player") as Node3D
-	var near := p != null and Vector2(p.global_position.x - global_position.x, p.global_position.z - global_position.z).length() <= PROMPT_RADIUS
-	# Said only while E would do something: tracing is always hers, riding
-	# waits for a second marked pair and for the story to let her travel.
-	var verb := ""
-	if near and not marked():
-		verb = "trace the whorl"
-	elif near and WhorlStones.can_travel() and not WhorlStones.destinations(def.id).is_empty():
-		verb = "ride the stones"
-	UsePrompt.of(get_tree()).offer(self, verb)
-	_hold_tip(p)
+	_hold_tip(get_tree().get_first_node_in_group(&"player") as Node3D)
 
 
 ## The corner tips (KeyHints) while she is within sight of a pair, before
