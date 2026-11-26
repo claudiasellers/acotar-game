@@ -177,7 +177,7 @@ func test_the_ride_is_played_from_the_cottage_road_to_the_steps() -> void:
 			&"birds", &"warm", &"name", &"gate", &"magic", &"paint", &"stairs",
 			&"stray_mare", &"stray_growl", &"stray_roar", &"stray_block",
 			&"follow", &"mount_order", &"mare_waits", &"mount_now",
-			&"through", &"beautiful", &"reins", &"lore_food", &"lore_lie", &"lore_promise"]:
+			&"through", &"beautiful", &"reins", &"lore_food", &"lore_lie", &"lore_promise", &"get_down"]:
 		assert_false(director._of(DialogueLine.Trigger.SCENE, StringName("ride_north.%s" % beat)).is_empty(), "lines for %s" % beat)
 	assert_eq((director.by_id[&"rn_stray_block"] as DialogueLine).speaker, &"tamlin_beast", "the block is his line")
 	assert_eq((director.by_id[&"rn_mount_order"] as DialogueLine).speaker, &"tamlin_beast", "outside, he sends her to the mare")
