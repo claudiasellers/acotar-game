@@ -34,6 +34,8 @@ const ELEMENTS := {
 	&"hush": "Hush: it drags them toward sleep.",
 }
 const EMPTY_SLOT := "An empty place for a steep."
+## Said once under the slots while any is empty: where a steep is made (WeaponSteep).
+const STEEP_HOW := "A steeped arrow at a hearth or a camp fire fills it."
 const NO_SLOTS := "It won't hold a steep."
 
 
@@ -91,4 +93,6 @@ static func steeps(slots: ImbueSlots) -> PackedStringArray:
 		out.append(String(ELEMENTS.get(StringName(e.get("element", &"")), EMPTY_SLOT)))
 	for i in slots.count - live.size():
 		out.append(EMPTY_SLOT)
+	if live.size() < slots.count:
+		out.append(STEEP_HOW)
 	return out

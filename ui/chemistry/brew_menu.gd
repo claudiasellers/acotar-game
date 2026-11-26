@@ -64,7 +64,7 @@ var _outcome: Label
 var _dishes: VBoxContainer
 ## The weapon in her hand, steeped with a steeped arrow (WeaponSteep): one
 ## button per arrow it would take, at a hearth or a lit camp fire.
-var _steeps: HBoxContainer
+var _steeps: HFlowContainer
 ## Her weapon rack, handed in by whoever opens the screen (null: no steeping).
 var rack: WeaponRack
 
@@ -365,8 +365,9 @@ func _build() -> void:
 	_outcome = BookKit.label("", &"SatchelBody")
 	_outcome.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(_outcome)
-	_steeps = HBoxContainer.new()
-	_steeps.add_theme_constant_override(&"separation", 6)
+	_steeps = HFlowContainer.new()
+	_steeps.add_theme_constant_override(&"h_separation", 6)
+	_steeps.add_theme_constant_override(&"v_separation", 6)
 	col.add_child(_steeps)
 
 	col.add_child(BookKit.label("Made", &"PageSection"))
