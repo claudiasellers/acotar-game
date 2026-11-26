@@ -160,14 +160,22 @@ func test_everyone_is_read_by_the_same_measures_in_the_same_order() -> void:
 		var read := BondBook.measures(b).map(func(m: Dictionary) -> StringName: return m.id)
 		assert_eq(read, legend, "%s: one legend for every bond" % b.id)
 		for m in BondBook.measures(b):
-			assert_between(int(m.filled), 0, int(m.of), "%s %s: never more marks than there are" % [b.id, m.id])
+			assert_gt(int(m.of), 0, "%s %s: a meter has a length" % [b.id, m.id])
+			assert_between(int(m.filled), 0, int(m.of), "%s %s: never past full" % [b.id, m.id])
 	for m in BondBook.MEASURES:
 		assert_ne(String(m.says), "", "%s is explained in the legend" % m.id)
+		assert_true(Icons.has(Icons.MEASURES, m.id), "%s has its glyph" % m.id)
+		assert_true(JournalTheme.MEASURE_PAINTS.has(m.id), "%s has its own paint" % m.id)
+	var paints := JournalTheme.MEASURE_PAINTS.values()
+	for i in paints.size():
+		for j in range(i + 1, paints.size()):
+			assert_ne(paints[i], paints[j], "no two measures share a paint")
 
 
 func test_her_family_has_warmth_memories_and_since_and_no_ladder() -> void:
-	assert_eq(_measure(&"nesta", BondBook.CLOSENESS).of, 0, "no ladder: the measure does not apply")
-	assert_eq(_measure(&"nesta", BondBook.DEEDS).of, 0)
+	assert_false(_measure(&"nesta", BondBook.CLOSENESS).applies, "no ladder: the measure does not apply")
+	assert_false(_measure(&"nesta", BondBook.DEEDS).applies)
+	assert_eq(_measure(&"nesta", BondBook.SINCE).filled, _measure(&"nesta", BondBook.SINCE).of, "always: the whole book")
 	assert_eq(_measure(&"nesta", BondBook.WARMTH).word, "Cold")
 	assert_eq(_measure(&"nesta", BondBook.SINCE).word, BondBook.ALWAYS)
 	assert_eq([_measure(&"nesta", BondBook.MEMORIES).filled, _measure(&"nesta", BondBook.MEMORIES).of], [1, 2])
@@ -193,10 +201,12 @@ func test_a_ladder_bond_shows_its_stage_its_deeds_and_a_passing_mood() -> void:
 	assert_true(Relationships.start_mood(&"tamlin", Relationships.COOL, Clock.day))
 	assert_eq(_measure(&"tamlin", BondBook.WARMTH).word, BondBook.COOL_FOR_NOW, "a bad day, said as one")
 	assert_eq(_measure(&"tamlin", BondBook.CLOSENESS).filled, 2, "and it costs no closeness")
-	assert_eq(_measure(&"mare", BondBook.WARMTH).of, 0, "the mare has no warmth to read")
+	assert_false(_measure(&"mare", BondBook.WARMTH).applies, "the mare has no warmth to read")
+	Clock.day = 10
+	assert_eq([_measure(&"tamlin", BondBook.SINCE).filled, _measure(&"tamlin", BondBook.SINCE).of], [9, 10], "in her life since day 2 of 10")
 
 
-func test_the_page_draws_every_measure_as_marks() -> void:
+func test_the_page_draws_every_measure_as_the_same_meter() -> void:
 	_raise("beast_claim_accepted", 2)
 	Relationships.check(&"tamlin")
 	var tab := BondsTab.new()
@@ -207,6 +217,8 @@ func test_the_page_draws_every_measure_as_marks() -> void:
 		tab.show_bond(id)
 		assert_eq(tab._measures.get_child_count(), BondBook.MEASURES.size(), "%s: the same rows for everyone" % id)
 		for m in BondBook.measures(BondBook.get_bond(id)):
-			var line := tab._measures.get_node(String(m.id))
-			var marks := line.get_children().filter(func(c: Node) -> bool: return c is TextureRect)
-			assert_eq(marks.size(), int(m.of), "%s %s: a mark for each step" % [id, m.id])
+			var meter := tab._measures.get_node(String(m.id)).get_node("Meter") as ProgressBar
+			assert_eq(meter.custom_minimum_size, BondsTab.METER, "%s %s: one size of meter" % [id, m.id])
+			assert_eq(meter.theme_type_variation, JournalTheme.measure_meter(m.id), "in the measure's own paint")
+			assert_eq([meter.value, meter.max_value], [float(m.filled) if m.applies else 0.0, float(m.of)])
+			assert_eq(tab._measures.get_node(String(m.id)).modulate.a < 1.0, not m.applies, "faint only when it is not ours")

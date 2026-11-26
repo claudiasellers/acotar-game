@@ -3,7 +3,7 @@
 ## the right sheet is the one she has turned to: what she calls them, how
 ## they are with her these days, and what has passed between them, oldest
 ## first, each with its day. Beside the portrait every bond is read by the
-## same measures (BondBook.MEASURES), drawn as dots of her one paint, and the left
+## same measures (BondBook.MEASURES), each a meter in its own paint with its glyph, and the left
 ## sheet keeps their legend. The words and measures are BondBook's.
 ## A mark on the tab says something has passed since she last looked.
 class_name BondsTab
@@ -13,11 +13,12 @@ extends MenuTab
 const FACE := 48.0
 const PAGE_FACE := 160.0
 const ROW_HEIGHT := 62.0
-## A measure's mark, the width its name takes, and how faint an unfilled mark
-## (and a measure that does not apply) is drawn.
-const MARK := 18.0
-const MEASURE_NAME_WIDTH := 96.0
-const EMPTY_ALPHA := 0.28
+## A measure's glyph, the width its name takes, its meter (one size for every
+## measure and every bond), and how faint a measure that does not apply is.
+const GLYPH := 22.0
+const MEASURE_NAME_WIDTH := 92.0
+const METER := Vector2(200, 14)
+const NOT_OURS_ALPHA := 0.35
 
 ## The bond the right sheet shows.
 var showing: StringName = &""
@@ -27,7 +28,6 @@ var _name: Label
 var _face: TextureRect
 var _days: Label
 var _measures: VBoxContainer
-var _dot: Texture2D = JournalTheme.soft_dot()
 var _past: VBoxContainer
 var _rows: Dictionary = {}  # bond id -> Button
 
@@ -95,6 +95,9 @@ func _build() -> void:
 		var m := BondBook.MEASURES[i]
 		var line := HBoxContainer.new()
 		line.add_theme_constant_override(&"separation", 8)
+		var glyph := BookKit.picture(Icons.texture(Icons.MEASURES, m.id), Vector2(GLYPH, GLYPH))
+		glyph.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		line.add_child(glyph)
 		var what := BookKit.label(String(m.name), &"SatchelSmall")
 		what.custom_minimum_size.x = MEASURE_NAME_WIDTH
 		line.add_child(what)
@@ -214,27 +217,29 @@ func _write_page(bond: Dictionary) -> void:
 		_past.add_child(line)
 
 
-## One measure of the open bond: its name, a dot for each step (the filled
-## ones in her accent paint, the rest faint) and its word. One that does not apply to
-## them is the faint name alone.
+## One measure of the open bond: its glyph, its name, its meter (the same
+## length for every measure and every bond, in the measure's own paint) and
+## its word. One that does not apply to them is the same row, empty and faint.
 func _measure(m: Dictionary) -> HBoxContainer:
 	var line := HBoxContainer.new()
 	line.name = String(m.id)
-	line.add_theme_constant_override(&"separation", 3)
+	line.add_theme_constant_override(&"separation", 8)
+	var glyph := BookKit.picture(Icons.texture(Icons.MEASURES, m.id), Vector2(GLYPH, GLYPH))
+	glyph.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	line.add_child(glyph)
 	var what := BookKit.label(String(m.name), &"SatchelSmall")
 	what.custom_minimum_size.x = MEASURE_NAME_WIDTH
 	line.add_child(what)
-	if int(m.of) == 0 and String(m.word) == "":
-		line.modulate.a = EMPTY_ALPHA * 2.0
-		return line
-	for i in int(m.of):
-		var mark := BookKit.picture(_dot, Vector2(MARK, MARK))
-		mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		mark.modulate = JournalTheme.color(&"accent" if i < int(m.filled) else &"ink_soft")
-		if i >= int(m.filled):
-			mark.modulate.a = EMPTY_ALPHA
-		line.add_child(mark)
-	if String(m.word) != "":
-		var word := BookKit.label(String(m.word), &"SatchelWhere")
-		line.add_child(word)
+	var meter := ProgressBar.new()
+	meter.name = "Meter"
+	meter.theme_type_variation = JournalTheme.measure_meter(m.id)
+	meter.show_percentage = false
+	meter.custom_minimum_size = METER
+	meter.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	meter.max_value = float(m.of)
+	meter.value = float(m.filled) if m.applies else 0.0
+	line.add_child(meter)
+	line.add_child(BookKit.label(String(m.word), &"SatchelWhere"))
+	if not m.applies:
+		line.modulate.a = NOT_OURS_ALPHA
 	return line

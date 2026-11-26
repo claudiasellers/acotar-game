@@ -18,6 +18,8 @@ const OUTFITS := &"wardrobe"
 const BREWS := &"brews"
 const STATUS := &"status"
 const BONDS := &"bonds"
+## The bond measures' glyphs (BondBook.MEASURES ids).
+const MEASURES := &"measures"
 ## Every cooked dish shares one picture.
 const DISH := &"dish"
 
