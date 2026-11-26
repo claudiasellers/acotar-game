@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"col_hob_iron_bracelet"
 display_name = "Child's iron bracelet"
-description = "Iron, and small enough for a child's wrist. Someone believed."
+description = "Iron, small enough for a child's wrist. Like the ones my sisters wear. Someone believed."
 weight_class = 0
 color = Color(0.416, 0.384, 0.353, 1)
 regions = Array[StringName]([])

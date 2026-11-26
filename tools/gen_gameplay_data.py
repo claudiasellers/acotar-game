@@ -239,7 +239,7 @@ C = [
 	# The Hollow Hob's eight charms (bestiary §10.3, L75): cut from its necklace,
 	# never foraged (no regions); common so they don't count as rare finds.
 	("col_hob_horseshoe", "Iron horseshoe", [], "Nailed over a door once, to keep them out. It didn't.", "5a5550", "rare", "Round the Hollow Hob's neck, while it sleeps"),
-	("col_hob_iron_bracelet", "Child's iron bracelet", [], "Iron, and small enough for a child's wrist. Someone believed.", "6a625a", "rare", "Round the Hollow Hob's neck, while it sleeps"),
+	("col_hob_iron_bracelet", "Child's iron bracelet", [], "Iron, small enough for a child's wrist. Like the ones my sisters wear. Someone believed.", "6a625a", "rare", "Round the Hollow Hob's neck, while it sleeps"),
 	("col_hob_pewter_locket", "Pewter locket", [], "Dented shut. Something rattles inside.", "9a9a94", "rare", "Round the Hollow Hob's neck, while it sleeps"),
 	("col_hob_little_bell", "Little bell", [], "A sheep's bell, its clapper bent.", "b8913a", "rare", "Round the Hollow Hob's neck, while it sleeps"),
 	("col_hob_bone_comb", "Bone comb", [], "Fine teeth, two missing. Someone combed her hair with this.", "e6dcc4", "rare", "Round the Hollow Hob's neck, while it sleeps"),
