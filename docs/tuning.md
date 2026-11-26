@@ -411,7 +411,7 @@ Numbers the slice tests hold the game to, derived from the systems' own rates.
 
 | Tunable | Where | Default | Range | What it does | Lane |
 |---|---|---|---|---|---|
-| `GREEN` / `PALE` | story/act2/spring_magic.gd | (0.45, 1.0, 0.55) / (0.85, 1.0, 0.75) | greens only | Colour of Tamlin's visible magic (owner [X]; Keeper: green, never gold, which reads as his shift). | L86-31 |
+| `GREEN` / `PALE` | story/act2/spring_magic.gd | (0.3, 1.0, 0.4) / (0.85, 1.0, 0.75) | greens only | Colour of Tamlin's visible magic (owner [X]; Keeper: green, never gold, which reads as his shift). Drawn with a green-tinted twinkle (0.35, 1.5, 0.45), 0.13 m, 70 per burst, so it stays green over warm light. | L86-33 |
 | `PULL` | story/act2/spring_magic.gd | 0.55 m | 0.4–0.7 | How far her chair at the foot of the table slides out at "Sit." | L86-31 |
 | `PULL_SECONDS` | story/act2/spring_magic.gd | 0.7 s | 0.4–1.2 | How long the slide takes. | L86-31 |
 | `RISEN_SECONDS` | story/act2/first_dinner.gd | 0.35 s | 0.2–0.6 | She is on her feet this long before the green hands press her back down. | L86-31 |

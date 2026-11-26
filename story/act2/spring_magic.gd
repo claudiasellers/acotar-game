@@ -6,7 +6,7 @@
 class_name SpringMagic
 extends RefCounted
 
-const GREEN := Color(0.45, 1.0, 0.55)
+const GREEN := Color(0.3, 1.0, 0.4)
 const PALE := Color(0.85, 1.0, 0.75)
 ## How far her chair slides out from the table, and how long it takes.
 const PULL := 0.55
@@ -106,12 +106,29 @@ static func press_down(on: Node3D) -> void:
 	Juice.burst(null, &"spring_magic", on.global_position + Vector3.UP * 1.2)
 
 
+static var _mesh: QuadMesh
+
+
+## Juice's twinkle, tinted green and a little larger. Juice's own quad adds a
+## near-white light on top of every colour, so green sparkles drawn with it
+## read white in the dining room's warm light (Mac render L86-dinner-1).
+static func _green_mesh() -> QuadMesh:
+	if _mesh == null:
+		var base := Juice.sparkle_mesh()
+		_mesh = QuadMesh.new()
+		_mesh.size = Vector2(0.13, 0.13)
+		var m := (base.material as BaseMaterial3D).duplicate() as BaseMaterial3D
+		m.albedo_color = Color(0.35, 1.5, 0.45)
+		_mesh.material = m
+	return _mesh
+
+
 ## One burst of green sparkles at `at`, thrown down at `fall` m/s (0: about).
 static func _glitter(owner: Node3D, at: Vector3, fall: float) -> GPUParticles3D:
 	var p := GPUParticles3D.new()
 	p.name = "SpringMagic"
 	p.one_shot = true
-	p.amount = maxi(int(40.0 * Juice.effects_scale), 1)
+	p.amount = maxi(int(70.0 * Juice.effects_scale), 1)
 	p.lifetime = 0.9
 	p.explosiveness = 0.7
 	var pm := ParticleProcessMaterial.new()
@@ -132,7 +149,7 @@ static func _glitter(owner: Node3D, at: Vector3, fall: float) -> GPUParticles3D:
 	ramp_tex.gradient = ramp
 	pm.color_ramp = ramp_tex
 	p.process_material = pm
-	p.draw_pass_1 = Juice.sparkle_mesh()
+	p.draw_pass_1 = _green_mesh()
 	var root: Node = owner.get_tree().current_scene if owner.get_tree().current_scene else owner.get_tree().root
 	root.add_child(p)
 	p.global_position = at
