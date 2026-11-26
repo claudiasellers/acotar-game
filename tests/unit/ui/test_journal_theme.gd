@@ -6,17 +6,18 @@ extends GutTest
 const VARIATIONS := {
 	&"PanelContainer": [
 		&"SatchelCard", &"LoosePage", &"NotifyCard", &"SatchelChip", &"SatchelKey",
-		&"PromptPill", &"BowCard",
+		&"PromptPill", &"BowCard", &"TinTray", &"TinWell", &"TinWellChosen", &"TinLid", &"TinKey",
 	],
-	&"Button": [&"SatchelTab", &"MenuTab", &"SatchelSlot", &"BookTab", &"BookRibbon", &"TitleChoice", &"PageChoice"],
+	&"Button": [&"SatchelTab", &"MenuTab", &"SatchelSlot", &"BookTab", &"BookRibbon", &"TitleChoice", &"PageChoice", &"TinPan", &"TinAct"],
 	&"Label": [
 		&"SatchelHeading", &"MenuTitle", &"PageSection", &"SatchelBody", &"SatchelSmall", &"SatchelWhere",
 		&"SatchelKeyLabel", &"SatchelCount", &"SlotKey", &"NewTag", &"TinName", &"PromptText", &"BowText", &"ChapterTitle",
-		&"NotifyText", &"ThoughtText", &"CoverKicker", &"CoverTitle",
+		&"NotifyText", &"ThoughtText", &"CoverKicker", &"CoverTitle", &"TinTitle", &"TinSub", &"TinSection",
+		&"TinLabel", &"TinHint", &"TinWord", &"TinKeyLabel", &"TinTag", &"SatchelLack",
 	],
 	&"ProgressBar": [
 		&"SatchelMeter", &"HealthMeter", &"StaminaMeter", &"MeasureMeter_closeness", &"MeasureMeter_warmth",
-		&"MeasureMeter_deeds", &"MeasureMeter_memories", &"MeasureMeter_since",
+		&"MeasureMeter_deeds", &"MeasureMeter_memories", &"MeasureMeter_since", &"TinMeter",
 	],
 }
 const TOKENS: Array[StringName] = [

@@ -65,10 +65,10 @@ deckled edge, tinted to a paper token. Made by
 
 | Variation | Base |
 |---|---|
-| SatchelCard, LoosePage, NotifyCard, LineBand, LineFlood, LineBare, ThoughtMark, PromptPill, BowCard, PickupRow, SatchelChip, SatchelKey | PanelContainer |
-| SatchelTab, MenuTab, SatchelSlot, BookTab, BookRibbon | Button (all states, including focus) |
-| SatchelHeading, MenuTitle, PageSection, SatchelBody, SatchelSmall, SatchelWhere, SatchelKeyLabel, SatchelCount, SatchelPin, TinName, NotifyText, ThoughtText, LineSaid, LineName, LineTold, LineWhisper, LineDread, PromptText, BowText, PickupText, VitalsFigure, NoticeKicker, NoticeTitle, NoticeBody, ChapterTitle, CoverKicker, CoverTitle | Label |
-| SatchelMeter | ProgressBar |
+| SatchelCard, LoosePage, NotifyCard, LineBand, LineFlood, LineBare, ThoughtMark, PromptPill, BowCard, PickupRow, SatchelChip, SatchelKey, TinTray, TinWell, TinWellChosen, TinLid, TinKey | PanelContainer |
+| SatchelTab, MenuTab, SatchelSlot, BookTab, BookRibbon, TinPan, TinAct | Button (all states, including focus) |
+| SatchelHeading, MenuTitle, PageSection, SatchelBody, SatchelSmall, SatchelWhere, SatchelKeyLabel, SatchelCount, SatchelPin, TinName, NotifyText, ThoughtText, LineSaid, LineName, LineTold, LineWhisper, LineDread, PromptText, BowText, PickupText, VitalsFigure, NoticeKicker, NoticeTitle, NoticeBody, ChapterTitle, CoverKicker, CoverTitle, TinTitle, TinSub, TinSection, TinLabel, TinHint, TinWord, TinKeyLabel, TinTag, SatchelLack | Label |
+| SatchelMeter, TinMeter | ProgressBar |
 
 `CheckBox`, `HSlider` and `LineEdit` (the easel's title line) are themed as base types (an inked box that fills, a
 brass rule with a knob), so a setting anywhere wears them with no variation.

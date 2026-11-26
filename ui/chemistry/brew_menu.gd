@@ -1,14 +1,16 @@
 ## The brewing screen (lane L62): at any hearth, kitchen range, stillroom
 ## bench, potion room or the starlight pool, Feyre lays forage from her pouch
 ## and satchel into the pot, picks how to work it, and brews. Drawn on the
-## satchel's crafted look (L50; JournalTheme only, no colours here).
+## open tin (OpenTin; owner, 2026-11-26), so the bench stays on screen:
+## JournalTheme only, no colours here.
 ##
-## Two ways to fill the pot on the one page (owner, 2026-11-25). On the left,
-## the recipes she knows: every brew and dish the book has recorded
+## Two ways to fill the pot (owner, 2026-11-25). On the tin's lid, the
+## recipes she knows: every brew and dish the book has recorded
 ## (RecipeUnlocks: made, or gathered all of). Picking one lays its makings in
 ## the pot and sets how to work it; one she lacks something for says what,
-## and one worked somewhere else says where. On the right, her bags, to try
-## what no recipe names. Discovery stays hers: an unknown brew is never
+## and one worked somewhere else says where. In the tin, her bags as pans, to
+## try what no recipe names, and the pot as a well at its right end. What she
+## has made, and steeping a blade, are on a slip above the tin. Discovery stays hers: an unknown brew is never
 ## listed, and her hunch line only names what she has made or unlocked, or
 ## the tags she has learned from using each ingredient. The first time a
 ## named brew comes out of the pot, a card shows its name and her note, with
@@ -19,16 +21,30 @@ extends CanvasLayer
 signal brewed(result: Dictionary)
 signal closed
 
-const WIDTH := 1140.0
-## The recipes column.
-const RECIPES_WIDTH := 340.0
+## The lid her recipes stand on, the tin's left compartment, the pot's well,
+## and the slip of what she has made.
+const LID_WIDTH := 372.0
+const LEFT_WIDTH := 300.0
+const POT_WIDTH := 440.0
+const SLIP_WIDTH := 520.0
 const RECIPE_ICON := 40.0
 ## How faint a recipe is that she can't make here and now.
 const UNMADE_ALPHA := 0.55
-## The green wash: leaves in the pot.
-const WASH := 2
-const ICON := 52.0
-const COLUMNS := 6
+## What is in the pot, pictured.
+const POT_ICON := 56.0
+## Her bags: pans to a row, and how many rows show before they scroll.
+const COLUMNS := 8
+const ROWS_SHOWN := 2
+const PAN_GAP := 8
+## A method's picture: a brew worked that way, until the methods have
+## glyphs of their own.
+const METHOD_ICON := 24
+const METHOD_BREWS := {
+	&"infuse": &"brew_steadying_tea", &"distill": &"brew_glow_draught", &"salve": &"brew_healing_salve",
+	&"steep": &"brew_hush_steep", &"tincture": &"brew_giddy_tincture", &"roast": &"brew_spit_roast",
+	&"stew": &"brew_hearty_stew", &"cook": &"brew_hunters_stew", &"bake": &"brew_honey_cakes",
+	&"preserve": &"brew_hedgerow_preserve",
+}
 ## The scene-tree name, kept from the M1 panel (tests and tools look for it).
 const NODE_NAME := "HearthPanel"
 const REVEAL_ICON := 96.0
@@ -46,14 +62,13 @@ var method: StringName = &""
 ## The last brew result (empty before the first brew).
 var last: Dictionary = {}
 
-var _page: LoosePage
-var _root: Control
+var tin: OpenTin
 var _title: Label
 var _found: Label
 var _grid: GridContainer
 var _recipes: VBoxContainer
-var _pot: HBoxContainer
-var _methods: HBoxContainer
+var _pot: HFlowContainer
+var _methods: GridContainer
 var _hunch: Label
 var _brew: Button
 var _reveal: PanelContainer
@@ -61,10 +76,6 @@ var _reveal_name: Label
 var _reveal_note: Label
 var _reveal_icon: TextureRect
 var _outcome: Label
-var _dishes: VBoxContainer
-## The weapon in her hand, steeped with a steeped arrow (WeaponSteep): one
-## button per arrow it would take, at a hearth or a lit camp fire.
-var _steeps: HFlowContainer
 ## Her weapon rack, handed in by whoever opens the screen (null: no steeping).
 var rack: WeaponRack
 
@@ -94,7 +105,7 @@ func _ready() -> void:
 
 
 func is_open() -> bool:
-	return _root != null and _root.visible
+	return tin != null and tin.visible
 
 
 func open(who: Feyre, at: CookingStation, her_rack: WeaponRack = null) -> void:
@@ -105,16 +116,16 @@ func open(who: Feyre, at: CookingStation, her_rack: WeaponRack = null) -> void:
 	method = at.station.methods[0] if at.station and not at.station.methods.is_empty() else &""
 	_reveal.visible = false
 	_outcome.text = ""
-	_root.visible = true
+	tin.visible = true
 	_refresh()
 	ScreenStack.push(self)
-	_page.settle()
+	tin.settle()
 
 
 func close() -> void:
 	if not is_open():
 		return
-	_root.visible = false
+	tin.visible = false
 	ScreenStack.pop(self)
 	closed.emit()
 
@@ -122,6 +133,15 @@ func close() -> void:
 ## Esc or B while the stillroom is the top screen.
 func screen_cancel() -> void:
 	close()
+
+
+## A pad starts on the first recipe she can lay, or the first thing in her bags.
+func screen_focus() -> void:
+	for group: Control in [_recipes, _grid]:
+		for c in group.get_children():
+			if c is Button and not (c as Button).disabled:
+				(c as Button).grab_focus()
+				return
 
 
 ## Adds or removes one ingredient from the pot. Returns true if it changed.
@@ -277,104 +297,93 @@ func _input(event: InputEvent) -> void:
 # --- build -------------------------------------------------------------------
 
 func _build() -> void:
-	_page = LoosePage.lay(self, WIDTH, WASH)
-	_root = _page.root
-	_root.visible = false
-	var head := _page.head()
+	tin = OpenTin.lay(self, true)
+	tin.visible = false
+	var known := tin.lid(LID_WIDTH)
+	var known_head := BookKit.label("Recipes I know", &"PageSection")
+	known_head.uppercase = true
+	known.add_child(known_head)
+	_recipes = VBoxContainer.new()
+	_recipes.name = "Recipes"
+	_recipes.add_theme_constant_override(&"separation", 4)
+	known.add_child(_recipes)
+
+	var left := tin.compartment(LEFT_WIDTH)
+	var head := OpenTin.head(left, "", " ")
 	_title = head[0]
 	_found = head[1]
+	left.add_child(OpenTin.section("How"))
+	_methods = GridContainer.new()
+	_methods.columns = 2
+	_methods.add_theme_constant_override(&"h_separation", 8)
+	_methods.add_theme_constant_override(&"v_separation", 8)
+	left.add_child(_methods)
+	left.add_child(BookKit.spring())
+	var away := OpenTin.hint_button("Esc", "Step away")
+	away.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	away.pressed.connect(close)
+	left.add_child(away)
 
-	# Two columns under the heading: the recipes she knows, and the pot.
-	var body := HBoxContainer.new()
-	body.add_theme_constant_override(&"separation", 22)
-	_page.column.add_child(body)
-	var known := VBoxContainer.new()
-	known.custom_minimum_size.x = RECIPES_WIDTH
-	known.add_theme_constant_override(&"separation", 8)
-	body.add_child(known)
-	known.add_child(BookKit.label("Recipes I know", &"PageSection"))
-	var known_scroll := ScrollContainer.new()
-	known_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	known_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	known.add_child(known_scroll)
-	_recipes = VBoxContainer.new()
-	_recipes.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_recipes.add_theme_constant_override(&"separation", 6)
-	known_scroll.add_child(_recipes)
-	body.add_child(VSeparator.new())
-	var col := VBoxContainer.new()
-	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	col.add_theme_constant_override(&"separation", 12)
-	body.add_child(col)
-
-	col.add_child(BookKit.label("Or try what's in my bags", &"PageSection"))
+	var bags := tin.compartment()
+	bags.add_child(OpenTin.section("What's in my bags"))
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(0, (ICON + 22.0) * 3.0)
+	scroll.custom_minimum_size.y = OpenTin.Pan.small_height() * ROWS_SHOWN + PAN_GAP * (ROWS_SHOWN - 1)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	col.add_child(scroll)
+	scroll.follow_focus = true
+	bags.add_child(scroll)
 	_grid = GridContainer.new()
 	_grid.columns = COLUMNS
 	_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_grid.add_theme_constant_override(&"h_separation", 8)
-	_grid.add_theme_constant_override(&"v_separation", 8)
+	_grid.add_theme_constant_override(&"h_separation", PAN_GAP)
+	_grid.add_theme_constant_override(&"v_separation", PAN_GAP)
 	scroll.add_child(_grid)
 
-	col.add_child(HSeparator.new())
-	var pot_row := HBoxContainer.new()
-	pot_row.add_theme_constant_override(&"separation", 12)
-	col.add_child(pot_row)
-	pot_row.add_child(BookKit.label("In the pot", &"PageSection"))
-	_pot = HBoxContainer.new()
-	_pot.add_theme_constant_override(&"separation", 6)
-	_pot.custom_minimum_size = Vector2(0, ICON)
-	_pot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	pot_row.add_child(_pot)
-	_methods = HBoxContainer.new()
-	_methods.add_theme_constant_override(&"separation", 6)
-	col.add_child(_methods)
-	_hunch = BookKit.label("", &"SatchelBody")
-	_hunch.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var pot_side := tin.compartment(POT_WIDTH)
+	var pot_well := OpenTin.well()
+	pot_well.name = "Pot"
+	var clear := MarginContainer.new()
+	clear.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	clear.add_theme_constant_override(&"margin_right", OpenTin.WHORL_ROOM)
+	pot_side.add_child(clear)
+	clear.add_child(pot_well)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override(&"separation", 6)
+	pot_well.add_child(col)
+	var pot_head := BookKit.label("In the pot", &"PageSection")
+	pot_head.uppercase = true
+	col.add_child(pot_head)
+	_pot = HFlowContainer.new()
+	_pot.add_theme_constant_override(&"h_separation", 14)
+	_pot.add_theme_constant_override(&"v_separation", 4)
+	col.add_child(_pot)
+	_hunch = BookKit.label("", &"ThoughtText", true)
 	col.add_child(_hunch)
-	_brew = LoosePage.button("Brew")
-	_brew.custom_minimum_size = Vector2(0, 44)
-	_brew.pressed.connect(func() -> void: brew())
-	col.add_child(_brew)
-
 	_reveal = PanelContainer.new()
-	_reveal.theme_type_variation = &"SatchelCard"
+	_reveal.theme_type_variation = &"LineBare"
 	_reveal.visible = false
 	col.add_child(_reveal)
 	var reveal_row := HBoxContainer.new()
 	reveal_row.add_theme_constant_override(&"separation", 14)
 	_reveal.add_child(reveal_row)
-	_reveal_icon = TextureRect.new()
-	_reveal_icon.custom_minimum_size = Vector2(REVEAL_ICON, REVEAL_ICON)
-	_reveal_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_reveal_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_reveal_icon = BookKit.picture(null, Vector2(REVEAL_ICON, REVEAL_ICON))
 	_reveal_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	reveal_row.add_child(_reveal_icon)
 	var reveal_text := VBoxContainer.new()
 	reveal_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	reveal_text.add_theme_constant_override(&"separation", 0)
 	reveal_row.add_child(reveal_text)
 	reveal_text.add_child(BookKit.label("A new brew", &"SatchelSmall"))
-	_reveal_name = BookKit.label("", &"SatchelHeading")
+	_reveal_name = BookKit.label("", &"SatchelHeading", true)
 	reveal_text.add_child(_reveal_name)
-	_reveal_note = BookKit.label("", &"SatchelBody")
-	_reveal_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_reveal_note = BookKit.label("", &"SatchelWhere", true)
 	reveal_text.add_child(_reveal_note)
-	_outcome = BookKit.label("", &"SatchelBody")
-	_outcome.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_outcome = BookKit.label("", &"SatchelBody", true)
 	col.add_child(_outcome)
-	_steeps = HFlowContainer.new()
-	_steeps.add_theme_constant_override(&"h_separation", 6)
-	_steeps.add_theme_constant_override(&"v_separation", 6)
-	col.add_child(_steeps)
-
-	col.add_child(BookKit.label("Made", &"PageSection"))
-	_dishes = VBoxContainer.new()
-	_dishes.add_theme_constant_override(&"separation", 4)
-	col.add_child(_dishes)
-	_page.set_hints([["E", "Brew"], ["Esc", "Step away"]])
+	col.add_child(BookKit.spring())
+	_brew = OpenTin.key_button("E", "Brew")
+	_brew.name = "Brew"
+	_brew.pressed.connect(func() -> void: brew())
+	col.add_child(_brew)
 
 
 func _refresh() -> void:
@@ -393,10 +402,12 @@ func _refresh() -> void:
 	for r in known:
 		_recipes.add_child(_recipe_row(r, r.id == now))
 	for c in _grid.get_children():
+		_grid.remove_child(c)
 		c.queue_free()
 	var ids := _pantry()
+	_grid.columns = COLUMNS if not ids.is_empty() else 1
 	if ids.is_empty():
-		_grid.add_child(BookKit.label("Nothing to brew with. Forage first.", &"SatchelSmall"))
+		_grid.add_child(OpenTin.words("Nothing to brew with. Forage first."))
 	for id in ids:
 		_grid.add_child(_tile(id))
 	for c in _pot.get_children():
@@ -404,39 +415,78 @@ func _refresh() -> void:
 	for id in chosen:
 		var item := ItemCatalog.get_item(id)
 		var pair := HBoxContainer.new()
-		pair.add_theme_constant_override(&"separation", 4)
-		pair.add_child(Icons.item(SatchelEntries.item_entry(Gameplay.inventory, id, &""), ICON * 0.8))
-		var named := BookKit.label(item.display_name, &"SatchelSmall")
+		pair.add_theme_constant_override(&"separation", 6)
+		pair.add_child(Icons.item(SatchelEntries.item_entry(Gameplay.inventory, id, &""), POT_ICON))
+		var named := BookKit.label(item.display_name, &"SatchelBody")
 		named.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		pair.add_child(named)
 		_pot.add_child(pair)
+	_pot.visible = not chosen.is_empty()
 	for c in _methods.get_children():
 		c.queue_free()
 	var group := ButtonGroup.new()
 	for m in data.methods:
-		var b := Button.new()
-		b.theme_type_variation = &"SatchelTab"
-		b.text = String(m).capitalize()
-		b.toggle_mode = true
+		var b := BookKit.chip(String(m).capitalize())
+		b.name = String(m)
+		b.focus_mode = Control.FOCUS_ALL
+		b.icon = Icons.texture(Icons.BREWS, METHOD_BREWS.get(m, &""))
+		b.add_theme_constant_override(&"icon_max_width", METHOD_ICON)
 		b.button_group = group
 		b.button_pressed = m == method
 		b.pressed.connect(set_method.bind(m))
 		_methods.add_child(b)
 	_hunch.text = hunch()
+	# The discovery, when there is one, has the well to itself.
+	_hunch.visible = not _reveal.visible
+	_outcome.visible = _outcome.text != ""
 	_brew.disabled = chosen.is_empty()
-	_refresh_dishes()
-	_refresh_steeps()
+	(_brew.get_node("Row") as Control).modulate.a = UNMADE_ALPHA if _brew.disabled else 1.0
+	_refresh_slip()
 
 
-## Steep the held weapon (WeaponSteep): a button per steeped arrow it takes.
-func _refresh_steeps() -> void:
-	for c in _steeps.get_children():
-		_steeps.remove_child(c)
-		c.queue_free()
-	if not WeaponSteep.is_fire(station):
+## What she has made here, and steeping the weapon in her hand (WeaponSteep:
+## a chip per steeped arrow it takes, at a hearth or a lit camp fire), on a
+## slip above the tin. With neither, there is no slip.
+func _refresh_slip() -> void:
+	var inv := Gameplay.inventory
+	var arrows: Array[StringName] = []
+	if WeaponSteep.is_fire(station):
+		arrows = WeaponSteep.offers(rack, inv)
+	if inv.dishes.is_empty() and arrows.is_empty():
+		tin.drop_slip()
 		return
-	for arrow in WeaponSteep.offers(rack, Gameplay.inventory):
-		_steeps.add_child(_small_button(WeaponSteep.verb(rack, arrow), steep_blade.bind(arrow)))
+	var slip := tin.slip(SLIP_WIDTH)
+	if not inv.dishes.is_empty():
+		slip.add_child(_paper_section("Made"))
+	for i in inv.dishes.size():
+		var d: Dictionary = inv.dishes[i]
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override(&"separation", 10)
+		var tex := Icons.texture(Icons.BREWS, StringName(d.get("brew", &"")))
+		if tex:
+			row.add_child(BookKit.picture(tex, Vector2(36, 36)))
+		var title := BookKit.label(String(d.get("name", "Dish")), &"SatchelBody")
+		title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(title)
+		row.add_child(_small_button("Eat" if StringName(d.get("kind", &"")) == &"food" else "Drink", eat.bind(i)))
+		if float(d.get("food_days", 0.0)) > 0.0:
+			row.add_child(_small_button("Give to family", give.bind(i)))
+		slip.add_child(row)
+	if not arrows.is_empty():
+		slip.add_child(_paper_section("Steep a blade"))
+		var steeps := HFlowContainer.new()
+		steeps.name = "Steeps"
+		steeps.add_theme_constant_override(&"h_separation", 6)
+		steeps.add_theme_constant_override(&"v_separation", 6)
+		slip.add_child(steeps)
+		for arrow in arrows:
+			steeps.add_child(_small_button(WeaponSteep.verb(rack, arrow), steep_blade.bind(arrow)))
+
+
+func _paper_section(text: String) -> Label:
+	var l := BookKit.label(text, &"PageSection")
+	l.uppercase = true
+	return l
 
 
 ## Steeps the weapon in her hand with one `arrow`.
@@ -466,30 +516,18 @@ func _pantry() -> Array[StringName]:
 func _tile(id: StringName) -> Button:
 	var item := ItemCatalog.get_item(id)
 	var left := Gameplay.inventory.count(id) - chosen.count(id)
-	var b := Button.new()
-	b.theme_type_variation = &"SatchelSlot"
-	b.custom_minimum_size = Vector2(ICON + 56.0, ICON + 18.0)
-	b.toggle_mode = true
-	b.button_pressed = chosen.has(id)
+	var pan := OpenTin.pan(Icons.item(SatchelEntries.item_entry(Gameplay.inventory, id, &""), OpenTin.Pan.ICON_SMALL), "", true)
+	pan.name = String(id)
+	pan.wash = _grid.get_child_count()
+	pan.in_pot = chosen.has(id)
+	pan.count("×%d" % maxi(left, 0))
 	var known := Gameplay.journal.known_tags(id)
-	b.tooltip_text = "%s\n%s" % [item.display_name,
+	pan.tooltip_text = "%s\n%s" % [item.display_name,
 			", ".join(PackedStringArray(known)) if not known.is_empty() else "I haven't used this yet."]
-	b.pressed.connect(func() -> void:
+	pan.pressed.connect(func() -> void:
 		if toggle(id):
 			Juice.bounce_control(_pot, 0.08))
-	var row := HBoxContainer.new()
-	row.set_anchors_preset(Control.PRESET_FULL_RECT)
-	row.offset_left = 6
-	row.offset_right = -6
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	b.add_child(row)
-	var icon := Icons.item(SatchelEntries.item_entry(Gameplay.inventory, id, &""), ICON)
-	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(icon)
-	var count := BookKit.label("×%d" % maxi(left, 0), &"SatchelCount")
-	count.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(count)
-	return b
+	return pan
 
 
 ## One known recipe: its picture, its name, and what it takes or lacks.
@@ -512,13 +550,8 @@ func _recipe_row(recipe: Dictionary, is_laid: bool) -> Button:
 	row.add_theme_constant_override(&"separation", 10)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.add_child(row)
-	var icon := TextureRect.new()
-	icon.texture = Icons.texture(Icons.BREWS, recipe.id)
-	icon.custom_minimum_size = Vector2(RECIPE_ICON, RECIPE_ICON)
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	var icon := BookKit.picture(Icons.texture(Icons.BREWS, recipe.id), Vector2(RECIPE_ICON, RECIPE_ICON))
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(icon)
 	var words := VBoxContainer.new()
 	words.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -533,33 +566,6 @@ func _recipe_row(recipe: Dictionary, is_laid: bool) -> Button:
 	if b.disabled:
 		row.modulate.a = UNMADE_ALPHA
 	return b
-
-
-func _refresh_dishes() -> void:
-	for c in _dishes.get_children():
-		c.queue_free()
-	var inv := Gameplay.inventory
-	if inv.dishes.is_empty():
-		_dishes.add_child(BookKit.label("Nothing yet.", &"SatchelSmall"))
-	for i in inv.dishes.size():
-		var d: Dictionary = inv.dishes[i]
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override(&"separation", 10)
-		var tex := Icons.texture(Icons.BREWS, StringName(d.get("brew", &"")))
-		if tex:
-			var icon := TextureRect.new()
-			icon.texture = tex
-			icon.custom_minimum_size = Vector2(36, 36)
-			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			row.add_child(icon)
-		var title := BookKit.label(String(d.get("name", "Dish")), &"SatchelBody")
-		title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row.add_child(title)
-		row.add_child(_small_button("Eat" if StringName(d.get("kind", &"")) == &"food" else "Drink", eat.bind(i)))
-		if float(d.get("food_days", 0.0)) > 0.0:
-			row.add_child(_small_button("Give to family", give.bind(i)))
-		_dishes.add_child(row)
 
 
 ## Feyre eats or drinks dish `i`; its effects run on her body (BodyState).
@@ -593,7 +599,7 @@ func _show_result(r: Dictionary) -> void:
 		_reveal_icon.texture = Icons.texture(Icons.BREWS, rule.id)
 		_outcome.text = describe(r)
 		Juice.bounce_control(_reveal, 0.18)
-		Juice.bounce_control(_found.get_parent() as Control, 0.25)
+		Juice.bounce_control(_found, 0.25)
 	else:
 		_reveal.visible = false
 		_outcome.text = "%s. %s" % [r.name, describe(r)]

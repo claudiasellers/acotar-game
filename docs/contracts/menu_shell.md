@@ -51,15 +51,40 @@ Idle frames on the same box jitter by 5 to 19 ms.
 
 ## Loose pages
 
-A station she uses with E (the stillroom, a stall, the whorl stones, the
-easel, the mare) is not a tab: it is a loose page of the same journal, laid
+A station she reads at (a stall, the whorl stones, the easel) is not a tab: it is a loose page of the same journal, laid
 over the world where she stands. `LoosePage.lay(layer, width)` gives the
 scrim, the paper (`LoosePage` theme variation), a column to write in,
 `head()` for the name and a count (the name sits on one dab of her
 watercolour in the station's wash, `LoosePage.heading()`: one mark of the
 journal per page), `set_hints()` for key caps along the foot
 and `LoosePage.button()` for a choice. `LoosePage.paper()` is the sheet alone,
-for a station that places its own (the mare beside her, the ride's
-whole-screen leaf). The station owns its content and its `ScreenStack` push;
+for a station that places its own (the ride's whole-screen leaf). The station owns its content and its `ScreenStack` push;
 it builds no scrim, card or key caps itself (`test_loose_page.gd`).
 `tools/ui/loose_page_probe.tscn -- <dir> [phase]` saves a frame of each.
+
+## Open tin
+
+A station where she works with her hands (the mare's tending, brewing) is
+not a page: it is her paint tin, opened out along the foot of the screen
+(owner, 2026-11-26, Menu B). `OpenTin.lay(layer, dim)` (`ui/menu/open_tin.gd`)
+gives the tray (ink, the quick strap's tin at a larger size, her whorl in its
+corner), at most `OpenTin.MAX_HEIGHT` tall at 1920 x 1080, so the world
+above it stays clear; `dim` lays the scrim at a quarter of its depth for a
+station that pauses. The station asks the tin for every part:
+
+| Part | What |
+|---|---|
+| `compartment(width)` | a column of the tray, a fading rule between two |
+| `OpenTin.head(into, title, sub)` | the station's name and a count line |
+| `OpenTin.section(text)`, `words(text)` | a group label and a line, on the tin |
+| `OpenTin.pan(icon, name, small)` | a round choice (`OpenTin.Pan`): a tab, an ingredient, a treat. `choose()` lifts it, `count()` badges it, `in_pot` and `wished` mark it; `name_pan(pan)` writes the chosen one's name on the tray's top edge |
+| `OpenTin.well(chosen)` | a paper tile set into the tin; type inside is the book's own, ink on paper |
+| `lid(width)`, `drop_lid()` | a standing sheet hinged at the tray's left end, for what she reads |
+| `slip(width)`, `drop_slip()` | a small sheet above the tray's right end |
+| `OpenTin.button(text)` | the one thing a well does (`TinAct`): ringed in `glow` while it will work, faint when `disabled` |
+| `OpenTin.hints(pairs)`, `hint_button(key, word)`, `key_button(key, word)` | key caps that read on the tin, and a button that carries one |
+
+Type on the tin is `paper` or `glow` (7 to 1 on `ink` in both acts); a
+meter on it is `MeterRow.on_tin(row)`. LB and RB step the chosen pan; focus
+is the pan's ring. The station owns its content and its `ScreenStack` push;
+it builds no tray, well, lid, scrim or key cap itself (`test_open_tin.gd`).

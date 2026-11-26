@@ -533,6 +533,7 @@ func mount(rider: Node3D) -> void:
 	rider.set_physics_process(false)
 	horse.state = MareMount.State.RIDDEN
 	horse.set_mountable(false)
+	horse.use_verb = ""
 	_pose = Saddle.seat(rider)
 	if _pose and horse.horse and is_inside_tree():
 		_pose.clear_overrides()
@@ -779,7 +780,10 @@ func _on_foot(delta: float) -> void:
 			_say(&"mount_now", true)
 	if not _queued.is_empty() and not _speaking():
 		_say(_queued.pop_front(), true)
-	UsePrompt.of(get_tree()).offer(self, "ride" if to_mare.length() <= MountDirector.PROMPT_RADIUS else "")
+	# The mare is a station only while she names a verb (MareMount.open_now):
+	# MountDirector names it for the stable mare, so the ride names it for
+	# this one. Interactor then puts "E   ride" up and sends E to `used`.
+	horse.use_verb = "ride" if to_mare.length() <= MountDirector.PROMPT_RADIUS else ""
 	# Past the last tier she is held at its edge, as the Wall holds her.
 	if stray > HARD and _rider is CharacterBody3D and to_mare.length() > 0.1:
 		var keep := horse.global_position + to_mare.normalized() * (FOOT_FREE + HARD)

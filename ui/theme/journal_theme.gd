@@ -119,12 +119,23 @@ const LABELS := {
 	&"ChapterTitle": [44, "display", 400, &"paper"],
 	&"CoverKicker": [22, "display", 400, &"foil"],
 	&"CoverTitle": [40, "display", 400, &"foil"],
+	# Type on the open tin (OpenTin): ivory and gold on the tin's ink. The
+	# gold is `glow`, which holds 7 to 1 on ink in both acts (foil does not).
+	&"TinTitle": [44, "display", 400, &"paper"],
+	&"TinSub": [19, "body", 700, &"glow"],
+	&"TinSection": [16, "display", 400, &"glow"],
+	&"TinLabel": [15, "body", 700, &"paper"],
+	&"TinHint": [19, "body", 700, &"paper"],
+	&"TinWord": [19, "hand", 600, &"glow"],
+	&"TinKeyLabel": [16, "body", 800, &"ink"],
+	# A making she is short of, on paper.
+	&"SatchelLack": [16, "body", 700, &"danger"],
 }
 const PANELS: Array[StringName] = [
 	&"SatchelCard", &"LoosePage", &"NotifyCard", &"LineBand", &"LineFlood", &"LineBare", &"ThoughtMark", &"SatchelChip", &"SatchelKey",
-	&"PromptPill", &"BowCard", &"PickupRow",
+	&"PromptPill", &"BowCard", &"PickupRow", &"TinTray", &"TinWell", &"TinWellChosen", &"TinLid", &"TinKey",
 ]
-const BUTTONS: Array[StringName] = [&"SatchelTab", &"MenuTab", &"SatchelSlot"]
+const BUTTONS: Array[StringName] = [&"SatchelTab", &"MenuTab", &"SatchelSlot", TIN_ACT]
 ## The badges on a thing in her book: how many, which pan, and new.
 const COUNT_BADGE := &"SatchelCount"
 const SLOT_BADGE := &"SlotKey"
@@ -154,6 +165,14 @@ const TITLE_CHOICE := &"TitleChoice"
 const PAGE_CHOICE := &"PageChoice"
 ## How far apart the cover's foil capitals are set, in px.
 const FOIL_SPACING := 5
+## The one thing a well of the open tin does (OpenTin.button): ringed in glow
+## while it will work, faint while it will not.
+const TIN_ACT := &"TinAct"
+## A pan of the open tin (OpenTin.Pan).
+const TIN_PAN := &"TinPan"
+## The open tin's brass rim, and how much paper shows in a meter's track on it.
+const TIN_RIM := 3
+const TIN_TRACK := 0.14
 const BUTTON_STATES: Array[StringName] = [
 	&"normal", &"hover", &"pressed", &"hover_pressed", &"disabled", &"focus",
 ]
@@ -275,6 +294,22 @@ static func build(of_act: Act) -> Theme:
 	t.set_stylebox(&"panel", &"PromptPill", prompt)
 	t.set_stylebox(&"panel", &"PickupRow", _trail(Color(c.ink, PILL_DEPTH)))
 	t.set_stylebox(&"panel", &"BowCard", _pill(Color(c.ink, PILL_DEPTH), Color(c.line, 0.8), 1, Vector2(18, 8)))
+	# The open tin (OpenTin): the strap's tin at a station's size. A tray of
+	# ink with a brass rim; wells of her paper set into it, the chosen one
+	# ringed in gold; a lid of paper standing at its end; a paper key cap.
+	var tray := _pill(c.ink, c.line, TIN_RIM, Vector2(26, 14), 30)
+	tray.content_margin_bottom = 12
+	t.set_stylebox(&"panel", &"TinTray", tray)
+	t.set_stylebox(&"panel", &"TinWell", _pill(c.paper, c.line, 2, Vector2(10, 8), 16))
+	t.set_stylebox(&"panel", &"TinWellChosen", _pill(c.paper, c.glow, 4, Vector2(10, 8), 16))
+	var lid := _pill(c.paper, c.line, TIN_RIM, Vector2(16, 16), 24)
+	lid.corner_radius_bottom_left = 6
+	lid.corner_radius_bottom_right = 6
+	lid.shadow_color = Color(c.ink, PROMPT_SHADOW)
+	lid.shadow_size = 8
+	lid.shadow_offset = Vector2(0, 4)
+	t.set_stylebox(&"panel", &"TinLid", lid)
+	t.set_stylebox(&"panel", &"TinKey", _pill(c.paper, c.line, 1, Vector2(12, 5), 8))
 
 	for v in BUTTONS:
 		t.set_type_variation(v, &"Button")
@@ -288,8 +323,9 @@ static func build(of_act: Act) -> Theme:
 			t.set_stylebox(&"focus", v, _arch(Color(c.glow, 0.0), c.glow, 3))
 		else:
 			var pad := Vector2(15, 7)
-			t.set_stylebox(&"normal", v, _pill(c.paper, Color(c.line, 0.55), 1, pad))
-			t.set_stylebox(&"hover", v, _pill(c.paper_deep, c.line, 1, pad))
+			var will_work: bool = v == TIN_ACT
+			t.set_stylebox(&"normal", v, _pill(c.paper, c.glow if will_work else Color(c.line, 0.55), TIN_RIM if will_work else 1, pad))
+			t.set_stylebox(&"hover", v, _pill(c.paper_deep, c.glow if will_work else c.line, TIN_RIM if will_work else 1, pad))
 			t.set_stylebox(&"pressed", v, _pill(c.ink, c.glow, 2, pad))
 			t.set_stylebox(&"hover_pressed", v, _pill(c.ink, c.glow, 2, pad))
 			t.set_stylebox(&"disabled", v, _pill(Color(c.paper, 0.4), Color(c.line, 0.2), 1, pad))
@@ -305,6 +341,11 @@ static func build(of_act: Act) -> Theme:
 		t.set_color(&"font_disabled_color", v, Color(c.ink, 0.35))
 	for state in [&"font_pressed_color", &"font_hover_pressed_color"]:
 		t.set_color(state, &"SatchelSlot", c.ink)
+
+	# A pan of the open tin draws its own disc and rings (OpenTin.Pan).
+	t.set_type_variation(TIN_PAN, &"Button")
+	for state in BUTTON_STATES:
+		t.set_stylebox(state, TIN_PAN, StyleBoxEmpty.new())
 
 	t.set_type_variation(INDEX_TAB, &"Button")
 	for state in BUTTON_STATES:
@@ -416,6 +457,12 @@ static func build(of_act: Act) -> Theme:
 	t.set_font_size(&"font_size", &"TinName", 14)
 	t.set_color(&"font_color", &"TinName", c.paper)
 	t.set_stylebox(&"normal", &"TinName", _pill(Color(c.ink, PILL_DEPTH), Color(c.line, 0.8), 1, Vector2(12, 2)))
+	# The chosen pan's name, on the open tin's top edge: the same tag, larger.
+	t.set_type_variation(&"TinTag", &"Label")
+	t.set_font(&"font", &"TinTag", spaced_body(800, 2))
+	t.set_font_size(&"font_size", &"TinTag", 18)
+	t.set_color(&"font_color", &"TinTag", c.paper)
+	t.set_stylebox(&"normal", &"TinTag", _pill(c.ink, c.line, 2, Vector2(18, 3)))
 	# The three badges a thing in her book can wear, each its own shape so
 	# none is taken for another: how many (a round paper chip), which pan of
 	# the tin it is in (a small ink key cap, like every key in the game), and
@@ -453,11 +500,22 @@ static func build(of_act: Act) -> Theme:
 		t.set_type_variation(meter[0], &"ProgressBar")
 		t.set_stylebox(&"background", meter[0], _pill(c.paper_deep, Color(c.line, 0.5), 1, Vector2(0, 4)))
 		t.set_stylebox(&"fill", meter[0], _pill(meter[1], Color(c.line, 0.5), 1, Vector2(0, 4)))
+	# A meter's track on the open tin: the row keeps its own fill.
+	t.set_type_variation(&"TinMeter", &"ProgressBar")
+	t.set_stylebox(&"background", &"TinMeter", _pill(Color(c.paper, TIN_TRACK), c.foil, 1, Vector2(0, 4)))
+	t.set_stylebox(&"fill", &"TinMeter", _pill(c.accent, Color(0, 0, 0, 0), 0, Vector2(0, 4)))
 	for id: StringName in MEASURE_PAINTS:
 		t.set_type_variation(measure_meter(id), &"ProgressBar")
 		t.set_stylebox(&"background", measure_meter(id), _pill(c.paper_deep, Color(c.line, 0.5), 1, Vector2(0, 4)))
 		t.set_stylebox(&"fill", measure_meter(id), _pill(MEASURE_PAINTS[id], Color(c.line, 0.5), 1, Vector2(0, 4)))
 	return t
+
+
+## The body face at `weight`, its letters set `spacing` px apart.
+static func spaced_body(weight: int, spacing: int) -> FontVariation:
+	var cut := font("body", weight) as FontVariation
+	cut.spacing_glyph = spacing
+	return cut
 
 
 ## The ProgressBar variation that is a bond measure's meter.

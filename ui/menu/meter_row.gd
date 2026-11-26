@@ -22,6 +22,7 @@ static func make(glyph: Texture2D, name: String, variation: StringName, filled: 
 	picture.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	line.add_child(picture)
 	var what := BookKit.label(name, &"SatchelSmall")
+	what.name = "Name"
 	what.custom_minimum_size.x = NAME_WIDTH
 	line.add_child(what)
 	var meter := ProgressBar.new()
@@ -46,4 +47,15 @@ static func of_measure(m: Dictionary) -> HBoxContainer:
 	var line := make(Icons.texture(Icons.MEASURES, m.id), String(m.name), JournalTheme.measure_meter(m.id),
 			float(m.filled), float(m.of), String(m.word), bool(m.applies))
 	line.name = String(m.id)
+	return line
+
+
+## Sets a row on the open tin (OpenTin): the same row, its words in the
+## tin's ivory and foil and its track showing the tin through. Its fill is
+## still its own.
+static func on_tin(line: HBoxContainer) -> HBoxContainer:
+	(line.get_node("Name") as Label).theme_type_variation = &"TinLabel"
+	(line.get_node("Word") as Label).theme_type_variation = &"TinWord"
+	var meter := line.get_node("Meter") as ProgressBar
+	meter.add_theme_stylebox_override(&"background", meter.get_theme_stylebox(&"background", &"TinMeter"))
 	return line
