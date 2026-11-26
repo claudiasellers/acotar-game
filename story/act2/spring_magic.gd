@@ -151,7 +151,8 @@ static func _glitter(owner: Node3D, at: Vector3, fall: float) -> GPUParticles3D:
 	p.process_material = pm
 	p.draw_pass_1 = _green_mesh()
 	var root: Node = owner.get_tree().current_scene if owner.get_tree().current_scene else owner.get_tree().root
-	root.add_child(p)
+	# Readable names (SpringMagic2, ...): several bursts can be alive at once.
+	root.add_child(p, true)
 	p.global_position = at
 	p.emitting = true
 	p.finished.connect(p.queue_free)
