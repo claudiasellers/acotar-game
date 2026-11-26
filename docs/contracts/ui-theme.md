@@ -66,7 +66,7 @@ deckled edge, tinted to a paper token. Made by
 | Variation | Base |
 |---|---|
 | SatchelCard, LoosePage, NotifyCard, LineBand, LineFlood, LineBare, ThoughtMark, PromptPill, BowCard, PickupRow, SatchelChip, SatchelKey, TinTray, TinWell, TinWellChosen, TinLid, TinKey | PanelContainer |
-| SatchelTab, MenuTab, SatchelSlot, BookTab, BookRibbon, TinPan | Button (all states, including focus) |
+| SatchelTab, MenuTab, SatchelSlot, BookTab, BookRibbon, TinPan, TinAct | Button (all states, including focus) |
 | SatchelHeading, MenuTitle, PageSection, SatchelBody, SatchelSmall, SatchelWhere, SatchelKeyLabel, SatchelCount, SatchelPin, TinName, NotifyText, ThoughtText, LineSaid, LineName, LineTold, LineWhisper, LineDread, PromptText, BowText, PickupText, VitalsFigure, NoticeKicker, NoticeTitle, NoticeBody, ChapterTitle, CoverKicker, CoverTitle, TinTitle, TinSub, TinSection, TinLabel, TinHint, TinWord, TinKeyLabel, TinTag, SatchelLack | Label |
 | SatchelMeter, TinMeter | ProgressBar |
 

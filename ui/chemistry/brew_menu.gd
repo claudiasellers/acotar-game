@@ -341,8 +341,11 @@ func _build() -> void:
 	var pot_side := tin.compartment(POT_WIDTH)
 	var pot_well := OpenTin.well()
 	pot_well.name = "Pot"
-	pot_well.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	pot_side.add_child(pot_well)
+	var clear := MarginContainer.new()
+	clear.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	clear.add_theme_constant_override(&"margin_right", OpenTin.WHORL_ROOM)
+	pot_side.add_child(clear)
+	clear.add_child(pot_well)
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", 6)
 	pot_well.add_child(col)

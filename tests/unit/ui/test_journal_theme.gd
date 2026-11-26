@@ -8,7 +8,7 @@ const VARIATIONS := {
 		&"SatchelCard", &"LoosePage", &"NotifyCard", &"SatchelChip", &"SatchelKey",
 		&"PromptPill", &"BowCard", &"TinTray", &"TinWell", &"TinWellChosen", &"TinLid", &"TinKey",
 	],
-	&"Button": [&"SatchelTab", &"MenuTab", &"SatchelSlot", &"BookTab", &"BookRibbon", &"TitleChoice", &"PageChoice", &"TinPan"],
+	&"Button": [&"SatchelTab", &"MenuTab", &"SatchelSlot", &"BookTab", &"BookRibbon", &"TitleChoice", &"PageChoice", &"TinPan", &"TinAct"],
 	&"Label": [
 		&"SatchelHeading", &"MenuTitle", &"PageSection", &"SatchelBody", &"SatchelSmall", &"SatchelWhere",
 		&"SatchelKeyLabel", &"SatchelCount", &"SlotKey", &"NewTag", &"TinName", &"PromptText", &"BowText", &"ChapterTitle",

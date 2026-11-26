@@ -81,6 +81,7 @@ station that pauses. The station asks the tin for every part:
 | `OpenTin.well(chosen)` | a paper tile set into the tin; type inside is the book's own, ink on paper |
 | `lid(width)`, `drop_lid()` | a standing sheet hinged at the tray's left end, for what she reads |
 | `slip(width)`, `drop_slip()` | a small sheet above the tray's right end |
+| `OpenTin.button(text)` | the one thing a well does (`TinAct`): ringed in `glow` while it will work, faint when `disabled` |
 | `OpenTin.hints(pairs)`, `hint_button(key, word)`, `key_button(key, word)` | key caps that read on the tin, and a button that carries one |
 
 Type on the tin is `paper` or `glow` (7 to 1 on `ink` in both acts); a

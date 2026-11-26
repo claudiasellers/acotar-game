@@ -111,7 +111,7 @@ func test_wells_lid_slip_and_key_caps() -> void:
 	plain.free()
 	ringed.free()
 	var b := OpenTin.button("Make it")
-	assert_eq(b.theme_type_variation, &"SatchelTab")
+	assert_eq(b.theme_type_variation, JournalTheme.TIN_ACT)
 	assert_eq(b.focus_mode, Control.FOCUS_ALL)
 	b.free()
 	tin.compartment(300.0)
@@ -193,3 +193,14 @@ func test_type_on_the_tin_reads() -> void:
 		assert_gte(JournalTheme.contrast(t.get_color(&"font_color", &"TinKeyLabel"), c[&"paper"]), 7.0, "act %d: the cap's letter" % act)
 		assert_eq((t.get_stylebox(&"panel", &"TinTray") as StyleBoxFlat).bg_color, c[&"ink"], "the tray is the strap's ink")
 		assert_eq((t.get_stylebox(&"panel", &"TinWell") as StyleBoxFlat).bg_color, c[&"paper"], "a well is her paper")
+
+
+func test_a_button_that_will_work_wears_the_chosen_ring() -> void:
+	var theme := ThemeDB.get_project_theme()
+	var will := theme.get_stylebox(&"normal", JournalTheme.TIN_ACT) as StyleBoxFlat
+	var wont := theme.get_stylebox(&"disabled", JournalTheme.TIN_ACT) as StyleBoxFlat
+	assert_eq(will.border_color, JournalTheme.color(&"glow"), "what she can do now is ringed")
+	assert_eq(will.border_width_top, JournalTheme.TIN_RIM)
+	assert_lt(wont.border_width_top, will.border_width_top, "what she can't do has no ring")
+	assert_lt(wont.bg_color.a, will.bg_color.a, "and is faint")
+

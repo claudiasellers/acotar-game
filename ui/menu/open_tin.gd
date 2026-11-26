@@ -23,6 +23,9 @@ const DROP := 8.0
 const HAIRLINE_IN := 6.0
 const WHORL_AT := Vector2(38, 34)
 const WHORL_R := 13.0
+## How far a well in the last compartment stays from the tray's right side, so
+## her whorl sits on the tin.
+const WHORL_ROOM := 30
 ## Between compartments: the rule's own room.
 const RULE_ROOM := 40.0
 ## How much of the page scrim a tin lays over a station that stops the world.
@@ -144,11 +147,12 @@ static func well(chosen: bool = false) -> PanelContainer:
 	return p
 
 
-## A choice she presses, in a well or on the lid.
+## A choice she presses, in a well or on the lid. It wears the chosen ring
+## while it will work; `disabled` takes the ring off and fades it.
 static func button(text: String) -> Button:
 	var b := Button.new()
 	b.text = text
-	b.theme_type_variation = &"SatchelTab"
+	b.theme_type_variation = JournalTheme.TIN_ACT
 	b.focus_mode = Control.FOCUS_ALL
 	b.pressed.connect(func() -> void: Juice.bounce_control(b, 0.06))
 	return b
@@ -390,7 +394,6 @@ class Hinges extends Control:
 		if tin == null:
 			return
 		var stamp := tin.tray.position + Vector2(tin.tray.size.x - OpenTin.WHORL_AT.x, OpenTin.WHORL_AT.y)
-		draw_circle(stamp, OpenTin.WHORL_R + 5.0, JournalTheme.color(&"ink"), true, -1.0, true)
 		WhorlInk.ink_whorl(self, stamp, OpenTin.WHORL_R, Color(JournalTheme.color(&"glow"), 0.9), 2.5)
 		if tin._lid == null:
 			return

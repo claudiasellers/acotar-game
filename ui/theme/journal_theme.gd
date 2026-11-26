@@ -135,7 +135,7 @@ const PANELS: Array[StringName] = [
 	&"SatchelCard", &"LoosePage", &"NotifyCard", &"LineBand", &"LineFlood", &"LineBare", &"ThoughtMark", &"SatchelChip", &"SatchelKey",
 	&"PromptPill", &"BowCard", &"PickupRow", &"TinTray", &"TinWell", &"TinWellChosen", &"TinLid", &"TinKey",
 ]
-const BUTTONS: Array[StringName] = [&"SatchelTab", &"MenuTab", &"SatchelSlot"]
+const BUTTONS: Array[StringName] = [&"SatchelTab", &"MenuTab", &"SatchelSlot", TIN_ACT]
 ## The badges on a thing in her book: how many, which pan, and new.
 const COUNT_BADGE := &"SatchelCount"
 const SLOT_BADGE := &"SlotKey"
@@ -165,6 +165,9 @@ const TITLE_CHOICE := &"TitleChoice"
 const PAGE_CHOICE := &"PageChoice"
 ## How far apart the cover's foil capitals are set, in px.
 const FOIL_SPACING := 5
+## The one thing a well of the open tin does (OpenTin.button): ringed in glow
+## while it will work, faint while it will not.
+const TIN_ACT := &"TinAct"
 ## A pan of the open tin (OpenTin.Pan).
 const TIN_PAN := &"TinPan"
 ## The open tin's brass rim, and how much paper shows in a meter's track on it.
@@ -320,8 +323,9 @@ static func build(of_act: Act) -> Theme:
 			t.set_stylebox(&"focus", v, _arch(Color(c.glow, 0.0), c.glow, 3))
 		else:
 			var pad := Vector2(15, 7)
-			t.set_stylebox(&"normal", v, _pill(c.paper, Color(c.line, 0.55), 1, pad))
-			t.set_stylebox(&"hover", v, _pill(c.paper_deep, c.line, 1, pad))
+			var will_work: bool = v == TIN_ACT
+			t.set_stylebox(&"normal", v, _pill(c.paper, c.glow if will_work else Color(c.line, 0.55), TIN_RIM if will_work else 1, pad))
+			t.set_stylebox(&"hover", v, _pill(c.paper_deep, c.glow if will_work else c.line, TIN_RIM if will_work else 1, pad))
 			t.set_stylebox(&"pressed", v, _pill(c.ink, c.glow, 2, pad))
 			t.set_stylebox(&"hover_pressed", v, _pill(c.ink, c.glow, 2, pad))
 			t.set_stylebox(&"disabled", v, _pill(Color(c.paper, 0.4), Color(c.line, 0.2), 1, pad))
