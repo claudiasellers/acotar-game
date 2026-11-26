@@ -1,0 +1,46 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+---  GUT  ---
+[INFO]:  using [/Users/claudiasellers/Documents/acotar-game/.git/mq/batches/1795664273/gate/scratch/gut_tests_unit_story_test_act2_first_dinner.gd/Library/Application Support/Godot/app_userdata/ACOTAR- The Spring Court] for temporary output.
+Godot version:  4.7.2
+GUT version:  9.7.1
+
+
+res://tests/unit/story/test_act2_first_dinner.gd
+* test_the_director_hangs_the_coded_dinner
+* test_she_wont_eat_until_the_hold_then_one_shove_holds_her
+* test_her_temper_brings_the_hold_if_the_player_sits_still
+* test_three_bites_then_the_torte_vanishes_and_the_deed
+* test_lines_come_from_the_stage_and_tag_inventions
+* test_the_slaves_line_answers_her_question
+* test_her_chair_slides_out_and_green_hands_hold_her
+    [Failed]:  [1] expected to be > than [1]:  green light lands on her arms
+      at line 189
+6/7 passed.
+
+
+
+
+==============================================
+= Run Summary
+==============================================
+
+res://tests/unit/story/test_act2_first_dinner.gd
+- test_her_chair_slides_out_and_green_hands_hold_her
+    [Failed]:  [1] expected to be > than [1]:  green light lands on her arms
+          at line 189
+
+Totals
+------
+Scripts               1
+Tests                 7
+Passing Tests         6
+Failing Tests         1
+Asserts           90/91
+Time              1.44s
+
+
+---- 1 failing tests ----
+
+WARNING: 13 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
