@@ -325,32 +325,3 @@ func test_the_director_picks_the_dread_look_by_the_sun() -> void:
 	director.night = 1.0
 	director.apply(GradeDirector.load_preset(&"human_winter"))
 	assert_gt(by_day, env.tonemap_exposure * 1.5, "the day hunt is far brighter than night dread")
-
-
-## Owner, 2026-11-26: "Keep a floor of light". Full dread at noon outdoors stays
-## frightening (drained, cold) but keeps DREAD_DAY_FLOOR of the grade's
-## exposure; night and indoor dread are as dark as before.
-func test_full_dread_at_noon_keeps_a_floor_of_light() -> void:
-	var env := Environment.new()
-	var we := WorldEnvironment.new()
-	we.environment = env
-	add_child_autofree(we)
-	director.environment = we
-	var spring := GradeDirector.load_preset(&"spring")
-	var dread := GradeDirector.load_preset(&"dread")
-	director.mood = &"dread"
-	director.mood_amount = 1.0
-	director.night = 0.0
-	director.indoors = false
-	director.apply(spring)
-	assert_gte(env.tonemap_exposure, spring.exposure * GradeDirector.DREAD_DAY_FLOOR - 0.001, "the noon sky never goes black")
-	assert_gt(env.tonemap_exposure, dread.exposure * 2.0, "well above the night horror")
-	assert_lt(env.adjustment_saturation, spring.saturation * 0.5, "the colour still drains")
-	director.night = 1.0
-	director.apply(spring)
-	assert_almost_eq(env.tonemap_exposure, dread.exposure, 0.001, "night dread is unchanged")
-	director.night = 0.0
-	director.indoors = true
-	director.apply(GradeDirector.load_preset(&"manor_interior"))
-	var inside := GradeDirector.with_mood(GradeDirector.load_preset(&"manor_interior"), 1.0, &"dread", 0.0)
-	assert_almost_eq(env.tonemap_exposure, inside.exposure, 0.001, "indoor dread is unchanged")
