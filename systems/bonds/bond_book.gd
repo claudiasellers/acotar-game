@@ -1,11 +1,12 @@
 ## Who Feyre knows and what has passed between them (owner, 2026-11-25): the
 ## people of plans/relationship-loops and the white mare, as she would write
-## them down. There is no number anywhere (R2): a bond is told as moments, each
+## them down. A bond is told as moments, each
 ## one a story flag or a `fact.` flag that some deed raised, with the day it
 ## happened. A moment says what passed (`then`) and may say how they are with
 ## her since (`now`), what she calls them from then on (`called`) and which
 ## portrait is theirs from then on (`face`, an Icons.BONDS id; their own id
-## until a moment says otherwise). Nobody
+## until a moment says otherwise). Every bond is also read by one set of
+## measures (`MEASURES`, `measures(bond)`), drawn as marks. Nobody
 ## is listed before the flag that brings them into her life (`met`).
 ##
 ## This only reads flags and keeps the day each moment came (WorldDeltas
@@ -113,14 +114,14 @@ const BONDS: Array[Dictionary] = [
 		],
 	},
 	{
-		"id": &"alis", "kind": PERSON, "met": "first_dinner_eaten", "called": "Alis",
+		"id": &"alis", "kind": PERSON, "met": "first_dinner_eaten", "called": "Alis", "warmth": Relationships.NEUTRAL,
 		"moments": [
 			{"flag": "first_dinner_eaten", "canon": "C6-7",
 				"then": "She scrubbed me, cut my hair, and found me a tunic and trousers when I would not wear the dress. She says the house is safe.",
 				"now": "Brisk, and not unkind."},
 			{"flag": "fact.alis_tripped", "canon": "C7",
 				"then": "My curtain snare caught her instead of an intruder."},
-			{"flag": "gallery_opened", "canon": "C19",
+			{"flag": "gallery_opened", "canon": "C19", "warmth": Relationships.WARM,
 				"then": "She took me to a room stocked with paints, all for me.",
 				"now": "She looks after what matters to me without my asking."},
 			{"flag": "glamour_lifted", "canon": "C24", "face": &"alis_true",
@@ -146,18 +147,18 @@ const BONDS: Array[Dictionary] = [
 		],
 	},
 	{
-		"id": &"nesta", "kind": PERSON, "met": "", "called": "Nesta",
+		"id": &"nesta", "kind": PERSON, "met": "", "called": "Nesta", "warmth": Relationships.COOL,
 		"moments": [
 			{"flag": "", "canon": "C1-3",
 				"then": "My eldest sister. Sharp as a blade, and she has never forgiven our father.",
 				"now": "Contempt, mostly. I hunt and she warms her hands."},
-			{"flag": "nesta_truth_heard", "canon": "C30",
+			{"flag": "nesta_truth_heard", "canon": "C30", "warmth": Relationships.NEUTRAL,
 				"then": "The glamour never took on her. She came after me and could not get through the Wall.",
 				"now": "I misjudged her. Something has eased between us."},
 		],
 	},
 	{
-		"id": &"elain", "kind": PERSON, "met": "", "called": "Elain",
+		"id": &"elain", "kind": PERSON, "met": "", "called": "Elain", "warmth": Relationships.WARM,
 		"moments": [
 			{"flag": "", "canon": "C1-3",
 				"then": "My middle sister. Gentle, and happiest with her hands in a flowerbed.",
@@ -165,7 +166,7 @@ const BONDS: Array[Dictionary] = [
 		],
 	},
 	{
-		"id": &"father", "kind": PERSON, "met": "", "called": "Father",
+		"id": &"father", "kind": PERSON, "met": "", "called": "Father", "warmth": Relationships.NEUTRAL,
 		"moments": [
 			{"flag": "", "canon": "A",
 				"then": "A creditor's men smashed his knee, and he has carved wood by the fire ever since.",
@@ -173,7 +174,7 @@ const BONDS: Array[Dictionary] = [
 		],
 	},
 	{
-		"id": &"stranger", "kind": PERSON, "met": "stranger_met", "called": "The stranger",
+		"id": &"stranger", "kind": PERSON, "met": "stranger_met", "called": "The stranger", "warmth": Relationships.BAITING,
 		"moments": [
 			{"flag": "stranger_met", "canon": "C20-21",
 				"then": "He stepped out of the dark at the fires and sent three faeries running from me. Then he mocked me.",
@@ -184,6 +185,32 @@ const BONDS: Array[Dictionary] = [
 		],
 	},
 ]
+
+## The one set of measures every bond is read by (owner, 2026-11-26), in the
+## order the page draws them, each with the legend's line. A measure that
+## does not apply to someone (`of` 0 and no word) is drawn faint. They are
+## marks and words, never a figure: regard itself stays inside Relationships.
+const CLOSENESS := &"closeness"
+const WARMTH := &"warmth"
+const DEEDS := &"deeds"
+const MEMORIES := &"memories"
+const SINCE := &"since"
+const MEASURES: Array[Dictionary] = [
+	{"id": CLOSENESS, "name": "Closeness", "says": "How far we have come. It never goes back."},
+	{"id": WARMTH, "name": "Warmth", "says": "How they are with me now. A bad day cools it, and it passes."},
+	{"id": DEEDS, "name": "Deeds", "says": "Things I did that they noticed."},
+	{"id": MEMORIES, "name": "Memories", "says": "What has passed between us, kept on their page."},
+	{"id": SINCE, "name": "Since", "says": "When it began between us."},
+]
+## Warmth's four steps, coldest first, and the word for each.
+const WARMTH_STEPS: Array[StringName] = [Relationships.COOL, Relationships.BAITING, Relationships.NEUTRAL, Relationships.WARM]
+const WARMTH_WORDS := {
+	Relationships.COOL: "Cold", Relationships.BAITING: "Sharp", Relationships.NEUTRAL: "Civil", Relationships.WARM: "Warm",
+}
+## Warmth's word while a passing mood holds it down.
+const COOL_FOR_NOW := "Cold, for now"
+const ALWAYS := "Always"
+const BEFORE := "Before I kept this book"
 
 static var _mare_page: MarePageData
 
@@ -261,6 +288,59 @@ static func these_days(bond: Dictionary) -> String:
 	for m in moments(bond):
 		if m.has("now"):
 			out = String(m.now)
+	return out
+
+
+## A bond read by every measure, in MEASURES' order: each `id`, `name`,
+## `filled` of `of` marks (`of` 0: no marks) and a `word` ("" for none).
+## Closeness and Deeds are the bond engine's (Relationships: the stage
+## reached on its ladder, the deeds counted of those it knows), so they apply
+## to whoever has a ladder there. Warmth is the engine's attitude, or for the
+## others the last `warmth` a reached moment gave (the bond's own until then);
+## the mare has none. Memories and Since apply to everyone.
+static func measures(bond: Dictionary) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	var def := Relationships.def(bond.id)
+	var on_ladder := def != null and Relationships.stage(bond.id) >= 0
+	for m in MEASURES:
+		var row := {"id": m.id, "name": m.name, "filled": 0, "of": 0, "word": ""}
+		match m.id:
+			CLOSENESS:
+				if on_ladder:
+					row.filled = Relationships.stage(bond.id) + 1
+					row.of = def.stages.size()
+			WARMTH:
+				var at := warmth(bond)
+				if at != &"":
+					row.filled = WARMTH_STEPS.find(at) + 1
+					row.of = WARMTH_STEPS.size()
+					row.word = COOL_FOR_NOW if on_ladder and Relationships.mood(bond.id) == Relationships.COOL else String(WARMTH_WORDS[at])
+			DEEDS:
+				if on_ladder:
+					row.of = def.deeds.size()
+					for d in def.deeds:
+						if Relationships.done(bond.id, d.id):
+							row.filled += 1
+			MEMORIES:
+				row.filled = moments(bond).size()
+				row.of = all_moments(bond).size()
+			SINCE:
+				var day := day_of(String(bond.met))
+				row.word = ALWAYS if bond.met == "" else ("Day %d" % day if day > 0 else BEFORE)
+		out.append(row)
+	return out
+
+
+## How they are with her now, one of WARMTH_STEPS; &"" for the mare.
+static func warmth(bond: Dictionary) -> StringName:
+	if bond.get("kind") == MARE:
+		return &""
+	if Relationships.def(bond.id) != null and Relationships.stage(bond.id) >= 0:
+		return Relationships.attitude(bond.id)
+	var out := StringName(bond.get("warmth", &""))
+	for m in all_moments(bond):
+		if m.has("warmth") and _up(m.flag):
+			out = m.warmth
 	return out
 
 
