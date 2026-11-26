@@ -393,3 +393,9 @@ Numbers the slice tests hold the game to, derived from the systems' own rates.
 | `WORN_DELTA` | tools/blender/monster_gear.py; the same in tests/unit/monster_gear/test_monster_gear_models.gd | 0.04 | 0.04–0.15 | The least a worn weapon's side-on outline must differ from its clean twin's, as a share of the clean outline, so "near breaking" reads in her hand. The build prints each weapon's figure and fails under it. | L88 |
 | `wear()` darkening | tools/blender/monster_gear_kit.py | × 0.62, 30% toward grey | 0.5–0.8 | How much darker and duller every colour on a worn weapon is. | L88 |
 | `wear()` bite | tools/blender/monster_gear_kit.py | 14% of the weapon's depth, at least 12 mm | 8–20% | How much is broken off whatever stands furthest forward on a worn weapon (a hook's point, a blade's belly, a hammer's face). Past 20% hooks lose their hook. | L88 |
+
+## The beast on the ride north (L86-29, owner 2026-11-26: "frightening and larger")
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| `BEAST_SCALE` | story/act1/ride_north.gd | 1.5 | 1.0–1.7 | Uniform size of the beast from the yard to the manor's dining room (model, blocking box, stride; the animation slows to match). 2.6 m tall at 1.0 with horns; the manor's front door is 3.4 m. Back to 1.0 when he turns into Tamlin; the cottage scene is unchanged. | L86-29 |

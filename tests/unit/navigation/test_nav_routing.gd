@@ -54,6 +54,48 @@ func test_routes_through_the_door() -> void:
 	assert_lt(walker.global_position.distance_to(goal), 0.6, "arrives")
 
 
+func test_feet_above_the_mesh_still_pass_each_corner() -> void:
+	# On steps the mover's feet ride the treads while the mesh's corner lies on
+	# the ramp below (the beast on the manor's front step, L86-29): a corner
+	# under him must count as passed, or he steers at his own feet and jitters.
+	_two_rooms()
+	NavBaker.bake_area(_root, AABB(Vector3(-10, -1, -6), Vector3(20, 5, 12)), _root)
+	var walker := Node3D.new()
+	_root.add_child(walker)
+	walker.global_position = Vector3(-5, 0, -2)
+	var mover := NavMover.on(walker)
+	for i in 120:
+		await wait_physics_frames(1)
+		if mover.has_mesh_at(walker.global_position):
+			break
+	var goal := Vector3(5, 1.2, -2)
+	walker.global_position.y = 1.2  # inside ON_MESH, but over path_desired_distance in 3D
+	for i in 600:
+		var step := mover.steer(goal)
+		var next := walker.global_position + step.normalized() * minf(0.08, walker.global_position.distance_to(goal))
+		assert_false(_through_wall(walker.global_position, next), "never through the shared wall")
+		walker.global_position = next
+		if walker.global_position.distance_to(goal) < 0.5:
+			break
+		await wait_physics_frames(1)
+	assert_lt(walker.global_position.distance_to(goal), 0.6, "round by the door and arrives")
+
+
+func test_next_corner_skips_one_underfoot() -> void:
+	var path := PackedVector3Array([Vector3(0, 0, 0), Vector3(0.2, -1.2, 0.1), Vector3(4, -1.2, 0)])
+	var to := NavMover.next_corner(path, 1, Vector3(0, 0, 0), 1.0)
+	assert_almost_eq(to.x, 4.0, 0.001, "the corner right below him counts as passed")
+	assert_eq(to.y, 0.0, "flat")
+	assert_eq(NavMover.next_corner(path, 0, Vector3(4, 0, 0), 1.0), Vector3(-4, 0, 0), "from the far end, the start is the next one out")
+
+
+func _through_wall(a: Vector3, b: Vector3) -> bool:
+	if signf(a.x) == signf(b.x) or a.x == 0.0:
+		return false
+	var z := lerpf(a.z, b.z, absf(a.x) / maxf(absf(b.x - a.x), 0.0001))
+	return z < 2.4 or z > 4.2
+
+
 func test_parse_runs_on_the_main_thread_and_bake_callback_lands() -> void:
 	_two_rooms()
 	NavBaker.last_parse_thread = -1

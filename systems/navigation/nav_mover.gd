@@ -56,9 +56,24 @@ func steer(goal: Vector3) -> Vector3:
 		target_position = goal
 	if is_navigation_finished():
 		return straight
-	var next := get_next_path_position() - from
-	next.y = 0.0
+	get_next_path_position()  # keeps the agent's own path and index current
+	var next := next_corner(get_current_navigation_path(), get_current_navigation_path_index(), from, path_desired_distance)
 	return next if next.length_squared() > 0.0004 else straight
+
+
+## Flat direction from `from` to the first corner of `path` (from `index` on)
+## that is more than `reach` away on the ground; ZERO when none is. The agent
+## counts a corner reached by 3D distance, so on steps, where the mover's feet
+## ride the treads and the mesh's corner sits on the ramp below, a corner right
+## under him was never reached: he steered at his own feet and jittered there
+## (the beast on the manor's front step, L86-29).
+static func next_corner(path: PackedVector3Array, index: int, from: Vector3, reach: float) -> Vector3:
+	for i in range(maxi(index, 0), path.size()):
+		var to := path[i] - from
+		to.y = 0.0
+		if to.length() > reach:
+			return to
+	return Vector3.ZERO
 
 
 ## True when a baked navmesh lies under `point`.
