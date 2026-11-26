@@ -38,6 +38,9 @@ const TAB_ICON := 40.0
 const TREAT_ICON := 52.0
 const SWATCH := 26.0
 const NEED_ICON := 24.0
+## How to brush, by the device she last used.
+const BRUSH_MOUSE := "I hold the mouse on her and stroke to brush her coat."
+const BRUSH_PAD := "I hold A and move the stick over her to brush her coat."
 ## How faint a treat she likes but Feyre has none of.
 const WISHED_ALPHA := 0.45
 ## The brush under the pointer, and the chime as it strokes: how often, how
@@ -273,11 +276,11 @@ func _refresh_shine() -> void:
 
 func _build_care() -> void:
 	_body.add_child(BookKit.section("Brushing"))
-	_body.add_child(BookKit.label("Hold the mouse on her and stroke to brush her coat.", &"SatchelBody", true))
+	_body.add_child(BookKit.label(BRUSH_PAD if SatchelHud.pad_active else BRUSH_MOUSE, &"SatchelBody", true))
 	_body.add_child(BookKit.section("Treats"))
 	var have := MareCare.treats_in(inventory)
 	if MareCare.full():
-		_body.add_child(BookKit.label("She has had her fill today. She noses your hand anyway.", &"SatchelBody", true))
+		_body.add_child(BookKit.label("She has had her fill today. She noses my hand anyway.", &"SatchelBody", true))
 	elif have.is_empty():
 		_body.add_child(BookKit.label("Nothing sweet in the satchel. These are what she likes:", &"SatchelBody", true))
 	var grid := HFlowContainer.new()
@@ -472,7 +475,7 @@ func _card_saddle() -> Control:
 	card.add_child(col)
 	var on := MareTack.saddled()
 	col.add_child(BookKit.label("Saddle", &"SatchelBody", true))
-	col.add_child(BookKit.label("She'll carry you without it now." if on else "Just her back and your knees.", &"SatchelSmall", true))
+	col.add_child(BookKit.label("She'll carry me without it now." if on else "Just her back and my knees.", &"SatchelSmall", true))
 	var b := Button.new()
 	b.theme_type_variation = &"SatchelSlot"
 	b.focus_mode = Control.FOCUS_ALL
