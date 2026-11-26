@@ -64,9 +64,20 @@ func test_a_click_while_tending_looses_no_arrow() -> void:
 	assert_eq(_click(bow.bow.draw_time + 0.3), 1, "closed, the same click shoots")
 
 
-func test_tending_has_its_own_key_not_e() -> void:
-	assert_true(InputMap.has_action(MountDirector.TEND_ACTION), "tend_mount is in the input map")
-	var tend := InputSettings.signature(InputMap.action_get_events(MountDirector.TEND_ACTION)[0])
+func test_tending_is_the_second_key_not_e() -> void:
+	assert_true(InputMap.has_action(&"interact_alt"), "interact_alt is in the input map")
+	var tend := InputSettings.signature(InputMap.action_get_events(&"interact_alt")[0])
 	for e in InputMap.action_get_events(&"interact"):
 		assert_ne(InputSettings.signature(e), tend, "tending isn't on E")
-	assert_eq(KeyHints.row(&"tend").size(), 1, "a key hint names it")
+	var mare := MareMount.new()
+	mare.use_verb = "ride"
+	mare.alt_verb = "tend"
+	assert_true(mare.open_now(), "she offers a ride")
+	var asked: Array = []
+	mare.tend_asked.connect(func(rider: Node) -> void: asked.append(rider))
+	mare.use_alt(feyre)
+	assert_eq(asked, [feyre], "her second action asks the director to open tending")
+	mare.alt_verb = ""
+	mare.use_verb = ""
+	assert_false(mare.open_now(), "out of reach she offers nothing")
+	mare.free()

@@ -18,6 +18,10 @@ const OUTFITS := &"wardrobe"
 const BREWS := &"brews"
 const STATUS := &"status"
 const BONDS := &"bonds"
+## The bond measures' glyphs (BondBook.MEASURES ids).
+const MEASURES := &"measures"
+## The tending screen's glyphs: its tabs (care, her, each MareTack slot) and a swatch's two layers.
+const TEND := &"tend"
 ## Every cooked dish shares one picture.
 const DISH := &"dish"
 

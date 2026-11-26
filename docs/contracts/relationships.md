@@ -35,6 +35,8 @@ before and after.
 
 - **No number on screen.** Regard is internal to `Relationships`. Nothing
   outside this lane reads it: other lanes read only the facts below.
+  Stage and done-deed counts are drawn as marks on the Bonds page (owner,
+  2026-11-26; [bonds.md](bonds.md)); regard is never shown.
 - **Facts only.** The core raises `fact.` flags and nothing else. It never sets
   a phase flag, a canon flag or a story flag. NPCs never set flags at all.
 - **No choices, markers or objective text.** People change by where they stand,
