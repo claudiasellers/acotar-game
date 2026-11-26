@@ -85,6 +85,7 @@ func _transform(_s: SceneSpace) -> void:
 			# The creature lane's beast: send it off unseen (its dread field fades).
 			(beast as BeastActor).withdraw()
 			(beast as BeastActor).visible = false
+			(beast as BeastActor).body_scale = 1.0  # the ride's size was for the ride
 		dismiss(&"tamlin_beast")
 	var tamlin := cast(&"tamlin", &"tamlin_seat", &"table")
 	sit(&"tamlin", &"chair_head_dining")

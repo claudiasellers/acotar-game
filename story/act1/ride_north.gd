@@ -58,6 +58,10 @@ const MARE_GONE_BY := 30.0
 ## The dread the cottage left (1.0, two stops down at night) eases to this
 ## outside, so the yard reads by moonlight; straying raises it again.
 const YARD_DREAD := 0.15
+## From the yard to the manor he is this much bigger than at the cottage door,
+## so he looms over her even in the saddle (owner 2026-11-26; docs/tuning.md).
+## ManorArrival puts him back to 1 when he turns into Tamlin.
+const BEAST_SCALE := 1.5
 ## On foot, this far from the mare is still the yard and her way to the mare.
 const FOOT_FREE := 30.0
 ## Metres along the road he keeps ahead of her.
@@ -460,6 +464,7 @@ func _begin(_space: SceneSpace) -> void:
 		var actor := beast as BeastActor
 		actor.door = null
 		actor.outdoors = true
+		actor.body_scale = BEAST_SCALE
 		_beast_walk = actor.walk_speed
 		actor.walk_speed = 2.2
 	if door:
