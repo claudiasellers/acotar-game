@@ -85,3 +85,10 @@ SceneSpace sends it when it ends). Only GradeDirector listens: it keeps the
 strongest request (ambient dread fields stay outdoors) and announces the result
 as `EventBus.mood_changed(mood, intensity, seconds)`, which sound, the HUD,
 vitals and the house lights follow.
+
+Migration (L89, 2026-11-26): both `mood_requested` and `grade_swap_requested`
+take the sender as a new first argument (pass `self`); listen to
+`mood_changed`, not `mood_requested`; `GradeDirector.release_story_holds()`,
+`SceneSpace.note_mood()`, `BounceLight` and `ShotLook` are gone (release a
+grade with `grade_swap_requested.emit(self, &"", s)`, light a World-less scene
+with `GradeDirector.light(root, grade)`).
