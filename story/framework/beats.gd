@@ -38,13 +38,12 @@ static func cue(actor: StringName, cue_name: StringName) -> SceneBeat:
 			"cue %s %s" % [actor, cue_name])
 
 
-## Sets the scene mood (lighting, sound) and camera shake. Horror is staged
-## with dread, never toned down.
+## Sets the scene mood (sound, her fear) and camera shake. Fear never darkens
+## the screen; horror is staged with sound, creatures and the scene's lights.
 static func mood(mood_name: StringName, intensity: float, seconds: float = 1.5, shake: float = 0.0) -> SceneBeat:
 	return DoBeat.new(func(space: SceneSpace) -> void:
-		space.note_mood()
 		StoryControl.shake = shake
-		EventBus.mood_requested.emit(mood_name, intensity, seconds), "mood %s" % mood_name)
+		EventBus.mood_requested.emit(space, mood_name, intensity, seconds), "mood %s" % mood_name)
 
 
 ## Runs a function once. It receives the SceneSpace.

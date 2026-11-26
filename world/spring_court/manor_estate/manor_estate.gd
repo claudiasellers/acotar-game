@@ -56,8 +56,9 @@ func _ready() -> void:
 		scatter = ManorScatter.add_field(self)
 	_add_creatures()
 	if standalone:
-		_add_preview_environment()
+		var director := GradeDirector.light(self)
 		_spawn_feyre()
+		director.focus = feyre
 
 
 ## The estate's RegionGrade: the manor look anywhere inside its bounds (the
@@ -165,46 +166,3 @@ func _spawn_feyre() -> void:
 	var interactor := ManorPreviewInteractor.new()
 	interactor.player = feyre
 	add_child(interactor)
-
-
-## Preview lighting only (R3 princess grade: warm and pink; the game's one
-## light-source glow). The World
-## scene's GradeDirector replaces this when the region is streamed in.
-func _add_preview_environment() -> void:
-	var env := Environment.new()
-	env.background_mode = Environment.BG_SKY
-	var sky := Sky.new()
-	var sky_mat := ProceduralSkyMaterial.new()
-	sky_mat.sky_top_color = Color(0.55, 0.66, 0.98)
-	sky_mat.sky_horizon_color = Color(1.0, 0.80, 0.86)
-	sky_mat.ground_horizon_color = Color(0.98, 0.82, 0.84)
-	sky_mat.ground_bottom_color = Color(0.45, 0.62, 0.42)
-	sky.sky_material = sky_mat
-	env.sky = sky
-	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	env.ambient_light_energy = 1.2
-	env.tonemap_mode = Environment.TONE_MAPPER_AGX
-	GradeDirector.light_source_glow(env)
-	env.ssao_enabled = true
-	env.sdfgi_enabled = true
-	env.fog_enabled = true
-	env.fog_light_color = Color(1.0, 0.86, 0.90)
-	env.fog_density = 0.0012
-	env.volumetric_fog_enabled = true
-	env.volumetric_fog_density = 0.008
-	env.volumetric_fog_albedo = Color(1.0, 0.90, 0.94)
-	env.adjustment_enabled = true
-	env.adjustment_saturation = 1.18
-	var world_env := WorldEnvironment.new()
-	world_env.name = "PreviewEnvironment"
-	world_env.environment = env
-	add_child(world_env)
-	var sun := DirectionalLight3D.new()
-	sun.name = "PreviewSun"
-	sun.light_color = Color(1.0, 0.90, 0.82)
-	sun.light_energy = 1.15
-	sun.shadow_enabled = true
-	sun.shadow_opacity = 0.7
-	sun.directional_shadow_max_distance = 220.0
-	sun.rotation = Vector3(deg_to_rad(-38.0), deg_to_rad(-30.0), 0.0)
-	add_child(sun)

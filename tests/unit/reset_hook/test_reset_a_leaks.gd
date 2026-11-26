@@ -13,6 +13,6 @@ func before_all() -> void:
 
 
 func test_leaks_dread_and_a_hold() -> void:
-	EventBus.mood_requested.emit(&"dread", 1.0, 0.0)
+	EventBus.mood_changed.emit(&"dread", 1.0, 0.0)
 	StoryControl.set_mode(StoryControl.Mode.LOOK)
 	assert_true(_hud.dread(), "the leak is real")

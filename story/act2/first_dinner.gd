@@ -141,7 +141,7 @@ func _sit(_s: SceneSpace) -> void:
 	_seen_nudges = nudges()
 	StoryControl.hold(self, StoryControl.Mode.LOOK, PackedStringArray(["interact"]))
 	StoryControl.set_focus(actor(&"tamlin"))
-	EventBus.mood_requested.emit(&"calm", 0.0, 1.0)
+	EventBus.mood_requested.emit(self, &"calm", 0.0, 1.0)
 	_use_seat_camera(true)
 
 

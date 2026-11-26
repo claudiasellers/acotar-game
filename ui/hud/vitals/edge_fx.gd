@@ -12,7 +12,7 @@ const GROUP := &"vitals_edge_fx"
 const WARN_OPACITY := 0.85
 const WARN_RATE := 11.0
 const WARN_START := 0.4
-const EASED: Array[StringName] = [&"dread", &"low_health", &"venom", &"cold", &"fae", &"ease", &"heal", &"hidden"]
+const EASED: Array[StringName] = [&"low_health", &"venom", &"cold", &"fae", &"ease", &"heal", &"hidden"]
 
 ## uniform -> wanted value.
 var target: Dictionary = {}

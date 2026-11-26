@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://world/shared/world/world.gd" id="1"]
 [ext_resource type="Script" path="res://world/shared/grades/grade_director.gd" id="2"]
@@ -8,7 +8,6 @@
 [ext_resource type="Script" path="res://world/shared/weather/winter_weather.gd" id="6"]
 [ext_resource type="Shader" uid="uid://cx4e1fim4qxqt" path="res://world/shared/grades/painted_sky.gdshader" id="7"]
 [ext_resource type="Script" path="res://systems/props/touch_world.gd" id="touch_world"]
-[ext_resource type="Script" path="res://world/shared/world/bounce_light.gd" id="bounce_light"]
 
 [sub_resource type="ShaderMaterial" id="sky_mat"]
 shader = ExtResource("7")
@@ -90,7 +89,3 @@ wind = NodePath("../WindDriver")
 
 [node name="TouchWorld" type="Node" parent="."]
 script = ExtResource("touch_world")
-
-[node name="BounceLight" type="Node" parent="." node_paths=PackedStringArray("environment")]
-script = ExtResource("bounce_light")
-environment = NodePath("../WorldEnvironment")

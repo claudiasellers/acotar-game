@@ -12,7 +12,7 @@ var hud: HudLayout
 func before_each() -> void:
 	hud = HudLayout.of(get_tree())
 	StoryControl.set_mode(StoryControl.Mode.FULL)
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	ChapterHeading.clear(get_tree())
 	log = PickupLog.of(get_tree())
 	log.clear()
@@ -21,7 +21,7 @@ func before_each() -> void:
 
 func after_each() -> void:
 	StoryControl.set_mode(StoryControl.Mode.FULL)
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	ChapterHeading.clear(get_tree())
 	log.clear()
 
@@ -128,7 +128,7 @@ func test_the_oldest_row_makes_room() -> void:
 
 
 func test_dread_holds_everything_and_calm_lets_it_show_in_order() -> void:
-	EventBus.mood_requested.emit(&"dread", 0.6, 2.0)
+	EventBus.mood_changed.emit(&"dread", 0.6, 2.0)
 	assert_true(UiMode.quiet(get_tree()))
 	log.find(&"fact.suriel_home", &"truths")
 	log.add(&"ing_bilberry", 1)
@@ -136,7 +136,7 @@ func test_dread_holds_everything_and_calm_lets_it_show_in_order() -> void:
 	await wait_seconds(0.6)
 	assert_eq(_rows().size(), 0, "nothing lands while the Suriel is frightening")
 	assert_eq(log.waiting(), 3, "held, not dropped")
-	EventBus.mood_requested.emit(&"calm", 0.0, 2.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 2.0)
 	assert_false(UiMode.quiet(get_tree()))
 	await wait_process_frames(3)
 	assert_eq(log.waiting(), 0)

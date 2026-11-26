@@ -160,7 +160,7 @@ func test_g_stays_in_the_court_with_no_need_and_dread() -> void:
 	for flag in LADDER:
 		WorldState.set_flag(flag)
 	StoryControl.set_mode(StoryControl.Mode.FULL)
-	EventBus.mood_requested.emit(&"dread", 1.0, 0.0)
+	EventBus.mood_changed.emit(&"dread", 1.0, 0.0)
 	var journal := GuideJournal.new(BOOK)
 	add_child_autofree(journal)
 	await get_tree().process_frame
@@ -177,5 +177,5 @@ func test_g_stays_in_the_court_with_no_need_and_dread() -> void:
 	journal._update_tab(10.0)
 	assert_false(journal._tab.visible, "a held moment still takes it away")
 	StoryControl.set_mode(StoryControl.Mode.FULL)
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	WorldState.clear()

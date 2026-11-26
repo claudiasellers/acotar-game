@@ -33,6 +33,7 @@ func before_each() -> void:
 	Clock.time_of_day = 12.0 / 24.0
 	StoryControl.release()
 	WorldState.clear()
+	Gameplay.reset()
 
 
 func after_each() -> void:
@@ -163,6 +164,21 @@ func test_a_sneak_blow_while_it_sleeps_cuts_a_charm_and_does_not_wound_it() -> v
 	assert_false(h.take_strike(&"knife", null), "a plain blow is only a blow")
 
 
+## Each charm is a keepsake she keeps: the first on the cord is the horseshoe.
+func test_a_cut_charm_is_a_keepsake_in_her_bag() -> void:
+	var h := _hob()
+	_think(h, DT)
+	assert_true(h.take_strike(&"sneak", null))
+	assert_eq(Gameplay.inventory.count(HobRoamer.CHARM_ITEMS[0]), 1)
+	assert_eq(CollectionBook.tab_of(HobRoamer.CHARM_ITEMS[0]), &"keepsakes", "a page of the keepsakes")
+	for id: StringName in HobRoamer.CHARM_ITEMS:
+		var item := ItemCatalog.get_item(id) as CollectibleData
+		assert_not_null(item, "%s is a keepsake" % id)
+		if item:
+			assert_true(item.regions.is_empty(), "%s is never foraged" % id)
+			assert_false(item.is_rare(), "%s doesn't count among rare finds" % id)
+
+
 func test_a_cut_charm_is_gone_from_its_necklace() -> void:
 	WorldState.set_flag(HobRoamer.CHARM_FLAG % 3, true)
 	var h := _hob()
@@ -226,6 +242,33 @@ func test_eight_charms_cut_settle_the_hollow() -> void:
 	assert_eq(HobRoamer.next_charm(), 0)
 	assert_true(site.is_settled, "robbed asleep of every charm: the hollow settles")
 	assert_true(h.alive)
+
+
+## G29: the first time she's within 25 m of it asleep, she thinks of what it
+## wears, once; from farther off, nothing.
+func test_first_sight_of_it_asleep_is_her_thought_once() -> void:
+	var d := DialogueDirector.new()
+	d.auto_tick = false
+	add_child_autofree(d)
+	var line := d.by_id.get(HobRoamer.SIGHT_LINE) as DialogueLine
+	assert_not_null(line, "in the sheet")
+	if line:
+		assert_true(line.once)
+		assert_true(line.inner, "her thought")
+	var h := _hob()
+	var her := FakeHer.new()
+	her.add_to_group(&"player")
+	add_child_autofree(her)
+	her.global_position = Vector3(0, 0, 40)
+	_think(h, DT)
+	assert_false(d.spoken_log.has(HobRoamer.SIGHT_LINE), "too far to make out the necklace")
+	her.global_position = Vector3(0, 0, 20)
+	_think(h, DT)
+	assert_eq(d.spoken_log.count(HobRoamer.SIGHT_LINE), 1)
+	assert_true(WorldState.has_flag("dlg.%s" % HobRoamer.SIGHT_LINE))
+	d._now += 60.0
+	_think(h, DT)
+	assert_eq(d.spoken_log.count(HobRoamer.SIGHT_LINE), 1, "once")
 
 
 # --- the fight ----------------------------------------------------------------------

@@ -176,16 +176,16 @@ func _play() -> void:
 	_note("slide off %.2f s, peak hip speed %.1f m/s" % [dm.t if dm else -1.0, dm.max_hip_speed if dm else -1.0])
 	_pass()
 
-	_begin("tend", "T (her own key): brush her to a gleam, feed her, make and put on a garland, bows and a lilac saddle cloth")
+	_begin("tend", "T (the second interact key, \"E ride  T tend\"): brush her to a gleam, feed her, make and put on a garland, bows and a lilac saddle cloth")
 	for id: String in ["ing_lilac", "ing_lavender", "ing_crocus", "ing_heather"]:
 		Gameplay.inventory.add(StringName(id), 3)
 	Gameplay.inventory.add(&"ing_spider_silk", 6)
 	Gameplay.inventory.add(&"ing_manor_fruit", 2)
-	# Her own key, as a player presses it (not E, which rides).
+	# The second key, as a player presses it (not E, which rides).
 	_record("tend")
 	await _wait(0.6)
 	var tkey := InputEventAction.new()
-	tkey.action = MountDirector.TEND_ACTION
+	tkey.action = &"interact_alt"
 	tkey.pressed = true
 	Input.parse_input_event(tkey)
 	await _wait(0.3)

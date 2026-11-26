@@ -95,7 +95,7 @@ func _init() -> void:
 
 
 func _ready() -> void:
-	EventBus.mood_requested.connect(_on_mood)
+	EventBus.mood_changed.connect(_on_mood)
 	_show_for(UiMode.current(get_tree()))
 
 

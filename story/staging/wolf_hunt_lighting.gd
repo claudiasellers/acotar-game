@@ -1,7 +1,6 @@
 ## The ch1 wolf hunt's rim light (lane L18). A child of the WolfKill space,
-## like WolfKillStaging; it only listens. The hunt's light is the overcast
-## day itself (human_winter's daylight dread look, GradePreset.dread_day_look);
-## this adds one thing: a cold rim on the doe and on the great wolf, a short
+## like WolfKillStaging; it only listens. The hunt's light is the winter day
+## itself (human_winter); this adds one thing: a cold rim on the doe and on the great wolf, a short
 ## spot behind each on the far side from the camera, so back, ears and the
 ## wolf's ruff edge against the grey woods. No light on the clearing itself
 ## (L18-14: a pool of light there blew the centre snow to white).

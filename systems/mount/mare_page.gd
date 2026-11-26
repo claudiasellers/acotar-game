@@ -113,7 +113,7 @@ static func think() -> String:
 
 ## A hint's {tend} names the tending key as it's bound now.
 static func _keyed(hint: String) -> String:
-	return hint.format({"tend": KeyPrompt.key(MountDirector.TEND_ACTION)})
+	return hint.format({"tend": UsePrompt.key_for(&"interact_alt")})
 
 
 ## Memories of every milestone done, in bond order.

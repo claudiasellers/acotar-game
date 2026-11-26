@@ -10,7 +10,7 @@ var feyre: Feyre
 
 
 func before_each() -> void:
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)  # no dread left by an earlier test: it holds the log
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)  # no dread left by an earlier test: it holds the log
 	WorldState.clear()
 	Gameplay.reset()
 	PhaseManager.start(TEST_SET)
@@ -61,7 +61,7 @@ func test_full_quiver_still_shows_the_prompt_and_says_so() -> void:
 		pass
 	feyre.global_position = arrow.global_position + Vector3(0.8, 0, 0)
 	await wait_seconds(Interactor.PROMPT_REFRESH + 0.3)
-	assert_eq(UsePrompt.of(get_tree()).offered(), [Interactor.FULL_QUIVER_VERB, &"interact"], "the prompt says why")
+	assert_eq(UsePrompt.of(get_tree()).offered(), [[Interactor.FULL_QUIVER_VERB, &"interact"]], "the prompt says why")
 	assert_true(feyre.interactor.interact(), "E answers")
 	assert_true(arrow.is_in_group(Arrow.STUCK_GROUP), "the arrow stays")
 	assert_has(Array(PickupLog.of(get_tree()).lines()), Interactor.NO_ROOM_LINES[Inventory.QUIVER])

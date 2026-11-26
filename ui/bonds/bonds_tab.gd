@@ -2,8 +2,9 @@
 ## life and the white mare in one place. The left sheet lists who she knows;
 ## the right sheet is the one she has turned to: what she calls them, how
 ## they are with her these days, and what has passed between them, oldest
-## first, each with its day. Everything is in her hand and nothing is a
-## number or a meter (R2): the words are BondBook's, which reads story flags.
+## first, each with its day. Beside the portrait every bond is read by the
+## same measures (BondBook.MEASURES), drawn as dots of her one paint, and the left
+## sheet keeps their legend. The words and measures are BondBook's.
 ## A mark on the tab says something has passed since she last looked.
 class_name BondsTab
 extends MenuTab
@@ -12,6 +13,11 @@ extends MenuTab
 const FACE := 48.0
 const PAGE_FACE := 160.0
 const ROW_HEIGHT := 62.0
+## A measure's mark, the width its name takes, and how faint an unfilled mark
+## (and a measure that does not apply) is drawn.
+const MARK := 18.0
+const MEASURE_NAME_WIDTH := 96.0
+const EMPTY_ALPHA := 0.28
 
 ## The bond the right sheet shows.
 var showing: StringName = &""
@@ -20,6 +26,8 @@ var _list: VBoxContainer
 var _name: Label
 var _face: TextureRect
 var _days: Label
+var _measures: VBoxContainer
+var _dot: Texture2D = JournalTheme.soft_dot()
 var _past: VBoxContainer
 var _rows: Dictionary = {}  # bond id -> Button
 
@@ -82,6 +90,18 @@ func _build() -> void:
 	_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_list.add_theme_constant_override(&"separation", 6)
 	scroll.add_child(_list)
+	left.add_child(BookKit.section("How I read a bond"))
+	for i in BondBook.MEASURES.size():
+		var m := BondBook.MEASURES[i]
+		var line := HBoxContainer.new()
+		line.add_theme_constant_override(&"separation", 8)
+		var what := BookKit.label(String(m.name), &"SatchelSmall")
+		what.custom_minimum_size.x = MEASURE_NAME_WIDTH
+		line.add_child(what)
+		var says := BookKit.label(String(m.says), &"SatchelWhere", true)
+		says.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		line.add_child(says)
+		left.add_child(line)
 
 	var right := column(right_sheet(), 8)
 	var head := HBoxContainer.new()
@@ -89,9 +109,16 @@ func _build() -> void:
 	right.add_child(head)
 	_face = BookKit.picture(null, Vector2(PAGE_FACE, PAGE_FACE))
 	head.add_child(_face)
+	var beside := VBoxContainer.new()
+	beside.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	beside.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	beside.add_theme_constant_override(&"separation", 6)
+	head.add_child(beside)
 	_name = BookKit.label("", &"SatchelHeading")
-	_name.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	head.add_child(_name)
+	beside.add_child(_name)
+	_measures = VBoxContainer.new()
+	_measures.add_theme_constant_override(&"separation", 3)
+	beside.add_child(_measures)
 	right.add_child(BookKit.section("These days"))
 	_days = BookKit.label("", &"SatchelBody", true)
 	right.add_child(_days)
@@ -162,8 +189,8 @@ func _row(bond: Dictionary, group: ButtonGroup) -> Button:
 
 
 func _write_page(bond: Dictionary) -> void:
-	for c in _past.get_children():
-		_past.remove_child(c)
+	for c in _past.get_children() + _measures.get_children():
+		c.get_parent().remove_child(c)
 		c.queue_free()
 	_face.texture = Icons.texture(Icons.BONDS, BondBook.face(bond)) if not bond.is_empty() else null
 	if bond.is_empty():
@@ -172,6 +199,9 @@ func _write_page(bond: Dictionary) -> void:
 		return
 	_name.text = BondBook.called(bond)
 	_days.text = BondBook.these_days(bond)
+	var read := BondBook.measures(bond)
+	for m in read:
+		_measures.add_child(_measure(m))
 	for m in BondBook.moments(bond):
 		var line := HBoxContainer.new()
 		line.add_theme_constant_override(&"separation", 12)
@@ -182,3 +212,29 @@ func _write_page(bond: Dictionary) -> void:
 		then.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		line.add_child(then)
 		_past.add_child(line)
+
+
+## One measure of the open bond: its name, a dot for each step (the filled
+## ones in her accent paint, the rest faint) and its word. One that does not apply to
+## them is the faint name alone.
+func _measure(m: Dictionary) -> HBoxContainer:
+	var line := HBoxContainer.new()
+	line.name = String(m.id)
+	line.add_theme_constant_override(&"separation", 3)
+	var what := BookKit.label(String(m.name), &"SatchelSmall")
+	what.custom_minimum_size.x = MEASURE_NAME_WIDTH
+	line.add_child(what)
+	if int(m.of) == 0 and String(m.word) == "":
+		line.modulate.a = EMPTY_ALPHA * 2.0
+		return line
+	for i in int(m.of):
+		var mark := BookKit.picture(_dot, Vector2(MARK, MARK))
+		mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		mark.modulate = JournalTheme.color(&"accent" if i < int(m.filled) else &"ink_soft")
+		if i >= int(m.filled):
+			mark.modulate.a = EMPTY_ALPHA
+		line.add_child(mark)
+	if String(m.word) != "":
+		var word := BookKit.label(String(m.word), &"SatchelWhere")
+		line.add_child(word)
+	return line

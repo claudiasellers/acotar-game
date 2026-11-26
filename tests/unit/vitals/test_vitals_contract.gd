@@ -193,8 +193,12 @@ func test_gauges_escalate_and_always_show() -> void:
 	assert_true(tags.has(&"cold") and tags.has(&"hunger"), "calm gauges are still listed")
 	var hud := VitalsHud.new()
 	add_child_autofree(hud)
-	assert_true(hud._status_wanted({"tag": &"hunger", "seconds_left": -1.0, "total": -1.0, "stage": 0}),
-		"Auto shows a calm gauge")
+	await wait_process_frames(2)
+	hud._vitals = v
+	hud._player = player
+	hud._update_statuses(0.1, VitalsHud.Mode.CONTEXTUAL, true)
+	var shown: Array = hud.status_row.shown.map(func(s: Dictionary) -> StringName: return s.tag)
+	assert_eq(shown.slice(0, 2), [&"cold", &"hunger"], "Auto shows the calm gauges, first")
 
 
 func test_every_status_tag_has_a_name_and_a_line() -> void:
@@ -205,7 +209,7 @@ func test_every_status_tag_has_a_name_and_a_line() -> void:
 
 func test_a_chip_is_taught_once_then_named_on_hover() -> void:
 	var path := "user://test_status_taught.cfg"
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	var row := VitalsStatusRow.new()
 	row.settings_path = path
@@ -226,7 +230,7 @@ func test_a_chip_is_taught_once_then_named_on_hover() -> void:
 
 func test_a_gauge_is_taught_when_it_bites_and_meters_on_offer() -> void:
 	var path := "user://test_gauge_taught.cfg"
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	var row := VitalsStatusRow.new()
 	row.settings_path = path
@@ -250,7 +254,7 @@ func test_a_gauge_is_taught_when_it_bites_and_meters_on_offer() -> void:
 func test_slips_wait_out_a_staged_moment_and_dread_ends_ease() -> void:
 	var path := "user://test_status_hushed.cfg"
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	var row := VitalsStatusRow.new()
 	row.settings_path = path
 	add_child_autofree(row)
@@ -268,10 +272,10 @@ func test_slips_wait_out_a_staged_moment_and_dread_ends_ease() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	v.ease_pulse = 0.8
 	assert_true(v.statuses().any(func(s: Dictionary) -> bool: return s.tag == &"at_ease"))
-	EventBus.mood_requested.emit(&"dread", 0.6, 0.0)
+	EventBus.mood_changed.emit(&"dread", 0.6, 0.0)
 	assert_eq(v.ease_pulse, 0.0, "fear ends the moment of ease")
 	assert_false(v.statuses().any(func(s: Dictionary) -> bool: return s.tag == &"at_ease"))
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 
 
 func test_she_has_a_thought_on_waking() -> void:
@@ -357,7 +361,7 @@ func test_ease_raises_max_stamina_and_dread_follows_mood() -> void:
 	v.ease = 0.4
 	v.step(0.1)
 	assert_almost_eq(player.max_stamina, 120.0, 0.01)
-	EventBus.mood_requested.emit(&"dread", 0.8, 1.0)
+	EventBus.mood_changed.emit(&"dread", 0.8, 1.0)
 	v.step(1.0)
 	assert_gt(v.dread, 0.1)
 
@@ -375,11 +379,23 @@ func test_save_round_trip() -> void:
 	other.free()
 
 
-func test_hud_contextual_shows_dangers_and_new_buffs_only() -> void:
+func test_hud_shows_a_status_exactly_while_she_has_it() -> void:
 	var hud := VitalsHud.new()
 	add_child_autofree(hud)
 	await wait_process_frames(2)
-	assert_true(hud._status_wanted({"tag": &"venom", "seconds_left": -1.0, "total": -1.0}))
-	hud._first_seen[&"steady"] = hud._clock - 10.0
-	assert_false(hud._status_wanted({"tag": &"steady", "seconds_left": 100.0, "total": 200.0}), "old buff hides")
-	assert_true(hud._status_wanted({"tag": &"steady", "seconds_left": 10.0, "total": 200.0}), "near its end")
+	hud._vitals = v
+	hud._player = player
+	player.body_state.add_effect(&"steady", 1.0, 200.0)
+	var tags := func() -> Array: return hud.status_row.shown.map(func(s: Dictionary) -> StringName: return s.tag)
+	hud._update_statuses(0.1, VitalsHud.Mode.CONTEXTUAL, true)
+	assert_has(tags.call(), &"steady", "a new buff shows")
+	for i in 30:
+		hud._update_statuses(1.0, VitalsHud.Mode.CONTEXTUAL, true)
+	assert_has(tags.call(), &"steady", "and stays while she has it, in Auto too: no buff hides on its own")
+	player.body_state.effects.erase(&"steady")
+	hud._update_statuses(VitalsHud.STATUS_LINGER * 0.5, VitalsHud.Mode.CONTEXTUAL, true)
+	assert_has(tags.call(), &"steady", "a status that leaves lingers a moment, so nothing flickers")
+	hud._update_statuses(VitalsHud.STATUS_LINGER, VitalsHud.Mode.CONTEXTUAL, true)
+	assert_does_not_have(tags.call(), &"steady", "then it goes")
+	hud._update_statuses(0.1, VitalsHud.Mode.OFF, true)
+	assert_eq(hud.status_row.shown.size(), 0, "Off shows none")

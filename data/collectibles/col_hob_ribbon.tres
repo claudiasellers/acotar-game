@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_hob_ribbon"
+display_name = "Ribbon"
+description = "Faded blue, knotted round the cord three times."
+weight_class = 0
+color = Color(0.435, 0.525, 0.659, 1)
+regions = Array[StringName]([])
+abundance = &"rare"
+icon = &"trinket"
+rarity = &"common"
+bound = &""
+hint = "Round the Hollow Hob's neck, while it sleeps"

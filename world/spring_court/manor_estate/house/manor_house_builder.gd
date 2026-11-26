@@ -164,9 +164,6 @@ static func _fill(house: Node3D, all: ManorHouseIndex, cache: bool, pace: BuildP
 		await pace.tick()
 	await _merge_meshes(house, all, cache, pace)
 	ManorMeshMerger.forget()
-	var mood := ManorMoodLights.new()
-	mood.name = "MoodLights"
-	house.add_child(mood)
 	house.add_child(ManorInteriorGrade.new())
 
 

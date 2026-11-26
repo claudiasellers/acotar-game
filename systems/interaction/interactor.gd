@@ -1,6 +1,10 @@
-## Feyre's one "interact" (E / gamepad X): the nearest thing in reach, in the
-## order of ORDER below (a stuck arrow, a carcass, a forage spot, a forage
-## field instance, a station: hearth, wardrobe, mirror, bed...).
+## Feyre's two interact keys: everything in reach, ranked in the order of
+## ORDER below (a stuck arrow, a carcass, a forage spot, a forage field
+## instance, the stations nearest first: hearth, wardrobe, mirror, bed, the
+## mare...). The first is on `interact` (E, a tap of X on a pad), the second
+## on `interact_alt` (T, a hold of X), and the use prompt names both, so two
+## things at one spot never both say E (owner, 2026-11-26). Anything past the
+## second waits its turn.
 ##
 ## Pickup shapes other lanes implement (no class dependency):
 ## - group "forage": harvest() -> StringName, and `item_id` so her bags can be
@@ -9,8 +13,10 @@
 ##   (ForageScatter.nearest_unpicked / take)
 ## - group "harvestable": harvest() -> Array[Dictionary] of {item_id, qty}, and
 ##   `items` (the same list) so her bags can be checked first
-## - group "station": station_id, use(user)
-## Whatever E would do is offered on the one use prompt ("E   pick rose hips").
+## - group "station": station_id, use(user); optional `use_verb` (what the
+##   prompt says), `use_reach` (metres, default REACH), open_now(), and a
+##   second action of its own: `alt_verb` with use_alt(user) (the mare's tend)
+## Both keys are offered on the one use prompt ("E   pick rose hips   T   ride").
 class_name Interactor
 extends Node
 
@@ -52,11 +58,17 @@ const NO_ROOM_LINES := {
 }
 ## The use prompt is refreshed this often (seconds).
 const PROMPT_REFRESH := 0.15
+## On a pad, with a second thing in reach, holding X this long does the second
+## (s); a shorter press does the first, on release. With nothing second, X
+## acts on press.
+const HOLD_SECOND := 0.4
 
 var feyre: Feyre
 var forage_focus: ForageFocus
 var _no_room_ms: int = -NO_ROOM_GAP_MS
 var _prompt_since: float = 0.0
+## Seconds the pad's X has been held while a second thing waits; -1 when not.
+var _pad_held: float = -1.0
 
 
 func _ready() -> void:
@@ -99,18 +111,57 @@ func update_forage_windows() -> int:
 
 
 func _process(delta: float) -> void:
+	_tick_pad(delta)
 	_prompt_since += delta
 	if _prompt_since < PROMPT_REFRESH or feyre == null or not feyre.is_inside_tree():
 		return
 	_prompt_since = 0.0
-	var t := target()
-	UsePrompt.of(get_tree()).offer(self, String(t.get("verb", "")))
+	var slots := actions()
+	var prompt := UsePrompt.of(get_tree())
+	for i in UsePrompt.SLOTS.size():
+		prompt.offer(self, String(slots[i].get("verb", "")) if i < slots.size() else "", UsePrompt.SLOTS[i])
 
 
+## E (or a pad's X, through press): the first thing in reach.
 func interact() -> bool:
-	var t := target()
-	if t.is_empty():
-		return false
+	var slots := actions()
+	return _do(slots[0]) if not slots.is_empty() else false
+
+
+## T (or a held X): the second thing in reach.
+func interact_alt() -> bool:
+	var slots := actions()
+	return _do(slots[1]) if slots.size() > 1 else false
+
+
+## The pad's X went down: with a second thing in reach a tap does the first
+## and a hold the second, so wait; otherwise act now.
+func press(pad: bool) -> bool:
+	if pad and actions().size() > 1:
+		_pad_held = 0.0
+		return true
+	_pad_held = -1.0
+	return interact()
+
+
+## The pad's X came up before HOLD_SECOND: the first thing.
+func release() -> void:
+	if _pad_held < 0.0:
+		return
+	_pad_held = -1.0
+	interact()
+
+
+func _tick_pad(delta: float) -> void:
+	if _pad_held < 0.0:
+		return
+	_pad_held += delta
+	if _pad_held >= HOLD_SECOND:
+		_pad_held = -1.0
+		interact_alt()
+
+
+func _do(t: Dictionary) -> bool:
 	if not t.fits:
 		_no_room(t.item)
 		return true
@@ -125,6 +176,10 @@ func interact() -> bool:
 			return _take(ForageScatter.take(t.node, t.index), 1, null)
 		&"station":
 			return _use_station(t.node, t.id)
+		&"station_alt":
+			t.node.call(&"use_alt", feyre)
+			station_used.emit(t.id)
+			return true
 	return false
 
 
@@ -179,18 +234,43 @@ func _struck_body(node: Node) -> Node:
 
 
 ## What E would do now: {"kind", "node", "verb", "fits", "item", ...}, or {}.
-## The first target that fits wins; if none fits, the first that doesn't.
 func target() -> Dictionary:
+	var slots := actions()
+	return slots[0] if not slots.is_empty() else {}
+
+
+## Everything the interact keys could do now, ranked: the slots, in ORDER,
+## each kind's nearest, then every live station in its reach, nearest first,
+## a station's own second action straight after it. Only what fits is a slot;
+## if nothing fits, the first that doesn't (it says why). A thing with no verb
+## to show takes a slot only when it is alone, so no key works unnamed beside
+## a named one.
+func actions() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	var silent: Array[Dictionary] = []
 	var refused := {}
 	for kind in ORDER:
-		var t := _target_of(kind)
-		if t.is_empty():
-			continue
-		if t.fits:
-			return t
-		if refused.is_empty():
-			refused = t
-	return refused
+		var found: Array[Dictionary] = []
+		if kind == &"station":
+			found = _stations()
+		else:
+			found.append(_target_of(kind))
+		for t: Dictionary in found:
+			if t.is_empty():
+				continue
+			if not t.fits:
+				if refused.is_empty():
+					refused = t
+			elif String(t.verb) != "":
+				out.append(t)
+			else:
+				silent.append(t)
+	if out.is_empty():
+		if not silent.is_empty():
+			out.append(silent[0])
+		elif not refused.is_empty():
+			out.append(refused)
+	return out
 
 
 func _target_of(kind: StringName) -> Dictionary:
@@ -229,22 +309,33 @@ func _target_of(kind: StringName) -> Dictionary:
 				return {}
 			return {"kind": kind, "node": find.field, "index": index, "item": find.id,
 				"verb": "pick %s" % _item_name(find.id, "it"), "fits": inv.room_for(find.id) > 0}
-		&"station":
-			# L62: the cottage hearth (a plain node in group "hearth") brews too.
-			# The nearest station in reach that does something now: a spent one
-			# (a deed already done) never hides a live one beside it.
-			var live: Array = []
-			for n in get_tree().get_nodes_in_group(&"station") + get_tree().get_nodes_in_group(ChemistryStations.HEARTH_GROUP):
-				if n is Node3D and (n as Node3D).is_inside_tree() \
-						and feyre.global_position.distance_to((n as Node3D).global_position) < REACH \
-						and _station_does_something(n, StringName(n.get(&"station_id")) if &"station_id" in n else &""):
-					live.append(n)
-			var node := _nearest(live)
-			if node == null:
-				return {}
-			var id := StringName(node.get(&"station_id")) if &"station_id" in node else &""
-			return {"kind": kind, "node": node, "id": id, "item": &"", "verb": _station_verb(node, id), "fits": true}
 	return {}
+
+
+## Every live station in its reach, nearest first, each followed by its own
+## second action when it offers one. L62: the cottage hearth (a plain node in
+## group "hearth") brews too. A spent station (a deed already done) is not
+## listed, so it never hides a live one beside it.
+func _stations() -> Array[Dictionary]:
+	var live: Array = []
+	for n in get_tree().get_nodes_in_group(&"station") + get_tree().get_nodes_in_group(ChemistryStations.HEARTH_GROUP):
+		if not n is Node3D or not (n as Node3D).is_inside_tree() or live.has(n):
+			continue
+		var reach := float(n.get(&"use_reach")) if &"use_reach" in n else REACH
+		var d := feyre.global_position.distance_to((n as Node3D).global_position)
+		var id := StringName(n.get(&"station_id")) if &"station_id" in n else &""
+		if d < reach and _station_does_something(n, id):
+			live.append(n)
+	live.sort_custom(func(a: Node3D, b: Node3D) -> bool:
+		return feyre.global_position.distance_squared_to(a.global_position) < feyre.global_position.distance_squared_to(b.global_position))
+	var out: Array[Dictionary] = []
+	for node: Node3D in live:
+		var id := StringName(node.get(&"station_id")) if &"station_id" in node else &""
+		out.append({"kind": &"station", "node": node, "id": id, "item": &"", "verb": _station_verb(node, id), "fits": true})
+		var alt := String(node.get(&"alt_verb")) if &"alt_verb" in node else ""
+		if alt != "" and node.has_method(&"use_alt"):
+			out.append({"kind": &"station_alt", "node": node, "id": id, "item": &"", "verb": alt, "fits": true})
+	return out
 
 
 ## `nth` is how many she has already pulled in this one press (0 for the first).
@@ -312,9 +403,8 @@ func _station_does_something(station: Node, id: StringName) -> bool:
 	return script != ManorStation and script != SimpleStation and station.has_method(&"use")
 
 
-## The use prompt's verb. A station with its own `use_verb` offers that;
-## brewing stations show BrewPrompt, and other stations with their own use()
-## offer nothing here.
+## The use prompt's verb. A station with its own `use_verb` offers that; a
+## brewing station names itself ("brew at the kitchen range").
 func _station_verb(station: Node, id: StringName) -> String:
 	if &"use_verb" in station and String(station.get(&"use_verb")) != "":
 		return String(station.get(&"use_verb"))
@@ -322,7 +412,10 @@ func _station_verb(station: Node, id: StringName) -> String:
 		return "dress"
 	if id == &"easel":
 		return "paint"
-	return StationUses.verb(id)
+	var verb := StationUses.verb(id)
+	if verb == "" and BrewPrompt.brews(station):
+		verb = "brew at the %s" % BrewPrompt.label_for(station).to_lower()
+	return verb
 
 
 func _take(id: StringName, count: int, source: Node) -> bool:

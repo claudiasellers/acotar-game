@@ -2,7 +2,10 @@
 ## stamina as meters with their numbers and the HUD's words for them, then every status on her now, each
 ## with the chip the HUD shows for it (VitalsStatusRow.draw_chip), its name and
 ## what it does (StatusRules.title and blurb: one wording, here and in play).
-## Cold and hunger are always listed; the rest come and go.
+## Cold and hunger are always listed; the rest come and go. It is also the
+## legend (owner, 2026-11-26): how to read a chip at the top, and under
+## "Every sign" every status there is, each with its chip, name and words,
+## whether she has it now or not.
 ## Read-only: it shows VitalsState, it never changes it.
 class_name StatusPage
 extends ScrollContainer
@@ -13,6 +16,11 @@ const CHIP := 60.0
 const SCROLL_ROOM := 18
 ## What a gauge's stage is called beside its name (StatusRules.stage).
 const STAGE_WORDS: Array[String] = ["Fine", "Rising", "Danger"]
+## How to read a chip, first on the page so it is seen on opening.
+const HOW_TO_READ: Array[String] = [
+	"A red rim is something hurting me; a plain rim is something helping, or just how I am. The ring round it is how long it has left, how strong it is, or for cold and hunger how far it's gone.",
+	"Cold and hunger are always there. The rest show only while I have them, each with its name under it.",
+]
 
 var health: ProgressBar
 var health_count: Label
@@ -20,6 +28,8 @@ var heals_to: Label
 var stamina: ProgressBar
 var stamina_count: Label
 var rows: VBoxContainer
+## Every status there is, in the HUD's order (StatusRules.ORDER).
+var legend: VBoxContainer
 
 
 func _init() -> void:
@@ -33,6 +43,11 @@ func _init() -> void:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", 6)
 	inset.add_child(col)
+	for i in HOW_TO_READ.size():
+		var line := BookKit.label(HOW_TO_READ[i], &"SatchelSmall", true)
+		line.name = "HowToRead%d" % i
+		col.add_child(line)
+	col.add_child(BookKit.gap(10))
 	var h := _meter(col, &"health", &"HealthMeter")
 	health = h[0]
 	health_count = h[1]
@@ -49,6 +64,14 @@ func _init() -> void:
 	rows.name = "Rows"
 	rows.add_theme_constant_override(&"separation", 12)
 	col.add_child(rows)
+	col.add_child(BookKit.gap(14))
+	col.add_child(BookKit.section("Every sign"))
+	legend = VBoxContainer.new()
+	legend.name = "Legend"
+	legend.add_theme_constant_override(&"separation", 12)
+	col.add_child(legend)
+	for tag: StringName in StatusRules.ORDER:
+		legend.add_child(_row(sample(tag), false))
 
 
 ## The page for `feyre` as she is this moment.
@@ -110,7 +133,15 @@ func _meter(col: VBoxContainer, meter: StringName, variation: StringName) -> Arr
 	return [bar, count]
 
 
-func _row(s: Dictionary) -> Control:
+## How `tag` looks at its plainest, for the legend: a calm gauge, a debuff
+## with its red rim, a full ring.
+static func sample(tag: StringName) -> Dictionary:
+	return {"tag": tag, "magnitude": 1.0 if StatusRules.kind(tag) != StatusRules.Kind.GAUGE else 0.3,
+		"seconds_left": -1.0, "total": -1.0, "stage": 0}
+
+
+## A status's row: its chip, name and words, and (`with_state`) how it stands now.
+func _row(s: Dictionary, with_state: bool = true) -> Control:
 	var row := HBoxContainer.new()
 	row.name = String(s.tag)
 	row.add_theme_constant_override(&"separation", 14)
@@ -126,7 +157,7 @@ func _row(s: Dictionary) -> Control:
 	title.name = "Title"
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(title)
-	var state := BookKit.label(state_of(s), &"SatchelSmall")
+	var state := BookKit.label(state_of(s) if with_state else "", &"SatchelSmall")
 	state.name = "State"
 	head.add_child(state)
 	words.add_child(head)

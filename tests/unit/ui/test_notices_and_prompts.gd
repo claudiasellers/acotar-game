@@ -14,7 +14,7 @@ var prompt: KeyPrompt
 func before_each() -> void:
 	SatchelHud.pad_active = false
 	StoryControl.set_mode(StoryControl.Mode.FULL)
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	ChapterHeading.clear(get_tree())
 	keeper = Node.new()
 	add_child_autofree(keeper)
