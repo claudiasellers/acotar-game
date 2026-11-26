@@ -1,0 +1,5 @@
+from clarity-lane L86-37
+quality look
+size 1920x1080
+timeout 900
+shot mare res://tools/_probe/mare_probe.tscn {out}
