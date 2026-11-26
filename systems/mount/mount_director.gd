@@ -54,6 +54,9 @@ const RIDE_PITCH := -0.314
 const RIDE_BLEND := 0.6
 const ACTION := &"call_mount"
 const UNLOCK_AFTER := "first_dinner_eaten"
+## From the arrival she stands in the stables (the mare that carried Feyre
+## north, owner 2026-11-26); she can be ridden only from the first dinner.
+const IN_STABLES_AFTER := "fact.manor_arrived"
 const RIDDEN_FLAG := "fact.mare_ridden"
 ## She waits at home only while Feyre is this near the stables.
 const HOME_RADIUS := 220.0
@@ -167,6 +170,11 @@ func _ready() -> void:
 ## True once the first dinner is eaten: the mare is in the stables.
 func available() -> bool:
 	return WorldState.has_flag(UNLOCK_AFTER)
+
+
+## True from the arrival: she is in the stables (not yet to be ridden).
+func present() -> bool:
+	return available() or WorldState.has_flag(IN_STABLES_AFTER)
 
 
 ## True once Feyre has ridden her: the whistle works.
@@ -935,7 +943,7 @@ func sweep_triggers() -> int:
 
 
 func _keep_mare(p: Node3D) -> void:
-	if not available() or not WorldMap.is_in_prythian(p.global_position):
+	if not present() or not WorldMap.is_in_prythian(p.global_position):
 		if mare and is_instance_valid(mare):
 			free_mare()
 		return
@@ -978,6 +986,7 @@ func _update_prompt(p: Node3D) -> void:
 	if mare == null or not is_instance_valid(mare):
 		return
 	var d := Vector2(mare.global_position.x - p.global_position.x, mare.global_position.z - p.global_position.z).length()
-	var on := d <= PROMPT_RADIUS and mare.state == MareMount.State.STANDING and not riding and not tending
+	var on := d <= PROMPT_RADIUS and mare.state == MareMount.State.STANDING and not riding and not tending \
+			and available()
 	mare.use_verb = "ride" if on else ""
 	mare.alt_verb = "tend" if on and unlocked() else ""

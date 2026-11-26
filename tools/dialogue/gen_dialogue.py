@@ -396,6 +396,8 @@ ride("rn_paint", "paint", "To paint it would be useless.", canon="A", delivery="
 ride("rn_fool", "stairs", "Only a fool would run with no food, no strength.", canon="V",
      delivery="inner voice: the mare won't move; reasoning herself down")
 ride("rn_food", "stairs", "Food first. Then run.", canon="A", delivery="inner voice: decided, low")
+# Still in the saddle at his doors (owner 2026-11-26): he waits, looking back.
+ride("rn_get_down", "get_down", "He's waiting at the doors. Get down.", delivery="inner voice: steeling herself")
 # Straying (Keeper's tiers): the mare first, then his growl, his roar, the block.
 ride("rn_stray_mare", "stray_mare", "She won't go. She's his.", delivery="inner voice: the reins useless, rising fear")
 ride("rn_stray_growl", "stray_growl", "Live, not die.", canon="V", delivery="inner voice: a whisper, frozen")
