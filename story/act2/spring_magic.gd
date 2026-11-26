@@ -117,8 +117,10 @@ static func _green_mesh() -> QuadMesh:
 		var base := Juice.sparkle_mesh()
 		_mesh = QuadMesh.new()
 		_mesh.size = Vector2(0.13, 0.13)
-		var m := (base.material as BaseMaterial3D).duplicate() as BaseMaterial3D
-		m.albedo_color = Color(0.35, 1.5, 0.45)
+		# A CandyMaterial (a ShaderMaterial with BaseMaterial3D's names), so
+		# copied and tinted by property name.
+		var m := base.material.duplicate() as Material
+		m.set(&"albedo_color", Color(0.35, 1.5, 0.45))
 		_mesh.material = m
 	return _mesh
 
