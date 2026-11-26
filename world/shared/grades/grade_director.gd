@@ -24,8 +24,7 @@ var weather_fog := 0.0
 ## be read back outside the editor).
 static var snow_cover_now := 1.0
 static var magic_now := 0.0
-static var _dread_preset: GradePreset
-## Presets other grades name (dread_day_look, night_look) by id, loaded once.
+## Night looks other grades name (GradePreset.night_look) by id, loaded once.
 static var _named_looks: Dictionary = {}
 var _from: GradePreset
 var _to: GradePreset
@@ -37,25 +36,26 @@ var _seconds := 0.0
 ## 2. Otherwise the newest story grade still held (EventBus.grade_swap_requested
 ##    by a source; it lasts until that source sends &"" or leaves the tree).
 ## 3. Otherwise the highest-priority RegionGrade she is in.
-## The fear overlay is the strongest mood request still held, one per source
-## (until it sends calm or leaves the tree); ambient fear (creature dread
-## fields, the woods) doesn't reach indoors. Everyone else follows the result
-## on EventBus.mood_changed.
+## The mood is the strongest request still held, one per source (until it
+## sends calm or leaves the tree), announced on EventBus.mood_changed for
+## sound, the HUD and her vitals. Fear never darkens the screen (owner,
+## 2026-11-26); only enchanted_sleep has a look.
 ## Story grades by source id: [source WeakRef, grade], oldest first.
 var _holds: Array = []
 var _shown: StringName = &""
 var _region: RegionGrade
 ## True while the winning area is an indoor one.
 var indoors := false
-## Mood requests by source id: [mood, intensity, outdoor_only].
+## Mood requests by source id: [mood, intensity].
 var _moods: Dictionary = {}
-## Story mood overlay (EventBus.mood_requested): "dread" drops the light about
-## two stops, drains colour and pools low fog (experience bar §1.5); "enchanted_sleep" fades to a soft, foggy dark (the carriage
-## farewell, the solstice night); "calm" from a source ends that source's request.
-var mood: StringName = &"dread"
-var mood_amount := 0.0
-var _mood_target := 0.0
-var _mood_rate := 1.0
+## The mood in force and its strength, as last announced.
+var mood: StringName = &"calm"
+var mood_strength := 0.0
+## Enchanted sleep (the carriage farewell, the solstice night): a soft, foggy
+## fade, eased toward the strongest sleep request.
+var sleep_amount := 0.0
+var _sleep_target := 0.0
+var _sleep_rate := 1.0
 ## 0 at midday, 1 with the sun on the horizon: blends in the golden-hour sky.
 var golden := 0.0
 ## 0 while the sun is up, 1 once it is below the horizon. Volumetric fog is lit
@@ -186,8 +186,8 @@ func _process(delta: float) -> void:
 		var k := _t * _t * (3.0 - 2.0 * _t)
 		current = GradePreset.mix(_from, _to, k)
 		dirty = true
-	if not is_equal_approx(mood_amount, _mood_target):
-		mood_amount = move_toward(mood_amount, _mood_target, _mood_rate * delta)
+	if not is_equal_approx(sleep_amount, _sleep_target):
+		sleep_amount = move_toward(sleep_amount, _sleep_target, _sleep_rate * delta)
 		dirty = true
 	if not is_equal_approx(sight, _sight_target):
 		sight = move_toward(sight, _sight_target, delta / SIGHT_SECONDS)
@@ -236,7 +236,7 @@ func target_id() -> StringName:
 
 
 func apply(base: GradePreset) -> void:
-	var p := with_mood(with_true_sight(with_night(base, night), sight), mood_amount, mood, night)
+	var p := with_sleep(with_true_sight(with_night(base, night), sight), sleep_amount)
 	snow_cover_now = p.snow_cover
 	magic_now = p.magic
 	RenderingServer.global_shader_parameter_set(&"snow_cover", p.snow_cover)
@@ -285,39 +285,6 @@ func apply(base: GradePreset) -> void:
 		sun.light_volumetric_fog_energy = p.volumetric_light_energy
 
 
-## How far a dread request moves the grade: eased out, so a scene asking for
-## moderate dread (0.5-0.6) already lands most of the way (about 0.8) and
-## bites like full dread does; 0 and 1 are unchanged.
-static func dread_weight(dread: float) -> float:
-	var d := clampf(dread, 0.0, 1.0)
-	return 1.0 - (1.0 - d) * (1.0 - d)
-
-
-## `p` with a story mood applied at `dread` (0..1) strength. `night_weight`
-## (GradeDirector.night) picks the dread look: the grade's daylight one by day,
-## the dread preset at night.
-static func with_mood(p: GradePreset, dread: float, kind: StringName = &"dread",
-		night_weight: float = 0.0) -> GradePreset:
-	if dread <= 0.0:
-		return p
-	if kind == &"enchanted_sleep":
-		return _sleepy(p, dread)
-	# A grade that already is the horror look takes less (or none) of it.
-	dread *= p.dread_headroom
-	if dread <= 0.0:
-		return p
-	# §1.5: the pink world leaves. Blend toward the dread look (horror
-	# palette, ~2 stops down, saturation 0.4, dense low fog, no magic, no
-	# lilac shadows); snow stays where it lies.
-	var cold := GradePreset.mix(p, dread_look(p, night_weight), dread_weight(dread))
-	cold.id = p.id
-	cold.lut = p.lut
-	cold.dread_day_look = p.dread_day_look
-	cold.tonemap_mode = p.tonemap_mode
-	cold.snow_cover = p.snow_cover
-	return cold
-
-
 ## `p` as the sun goes down: blended toward its night look (GradePreset.
 ## night_look) by `night_weight`; unchanged for grades without one.
 static func with_night(p: GradePreset, night_weight: float) -> GradePreset:
@@ -329,28 +296,14 @@ static func with_night(p: GradePreset, night_weight: float) -> GradePreset:
 	dark.id = p.id
 	dark.lut = p.lut
 	dark.tonemap_mode = p.tonemap_mode
-	dark.dread_day_look = p.dread_day_look
 	dark.night_look = p.night_look
 	return dark
-
-
-## The preset dread blends `p` toward: the grade's daylight look while the sun
-## is up, easing into the dread preset as night falls.
-static func dread_look(p: GradePreset, night_weight: float) -> GradePreset:
-	if _dread_preset == null:
-		_dread_preset = load_preset(&"dread")
-	if p.dread_day_look == &"" or night_weight >= 1.0:
-		return _dread_preset
-	if not _named_looks.has(p.dread_day_look):
-		_named_looks[p.dread_day_look] = load_preset(p.dread_day_look)
-	var day: GradePreset = _named_looks[p.dread_day_look]
-	return day if night_weight <= 0.0 else GradePreset.mix(day, _dread_preset, night_weight)
 
 
 ## `p` as she sees it once the glamour on her senses is gone (canon ch23:
 ## "richer, clearer", a near-invisible rainbow on the brook, leaf edges
 ## shimmering): more colour and clarity, a little more warm light,
-## and the world's magic shimmer turned up. Dread still drains it (applied after).
+## and the world's magic shimmer turned up.
 static func with_true_sight(p: GradePreset, amount: float) -> GradePreset:
 	if amount <= 0.0:
 		return p
@@ -371,7 +324,10 @@ func _on_flag_changed(flag: String, _value: Variant) -> void:
 		_sight_target = 1.0 if WorldState.has_flag(GlamourLayer.FLAG) else 0.0
 
 
-static func _sleepy(p: GradePreset, amount: float) -> GradePreset:
+## `p` as she drifts into enchanted sleep, `amount` 0..1.
+static func with_sleep(p: GradePreset, amount: float) -> GradePreset:
+	if amount <= 0.0:
+		return p
 	var s := GradePreset.mix(p, p, 0.0)
 	s.lut = p.lut
 	# A dreamy fade, not a dropout: about 1.3 stops down at full sleep, colour
@@ -382,13 +338,6 @@ static func _sleepy(p: GradePreset, amount: float) -> GradePreset:
 	return s
 
 
-## Ambient fear from the world (every creature's dread field, sent as the
-## DreadField class, and the woods' AmbientLife) stays outdoors: it never
-## darkens the rooms. A staged scene's dread reaches wherever she is.
-static func outdoor_only(source: Object) -> bool:
-	return source == DreadField or source is AmbientLife
-
-
 func _on_mood_requested(source: Object, requested: StringName, intensity: float, seconds: float) -> void:
 	if source == null and requested == &"calm":
 		_moods.clear()   # a load or a reset: every request ends
@@ -397,7 +346,7 @@ func _on_mood_requested(source: Object, requested: StringName, intensity: float,
 		if requested == &"calm" or intensity <= 0.0:
 			_moods.erase(key)
 		else:
-			_moods[key] = [requested, clampf(intensity, 0.0, 1.0), outdoor_only(source)]
+			_moods[key] = [requested, clampf(intensity, 0.0, 1.0)]
 			# A scene that ends without calm takes its fear with it.
 			var drop := _drop_mood.bind(key)
 			if source is Node and not (source as Node).tree_exiting.is_connected(drop):
@@ -410,25 +359,25 @@ func _drop_mood(key: int) -> void:
 		_resolve_mood(2.0)
 
 
-## The strongest request that applies where she is becomes the overlay.
+## The strongest request is the mood; the strongest sleep request is the fade.
 func _resolve_mood(seconds: float) -> void:
-	var best_mood := mood
+	var best_mood := &"calm"
 	var best := 0.0
+	var sleep := 0.0
 	for key: int in _moods:
 		var r: Array = _moods[key]
-		if indoors and r[2]:
-			continue
 		if float(r[1]) > best:
 			best = r[1]
 			best_mood = r[0]
-	if best_mood == mood and is_equal_approx(best, _mood_target):
+		if r[0] == &"enchanted_sleep":
+			sleep = maxf(sleep, r[1])
+	_sleep_target = sleep
+	_sleep_rate = absf(_sleep_target - sleep_amount) / maxf(seconds, 0.001)
+	if best_mood == mood and is_equal_approx(best, mood_strength):
 		return
-	if best_mood != mood and mood_amount > 0.0:
-		mood_amount = 0.0
 	mood = best_mood
-	_mood_target = best
-	_mood_rate = absf(_mood_target - mood_amount) / maxf(seconds, 0.001)
-	EventBus.mood_changed.emit(mood if best > 0.0 else &"calm", _mood_target, seconds)
+	mood_strength = best
+	EventBus.mood_changed.emit(mood, mood_strength, seconds)
 
 
 ## A story grade from `source`, held until the source sends &"" or leaves the
@@ -476,7 +425,6 @@ func _retarget(seconds: float) -> void:
 			var here := node as RegionGrade
 			if (rg == null or here.priority > rg.priority) and here.contains(focus.global_position):
 				rg = here
-	var was_indoors := indoors
 	indoors = rg != null and rg.indoor
 	var want: StringName = _shown
 	var blend := seconds
@@ -489,8 +437,6 @@ func _retarget(seconds: float) -> void:
 	elif not _holds.is_empty():
 		want = _holds.back()[1]
 		_region = null
-	if indoors != was_indoors:
-		_resolve_mood(1.0)
 	if want != _shown and want != &"":
 		_shown = want
 		swap_to(want, maxf(blend, 0.0))

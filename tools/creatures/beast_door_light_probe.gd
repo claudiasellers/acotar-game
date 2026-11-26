@@ -1,5 +1,5 @@
 ## Measures how readable the beast at the door is under the scene's real
-## lighting (lane L55): night, the dread grade at full, the staged cameras.
+## lighting (lane L55): night, the staged cameras.
 ##   godot res://tools/creatures/beast_door_light_probe.tscn -- <out_dir> [off] [no_feyre] [gains=1,2,4]
 ## off: without BeastDoorLighting (the "before"). no_feyre: a bare camera
 ## stands in for her (cloud lavapipe crashes on it, F46). Prints per frame: frame mean
@@ -101,7 +101,7 @@ func _run() -> void:
 	for g in _gains:
 		_sheets.append(Image.create(TILE.x * 2, TILE.y * 2, false, Image.FORMAT_RGB8))
 	await _settle(2.0)
-	# As BeastDoor plays it: dread builds, then full dread as the door breaks.
+	# As BeastDoor plays it: full dread (her fear and the sound) as the door breaks.
 	EventBus.mood_requested.emit(self, &"dread", 1.0, 0.2)
 	await _settle(0.4)
 	StoryControl.set_mode(StoryControl.Mode.WALK)

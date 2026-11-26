@@ -66,17 +66,6 @@ extends Resource
 @export_range(0.0, 1.0) var snow_cover := 0.0
 ## Sparkle and glints on stylized materials (Spring Court magic).
 @export_range(0.0, 1.0) var magic := 0.0
-@export_group("Mood")
-## How much of a dread mood this grade still takes (0..1). A grade that is
-## already the horror look (the Bogge) sets 0: stacking dread on top of it
-## doubles the darkening and the frame goes black.
-@export_range(0.0, 1.0) var dread_headroom := 1.0
-## What dread looks like under this grade by daylight: a preset id the mood
-## blends toward while the sun is up (empty = the "dread" preset, day and
-## night). The dread preset is a night look, a purple-black sky two stops down;
-## on a winter day it turned the snow woods black (the wolf hunt, L18-11).
-## Dread still takes the dread preset at night, so night scenes are unchanged.
-@export var dread_day_look: StringName = &""
 @export_group("Night")
 ## A preset this grade blends toward as the sun goes down (empty = none: the
 ## sun alone darkens it). For grades whose light isn't the sky's, like the
@@ -89,7 +78,7 @@ const _FLOATS := [&"sun_energy", &"ambient_energy", &"fog_density", &"volumetric
 	&"saturation", &"contrast", &"brightness", &"snow_cover", &"magic",
 	&"volumetric_anisotropy", &"volumetric_light_energy", &"fog_sky_affect", &"fog_height",
 	&"fog_height_density", &"fog_aerial_perspective", &"golden_sun_energy",
-	&"dread_headroom", &"volumetric_ambient_inject", &"cloud_cover", &"ambient_sky_contribution"]
+	&"volumetric_ambient_inject", &"cloud_cover", &"ambient_sky_contribution"]
 const _COLORS := [&"sky_top", &"sky_horizon", &"ground_horizon", &"ground_bottom", &"sun_color",
 	&"ambient_color", &"fog_color", &"volumetric_albedo", &"golden_sky_top", &"golden_sky_horizon",
 	&"golden_sun_color", &"cloud_color", &"cloud_shade"]
@@ -105,7 +94,6 @@ static func mix(a: GradePreset, b: GradePreset, t: float) -> GradePreset:
 	for c in _COLORS:
 		out.set(c, (a.get(c) as Color).lerp(b.get(c), t))
 	out.lut = b.lut if t >= 0.5 else a.lut
-	out.dread_day_look = b.dread_day_look if t >= 0.5 else a.dread_day_look
 	out.night_look = b.night_look if t >= 0.5 else a.night_look
 	out.tonemap_mode = b.tonemap_mode if t >= 0.5 else a.tonemap_mode
 	return out

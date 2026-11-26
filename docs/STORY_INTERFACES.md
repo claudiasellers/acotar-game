@@ -79,16 +79,18 @@ Act I spaces live in `story/act1/`; the greybox (`story/act1/greybox/`) is the
 main scene until real regions land.
 
 `EventBus.mood_requested(source, mood, intensity, seconds)`: `dread` for the
-wolf and the beast (silence, guttering fire, cold low light, camera shake
-through `StoryControl.shake`), `calm` to end that source's request (every
-SceneSpace sends it when it ends). Only GradeDirector listens: it keeps the
-strongest request (ambient dread fields stay outdoors) and announces the result
-as `EventBus.mood_changed(mood, intensity, seconds)`, which sound, the HUD,
-vitals and the house lights follow.
+wolf and the beast (silenced ambience, her fear, camera shake through
+`StoryControl.shake`), `enchanted_sleep` for the soft fade into sleep, `calm`
+to end that source's request (every SceneSpace sends it when it ends). Only
+GradeDirector listens: it keeps the strongest request and announces it as
+`EventBus.mood_changed(mood, intensity, seconds)`, which sound, the HUD and
+her vitals follow. Fear never darkens the screen (owner, 2026-11-26): horror is
+staged with sound, creatures and the scene's own lights.
 
 Migration (L89, 2026-11-26): both `mood_requested` and `grade_swap_requested`
 take the sender as a new first argument (pass `self`); listen to
 `mood_changed`, not `mood_requested`; `GradeDirector.release_story_holds()`,
-`SceneSpace.note_mood()`, `BounceLight` and `ShotLook` are gone (release a
+`SceneSpace.note_mood()`, `BounceLight`, `ShotLook`, `ManorMoodLights`, the
+`dread` grade presets and the dread look are gone (release a
 grade with `grade_swap_requested.emit(self, &"", s)`, light a World-less scene
 with `GradeDirector.light(root, grade)`).

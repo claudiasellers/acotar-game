@@ -58,7 +58,7 @@ world lane thread ("Build the human realm and the wall").
 
 ### 3.1 Grades in detail (experience bar §2.1)
 - `GradePreset` also carries `fog_sky_affect` (keep ≈0.1–0.3: at 1.0 distance fog paints the sky flat), height fog (`fog_height` is absolute world metres and the terrain sits at roughly 0–40 m, so keep it low), `fog_aerial_perspective`, `volumetric_anisotropy`, `volumetric_light_energy` (sun god-rays), `glow_hdr_threshold`, and golden-hour sky and sun colours that `GradeDirector` blends in as the sun nears the horizon.
-- `mood_requested(source, &"dread", w)` blends toward `grades/dread.tres` by `w` (horror palette, about 2 stops down, saturation 0.4, dense low fog, no magic, no lilac). Requests are kept per source and the strongest wins; `&"calm"` from a source ends its request (from null, all of them). Ambient fear (DreadField, AmbientLife) stays outdoors. The result goes out as `mood_changed(mood, w, seconds)`.
+- Moods (`mood_requested(source, mood, w)`) are kept per source and the strongest wins; `&"calm"` from a source ends its request (from null, all of them). The result goes out as `mood_changed(mood, w, seconds)`. Fear (`&"dread"`) never changes the look (owner, 2026-11-26: nothing darkens the screen); only `&"enchanted_sleep"` has one, a soft fade (`with_sleep`, about 1.3 stops down at full sleep).
 
 ### 3.2 Act I anchors and authored frames (human realm)
 Each is a `Marker3D` in group `story_anchor` (the village one uses meta `anchor_id`):

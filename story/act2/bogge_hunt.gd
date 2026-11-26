@@ -58,7 +58,7 @@ var _following: bool = false
 func _ready() -> void:
 	super._ready()
 	# A day hunt (ch9-10). Arriving at dusk brings the morning to her; at
-	# night the bogge grade and the dread take the wood to black.
+	# night the bogge grade takes the wood to black.
 	day_only = true
 	if arrive_radius <= 0.0:
 		arrive_radius = 8.0
@@ -137,10 +137,10 @@ func _freeze() -> void:
 		lucien.global_position = mark(&"lucien_freeze")
 		lucien.look_at(Vector3(mark(&"elm").x, lucien.global_position.y, mark(&"elm").z), Vector3.UP)
 	StoryControl.shake = 0.08
-	# Dread, but not black: she has to see the wood to keep her eyes on the elm.
+	# Dread, but she has to stay steady enough to keep her eyes on the elm.
 	EventBus.mood_requested.emit(self, &"dread", 0.45, 2.5)
 	# No grade swap: the shared "bogge" grade's volumetrics (0.06, 60x spring)
-	# black the screen out. The dread mood and this scene's own mist do it.
+	# black the screen out. This scene's own mist does it.
 	# Her eyes go to the elm at first; after that, holding them there is hers.
 	StoryControl.set_focus(_elm_marker())
 	sound(&"drone", -14.0)
