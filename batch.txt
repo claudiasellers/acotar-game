@@ -1,0 +1,6 @@
+rejected commit: c926e8e2b71db8c7f93162d43b9fae7e27b27a9c (task L75)
+tested on main: 2dff24ff28cbc690a518472f0bce353534617464
+other entries in the batch:
+  L75 9e26b127a002ee703c0c9844609080a98f9c3b55
+  L89 6d1d475037e7c1427cbe66cfe7a6ecb5cc81f3fd
+  L92 1c87aaedb8e640f3fcf5740a07acb1aa57d6bc0b
