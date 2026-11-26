@@ -1,0 +1,484 @@
+== import
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Started Project initialization (5 steps)[39m[0m
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Scanning file structure...[39m[0m
+[  16% ] [90m[1mfirst_scan_filesystem[22m | Loading global class names...[39m[0m
+[  33% ] [90m[1mfirst_scan_filesystem[22m | Verifying GDExtensions...[39m[0m
+[  50% ] [90m[1mfirst_scan_filesystem[22m | Creating autoload scripts...[39m[0m
+[  66% ] [90m[1mfirst_scan_filesystem[22m | Initializing plugins...[39m[0m
+[  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
+[92m[ DONE ][39m [1mfirst_scan_filesystem[22m
+[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | Started Registering global classes... (120 steps)[39m[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   1% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   2% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   3% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   4% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   4% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   5% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   6% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   7% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   8% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   9% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   9% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  10% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  11% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  12% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  13% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  14% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  14% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  15% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  16% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  17% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  18% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  19% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  19% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  20% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  21% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  22% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  23% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  23% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  24% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  25% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  26% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  27% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  28% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  28% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  29% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  30% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  31% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  32% ] [90m[1mupdate_scripts_classes[22m | GutErrorTracker[39m[0m
+[  33% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  33% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  34% ] [90m[1mupdate_scripts_classes[22m | GutMain[39m[0m
+[  35% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  36% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  37% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  38% ] [90m[1mupdate_scripts_classes[22m | GutConstants[39m[0m
+[  38% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  39% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  40% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  41% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  42% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  42% ] [90m[1mupdate_scripts_classes[22m | GutTrackedError[39m[0m
+[  43% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  44% ] [90m[1mupdate_scripts_classes[22m | GutHookScript[39m[0m
+[  45% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  46% ] [90m[1mupdate_scripts_classes[22m | GutInputFactory[39m[0m
+[  47% ] [90m[1mupdate_scripts_classes[22m | GutInputSender[39m[0m
+[  47% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  48% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  49% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  50% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  51% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  52% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  52% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  53% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  54% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  55% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  56% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  57% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  57% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  58% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  59% ] [90m[1mupdate_scripts_classes[22m | GutStringUtils[39m[0m
+[  60% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  61% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  61% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  62% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  63% ] [90m[1mupdate_scripts_classes[22m | GutTest[39m[0m
+[  64% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  65% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  66% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  66% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  67% ] [90m[1mupdate_scripts_classes[22m | GutUtils[39m[0m
+[  68% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  69% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  70% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  71% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  71% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  72% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  73% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  74% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  75% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  76% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  76% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  77% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  78% ] [90m[1mupdate_scripts_classes[22m | Terrain3DListContainer[39m[0m
+[  79% ] [90m[1mupdate_scripts_classes[22m | Terrain3DListEntry[39m[0m
+[  80% ] [90m[1mupdate_scripts_classes[22m | DoubleSlider[39m[0m
+[  80% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  81% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  82% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  83% ] [90m[1mupdate_scripts_classes[22m | Terrain3DLiveInfoPanel[39m[0m
+[  84% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  85% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  85% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  86% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  87% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  88% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  89% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  90% ] [90m[1mupdate_scripts_classes[22m | Terrain3DObjects[39m[0m
+[  90% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  91% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  92% ] [90m[1mupdate_scripts_classes[22m | FeyreCamera[39m[0m
+[  93% ] [90m[1mupdate_scripts_classes[22m | CameraFade[39m[0m
+[  94% ] [90m[1mupdate_scripts_classes[22m | FeyreAnimator[39m[0m
+[  95% ] [90m[1mupdate_scripts_classes[22m | MantleMotor[39m[0m
+[  95% ] [90m[1mupdate_scripts_classes[22m | MovementFeel[39m[0m
+[  96% ] [90m[1mupdate_scripts_classes[22m | Feyre[39m[0m
+[  97% ] [90m[1mupdate_scripts_classes[22m | FeyreBreath[39m[0m
+[  98% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[92m[ DONE ][39m [1mupdate_scripts_classes[22m
+[0m
+[   0% ] [90m[1m_update_scan_actions[22m | Started Scanning actions... (303 steps)[39m[0m
+[   0% ] [90m[1m_update_scan_actions[22m | AnonymousPro-Bold.ttf[39m[0m
+[   0% ] [90m[1m_update_scan_actions[22m | AnonymousPro-BoldItalic.ttf[39m[0m
+[   0% ] [90m[1m_update_scan_actions[22m | AnonymousPro-Italic.ttf[39m[0m
+[   0% ] [90m[1m_update_scan_actions[22m | AnonymousPro-Regular.ttf[39m[0m
+[   1% ] [90m[1m_update_scan_actions[22m | CourierPrime-Bold.ttf[39m[0m
+[   1% ] [90m[1m_update_scan_actions[22m | CourierPrime-BoldItalic.ttf[39m[0m
+[   1% ] [90m[1m_update_scan_actions[22m | CourierPrime-Italic.ttf[39m[0m
+[   2% ] [90m[1m_update_scan_actions[22m | CourierPrime-Regular.ttf[39m[0m
+[   2% ] [90m[1m_update_scan_actions[22m | LobsterTwo-Bold.ttf[39m[0m
+[   2% ] [90m[1m_update_scan_actions[22m | LobsterTwo-BoldItalic.ttf[39m[0m
+[   3% ] [90m[1m_update_scan_actions[22m | LobsterTwo-Italic.ttf[39m[0m
+[   3% ] [90m[1m_update_scan_actions[22m | LobsterTwo-Regular.ttf[39m[0m
+[   3% ] [90m[1m_update_scan_actions[22m | arrow.png[39m[0m
+[   4% ] [90m[1m_update_scan_actions[22m | play.png[39m[0m
+[   4% ] [90m[1m_update_scan_actions[22m | eyey.png[39m[0m
+[   4% ] [90m[1m_update_scan_actions[22m | Folder.svg[39m[0m
+[   5% ] [90m[1m_update_scan_actions[22m | green.png[39m[0m
+[   5% ] [90m[1m_update_scan_actions[22m | GutIconV2_base.png[39m[0m
+[   5% ] [90m[1m_update_scan_actions[22m | GutIconV2_no_shine.png[39m[0m
+[   6% ] [90m[1m_update_scan_actions[22m | HSplitContainer.svg[39m[0m
+[   6% ] [90m[1m_update_scan_actions[22m | red.png[39m[0m
+[   6% ] [90m[1m_update_scan_actions[22m | Script.svg[39m[0m
+[   7% ] [90m[1m_update_scan_actions[22m | VSplitContainer.svg[39m[0m
+[   7% ] [90m[1m_update_scan_actions[22m | yellow.png[39m[0m
+[   7% ] [90m[1m_update_scan_actions[22m | icon.png[39m[0m
+[   8% ] [90m[1m_update_scan_actions[22m | source_code_pro.fnt[39m[0m
+[   8% ] [90m[1m_update_scan_actions[22m | autoshader.svg[39m[0m
+[   8% ] [90m[1m_update_scan_actions[22m | color_paint.svg[39m[0m
+[   9% ] [90m[1m_update_scan_actions[22m | height_add.svg[39m[0m
+[   9% ] [90m[1m_update_scan_actions[22m | height_div.svg[39m[0m
+[   9% ] [90m[1m_update_scan_actions[22m | height_flat.svg[39m[0m
+[  10% ] [90m[1m_update_scan_actions[22m | height_mul.svg[39m[0m
+[  10% ] [90m[1m_update_scan_actions[22m | height_slope.svg[39m[0m
+[  10% ] [90m[1m_update_scan_actions[22m | height_smooth.svg[39m[0m
+[  11% ] [90m[1m_update_scan_actions[22m | height_sub.svg[39m[0m
+[  11% ] [90m[1m_update_scan_actions[22m | holes.svg[39m[0m
+[  11% ] [90m[1m_update_scan_actions[22m | layers.svg[39m[0m
+[  12% ] [90m[1m_update_scan_actions[22m | multimesh.svg[39m[0m
+[  12% ] [90m[1m_update_scan_actions[22m | navigation.svg[39m[0m
+[  12% ] [90m[1m_update_scan_actions[22m | picker_checked.svg[39m[0m
+[  13% ] [90m[1m_update_scan_actions[22m | region_add.svg[39m[0m
+[  13% ] [90m[1m_update_scan_actions[22m | region_remove.svg[39m[0m
+[  13% ] [90m[1m_update_scan_actions[22m | terrain3d.svg[39m[0m
+[  14% ] [90m[1m_update_scan_actions[22m | texture_paint.svg[39m[0m
+[  14% ] [90m[1m_update_scan_actions[22m | texture_spray.svg[39m[0m
+[  14% ] [90m[1m_update_scan_actions[22m | wetness.svg[39m[0m
+[  15% ] [90m[1m_update_scan_actions[22m | curtain_rope.glb[39m[0m
+[  15% ] [90m[1m_update_scan_actions[22m | curtain_rope_coil.glb[39m[0m
+[  15% ] [90m[1m_update_scan_actions[22m | calanmai_campfire.glb[39m[0m
+[  16% ] [90m[1m_update_scan_actions[22m | calanmai_pyre.glb[39m[0m
+[  16% ] [90m[1m_update_scan_actions[22m | calanmai_pyre_ash.glb[39m[0m
+[  16% ] [90m[1m_update_scan_actions[22m | kitchen_apple.glb[39m[0m
+[  17% ] [90m[1m_update_scan_actions[22m | kitchen_lemon_tart.glb[39m[0m
+[  17% ] [90m[1m_update_scan_actions[22m | laurel_crown.glb[39m[0m
+[  17% ] [90m[1m_update_scan_actions[22m | snowy_forest_canvas.webp[39m[0m
+[  18% ] [90m[1m_update_scan_actions[22m | white_roses_vase.glb[39m[0m
+[  18% ] [90m[1m_update_scan_actions[22m | dinner_bread.glb[39m[0m
+[  18% ] [90m[1m_update_scan_actions[22m | dinner_chicken.glb[39m[0m
+[  19% ] [90m[1m_update_scan_actions[22m | dinner_goblet.glb[39m[0m
+[  19% ] [90m[1m_update_scan_actions[22m | dinner_plate.glb[39m[0m
+[  19% ] [90m[1m_update_scan_actions[22m | dinner_sauce_peas.glb[39m[0m
+[  20% ] [90m[1m_update_scan_actions[22m | dinner_torte.glb[39m[0m
+[  20% ] [90m[1m_update_scan_actions[22m | dinner_wine_glass.glb[39m[0m
+[  20% ] [90m[1m_update_scan_actions[22m | whorl_mark.glb[39m[0m
+[  21% ] [90m[1m_update_scan_actions[22m | whorl_stones.glb[39m[0m
+[  21% ] [90m[1m_update_scan_actions[22m | whorl_stones_blight.glb[39m[0m
+[  21% ] [90m[1m_update_scan_actions[22m | map_detail.webp[39m[0m
+[  22% ] [90m[1m_update_scan_actions[22m | archeron_manor.glb[39m[0m
+[  22% ] [90m[1m_update_scan_actions[22m | carried_chair.glb[39m[0m
+[  22% ] [90m[1m_update_scan_actions[22m | carried_chest.glb[39m[0m
+[  23% ] [90m[1m_update_scan_actions[22m | carried_frame.glb[39m[0m
+[  23% ] [90m[1m_update_scan_actions[22m | chain_span.glb[39m[0m
+[  23% ] [90m[1m_update_scan_actions[22m | court_terrace.glb[39m[0m
+[  24% ] [90m[1m_update_scan_actions[22m | fae_palace_a.glb[39m[0m
+[  24% ] [90m[1m_update_scan_actions[22m | fae_palace_b.glb[39m[0m
+[  24% ] [90m[1m_update_scan_actions[22m | fae_palace_c.glb[39m[0m
+[  25% ] [90m[1m_update_scan_actions[22m | feral_temple.glb[39m[0m
+[  25% ] [90m[1m_update_scan_actions[22m | ground_dust.glb[39m[0m
+[  25% ] [90m[1m_update_scan_actions[22m | ground_mud.glb[39m[0m
+[  25% ] [90m[1m_update_scan_actions[22m | longbow.glb[39m[0m
+[  26% ] [90m[1m_update_scan_actions[22m | merchant_ship.glb[39m[0m
+[  26% ] [90m[1m_update_scan_actions[22m | stone_block.glb[39m[0m
+[  26% ] [90m[1m_update_scan_actions[22m | storm_sea.glb[39m[0m
+[  27% ] [90m[1m_update_scan_actions[22m | sword.glb[39m[0m
+[  27% ] [90m[1m_update_scan_actions[22m | treaty_parchment.glb[39m[0m
+[  27% ] [90m[1m_update_scan_actions[22m | treaty_seal.glb[39m[0m
+[  28% ] [90m[1m_update_scan_actions[22m | treaty_table.glb[39m[0m
+[  28% ] [90m[1m_update_scan_actions[22m | treaty_wax.glb[39m[0m
+[  28% ] [90m[1m_update_scan_actions[22m | war_banner.glb[39m[0m
+[  29% ] [90m[1m_update_scan_actions[22m | col_acorn_caps.glb[39m[0m
+[  29% ] [90m[1m_update_scan_actions[22m | col_bone_charm.glb[39m[0m
+[  29% ] [90m[1m_update_scan_actions[22m | col_jay_feather.glb[39m[0m
+[  30% ] [90m[1m_update_scan_actions[22m | col_odd_stone.glb[39m[0m
+[  30% ] [90m[1m_update_scan_actions[22m | col_old_arrowhead.glb[39m[0m
+[  30% ] [90m[1m_update_scan_actions[22m | col_painted_pebble.glb[39m[0m
+[  31% ] [90m[1m_update_scan_actions[22m | col_river_glass.glb[39m[0m
+[  31% ] [90m[1m_update_scan_actions[22m | col_robin_egg_shell.glb[39m[0m
+[  31% ] [90m[1m_update_scan_actions[22m | col_shed_antler.glb[39m[0m
+[  32% ] [90m[1m_update_scan_actions[22m | ing_acorn.glb[39m[0m
+[  32% ] [90m[1m_update_scan_actions[22m | ing_ash_wood.glb[39m[0m
+[  32% ] [90m[1m_update_scan_actions[22m | ing_birch_bark.glb[39m[0m
+[  33% ] [90m[1m_update_scan_actions[22m | ing_blackberry.glb[39m[0m
+[  33% ] [90m[1m_update_scan_actions[22m | ing_blighted_petals.glb[39m[0m
+[  33% ] [90m[1m_update_scan_actions[22m | ing_chaga.glb[39m[0m
+[  34% ] [90m[1m_update_scan_actions[22m | ing_chalk.glb[39m[0m
+[  34% ] [90m[1m_update_scan_actions[22m | ing_charcoal.glb[39m[0m
+[  34% ] [90m[1m_update_scan_actions[22m | ing_clay.glb[39m[0m
+[  35% ] [90m[1m_update_scan_actions[22m | ing_crocus.glb[39m[0m
+[  35% ] [90m[1m_update_scan_actions[22m | ing_crow_feather.glb[39m[0m
+[  35% ] [90m[1m_update_scan_actions[22m | ing_dead_chicken.glb[39m[0m
+[  36% ] [90m[1m_update_scan_actions[22m | ing_elderflower.glb[39m[0m
+[  36% ] [90m[1m_update_scan_actions[22m | ing_faelight_dandelion.glb[39m[0m
+[  36% ] [90m[1m_update_scan_actions[22m | ing_flint.glb[39m[0m
+[  37% ] [90m[1m_update_scan_actions[22m | ing_foxglove.glb[39m[0m
+[  37% ] [90m[1m_update_scan_actions[22m | ing_frozen_reed.glb[39m[0m
+[  37% ] [90m[1m_update_scan_actions[22m | ing_glowcap.glb[39m[0m
+[  38% ] [90m[1m_update_scan_actions[22m | ing_hare_pelt.glb[39m[0m
+[  38% ] [90m[1m_update_scan_actions[22m | ing_hawk_feather.glb[39m[0m
+[  38% ] [90m[1m_update_scan_actions[22m | ing_hawthorn_haw.glb[39m[0m
+[  39% ] [90m[1m_update_scan_actions[22m | ing_hazelnut.glb[39m[0m
+[  39% ] [90m[1m_update_scan_actions[22m | ing_honey.glb[39m[0m
+[  39% ] [90m[1m_update_scan_actions[22m | ing_honeysuckle.glb[39m[0m
+[  40% ] [90m[1m_update_scan_actions[22m | ing_juniper_berry.glb[39m[0m
+[  40% ] [90m[1m_update_scan_actions[22m | ing_moss.glb[39m[0m
+[  40% ] [90m[1m_update_scan_actions[22m | ing_old_mans_beard.glb[39m[0m
+[  41% ] [90m[1m_update_scan_actions[22m | ing_owl_feather.glb[39m[0m
+[  41% ] [90m[1m_update_scan_actions[22m | ing_pine_resin.glb[39m[0m
+[  41% ] [90m[1m_update_scan_actions[22m | ing_river_silt.glb[39m[0m
+[  42% ] [90m[1m_update_scan_actions[22m | ing_snail_shell.glb[39m[0m
+[  42% ] [90m[1m_update_scan_actions[22m | ing_snowdrop.glb[39m[0m
+[  42% ] [90m[1m_update_scan_actions[22m | ing_snowmelt_water.glb[39m[0m
+[  43% ] [90m[1m_update_scan_actions[22m | ing_thornbriar_sap.glb[39m[0m
+[  43% ] [90m[1m_update_scan_actions[22m | ing_tinder_fungus.glb[39m[0m
+[  43% ] [90m[1m_update_scan_actions[22m | ing_violet.glb[39m[0m
+[  44% ] [90m[1m_update_scan_actions[22m | ing_water_mint.glb[39m[0m
+[  44% ] [90m[1m_update_scan_actions[22m | ing_wild_garlic.glb[39m[0m
+[  44% ] [90m[1m_update_scan_actions[22m | ing_wild_hyacinth.glb[39m[0m
+[  45% ] [90m[1m_update_scan_actions[22m | ing_willow_bark.glb[39m[0m
+[  45% ] [90m[1m_update_scan_actions[22m | obj_wolf_pelt.glb[39m[0m
+[  45% ] [90m[1m_update_scan_actions[22m | bandage_roll.glb[39m[0m
+[  46% ] [90m[1m_update_scan_actions[22m | feyre_hall_map.glb[39m[0m
+[  46% ] [90m[1m_update_scan_actions[22m | hand_wrap_1.glb[39m[0m
+[  46% ] [90m[1m_update_scan_actions[22m | hand_wrap_2.glb[39m[0m
+[  47% ] [90m[1m_update_scan_actions[22m | prythian_mural.webp[39m[0m
+[  47% ] [90m[1m_update_scan_actions[22m | camp_blackvein_bone_rain.glb[39m[0m
+[  47% ] [90m[1m_update_scan_actions[22m | camp_briar_uprooted_ring.glb[39m[0m
+[  48% ] [90m[1m_update_scan_actions[22m | camp_fire_spit.glb[39m[0m
+[  48% ] [90m[1m_update_scan_actions[22m | camp_gloamer_shiny_line.glb[39m[0m
+[  48% ] [90m[1m_update_scan_actions[22m | camp_gloamer_squabble_pile.glb[39m[0m
+[  49% ] [90m[1m_update_scan_actions[22m | camp_hob_loot_pile.glb[39m[0m
+[  49% ] [90m[1m_update_scan_actions[22m | camp_hob_sheep_bones.glb[39m[0m
+[  49% ] [90m[1m_update_scan_actions[22m | camp_hob_sleep_stone.glb[39m[0m
+[  50% ] [90m[1m_update_scan_actions[22m | camp_martax_den_hoard.glb[39m[0m
+[  50% ] [90m[1m_update_scan_actions[22m | camp_naga_reed_nest.glb[39m[0m
+[  50% ] [90m[1m_update_scan_actions[22m | camp_skull_stake.glb[39m[0m
+[  50% ] [90m[1m_update_scan_actions[22m | wpn_blackvein_jaw_shears.glb[39m[0m
+[  51% ] [90m[1m_update_scan_actions[22m | wpn_blackvein_veinhook.glb[39m[0m
+[  51% ] [90m[1m_update_scan_actions[22m | wpn_crow_beak_awl.glb[39m[0m
+[  51% ] [90m[1m_update_scan_actions[22m | wpn_smiths_hammer.glb[39m[0m
+[  52% ] [90m[1m_update_scan_actions[22m | wpn_woodcutter_hatchet.glb[39m[0m
+[  52% ] [90m[1m_update_scan_actions[22m | paint_tins_spilled.glb[39m[0m
+[  52% ] [90m[1m_update_scan_actions[22m | picnic_basket.glb[39m[0m
+[  53% ] [90m[1m_update_scan_actions[22m | solstice_lantern_string.glb[39m[0m
+[  53% ] [90m[1m_update_scan_actions[22m | wine_table_solstice.glb[39m[0m
+[  53% ] [90m[1m_update_scan_actions[22m | firewood_log.glb[39m[0m
+[  54% ] [90m[1m_update_scan_actions[22m | bees.ogg[39m[0m
+[  54% ] [90m[1m_update_scan_actions[22m | cottage_yard.ogg[39m[0m
+[  54% ] [90m[1m_update_scan_actions[22m | dread.ogg[39m[0m
+[  55% ] [90m[1m_update_scan_actions[22m | spring_arrival.ogg[39m[0m
+[  55% ] [90m[1m_update_scan_actions[22m | calanmai_drums.ogg[39m[0m
+[  55% ] [90m[1m_update_scan_actions[22m | calanmai_fire.ogg[39m[0m
+[  56% ] [90m[1m_update_scan_actions[22m | cottage.ogg[39m[0m
+[  56% ] [90m[1m_update_scan_actions[22m | film_silent_manor.ogg[39m[0m
+[  56% ] [90m[1m_update_scan_actions[22m | spring_estate.ogg[39m[0m
+[  57% ] [90m[1m_update_scan_actions[22m | bellow_who.ogg[39m[0m
+[  57% ] [90m[1m_update_scan_actions[22m | claws.ogg[39m[0m
+[  57% ] [90m[1m_update_scan_actions[22m | cottage_rattle.ogg[39m[0m
+[  58% ] [90m[1m_update_scan_actions[22m | footfall_1.ogg[39m[0m
+[  58% ] [90m[1m_update_scan_actions[22m | footfall_3.ogg[39m[0m
+[  58% ] [90m[1m_update_scan_actions[22m | roar.ogg[39m[0m
+[  59% ] [90m[1m_update_scan_actions[22m | snap_arrow.ogg[39m[0m
+[  59% ] [90m[1m_update_scan_actions[22m | whisper_2.ogg[39m[0m
+[  59% ] [90m[1m_update_scan_actions[22m | whisper_3.ogg[39m[0m
+[  60% ] [90m[1m_update_scan_actions[22m | break.ogg[39m[0m
+[  60% ] [90m[1m_update_scan_actions[22m | draw.ogg[39m[0m
+[  60% ] [90m[1m_update_scan_actions[22m | hit_flesh.ogg[39m[0m
+[  61% ] [90m[1m_update_scan_actions[22m | whoosh.ogg[39m[0m
+[  61% ] [90m[1m_update_scan_actions[22m | grass_1.ogg[39m[0m
+[  61% ] [90m[1m_update_scan_actions[22m | grass_2.ogg[39m[0m
+[  62% ] [90m[1m_update_scan_actions[22m | snow_4.ogg[39m[0m
+[  62% ] [90m[1m_update_scan_actions[22m | snow_5.ogg[39m[0m
+[  62% ] [90m[1m_update_scan_actions[22m | stone_1.ogg[39m[0m
+[  63% ] [90m[1m_update_scan_actions[22m | stone_2.ogg[39m[0m
+[  63% ] [90m[1m_update_scan_actions[22m | stone_3.ogg[39m[0m
+[  63% ] [90m[1m_update_scan_actions[22m | stone_4.ogg[39m[0m
+[  64% ] [90m[1m_update_scan_actions[22m | wrong.ogg[39m[0m
+[  64% ] [90m[1m_update_scan_actions[22m | attack.ogg[39m[0m
+[  64% ] [90m[1m_update_scan_actions[22m | hiss_1.ogg[39m[0m
+[  65% ] [90m[1m_update_scan_actions[22m | hiss_3.ogg[39m[0m
+[  65% ] [90m[1m_update_scan_actions[22m | ripple.ogg[39m[0m
+[  65% ] [90m[1m_update_scan_actions[22m | scream.ogg[39m[0m
+[  66% ] [90m[1m_update_scan_actions[22m | snare_creak.ogg[39m[0m
+[  66% ] [90m[1m_update_scan_actions[22m | death.ogg[39m[0m
+[  66% ] [90m[1m_update_scan_actions[22m | growl_low.ogg[39m[0m
+[  67% ] [90m[1m_update_scan_actions[22m | pack_growl.ogg[39m[0m
+[  67% ] [90m[1m_update_scan_actions[22m | celebrate.ogg[39m[0m
+[  67% ] [90m[1m_update_scan_actions[22m | alis.blend[39m[0m
+[  68% ] [90m[1m_update_scan_actions[22m | alis.glb[39m[0m
+[  68% ] [90m[1m_update_scan_actions[22m | alis_apron.glb[39m[0m
+[  68% ] [90m[1m_update_scan_actions[22m | elain_curls.glb[39m[0m
+[  69% ] [90m[1m_update_scan_actions[22m | elain.blend[39m[0m
+[  69% ] [90m[1m_update_scan_actions[22m | eye_iris.png[39m[0m
+[  69% ] [90m[1m_update_scan_actions[22m | makeup_mask_b.png[39m[0m
+[  70% ] [90m[1m_update_scan_actions[22m | elain_garden_hat.glb[39m[0m
+[  70% ] [90m[1m_update_scan_actions[22m | eye_iris.png[39m[0m
+[  70% ] [90m[1m_update_scan_actions[22m | father.blend[39m[0m
+[  71% ] [90m[1m_update_scan_actions[22m | father.glb[39m[0m
+[  71% ] [90m[1m_update_scan_actions[22m | father_knife.glb[39m[0m
+[  71% ] [90m[1m_update_scan_actions[22m | makeup_mask_b.png[39m[0m
+[  72% ] [90m[1m_update_scan_actions[22m | father_coat.glb[39m[0m
+[  72% ] [90m[1m_update_scan_actions[22m | father_fine_shirt.glb[39m[0m
+[  72% ] [90m[1m_update_scan_actions[22m | father_shirt.glb[39m[0m
+[  73% ] [90m[1m_update_scan_actions[22m | father_shoes.glb[39m[0m
+[  73% ] [90m[1m_update_scan_actions[22m | father_vest.glb[39m[0m
+[  73% ] [90m[1m_update_scan_actions[22m | ballerina_bun.glb[39m[0m
+[  74% ] [90m[1m_update_scan_actions[22m | ballerina_bun_hair_strands_dry.png[39m[0m
+[  74% ] [90m[1m_update_scan_actions[22m | braid_hair_strands_dry.png[39m[0m
+[  74% ] [90m[1m_update_scan_actions[22m | calanmai_crown_hair_strands_dry.png[39m[0m
+[  75% ] [90m[1m_update_scan_actions[22m | fishtail_braid.glb[39m[0m
+[  75% ] [90m[1m_update_scan_actions[22m | fishtail_braid_hair_strands_dry.png[39m[0m
+[  75% ] [90m[1m_update_scan_actions[22m | flower_crown_hair_hair_strands_dry.png[39m[0m
+[  75% ] [90m[1m_update_scan_actions[22m | hair.blend[39m[0m
+[  76% ] [90m[1m_update_scan_actions[22m | hair_loose_with_flowers.glb[39m[0m
+[  76% ] [90m[1m_update_scan_actions[22m | hair_loose_with_flowers_hair_strands_dry.png[39m[0m
+[  76% ] [90m[1m_update_scan_actions[22m | half_up_hair_strands_dry.png[39m[0m
+[  77% ] [90m[1m_update_scan_actions[22m | hunters_knot_hair_strands_dry.png[39m[0m
+[  77% ] [90m[1m_update_scan_actions[22m | ribboned_curls.glb[39m[0m
+[  77% ] [90m[1m_update_scan_actions[22m | rose_bun.glb[39m[0m
+[  78% ] [90m[1m_update_scan_actions[22m | soft_curls.glb[39m[0m
+[  78% ] [90m[1m_update_scan_actions[22m | twin_braids.glb[39m[0m
+[  78% ] [90m[1m_update_scan_actions[22m | wet.glb[39m[0m
+[  79% ] [90m[1m_update_scan_actions[22m | feyre.blend[39m[0m
+[  79% ] [90m[1m_update_scan_actions[22m | feyre.glb[39m[0m
+[  79% ] [90m[1m_update_scan_actions[22m | satchel_manor.glb[39m[0m
+[  80% ] [90m[1m_update_scan_actions[22m | satchel_patched_cloak.glb[39m[0m
+[  80% ] [90m[1m_update_scan_actions[22m | earrings_drop.glb[39m[0m
+[  80% ] [90m[1m_update_scan_actions[22m | earrings_pearl.glb[39m[0m
+[  81% ] [90m[1m_update_scan_actions[22m | earrings_star.glb[39m[0m
+[  81% ] [90m[1m_update_scan_actions[22m | flower_wristlet.glb[39m[0m
+[  81% ] [90m[1m_update_scan_actions[22m | gloves_lace.glb[39m[0m
+[  82% ] [90m[1m_update_scan_actions[22m | gowns.blend[39m[0m
+[  82% ] [90m[1m_update_scan_actions[22m | gown_ball.glb[39m[0m
+[  82% ] [90m[1m_update_scan_actions[22m | hunter_tunic.glb[39m[0m
+[  83% ] [90m[1m_update_scan_actions[22m | linen_shift.glb[39m[0m
+[  83% ] [90m[1m_update_scan_actions[22m | necklace_locket.glb[39m[0m
+[  83% ] [90m[1m_update_scan_actions[22m | necklace_pearl.glb[39m[0m
+[  84% ] [90m[1m_update_scan_actions[22m | necklace_pendant.glb[39m[0m
+[  84% ] [90m[1m_update_scan_actions[22m | ribbon_cuff.glb[39m[0m
+[  84% ] [90m[1m_update_scan_actions[22m | vest.glb[39m[0m
+[  85% ] [90m[1m_update_scan_actions[22m | wardrobe.blend[39m[0m
+[  85% ] [90m[1m_update_scan_actions[22m | woven_crown.glb[39m[0m
+[  85% ] [90m[1m_update_scan_actions[22m | lucien.blend[39m[0m
+[  86% ] [90m[1m_update_scan_actions[22m | lucien.glb[39m[0m
+[  86% ] [90m[1m_update_scan_actions[22m | lucien_eye_iris.png[39m[0m
+[  86% ] [90m[1m_update_scan_actions[22m | lucien_knife.glb[39m[0m
+[  87% ] [90m[1m_update_scan_actions[22m | lucien_trousers.glb[39m[0m
+[  87% ] [90m[1m_update_scan_actions[22m | nesta_chignon.glb[39m[0m
+[  87% ] [90m[1m_update_scan_actions[22m | eye_iris.png[39m[0m
+[  88% ] [90m[1m_update_scan_actions[22m | nesta.blend[39m[0m
+[  88% ] [90m[1m_update_scan_actions[22m | nesta.glb[39m[0m
+[  88% ] [90m[1m_update_scan_actions[22m | nesta_cloak.glb[39m[0m
+[  89% ] [90m[1m_update_scan_actions[22m | nesta_iron_bangle.glb[39m[0m
+[  89% ] [90m[1m_update_scan_actions[22m | makeup_mask_a.png[39m[0m
+[  89% ] [90m[1m_update_scan_actions[22m | rhysand.blend[39m[0m
+[  90% ] [90m[1m_update_scan_actions[22m | rhysand.glb[39m[0m
+[  90% ] [90m[1m_update_scan_actions[22m | rhysand_eye_iris.png[39m[0m
+[  90% ] [90m[1m_update_scan_actions[22m | rhysand_trousers.glb[39m[0m
+[  91% ] [90m[1m_update_scan_actions[22m | summer_faerie_long.glb[39m[0m
+[  91% ] [90m[1m_update_scan_actions[22m | summer_faerie.blend[39m[0m
+[  91% ] [90m[1m_update_scan_actions[22m | summer_faerie_trousers.glb[39m[0m
+[  92% ] [90m[1m_update_scan_actions[22m | summer_faerie_wounds.glb[39m[0m
+[  92% ] [90m[1m_update_scan_actions[22m | tamlin_beast.blend[39m[0m
+[  92% ] [90m[1m_update_scan_actions[22m | tamlin_beast_eye.png[39m[0m
+[  93% ] [90m[1m_update_scan_actions[22m | tamlin_beast_tamlin_beast_eye.png[39m[0m
+[  93% ] [90m[1m_update_scan_actions[22m | makeup_mask_b.png[39m[0m
+[  93% ] [90m[1m_update_scan_actions[22m | tamlin.blend[39m[0m
+[  94% ] [90m[1m_update_scan_actions[22m | tamlin_mask.glb[39m[0m
+[  94% ] [90m[1m_update_scan_actions[22m | alis_true.webp[39m[0m
+[  94% ] [90m[1m_update_scan_actions[22m | elain.webp[39m[0m
+[  95% ] [90m[1m_update_scan_actions[22m | father.webp[39m[0m
+[  95% ] [90m[1m_update_scan_actions[22m | lucien.webp[39m[0m
+[  95% ] [90m[1m_update_scan_actions[22m | mare.webp[39m[0m
+[  96% ] [90m[1m_update_scan_actions[22m | nesta.webp[39m[0m
+[  96% ] [90m[1m_update_scan_actions[22m | stranger.webp[39m[0m
+[  96% ] [90m[1m_update_scan_actions[22m | tamlin.webp[39m[0m
+[  97% ] [90m[1m_update_scan_actions[22m | tamlin_beast.webp[39m[0m
+[  97% ] [90m[1m_update_scan_actions[22m | closeness.webp[39m[0m
+[  97% ] [90m[1m_update_scan_actions[22m | deeds.webp[39m[0m
+[  98% ] [90m[1m_update_scan_actions[22m | memories.webp[39m[0m
+[  98% ] [90m[1m_update_scan_actions[22m | since.webp[39m[0m
+[  98% ] [90m[1m_update_scan_actions[22m | warmth.webp[39m[0m
+[  99% ] [90m[1m_update_scan_actions[22m | snow_normal.png[39m[0m
+[  99% ] [90m[1m_update_scan_actions[22m | trees.csv[39m[0m
+[92m[ DONE ][39m [1m_update_scan_actions[22m
+[0m
+[   0% ] [90m[1mreimport[22m | Started (Re)Importing Assets (14 steps)[39m[0m
+[   0% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   6% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  13% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  20% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  26% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  33% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  40% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  46% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  53% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  60% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  66% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  73% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  80% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  86% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   0% ] [90m[1mreimport[22m | Executing pre-reimport operations...[39m[0m
+[   0% ] [90m[1mreimport[22m | alis_true.webp[39m[0m
+[   6% ] [90m[1mreimport[22m | elain.webp[39m[0m
+[  13% ] [90m[1mreimport[22m | father.webp[39m[0m
+[  20% ] [90m[1mreimport[22m | lucien.webp[39m[0m
+[  26% ] [90m[1mreimport[22m | mare.webp[39m[0m
+[  33% ] [90m[1mreimport[22m | nesta.webp[39m[0m
+[  40% ] [90m[1mreimport[22m | stranger.webp[39m[0m
+[  46% ] [90m[1mreimport[22m | tamlin.webp[39m[0m
+[  53% ] [90m[1mreimport[22m | tamlin_beast.webp[39m[0m
+[  60% ] [90m[1mreimport[22m | closeness.webp[39m[0m
+[  66% ] [90m[1mreimport[22m | deeds.webp[39m[0m
+[  73% ] [90m[1mreimport[22m | memories.webp[39m[0m
+[  80% ] [90m[1mreimport[22m | since.webp[39m[0m
+[  86% ] [90m[1mreimport[22m | warmth.webp[39m[0m
+[  93% ] [90m[1mreimport[22m | Finalizing Asset Import...[39m[0m
+[92m[ DONE ][39m [1mreimport[22m
+[0m
+[   0% ] [90m[1mreimport[22m | Started (Re)Importing Assets (14 steps)[39m[0m
+[   0% ] [90m[1mreimport[22m | Executing post-reimport operations...[39m[0m
+[92m[ DONE ][39m [1mreimport[22m
+[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Started Loading editor (5 steps)[39m[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Loading editor layout...[39m[0m
+[  16% ] [90m[1mloading_editor_layout[22m | Loading docks...[39m[0m
+[92m[ DONE ][39m [1mloading_editor_layout[22m
+[0m
+== levels.sh ensure
