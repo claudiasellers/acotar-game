@@ -93,9 +93,16 @@ func test_carried_rig_never_lets_the_horse_pull_away() -> void:
 		var cine := Cine.of(get_tree())
 		cine.claim(self)
 		cine.rig(carrier, Vector3(0.4, 3.6, 5.0), aim, 46.0, 0.0, 2.0, carried)
-		for i in 60:
-			horse.global_position += Vector3(0, 0, -12.0) * (1.0 / 60.0)
+		# The rig eases by wall-clock time, so the horse is placed by wall-clock
+		# time too: 12 m/s for one second, however fast headless frames run.
+		var t0 := Time.get_ticks_usec()
+		while true:
+			var secs := minf((Time.get_ticks_usec() - t0) / 1e6, 1.0)
+			horse.global_position = Vector3(0, 0, -12.0 * secs)
+			if secs >= 1.0:
+				break
 			await wait_process_frames(1)
+		await wait_process_frames(1)
 		gaps.append(cine.camera.global_position.distance_to(horse.global_position))
 		cine.drop(self, 0.0)
 	assert_gt(gaps[0], 9.0, "loose: the horse at 12 m/s pulls away")
