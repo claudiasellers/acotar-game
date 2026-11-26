@@ -429,16 +429,24 @@ func _refresh_steeps() -> void:
 	for c in _steeps.get_children():
 		_steeps.remove_child(c)
 		c.queue_free()
-	var rack := WeaponSteep.rack_of(feyre)
+	var rack := _rack()
 	if not WeaponSteep.is_fire(station):
 		return
 	for arrow in WeaponSteep.offers(rack, Gameplay.inventory):
 		_steeps.add_child(_small_button(WeaponSteep.verb(rack, arrow), steep_blade.bind(arrow)))
 
 
+## Her weapon rack: Feyre's, or the player's when the screen was opened
+## without her (tests, the shot tools).
+func _rack() -> WeaponRack:
+	if feyre:
+		return WeaponSteep.rack_of(feyre)
+	return WeaponSteep.rack_of(get_tree().get_first_node_in_group(&"player")) if is_inside_tree() else null
+
+
 ## Steeps the weapon in her hand with one `arrow`.
 func steep_blade(arrow: StringName) -> Dictionary:
-	var r := WeaponSteep.steep(WeaponSteep.rack_of(feyre), station, arrow)
+	var r := WeaponSteep.steep(_rack(), station, arrow)
 	_reveal.visible = false
 	if r.ok:
 		_outcome.text = String(r.text)
