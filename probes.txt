@@ -1,0 +1,3 @@
+from L77 open tin
+quality look
+shot tin res://tools/ui/open_tin_shot.tscn -- --out={out}/report.json

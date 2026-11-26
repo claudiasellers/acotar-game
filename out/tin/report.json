@@ -1,0 +1,93 @@
+{
+  "assist_causes": {},
+  "assisted_metres": 0.0,
+  "assists": 0,
+  "beats": [
+    {
+      "goal": "load, jump past the first dinner, stand in the stable yard",
+      "id": "tin_setup",
+      "notes": [],
+      "sim_seconds": 3.6,
+      "status": "pass",
+      "wall_seconds": 7.4
+    },
+    {
+      "goal": "the tending tray in the stable yard: Care, a slot, her page",
+      "id": "tend",
+      "notes": [
+        "saved tend_care.png",
+        "saved tend_slot.png",
+        "tray 337 px tall, 717 px clear above",
+        "saved tend_her.png"
+      ],
+      "sim_seconds": 6.4,
+      "status": "pass",
+      "wall_seconds": 8.0
+    },
+    {
+      "goal": "brewing at the stillroom bench",
+      "id": "brew",
+      "notes": [
+        "FAIL: no brewing station within 8 m of the stillroom bench"
+      ],
+      "sim_seconds": 108.6,
+      "status": "fail",
+      "wall_seconds": 120.0
+    }
+  ],
+  "commit": "",
+  "events": [
+    "[    0.0 s] phase  -> p0_winter",
+    "[    0.0 s] game scene loaded in 9.8 s (wall)",
+    "[    0.0 s] BEAT tin_setup: load, jump past the first dinner, stand in the stable yard",
+    "[    0.3 s] deed wolf_killed",
+    "[    0.3 s] phase p0_winter -> p1_wolf_and_crossing",
+    "[    0.3 s] deed pelt_sold",
+    "[    0.3 s] deed beast_claim_accepted",
+    "[    0.3 s] phase p1_wolf_and_crossing -> p2_grounds",
+    "[    0.3 s] deed wall_crossed",
+    "[    0.3 s] deed fact.manor_arrived",
+    "[    0.3 s] deed fact.alis_bathed",
+    "[    0.3 s] deed fact.tam_bond_host",
+    "[    0.3 s] deed fact.tam_did_ate_at_table",
+    "[    0.3 s] deed first_dinner_eaten",
+    "[    0.3 s] deed fact.luc_did_rode_out",
+    "[    3.6 s] BEAT tin_setup PASS (3.6 s game, 7.4 s wall)",
+    "[    3.6 s] BEAT tend: the tending tray in the stable yard: Care, a slot, her page",
+    "[    5.7 s]   saved tend_care.png",
+    "[    7.6 s]   saved tend_slot.png",
+    "[    7.6 s]   tray 337 px tall, 717 px clear above",
+    "[    9.5 s]   saved tend_her.png",
+    "[   10.0 s] BEAT tend PASS (6.4 s game, 8.0 s wall)",
+    "[   10.0 s] BEAT brew: brewing at the stillroom bench",
+    "[  118.6 s]   FAIL: no brewing station within 8 m of the stillroom bench",
+    "[  118.6 s] BEAT brew FAIL (108.6 s game, 120.0 s wall)",
+    "[  118.6 s] shutdown suspects: none",
+    "[  118.6 s] MISSING beats (never ran; a beat script failed to load?): spawn, hunt_to_clearing, wolf_kill, skin, pelt_sale, evening, sleep, beast_door, crossing, manor_arrival, act2_arrival, act2_bath, act2_dinner, curtain_trap, first_dinner, bogge_hunt, puca_gate, house:travel, house:spawn, house:hall_marks, house:map_drawn, house:the_beast, house:to_the_infirmary, house:wound_dressed, house:mural, suriel:travel, suriel:spawn, suriel:scout_stream, suriel:set_snare, suriel:hide_downwind, suriel:suriel_caught, suriel:answers, suriel:naga, faerie:travel, faerie:spawn, faerie:carried_in, faerie:shelves, faerie:triage, faerie:words, faerie:hand, faerie:held, pool:picnic, pool:found, pool:jump_in, pool:swim, painting:travel, painting:spawn, painting:dev_jump_p4, painting:studio_open, painting:gallery_opened, painting:first_painting, painting:gallery_seen, attor:travel, attor:stillness, attor:hide, attor:still, calanmai:travel, calanmai:order, calanmai:fires, calanmai:stranger, calanmai:explained, calanmai:supper, calanmai:bite, calanmai:vanity, calanmai:lunch, calanmai:roses, calanmai:gown",
+    "[  118.6 s] shutdown suspects: none"
+  ],
+  "final_phase": "p2_grounds",
+  "flags": [
+    "dlg.c_home_hungry",
+    "wolf_killed",
+    "pelt_sold",
+    "beast_claim_accepted",
+    "wall_crossed",
+    "fact.manor_arrived",
+    "fact.alis_bathed",
+    "first_dinner_eaten",
+    "fact.tam_did_ate_at_table",
+    "fact.tam_bond_host",
+    "fact.mare_ridden",
+    "fact.luc_did_rode_out",
+    "thought_crown_blooms",
+    "dlg.d_first_dinner",
+    "dlg.g_bloom"
+  ],
+  "load_seconds": 9.8,
+  "primitives": [],
+  "shutdown_suspects": [],
+  "stand_ins": [],
+  "total_wall_seconds": 145.6,
+  "workarounds": []
+}

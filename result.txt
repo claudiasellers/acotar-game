@@ -1,0 +1,12 @@
+status fail
+request L77-52
+commit bc276d5f772157a67af4121826260e1550b66c42
+machine Claudias-Mac-mini
+godot 4.7.2.stable.official.ed1daf0bf
+quality look
+size 1920x1080
+renderer project default
+prep ok 35s: import 10s, generated content 25s (levels.sh)
+note focus guard: handed focus back 1x, render held it 194 ms
+shot tin fail exit=1 158s files=4
+answered 2026-11-26T19:04:20Z after 196s

@@ -1,0 +1,50 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+Metal 4.0 - Forward+ - Using Device #0: Apple - Apple M4 (Apple9)
+
+focus guard: handed focus back 1x, render held it 194 ms
+PLAYTEST [    0.0 s] phase  -> p0_winter
+ERROR: This function should never be used outside the editor, it can severely damage performance.
+   at: global_shader_parameter_get_list (servers/rendering/renderer_rd/storage_rd/material_storage.cpp:1848)
+   GDScript backtrace (most recent call first):
+       [0] ensure_wetness_global (res://world/shared/weather/spring_weather.gd:87)
+       [1] _ready (res://world/shared/weather/spring_weather.gd:59)
+       [2] _ready (res://systems/props/touch_world.gd:27)
+       [3] _ready (res://story/act1/act1_game.gd:45)
+       [4] _run (res://tools/playtest/act1_playtest.gd:160)
+PLAYTEST [    0.0 s] game scene loaded in 9.8 s (wall)
+PLAYTEST [    0.0 s] BEAT tin_setup: load, jump past the first dinner, stand in the stable yard
+PLAYTEST [    0.3 s] deed wolf_killed
+PLAYTEST [    0.3 s] phase p0_winter -> p1_wolf_and_crossing
+PLAYTEST [    0.3 s] deed pelt_sold
+PLAYTEST [    0.3 s] deed beast_claim_accepted
+PLAYTEST [    0.3 s] phase p1_wolf_and_crossing -> p2_grounds
+PLAYTEST [    0.3 s] deed wall_crossed
+PLAYTEST [    0.3 s] deed fact.manor_arrived
+PLAYTEST [    0.3 s] deed fact.alis_bathed
+PLAYTEST [    0.3 s] deed fact.tam_bond_host
+PLAYTEST [    0.3 s] deed fact.tam_did_ate_at_table
+PLAYTEST [    0.3 s] deed first_dinner_eaten
+PLAYTEST [    0.3 s] deed fact.luc_did_rode_out
+PLAYTEST [    3.6 s] BEAT tin_setup PASS (3.6 s game, 7.4 s wall)
+PLAYTEST [    3.6 s] BEAT tend: the tending tray in the stable yard: Care, a slot, her page
+PLAYTEST [    5.7 s]   saved tend_care.png
+PLAYTEST [    7.6 s]   saved tend_slot.png
+PLAYTEST [    7.6 s]   tray 337 px tall, 717 px clear above
+PLAYTEST [    9.5 s]   saved tend_her.png
+PLAYTEST [   10.0 s] BEAT tend PASS (6.4 s game, 8.0 s wall)
+PLAYTEST [   10.0 s] BEAT brew: brewing at the stillroom bench
+PLAYTEST [  118.6 s]   FAIL: no brewing station within 8 m of the stillroom bench
+PLAYTEST [  118.6 s] BEAT brew FAIL (108.6 s game, 120.0 s wall)
+PLAYTEST [  118.6 s] shutdown suspects: none
+PLAYTEST [  118.6 s] MISSING beats (never ran; a beat script failed to load?): spawn, hunt_to_clearing, wolf_kill, skin, pelt_sale, evening, sleep, beast_door, crossing, manor_arrival, act2_arrival, act2_bath, act2_dinner, curtain_trap, first_dinner, bogge_hunt, puca_gate, house:travel, house:spawn, house:hall_marks, house:map_drawn, house:the_beast, house:to_the_infirmary, house:wound_dressed, house:mural, suriel:travel, suriel:spawn, suriel:scout_stream, suriel:set_snare, suriel:hide_downwind, suriel:suriel_caught, suriel:answers, suriel:naga, faerie:travel, faerie:spawn, faerie:carried_in, faerie:shelves, faerie:triage, faerie:words, faerie:hand, faerie:held, pool:picnic, pool:found, pool:jump_in, pool:swim, painting:travel, painting:spawn, painting:dev_jump_p4, painting:studio_open, painting:gallery_opened, painting:first_painting, painting:gallery_seen, attor:travel, attor:stillness, attor:hide, attor:still, calanmai:travel, calanmai:order, calanmai:fires, calanmai:stranger, calanmai:explained, calanmai:supper, calanmai:bite, calanmai:vanity, calanmai:lunch, calanmai:roses, calanmai:gown
+PLAYTEST [  118.6 s] shutdown suspects: none
+PLAYTEST report -> /Users/claudiasellers/Documents/acotar-game/.git/mq/shots/work/L77-52/out/tin/report.json
+PLAYTEST exit 1
+WARNING: A Thread object is being destroyed without its completion having been realized.
+Please call wait_to_finish() on it to ensure correct cleanup.
+     at: ~Thread (drivers/apple/thread_apple.cpp:150)
+ERROR: 2 shaders of type ParticlesShaderRD were never freed
+   at: ~ShaderRD (servers/rendering/renderer_rd/shader_rd.cpp:1236)
+WARNING: 12 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 2 RID allocations of type 'N10RendererRD15MaterialStorage6ShaderE' were leaked at exit.
