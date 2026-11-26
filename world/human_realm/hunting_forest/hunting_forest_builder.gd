@@ -83,7 +83,9 @@ static func exclusion_circles() -> Array:
 	var b: Array = bridge_site()
 	var bp: Vector2 = b[0]
 	var cr := crossroads()
+	var rb: Vector2 = HumanRealmLayout.ride_bridge().centre
 	return [
+		Vector3(rb.x, rb.y, 11.0),
 		Vector3(HumanRealmLayout.HUNTING_LODGE.x, HumanRealmLayout.HUNTING_LODGE.y, 16.0), Vector3(FARMSTEAD.x, FARMSTEAD.y, 14.0),
 		Vector3(LEANTO.x, LEANTO.y, 6.0), Vector3(SPLIT_OAK.x, SPLIT_OAK.y, 4.0), Vector3(FALL.x, FALL.y, 6.0),
 		Vector3(DEER_STAND.x, DEER_STAND.y, 3.5), Vector3(HIDE.x, HIDE.y, 2.6), Vector3(KEEPER_HUT.x, KEEPER_HUT.y, 6.0),

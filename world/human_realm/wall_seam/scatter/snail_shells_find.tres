@@ -9,5 +9,5 @@ id = &"snail_shells_find"
 mesh_path = "res://world/human_realm/shared/assets/flora/snail_shells.glb"
 ingredient_id = &"ing_snail_shell"
 tags = PackedStringArray("canon:X")
-instances = PackedFloat32Array(-56.060303, -0.68005896, 1433.2374, 1.1652998, 1.061126, -295.76886, 4.8567224, 1428.4757, 1.5549214, 0.9994956, -264.96527, 3.9992473, 1453.5383, 1.6536219, 0.9175809, 201.73914, 4.752495, 1450.5671, 4.3747487, 0.9113616)
+instances = PackedFloat32Array(166.12524, 6.784653, 1443.9368, 0.82200414, 0.9640296, -476.66644, 9.778521, 1419.0269, 6.1597767, 0.9335706, -413.4451, 8.070352, 1411.0541, 2.9424107, 1.1034968, 92.87756, 7.535609, 1468.5824, 5.9380593, 0.96461487)
 material = ExtResource("1_lerai")

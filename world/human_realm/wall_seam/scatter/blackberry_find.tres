@@ -9,6 +9,6 @@ id = &"blackberry_find"
 mesh_path = "res://world/human_realm/shared/assets/flora/blackberry_bramble.glb"
 ingredient_id = &"ing_blackberry"
 tags = PackedStringArray("canon:X")
-instances = PackedFloat32Array(329.7008, -0.7335992, 1451.2627, 2.5307312, 1.0644109, -688.4393, 8.644172, 1476.6088, 1.8104264, 0.96388245, -478.8711, 9.002396, 1431.4703, 5.9754667, 1.0865583, -587.38403, 7.1054363, 1425.0309, 0.42879787, 1.0072144)
+instances = PackedFloat32Array(128.83398, 7.734412, 1430.648, 0.12920532, 1.0789976, 641.53613, -4.783557, 1435.9135, 4.9112797, 0.8961768, -213.55902, 0.954844, 1426.2341, 4.435625, 0.9702464, -616.83923, 10.345514, 1422.213, 4.390446, 1.1222653)
 wind = 0.15
 material = ExtResource("1_x6wh4")

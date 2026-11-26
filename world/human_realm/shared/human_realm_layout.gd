@@ -75,6 +75,19 @@ const MILL_POND_RADIUS := 28.0
 const CREEK_BRIDGE_AT := Vector2(318.0, 2149.0)
 const FROZEN_BRIDGE_AT := Vector2(-323.0, 1784.0)
 const BRIDGE_RUN_IN := 16.0
+## The ride-north track's crossing: a wider span a mare and the beast can walk.
+const RIDE_BRIDGE_AT := Vector2(-75.0, 1935.0)
+
+## The direct ride north, cottage yard to the gap in the Wall (about 790 m):
+## north through the forest edge, over the creek on its own bridge, and onto
+## the village's north road at (0, 1700) for the last stretch. Story's ride
+## north follows this; the village keeps ROADS[0] and ROADS[1].
+static var RIDE_NORTH_TRACK := PackedVector2Array([Vector2(-150.0, 2160.0), Vector2(-110.0, 2050.0)]) \
+	+ BridgeSpan.run_in(ride_bridge(), BRIDGE_RUN_IN) \
+	+ PackedVector2Array([Vector2(-30.0, 1800.0), Vector2(0.0, 1700.0), Vector2(-80.0, 1500.0), Vector2(-100.0, 1400.0)])
+## Scatter and trees stay this far from the track's centreline (the beast on
+## this ride is half again his old size); ruts and road paint are as ROADS.
+const RIDE_TRACK_HALF_WIDTH := 4.0
 
 ## Roads and paths (polylines). Roads are rutted and flattened; paths are trodden snow.
 static var ROADS: Array[PackedVector2Array] = [
@@ -107,6 +120,11 @@ static func creek_bridge() -> Dictionary:
 	return BridgeSpan.square_across(CREEK, CREEK_BRIDGE_AT, VILLAGE_SQUARE)
 
 
+## The ride-north track's bridge, crossing north from the cottage side.
+static func ride_bridge() -> Dictionary:
+	return BridgeSpan.square_across(CREEK, RIDE_BRIDGE_AT, COTTAGE)
+
+
 ## The frozen bridge, crossing north on Feyre's path from the cottage.
 static func frozen_bridge() -> Dictionary:
 	return BridgeSpan.square_across(CREEK, FROZEN_BRIDGE_AT, COTTAGE)
@@ -128,10 +146,20 @@ static func distance_to_creek(p: Vector2) -> float:
 	return distance_to_polyline(p, CREEK)
 
 
+## Distance to the nearest road centreline, the ride-north track included.
 static func distance_to_road(p: Vector2) -> float:
-	var best := INF
+	var best := distance_to_polyline(p, RIDE_NORTH_TRACK)
 	for r in ROADS:
 		best = minf(best, distance_to_polyline(p, r))
+	return best
+
+
+## Distance past the nearest road's edge (negative on the road): what scatter
+## and trees keep clear of. The ride-north track is wider than the others.
+static func distance_to_road_edge(p: Vector2) -> float:
+	var best := distance_to_polyline(p, RIDE_NORTH_TRACK) - RIDE_TRACK_HALF_WIDTH
+	for r in ROADS:
+		best = minf(best, distance_to_polyline(p, r) - ROAD_HALF_WIDTH)
 	return best
 
 

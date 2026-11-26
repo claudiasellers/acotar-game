@@ -9,5 +9,5 @@ id = &"old_mans_beard_find"
 mesh_path = "res://world/human_realm/shared/assets/flora/old_mans_beard.glb"
 ingredient_id = &"ing_old_mans_beard"
 tags = PackedStringArray("canon:X")
-instances = PackedFloat32Array(-281.5622, 4.606501, 1434.9519, 0.103395, 1.1262753, -77.54653, -1.4920523, 1461.9214, 1.5840881, 0.9938406, 345.8324, 0.28279218, 1478.1749, 2.7884285, 1.0936359)
+instances = PackedFloat32Array(622.15295, -4.853902, 1458.9063, 2.035055, 0.944539, -430.03613, 5.37129, 1478.5834, 3.0879686, 1.1350358, -714.23645, 11.277265, 1450.3835, 5.045832, 0.9830856)
 material = ExtResource("1_nlclr")

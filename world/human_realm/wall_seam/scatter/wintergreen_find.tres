@@ -9,5 +9,5 @@ id = &"wintergreen_find"
 mesh_path = "res://world/human_realm/shared/assets/flora/wintergreen_patch.glb"
 ingredient_id = &"ing_wintergreen"
 tags = PackedStringArray("canon:X")
-instances = PackedFloat32Array(527.2594, -7.2140255, 1410.3788, 3.3867712, 1.0628422, -331.60358, 5.4843397, 1460.857, 0.21545951, 1.075564, -309.05402, 5.247713, 1419.0447, 4.949272, 0.8957189, -577.7179, 6.699348, 1446.8691, 0.9293684, 0.8539593)
+instances = PackedFloat32Array(587.2855, -7.174986, 1418.693, 0.5619475, 0.9390936, -111.84265, -3.492003, 1421.5665, 1.4386224, 1.0378984, -564.3856, 6.6779046, 1419.0834, 4.9326744, 1.0711693, -603.53204, 8.787905, 1424.8612, 5.22567, 1.1312723)
 material = ExtResource("1_5uxrb")

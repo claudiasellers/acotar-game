@@ -7,4 +7,4 @@ script = ExtResource("1_u474u")
 id = &"child_mitten"
 mesh_path = "res://world/human_realm/wall_seam/assets/props/child_mitten.glb"
 tags = PackedStringArray("collectible", "canon:X")
-instances = PackedFloat32Array(381.23132, -3.3569763, 1402.3384, 0.062204447, 0.92688054, -564.3861, 8.36083, 1404.0344, 3.1015792, 0.86728156, 58.255554, 8.444969, 1424.7698, 5.6712995, 1.0843464)
+instances = PackedFloat32Array(-255.198, 2.5895915, 1417.8905, 6.224485, 0.89479256, 338.5548, -0.8970096, 1446.7671, 5.7449937, 1.1307518, -44.29663, -0.33687067, 1451.8019, 0.2767389, 0.95432836)

@@ -40,7 +40,7 @@ static func tree_layer(id: StringName, asset: String, canon: String) -> ScatterL
 
 
 static func off_road(p: Vector2, margin: float = 1.0) -> bool:
-	return HumanRealmLayout.distance_to_road(p) > HumanRealmLayout.ROAD_HALF_WIDTH + margin
+	return HumanRealmLayout.distance_to_road_edge(p) > margin
 
 
 static func off_creek(p: Vector2, margin: float = 0.5) -> bool:

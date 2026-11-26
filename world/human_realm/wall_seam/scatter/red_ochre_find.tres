@@ -9,5 +9,5 @@ id = &"red_ochre_find"
 mesh_path = "res://world/human_realm/shared/assets/flora/red_ochre_rock.glb"
 ingredient_id = &"ing_red_ochre"
 tags = PackedStringArray("canon:X")
-instances = PackedFloat32Array(330.76904, -0.14472784, 1425.4725, 4.095026, 0.9350174, -352.52368, 6.5398993, 1445.2893, 4.4502363, 0.891205, -504.137, 8.17663, 1452.4606, 1.0559503, 1.0273674)
+instances = PackedFloat32Array(371.448, -4.035695, 1436.8324, 6.209629, 0.86821824, 364.0697, -3.7811053, 1427.2194, 5.614549, 1.1477646, 660.76794, -2.90908, 1443.7808, 5.7834716, 1.0159669)
 material = ExtResource("1_nasmd")

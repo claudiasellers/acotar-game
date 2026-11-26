@@ -168,6 +168,8 @@ func _build_landmarks(root: Node3D, b: HuntingForestBuilder) -> void:
 	# the abandoned farmstead, waystones.
 	var ride := _group(lm, "RideNorth", root)
 	var bp := _frozen_bridge(ride, root)
+	# The direct ride-north track's own crossing (RIDE_NORTH_TRACK).
+	_frozen_bridge(ride, root, HumanRealmLayout.ride_bridge(), "RideTrackBridge", RIDE_BRIDGE_WIDTH)
 	var cr := HuntingForestBuilder.crossroads()
 	var road := HumanRealmLayout.ROADS[1]
 	var road_dir := _nearest_dir(road, cr)
@@ -202,26 +204,33 @@ func _build_landmarks(root: Node3D, b: HuntingForestBuilder) -> void:
 		s += 110.0
 
 
-## The frozen bridge, its deck ends on the banks and its model tilted to them
-## if they differ. The model's long axis is local X. Returns its centre.
-func _frozen_bridge(parent: Node, root: Node) -> Vector2:
-	var span := HumanRealmLayout.frozen_bridge()
+## The ride-track bridge is the frozen bridge's build widened by this (deck
+## half-width 2.0 m becomes 4.4 m: a mare and the beast abreast of the rails).
+const RIDE_BRIDGE_WIDTH := 2.2
+
+
+## A creek bridge (the frozen one by default), its deck ends on the banks and
+## its model tilted to them if they differ. The model's long axis is local X.
+## Returns its centre.
+func _frozen_bridge(parent: Node, root: Node, span: Dictionary = {}, bridge_name := "FrozenBridge", width := 1.0) -> Vector2:
+	if span.is_empty():
+		span = HumanRealmLayout.frozen_bridge()
 	var ends := BridgeSpan.ends_on_ground(span, HuntingForestBuilder.BRIDGE_HALF_LENGTH)
 	var xf := BridgeSpan.frame(ends[0], ends[1])
 	var deck := HuntingForestBuilder.bridge_deck_profile()
 	xf.origin -= xf.basis.y * deck[0].y
 	var bp: Vector2 = span.centre
-	var n := _lm(parent, root, "FrozenBridge", A % "frozen_bridge", bp, 0.0, 1.0, 0.0, false)
+	var n := _lm(parent, root, bridge_name, A % "frozen_bridge", bp, 0.0, 1.0, 0.0, false)
 	var stretch := HuntingForestBuilder.BRIDGE_HALF_LENGTH * 2.0 / HuntingForestBuilder.BRIDGE_MODEL_LENGTH
-	n.transform = Transform3D(xf.basis * Basis(Vector3.UP, -PI * 0.5) * Basis.from_scale(Vector3(stretch, 1.0, 1.0)), xf.origin)
+	n.transform = Transform3D(xf.basis * Basis(Vector3.UP, -PI * 0.5) * Basis.from_scale(Vector3(stretch, 1.0, width)), xf.origin)
 	var body := StaticBody3D.new()
-	body.name = "FrozenBridgeCollision"
+	body.name = bridge_name + "Collision"
 	body.collision_layer = 1
 	body.collision_mask = 0
 	parent.add_child(body)
 	body.owner = root
 	var cs := CollisionShape3D.new()
-	cs.shape = BridgeSpan.deck_shape(deck, 2.0)
+	cs.shape = BridgeSpan.deck_shape(deck, 2.0 * width)
 	cs.transform = xf
 	body.add_child(cs)
 	cs.owner = root

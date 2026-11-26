@@ -28,6 +28,12 @@ func _bridges() -> Array:
 	var fxf := BridgeSpan.frame(fe[0], fe[1])
 	fxf.origin -= fxf.basis.y * HuntingForestBuilder.bridge_deck_profile()[0].y
 	out.append({id = "frozen", ends = fe, water = f.along, half_width = 1.6, way = L.PATHS[0], shapes = [[BridgeSpan.deck_shape(HuntingForestBuilder.bridge_deck_profile(), 2.0), fxf]], walk = true})
+	# The ride-north track's bridge: the frozen build, widened.
+	var r := L.ride_bridge()
+	var re := BridgeSpan.ends_on_ground(r, HuntingForestBuilder.BRIDGE_HALF_LENGTH)
+	var rxf := BridgeSpan.frame(re[0], re[1])
+	rxf.origin -= rxf.basis.y * HuntingForestBuilder.bridge_deck_profile()[0].y
+	out.append({id = "ride_track", ends = re, water = r.along, half_width = 3.6, way = L.RIDE_NORTH_TRACK, shapes = [[BridgeSpan.deck_shape(HuntingForestBuilder.bridge_deck_profile(), 2.0 * 2.2), rxf]], walk = true})
 	# Spring Court: every landmark built on the arched footbridge.
 	for path in ["res://data/regions/spring_court/content/fae_village.tres", "res://data/regions/spring_court/content/blossom_vale.tres"]:
 		var c: CourtRegionContent = load(path)

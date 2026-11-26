@@ -83,3 +83,19 @@ func test_scene_has_landmarks_and_trunk_collision() -> void:
 	for body in trunks.get_children():
 		assert_eq((body as StaticBody3D).collision_layer, 1)
 		assert_lt(body.position.x - floorf(body.position.x / 64.0) * 64.0, 64.0)
+
+
+func test_the_ride_north_track_is_short_and_clear() -> void:
+	var track := HumanRealmLayout.RIDE_NORTH_TRACK
+	var length := ForestGenUtil.polyline_length(track)
+	assert_between(length, 760.0, 830.0, "cottage to the gap in about 790 m (was ~1,510 m)")
+	assert_eq(track[track.size() - 1], HumanRealmLayout.WALL_GAP)
+	var bad := []
+	for l in _layers():
+		if l.id == &"tree_oak" or l.id == &"tree_pine" or l.tags.has("tree") or l.cast_shadow:
+			for i in l.count():
+				var p := l.position_of(i)
+				var q := Vector2(p.x, p.z)
+				if HumanRealmLayout.distance_to_polyline(q, track) < HumanRealmLayout.RIDE_TRACK_HALF_WIDTH:
+					bad.append("%s:%d" % [l.id, i])
+	assert_eq(bad.size(), 0, "nothing tall on the track: %s" % [bad.slice(0, 10)])
