@@ -14,7 +14,10 @@ const VARIATIONS := {
 		&"SatchelKeyLabel", &"SatchelCount", &"SlotKey", &"NewTag", &"TinName", &"PromptText", &"BowText", &"ChapterTitle",
 		&"NotifyText", &"ThoughtText", &"CoverKicker", &"CoverTitle",
 	],
-	&"ProgressBar": [&"SatchelMeter", &"HealthMeter", &"StaminaMeter"],
+	&"ProgressBar": [
+		&"SatchelMeter", &"HealthMeter", &"StaminaMeter", &"MeasureMeter_closeness", &"MeasureMeter_warmth",
+		&"MeasureMeter_deeds", &"MeasureMeter_memories", &"MeasureMeter_since",
+	],
 }
 const TOKENS: Array[StringName] = [
 	&"paper", &"paper_deep", &"ink", &"ink_soft", &"accent", &"glow", &"rare", &"danger",
