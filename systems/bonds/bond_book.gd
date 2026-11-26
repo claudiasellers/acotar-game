@@ -199,8 +199,8 @@ const MEASURES: Array[Dictionary] = [
 	{"id": CLOSENESS, "name": "Closeness", "says": "How far we have come. It never goes back."},
 	{"id": WARMTH, "name": "Warmth", "says": "How they are with me now. A bad day cools it, and it passes."},
 	{"id": DEEDS, "name": "Deeds", "says": "Things I did that they noticed."},
-	{"id": MEMORIES, "name": "Memories", "says": "What has passed between us, written on their page."},
-	{"id": SINCE, "name": "Since", "says": "The day they came into my life."},
+	{"id": MEMORIES, "name": "Memories", "says": "What has passed between us, kept on their page."},
+	{"id": SINCE, "name": "Since", "says": "When it began between us."},
 ]
 ## Warmth's four steps, coldest first, and the word for each.
 const WARMTH_STEPS: Array[StringName] = [Relationships.COOL, Relationships.BAITING, Relationships.NEUTRAL, Relationships.WARM]
