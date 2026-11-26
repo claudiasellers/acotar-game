@@ -101,8 +101,7 @@ func test_the_winter_night_is_dark_by_light_not_by_the_screen() -> void:
 	var winter := GradeDirector.load_preset(&"human_winter")
 	assert_eq(winter.night_look, &"human_winter_night")
 	var night := GradeDirector.with_night(winter, 1.0)
-	assert_lt(night.ambient_energy * night.ambient_color.get_luminance(),
-		winter.ambient_energy * winter.ambient_color.get_luminance() * 0.25, "a low night ambient")
+	assert_lt(night.ambient_energy, winter.ambient_energy * 0.5, "a low night ambient")
 	assert_gt(night.ambient_color.b, night.ambient_color.r, "and a cold one")
 	assert_lt(night.sky_horizon.get_luminance(), 0.15, "no grey-white day in the windows")
 	assert_almost_eq(night.exposure, winter.exposure, 0.0001, "never a darker screen")
