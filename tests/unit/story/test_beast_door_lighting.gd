@@ -40,6 +40,7 @@ func before_each() -> void:
 	_fire = Flicker.new()
 	_fire.light_energy = 1.8
 	_fire._base = 1.8
+	_fire.omni_attenuation = 1.2
 	hearth.add_child(_fire)
 	_beast = Node3D.new()
 	_space.add_child(_beast)
@@ -73,6 +74,7 @@ func test_the_door_breaks_into_moon_fire_and_rim() -> void:
 	# The hearth burns high (the existing shadowed light, not a second one).
 	assert_almost_eq(_fire.light_energy, 1.8 * BeastDoorLighting.FIRE_GAIN, 0.01)
 	assert_almost_eq(_fire._base, 1.8 * BeastDoorLighting.FIRE_GAIN, 0.01, "the flicker keeps its new base")
+	assert_almost_eq(_fire.omni_attenuation, BeastDoorLighting.FIRE_ATTENUATION, 0.01, "the warmth falls off hard")
 	# The rim rides behind his head and follows him.
 	var rim := _rig.rim
 	assert_not_null(rim)
@@ -103,6 +105,7 @@ func test_the_room_gets_its_own_light_back_after() -> void:
 	assert_null(_rig.glow)
 	assert_almost_eq(_fire.light_energy, 1.8, 0.001)
 	assert_almost_eq(_fire._base, 1.8, 0.001)
+	assert_almost_eq(_fire.omni_attenuation, 1.2, 0.001, "and its own falloff")
 	assert_eq(_space.find_children("*", "Light3D", true, false).size(), 1, "only the hearth")
 
 

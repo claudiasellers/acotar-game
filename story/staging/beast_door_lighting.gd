@@ -11,16 +11,19 @@
 ## - A rim on his back: a short cold spot behind his head and shoulders,
 ##   following him, so horns, mane and spine edge against the dark.
 ##
-## Lights only: the grade, the camera and the beats are untouched. Everything
-## fades back to the room's own light when the scene ends.
+## Lights only: the grade, the camera and the beats are untouched. The night
+## around them is human_winter's own night look (human_winter_night: a cold low
+## ambient and a dark sky), so the room is dark before a light touches it.
+## Everything fades back to the room's own light when the scene ends.
 class_name BeastDoorLighting
 extends Node
 
-const MOON_COLOR := Color(0.68, 0.78, 1.0)
-## Energies were measured under the old dread grade (exposure 0.19 against the
-## winter grade's 0.85) and scaled by that ratio (x0.22) when fear stopped
-## darkening the screen (owner, 2026-11-26), so the frame keeps its balance.
-const MOON_ENERGY := 8.0
+## A deep cold blue, so the doorway reads as moonlight and never clips white.
+const MOON_COLOR := Color(0.45, 0.58, 1.0)
+## Energies for the winter night look at the grade's own exposure (L89-5): the
+## hearth is the key, the moon a cool shaft, his eyes and the fire on his teeth
+## the brightest things in frame (beast_door_light_probe measures it on the Mac).
+const MOON_ENERGY := 4.0
 const MOON_RANGE := 14.0
 const MOON_ANGLE := 30.0
 ## How far outside, and how high, the moon spot hangs from the door.
@@ -29,11 +32,14 @@ const MOON_UP := 3.4
 ## The hearth's FireLight is multiplied by this while the scene runs: the fire
 ## burns high with the gust and carries the room (beast_door_light_probe
 ## measures it on the Mac). The door-burst shot stays a silhouette on purpose.
-const FIRE_GAIN := 3.0
+const FIRE_GAIN := 3.5
 ## The gust through the broken door: the fire leaps to this, then settles.
-const FIRE_FLARE := 5.0
+const FIRE_FLARE := 6.0
+## The hearth light's falloff while the scene runs: steep, so its warmth stays
+## on the faces near the fire and the corners of the room go dark.
+const FIRE_ATTENUATION := 2.4
 const FLARE_SECONDS := 0.9
-const RIM_COLOR := Color(0.72, 0.8, 1.0)
+const RIM_COLOR := Color(0.55, 0.66, 1.0)
 const RIM_ENERGY := 6.5
 const RIM_RANGE := 3.2
 ## A narrow cone aimed at his head from behind, so it never lights the wall
@@ -45,7 +51,7 @@ const RIM_BACK := 1.0
 ## wall around the doorway, so he stands as a dark shape against it. On the
 ## Mac a bright omni there clipped that wall to white (L55-1); this level
 ## keeps it a pale glow.
-const GLOW_ENERGY := 1.6
+const GLOW_ENERGY := 0.8
 const GLOW_RANGE := 5.0
 const RIM_UP := 0.7
 const FADE_IN := 0.3
@@ -61,6 +67,7 @@ var rim: SpotLight3D
 var glow: OmniLight3D
 var fire: OmniLight3D
 var _fire_base := 0.0
+var _fire_attenuation := 1.0
 var _target := 0.0
 var _rate := 1.0
 var _flare := 0.0
@@ -140,6 +147,7 @@ func light_up() -> void:
 		fire = _hearth_light()
 		if fire != null:
 			_fire_base = _base_of(fire)
+			_fire_attenuation = fire.omni_attenuation
 	_flare = FLARE_SECONDS
 	_target = 1.0
 	_rate = 1.0 / FADE_IN
@@ -175,6 +183,7 @@ func _apply() -> void:
 	if fire != null and is_instance_valid(fire):
 		var k := lerpf(FIRE_GAIN, FIRE_FLARE, _flare / FLARE_SECONDS) * gain
 		_set_base(fire, _fire_base * lerpf(1.0, k, amount))
+		fire.omni_attenuation = lerpf(_fire_attenuation, FIRE_ATTENUATION, amount)
 
 
 ## The rim rides behind his head; it holds still if he's gone.
@@ -195,6 +204,7 @@ func _follow() -> void:
 func _restore() -> void:
 	if fire != null and is_instance_valid(fire):
 		_set_base(fire, _fire_base)
+		fire.omni_attenuation = _fire_attenuation
 	fire = null
 	for l: Light3D in [moon, rim, glow]:
 		if l != null and is_instance_valid(l):
