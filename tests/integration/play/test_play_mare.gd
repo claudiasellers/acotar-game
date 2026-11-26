@@ -143,8 +143,8 @@ func test_4_a_held_x_on_the_pad_tends_her() -> void:
 	if not booted or not _mare_standing_near(8.0):
 		return
 	await _up_to_her()
-	assert_true(await h.wait_until(func() -> bool: return UsePrompt.of(get_tree()).offered().size() == 2, 60),
-			"beside her the prompt names two keys: %s" % [UsePrompt.of(get_tree()).offered()])
+	assert_true(await h.wait_until(func() -> bool: return UsePrompt.of(get_tree()).offered() == [["ride", &"interact"], ["tend", &"interact_alt"]], 60),
+			"beside her the prompt says E ride, T tend: %s" % [UsePrompt.of(get_tree()).offered()])
 	var x := InputEventJoypadButton.new()
 	for bound in InputMap.action_get_events(&"interact"):
 		if bound is InputEventJoypadButton:
