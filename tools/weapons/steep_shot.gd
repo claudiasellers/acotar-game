@@ -28,7 +28,6 @@ func _run() -> void:
 	get_tree().root.add_child(layer)
 	var her := Node3D.new()
 	her.name = "Her"
-	her.add_to_group(&"player")
 	get_tree().root.add_child(her)
 	WeaponRack.of(her).add(GLAIVE)
 	var hearth := CookingStation.new()
@@ -36,7 +35,7 @@ func _run() -> void:
 	get_tree().root.add_child(hearth)
 	var menu := BrewMenu.new()
 	get_tree().root.add_child(menu)
-	menu.open(null, hearth)
+	menu.open(null, hearth, WeaponRack.of(her))
 	for i in 4:
 		await get_tree().process_frame
 	var offered := WeaponSteep.offers(WeaponRack.of(her), Gameplay.inventory)
