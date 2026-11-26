@@ -61,6 +61,19 @@ func steer(goal: Vector3) -> Vector3:
 	return next if next.length_squared() > 0.0004 else straight
 
 
+## True when the mover is on a navmesh whose path to `goal` ends well short of it
+## (the goal is off the mesh, or cut off from where the mover stands).
+func stalls_short_of(goal: Vector3, slack: float = 1.5) -> bool:
+	var from := _host.global_position
+	if not has_mesh_at(from):
+		return false
+	var path := NavigationServer3D.map_get_path(get_navigation_map(), from, goal, true)
+	if path.is_empty():
+		return true
+	var end := path[path.size() - 1]
+	return Vector2(end.x - goal.x, end.z - goal.z).length() > slack
+
+
 ## True when a baked navmesh lies under `point`.
 func has_mesh_at(point: Vector3) -> bool:
 	var map := get_navigation_map()

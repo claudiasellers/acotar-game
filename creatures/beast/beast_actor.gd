@@ -296,6 +296,11 @@ func _process(delta: float) -> void:
 	if to.length() > 0.05:
 		# Round the walls on the navmesh (T5); straight when there is none.
 		var dir := NavMover.on(self).steer(_destination) if to.length() >= NavMover.MIN_DISTANCE else to
+		# Leading her in, a goal the navmesh can't reach (the manor's front door
+		# baked shut: its path ends on the step) is walked straight; he stalled
+		# on the doorstep for good otherwise.
+		if stage == Stage.LEAD and to.length() >= NavMover.MIN_DISTANCE and NavMover.on(self).stalls_short_of(_destination):
+			dir = to
 		var step := minf((burst_speed if _bursting else walk_speed) * delta, to.length())
 		global_position += dir.normalized() * step
 		_keep_to_ground(step)
