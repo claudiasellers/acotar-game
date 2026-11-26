@@ -1,0 +1,3 @@
+from one-light-lane
+quality look
+shot onelight res://tools/lighting/one_light_probe.tscn {out}
