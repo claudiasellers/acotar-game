@@ -38,25 +38,33 @@ var catch_left := 0.0
 var pulse_left := 0.0
 
 
-func _init(controller: BowController = null) -> void:
+func _init(controller: BowController) -> void:
 	bow = controller
 	name = "Reticle"
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
 func _ready() -> void:
-	if bow:
-		bow.full_draw.connect(func() -> void: catch_left = bow.tuning.full_draw_catch_s)
+	bow.full_draw.connect(func() -> void: catch_left = bow.tuning.full_draw_catch_s)
+	# Its life is its bow's: HudLayout frees it when the bow has left the tree,
+	# and from the moment the bow starts to leave it neither runs nor draws.
+	bow.tree_exiting.connect(_bow_leaving)
 	EventBus.creature_hit.connect(_on_creature_hit)
 
 
 func _on_creature_hit(_id: StringName, _kind: StringName, cause: StringName, _part: StringName) -> void:
 	if String(cause).begins_with("arrow") and bool(GameSettings.get_value(&"hit_marks")):
-		pulse_left = bow.tuning.hit_pulse_s if bow else 0.2
+		pulse_left = bow.tuning.hit_pulse_s
+
+
+func _bow_leaving() -> void:
+	set_process(false)
+	visible = false
+	EventBus.creature_hit.disconnect(_on_creature_hit)
 
 
 func _process(delta: float) -> void:
-	var feyre := bow.feyre if bow else null
+	var feyre := bow.feyre
 	var show := feyre != null and bow.is_up() and feyre.camera != null
 	visible = show
 	if not show:
@@ -82,8 +90,6 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	if not is_instance_valid(bow):
-		return
 	var t := bow.tuning
 	var held := catch_left / maxf(t.full_draw_catch_s, 0.001)
 	var radius := lerpf(RADIUS_OPEN, RADIUS_DRAWN, bow.draw_amount)

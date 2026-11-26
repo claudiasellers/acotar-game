@@ -71,7 +71,7 @@ func say(line: String) -> void:
 func describe(item_id: StringName = &"") -> String:
 	if controller == null:
 		return ""
-	var id := item_id if item_id != &"" else controller._available()
+	var id := item_id if item_id != &"" else controller.arrow_ready()
 	if id == &"":
 		return "No arrows"
 	var inv := Gameplay.inventory

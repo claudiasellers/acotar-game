@@ -142,3 +142,54 @@ func test_the_ride_waits_until_the_cottage_scene_is_over() -> void:
 	# A finished space stays in the live group; only running counts.
 	cottage.running = false
 	assert_true(ride.can_start(), "then out to the mare")
+
+
+func test_the_ridden_mare_is_gone_from_the_manor_once_she_is_down() -> void:
+	var ride := RideNorth.new()
+	ride.auto_tick = false
+	add_child(ride)  # after_each frees the ride
+	var feyre := Node3D.new()
+	add_child_autofree(feyre)
+	ride._rider = feyre
+	ride.horse = MareMount.new()
+	ride.horse.data = RideNorth.MARE_DATA
+	ride.add_child(ride.horse)
+	ride.horse.global_position = Vector3(3, 0, 0)
+	ride.horse.go_home()
+	ride.step = RideNorth.Step.DONE
+	ride._process(1.0)
+	assert_not_null(ride.horse, "she walks off first, not gone the moment Feyre is down")
+	ride._process(RideNorth.MARE_GONE_BY)
+	assert_null(ride.horse, "then gone from the drive: the only mare is the one in the stables")
+
+
+func test_the_rides_end_leaves_him_to_the_arrival() -> void:
+	var ride := RideNorth.new()
+	ride.auto_tick = false
+	add_child(ride)  # after_each frees the ride
+	var beast := BeastActor.new()
+	add_child_autofree(beast)
+	ride.beast = beast
+	var arrival := SceneSpace.new()
+	arrival.auto_tick = false
+	add_child_autofree(arrival)
+	arrival.set_meta(&"story_space_id", &"manor_arrival")
+	arrival.add_to_group(&"story_space_live")
+	arrival.running = true
+	var hall := Vector3(0, 0, -38)
+	beast.lead(hall)  # the arrival's one order: down the hall
+	ride._end(ride)
+	assert_eq(beast._destination, hall, "the ride ending (her slide down done) never sends him back to the steps")
+
+
+func test_leading_he_never_stands_stuck_on_a_doorstep() -> void:
+	var beast := BeastActor.new()
+	add_child_autofree(beast)
+	beast.lead(Vector3(0, 0, -12))
+	var moved_straight := false
+	for i in 120:  # two seconds held in place (a path baked short of the hall)
+		moved_straight = beast._lead_stuck(1.0 / 60.0)
+	assert_true(moved_straight, "after standing in place for LEAD_STUCK_AFTER he takes the straight line")
+	beast.lead(Vector3(5, 0, -12))
+	assert_false(beast._lead_stuck(1.0 / 60.0), "a new goal gives the navmesh another chance")
+
