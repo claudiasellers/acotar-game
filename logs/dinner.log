@@ -1,0 +1,68 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+Metal 4.0 - Forward+ - Using Device #0: Apple - Apple M4 (Apple9)
+
+ERROR: This function should never be used outside the editor, it can severely damage performance.
+   at: global_shader_parameter_get_list (servers/rendering/renderer_rd/storage_rd/material_storage.cpp:1848)
+   GDScript backtrace (most recent call first):
+       [0] ensure_wetness_global (res://world/shared/weather/spring_weather.gd:87)
+       [1] _ready (res://world/shared/weather/spring_weather.gd:59)
+       [2] _ready (res://systems/props/touch_world.gd:27)
+       [3] _ready (res://story/act1/act1_game.gd:45)
+       [4] _run (res://tools/_probe/dinner_probe.gd:86)
+focus guard: handed focus back 2x, render held it 317 ms
+PROBE at the doors | caption 'Every flower open at once. Nothing grows like this. Nothing.' feyre (0.0, 9.1, -24.0) | chair (25.4, 8.9, -38.0)
+PROBE arrival running true
+SHOT 1_follow_him_in | caption 'The doors swung open on silent hinges. A faint, metallic smell: magic.' feyre (0.0, 8.9, -24.0) | manor_arrival 'wait 3.0' | chair (25.4, 8.9, -38.0)
+PROBE follow 0 | caption 'The doors swung open on silent hinges. A faint, metallic smell: magic.' feyre (0.0, 8.9, -24.0) | manor_arrival 'wait 3.0' | chair (25.4, 8.9, -38.0)
+PROBE follow 8 | caption 'He padded inside without looking back. I followed him in.' feyre (0.0, 9.0, -25.7) | manor_arrival 'lead tamlin_beast' tamlin_beast (-0.0, 8.9, -28.1) | chair (25.4, 8.9, -38.0) | beast TamlinBeast cls Node3D stage 6 dest (0.0, 8.9, -38.0) mesh true next (-0.0, 0.0, -0.5) fin false ws 1.4 burst false proc true paused false ride false
+PROBE frame 0 at (-0.0, 8.9, -29.7) steer (-0.0, 0.0, -2.8) idx 7 path [(0.0, 9.166016, -27.02791), (-0.000021, 9.166016, -27.06248), (-0.000379, 9.166016, -27.6428), (-0.000599, 9.166016, -28.0002), (-0.000819, 9.166016, -28.35703), (-0.001005, 9.166016, -28.65854), (-0.001677, 9.166016, -29.75), (-0.003361, 9.166016, -32.48224), (-0.005729, 9.166016, -36.32655), (-0.005832, 9.166016, -36.49316), (-0.006212, 9.166016, -37.11132), (-0.006732, 9.166016, -37.95557)]
+PROBE frame 1 at (-0.0, 8.9, -29.8) steer (-0.0, 0.0, -2.7) idx 7 path [(0.0, 9.166016, -27.02791), (-0.000021, 9.166016, -27.06248), (-0.000379, 9.166016, -27.6428), (-0.000599, 9.166016, -28.0002), (-0.000819, 9.166016, -28.35703), (-0.001005, 9.166016, -28.65854), (-0.001677, 9.166016, -29.75), (-0.003361, 9.166016, -32.48224), (-0.005729, 9.166016, -36.32655), (-0.005832, 9.166016, -36.49316), (-0.006212, 9.166016, -37.11132), (-0.006732, 9.166016, -37.95557)]
+PROBE frame 2 at (-0.0, 8.9, -30.0) steer (-0.0, 0.0, -2.5) idx 7 path [(0.0, 9.166016, -27.02791), (-0.000021, 9.166016, -27.06248), (-0.000379, 9.166016, -27.6428), (-0.000599, 9.166016, -28.0002), (-0.000819, 9.166016, -28.35703), (-0.001005, 9.166016, -28.65854), (-0.001677, 9.166016, -29.75), (-0.003361, 9.166016, -32.48224), (-0.005729, 9.166016, -36.32655), (-0.005832, 9.166016, -36.49316), (-0.006212, 9.166016, -37.11132), (-0.006732, 9.166016, -37.95557)]
+PROBE frame 3 at (-0.0, 8.9, -30.1) steer (-0.0, 0.0, -2.3) idx 7 path [(0.0, 9.166016, -27.02791), (-0.000021, 9.166016, -27.06248), (-0.000379, 9.166016, -27.6428), (-0.000599, 9.166016, -28.0002), (-0.000819, 9.166016, -28.35703), (-0.001005, 9.166016, -28.65854), (-0.001677, 9.166016, -29.75), (-0.003361, 9.166016, -32.48224), (-0.005729, 9.166016, -36.32655), (-0.005832, 9.166016, -36.49316), (-0.006212, 9.166016, -37.11132), (-0.006732, 9.166016, -37.95557)]
+PROBE frame 4 at (-0.0, 8.9, -30.3) steer (-0.0, 0.0, -2.2) idx 7 path [(0.0, 9.166016, -27.02791), (-0.000021, 9.166016, -27.06248), (-0.000379, 9.166016, -27.6428), (-0.000599, 9.166016, -28.0002), (-0.000819, 9.166016, -28.35703), (-0.001005, 9.166016, -28.65854), (-0.001677, 9.166016, -29.75), (-0.003361, 9.166016, -32.48224), (-0.005729, 9.166016, -36.32655), (-0.005832, 9.166016, -36.49316), (-0.006212, 9.166016, -37.11132), (-0.006732, 9.166016, -37.95557)]
+PROBE frame 5 at (-0.0, 8.9, -30.4) steer (-0.0, 0.0, -2.1) idx 7 path [(0.0, 9.166016, -27.02791), (-0.000021, 9.166016, -27.06248), (-0.000379, 9.166016, -27.6428), (-0.000599, 9.166016, -28.0002), (-0.000819, 9.166016, -28.35703), (-0.001005, 9.166016, -28.65854), (-0.001677, 9.166016, -29.75), (-0.003361, 9.166016, -32.48224), (-0.005729, 9.166016, -36.32655), (-0.005832, 9.166016, -36.49316), (-0.006212, 9.166016, -37.11132), (-0.006732, 9.166016, -37.95557)]
+PROBE manual step (-0.0, 8.9, -29.5) -> (-0.0, 8.9, -29.6) -> frame (-0.0, 8.9, -29.6) -> physics (-0.0, 8.9, -30.4)
+PROBE follow 16 | caption '' feyre (-0.0, 9.0, -28.5) | manor_arrival 'lead tamlin_beast' tamlin_beast (-0.0, 8.9, -31.9) | chair (25.4, 8.9, -38.0) | beast TamlinBeast cls Node3D stage 6 dest (0.0, 8.9, -38.0) mesh true next (-0.0, 0.0, -0.6) fin false ws 1.4 burst false proc true paused false ride false
+SHOT 1b_down_the_hall | caption '' feyre (-0.0, 9.0, -31.1) | manor_arrival 'lead tamlin_beast' tamlin_beast (-0.0, 8.9, -33.7) | chair (25.4, 8.9, -38.0) | beast TamlinBeast cls Node3D stage 6 dest (0.0, 8.9, -38.0) mesh true next (-0.0, 0.0, -2.7) fin false ws 1.4 burst false proc true paused false ride false
+PROBE follow 24 | caption '' feyre (-0.0, 9.0, -32.2) | manor_arrival 'lead tamlin_beast' tamlin_beast (-0.0, 9.7, -35.0) | chair (25.4, 8.9, -38.0) | beast TamlinBeast cls Node3D stage 6 dest (0.0, 8.9, -38.0) mesh true next (-0.0, 0.0, -1.4) fin false ws 1.4 burst false proc true paused false ride false
+PROBE follow 32 | caption '' feyre (-0.0, 9.8, -35.0) | manor_arrival 'lead tamlin_beast' tamlin_beast (0.2, 8.9, -37.6) | chair (25.4, 8.9, -38.0) | beast TamlinBeast cls Node3D stage 6 dest (7.0, 8.9, -38.0) mesh true next (1.6, 0.0, -0.1) fin false ws 1.4 burst false proc true paused false ride false
+PROBE follow 40 | caption '' feyre (0.8, 9.0, -37.6) | manor_arrival 'lead tamlin_beast' tamlin_beast (3.2, 8.9, -37.8) | chair (25.4, 8.9, -38.0) | beast TamlinBeast cls Node3D stage 6 dest (7.0, 8.9, -38.0) mesh true next (0.3, 0.0, -0.0) fin false ws 1.4 burst false proc true paused false ride false
+PROBE follow 48 | caption '' feyre (4.0, 9.0, -37.8) | manor_arrival 'lead tamlin_beast' tamlin_beast (6.2, 8.9, -38.0) | chair (25.4, 8.9, -38.0) | beast TamlinBeast cls Node3D stage 6 dest (7.0, 8.9, -38.0) mesh true next (0.8, 0.0, -0.0) fin false ws 1.4 burst false proc true paused false ride false
+PROBE follow 56 | caption '' feyre (7.0, 9.0, -38.0) | manor_arrival 'lead tamlin_beast' tamlin_beast (9.4, 8.9, -38.0) | chair (25.4, 8.9, -38.0) | beast TamlinBeast cls Node3D stage 6 dest (10.0, 8.9, -38.0) mesh true next (0.6, 0.0, -0.0) fin true ws 1.4 burst false proc true paused false ride false
+SHOT 2_in_here | caption 'In here.' feyre (7.0, 9.0, -38.0) | manor_arrival 'say call_in' tamlin_beast (9.4, 8.9, -38.0) | chair (25.4, 8.9, -38.0) | beast TamlinBeast cls Node3D stage 6 dest (9.4, 8.9, -38.0) mesh true next (0.0, 0.0, 0.0) fin true ws 1.4 burst false proc true paused false ride false
+PROBE hanging back | caption 'In here.' feyre (7.0, 8.9, -38.0) | manor_arrival 'say call_in' tamlin_beast (9.4, 8.9, -38.0) | chair (25.4, 8.9, -38.0) | beast TamlinBeast cls Node3D stage 6 dest (9.4, 8.9, -38.0) mesh true next (0.0, 0.0, 0.0) fin true ws 1.4 burst false proc true paused false ride false
+SHOT 3_waits_at_the_chair | caption 'In here.' feyre (7.0, 8.9, -38.0) | manor_arrival 'say call_in' tamlin_beast (9.4, 8.9, -38.0) | chair (25.4, 8.9, -38.0) | beast TamlinBeast cls Node3D stage 6 dest (9.4, 8.9, -38.0) mesh true next (0.0, 0.0, 0.0) fin true ws 1.4 burst false proc true paused false ride false
+SHOT 4_the_change | caption 'In here.' feyre (11.0, 8.9, -37.4) | manor_arrival 'say call_in' tamlin_beast (9.4, 8.9, -38.0) | chair (25.4, 8.9, -38.0) | beast TamlinBeast cls Node3D stage 6 dest (9.4, 8.9, -38.0) mesh true next (0.0, 0.0, 0.0) fin true ws 1.4 burst false proc true paused false ride false
+PROBE in the room | caption 'In here.' feyre (11.0, 8.9, -37.4) | manor_arrival 'say call_in' tamlin_beast (9.4, 8.9, -38.0) | chair (25.4, 8.9, -38.0) | beast TamlinBeast cls Node3D stage 6 dest (9.4, 8.9, -38.0) mesh true next (0.0, 0.0, 0.0) fin true ws 1.4 burst false proc true paused false ride false
+SCRIPT ERROR: Cannot call method 'duplicate' on a null value.
+          at: _green_mesh (res://story/act2/spring_magic.gd:120)
+          GDScript backtrace (most recent call first):
+              [0] _green_mesh (res://story/act2/spring_magic.gd:120)
+              [1] _glitter (res://story/act2/spring_magic.gd:152)
+              [2] pull_out (res://story/act2/spring_magic.gd:33)
+              [3] pull (res://story/act2/spring_magic.gd:77)
+              [4] _pull_out_her_chair (res://story/act2/manor_arrival.gd:132)
+              [5] enter (res://story/framework/beats.gd:121)
+              [6] _advance (res://story/framework/scene_space.gd:262)
+              [7] tick (res://story/framework/scene_space.gd:183)
+              [8] tick (res://story/act2/manor_arrival.gd:138)
+              [9] _physics_process (res://story/framework/scene_space.gd:64)
+SHOT 5_chair_slides_out | caption 'At the far end of the table, an empty chair slid out by itself.' feyre (11.0, 8.9, -37.4) | manor_arrival 'say chair' tamlin (16.6, 8.9, -38.0) | chair (25.9, 8.9, -38.0)
+SHOT 6_eat | caption 'Eat.' feyre (11.0, 8.9, -37.4) | manor_arrival 'say eat' tamlin (16.6, 8.9, -38.0) | chair (25.9, 8.9, -38.0)
+PROBE arrival done | caption 'Your bath's drawn. In with you, and mind the hot water.' feyre (23.0, 13.7, -58.4) | alis_welcome 'say alis_bath_drawn' alis (26.0, 13.7, -60.4) | chair (25.4, 8.9, -38.0)
+PROBE welcome running true | caption 'Your bath's drawn. In with you, and mind the hot water.' feyre (23.0, 13.7, -58.4) | alis_welcome 'say alis_bath_drawn' alis (26.0, 13.7, -60.4) | chair (25.4, 8.9, -38.0)
+SHOT 7_this_way | caption 'This way. Through here.' feyre (23.0, 13.7, -58.4) | alis_welcome 'say alis_this_way' alis (29.1, 13.7, -57.5) | chair (25.4, 8.9, -38.0)
+SHOT 8_at_the_bath | caption 'This way. Through here.' feyre (30.6, 13.7, -57.4) | alis_welcome 'say alis_this_way' alis (29.1, 13.7, -57.5) | chair (25.4, 8.9, -38.0)
+PROBE welcome done | caption '' feyre (30.6, 13.7, -57.4) | alis_welcome 'until she steps in' alis (29.1, 13.7, -57.5) | chair (25.4, 8.9, -38.0)
+PROBE dinner running false | caption '' feyre (30.6, 13.7, -57.4) | alis_welcome 'until she steps in' alis (29.1, 13.7, -57.5) | chair (25.4, 8.9, -38.0)
+SHOT 9_dinner_chair_out | caption '' feyre (30.6, 13.7, -57.4) | alis_welcome 'until she steps in' alis (29.1, 13.7, -57.5) | chair (25.4, 8.9, -38.0)
+SHOT 10_no_slaves | caption '' feyre (26.0, 8.9, -38.0) | alis_welcome 'until she steps in' alis (29.1, 13.7, -57.5) | chair (25.4, 8.9, -38.0)
+SHOT 11_she_rises | caption '' feyre (26.0, 8.9, -38.0) | alis_welcome 'until she steps in' alis (29.1, 13.7, -57.5) | chair (25.4, 8.9, -38.0)
+SHOT 12_green_hands | caption '' feyre (26.0, 8.9, -38.0) | alis_welcome 'until she steps in' alis (29.1, 13.7, -57.5) | chair (25.4, 8.9, -38.0)
+SHOT 12b_green_hands | caption '' feyre (26.0, 8.9, -38.0) | alis_welcome 'until she steps in' alis (29.1, 13.7, -57.5) | chair (25.4, 8.9, -38.0)
+PROBE held | caption '' feyre (26.0, 8.9, -38.0) | alis_welcome 'until she steps in' alis (29.1, 13.7, -57.5) | chair (25.4, 8.9, -38.0)
+ERROR: 2 shaders of type ParticlesShaderRD were never freed
+   at: ~ShaderRD (servers/rendering/renderer_rd/shader_rd.cpp:1236)
+WARNING: 16 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 2 RID allocations of type 'N10RendererRD15MaterialStorage6ShaderE' were leaked at exit.
