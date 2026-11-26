@@ -94,6 +94,13 @@ const SSAO_RADIUS := 1.0
 const SSAO_INTENSITY := 1.2
 const SSIL_RADIUS := 5.0
 const SSIL_INTENSITY := 1.0
+## A floor of light under dread outdoors by day (owner, 2026-11-26: "Keep a
+## floor of light"): full dread keeps at least this share of the grade's own
+## exposure while the sun is up, so the noon sky never goes black; the fear is
+## in the drained colour, cold tint and crushed shadows. It fades out as the
+## sun sets and never applies indoors, so night and interior dread are as dark
+## as before.
+const DREAD_DAY_FLOOR := 0.6
 
 
 func _ready() -> void:
@@ -236,7 +243,8 @@ func target_id() -> StringName:
 
 
 func apply(base: GradePreset) -> void:
-	var p := with_mood(with_true_sight(with_night(base, night), sight), mood_amount, mood, night)
+	var p := with_mood(with_true_sight(with_night(base, night), sight), mood_amount, mood, night,
+			0.0 if indoors else 1.0 - night)
 	snow_cover_now = p.snow_cover
 	magic_now = p.magic
 	RenderingServer.global_shader_parameter_set(&"snow_cover", p.snow_cover)
@@ -295,9 +303,10 @@ static func dread_weight(dread: float) -> float:
 
 ## `p` with a story mood applied at `dread` (0..1) strength. `night_weight`
 ## (GradeDirector.night) picks the dread look: the grade's daylight one by day,
-## the dread preset at night.
+## the dread preset at night. `day_floor` (1 outdoors at noon, 0 at night and
+## indoors) keeps the DREAD_DAY_FLOOR share of the grade's exposure.
 static func with_mood(p: GradePreset, dread: float, kind: StringName = &"dread",
-		night_weight: float = 0.0) -> GradePreset:
+		night_weight: float = 0.0, day_floor: float = 0.0) -> GradePreset:
 	if dread <= 0.0:
 		return p
 	if kind == &"enchanted_sleep":
@@ -315,6 +324,7 @@ static func with_mood(p: GradePreset, dread: float, kind: StringName = &"dread",
 	cold.dread_day_look = p.dread_day_look
 	cold.tonemap_mode = p.tonemap_mode
 	cold.snow_cover = p.snow_cover
+	cold.exposure = maxf(cold.exposure, p.exposure * DREAD_DAY_FLOOR * clampf(day_floor, 0.0, 1.0))
 	return cold
 
 

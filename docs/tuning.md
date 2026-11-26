@@ -342,6 +342,7 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | Tunable | Where | Default | Range | What it does | Lane |
 |---|---|---|---|---|---|
 | `dread_day_look` | grade_preset.gd (set in human_winter.tres) | `&"dread_winter_day"` | preset id or empty | The look dread blends toward while the sun is up; empty = the night `dread` preset. Night always takes `dread`, so the beast at the door (L55) is unchanged. | L18 |
+| `DREAD_DAY_FLOOR` | GradeDirector | 0.6 | 0.3–1.0 | Share of the grade's own exposure dread keeps outdoors while the sun is up (owner, 2026-11-26: "Keep a floor of light"); fades out at sunset, never indoors, so night and interior dread are unchanged. | L89 |
 | `dread_winter_day` exposure / sky / fog | world/shared/grades/dread_winter_day.tres | 0.56 / grey overcast / 0.016 | — | Winter-day horror: drained colour, the fog closing in pale (ambient_inject 0.6), the overcast and snow as the light. | L18 |
 | `BREAK_ENERGY`, `BREAK_ANGLE`, `BREAK_FROM` | story/staging/wolf_hunt_lighting.gd | 8, 24°, (-6, 34, 14) | — | The break in the overcast over the doe's clearing (shadowed, shows in the fog). | L18 |
 | `RIM_ENERGY`, `RIM_BACK`, `RIM_UP` | story/staging/wolf_hunt_lighting.gd | 18, 1.6 m, 2.4 m | — | Cold rim behind the doe and the great wolf, opposite the camera. | L18 |
