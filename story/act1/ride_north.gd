@@ -483,13 +483,26 @@ func _end(_space: SceneSpace) -> void:
 		d.hold(space_id, false)
 	SoundDirector.stop_cue(&"beast_heartbeat", 2.0)
 	StoryControl.shake = 0.0
-	# He goes on up to the steps and waits there to lead her in (ManorArrival).
+	# He goes on up to the steps and waits there to lead her in (ManorArrival),
+	# unless the arrival has already taken him: it starts while she is still
+	# sliding down, and sending him back to the steps would undo its one order
+	# to pad down the hall (he stood at the doors for good).
 	if beast is BeastActor and is_instance_valid(beast):
 		var actor := beast as BeastActor
 		if _beast_walk > 0.0:
 			actor.walk_speed = _beast_walk
 		actor.outdoors = false
-		actor.lead(beast_steps() if WorldStreamer.get_region(MANOR) else actor.global_position)
+		if not _arrival_running():
+			actor.lead(beast_steps() if WorldStreamer.get_region(MANOR) else actor.global_position)
+
+
+func _arrival_running() -> bool:
+	if not is_inside_tree():
+		return false
+	for n in get_tree().get_nodes_in_group(&"story_space_live"):
+		if n != self and StringName(n.get_meta(&"story_space_id", &"")) == &"manor_arrival" and bool(n.get(&"running")):
+			return true
+	return false
 
 
 # ------------------------------------------------------------------ the mare

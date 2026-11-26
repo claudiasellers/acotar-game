@@ -161,3 +161,23 @@ func test_the_ridden_mare_is_gone_from_the_manor_once_she_is_down() -> void:
 	assert_not_null(ride.horse, "she walks off first, not gone the moment Feyre is down")
 	ride._process(RideNorth.MARE_GONE_BY)
 	assert_null(ride.horse, "then gone from the drive: the only mare is the one in the stables")
+
+
+func test_the_rides_end_leaves_him_to_the_arrival() -> void:
+	var ride := RideNorth.new()
+	ride.auto_tick = false
+	add_child(ride)  # after_each frees the ride
+	var beast := BeastActor.new()
+	add_child_autofree(beast)
+	ride.beast = beast
+	var arrival := SceneSpace.new()
+	arrival.auto_tick = false
+	add_child_autofree(arrival)
+	arrival.set_meta(&"story_space_id", &"manor_arrival")
+	arrival.add_to_group(&"story_space_live")
+	arrival.running = true
+	var hall := Vector3(0, 0, -38)
+	beast.lead(hall)  # the arrival's one order: down the hall
+	ride._end(ride)
+	assert_eq(beast._destination, hall, "the ride ending (her slide down done) never sends him back to the steps")
+
