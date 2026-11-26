@@ -80,6 +80,12 @@ func _ready() -> void:
 	set_process(false)
 
 
+## Skipped, quit or freed mid-scene: the hearth gets its own energy and
+## falloff back however the scene ends.
+func _exit_tree() -> void:
+	_restore()
+
+
 func _running() -> bool:
 	return space != null and bool(space.get(&"running"))
 

@@ -109,6 +109,16 @@ func test_the_room_gets_its_own_light_back_after() -> void:
 	assert_eq(_space.find_children("*", "Light3D", true, false).size(), 1, "only the hearth")
 
 
+func test_a_scene_freed_mid_run_gives_the_hearth_back() -> void:
+	EventBus.story_actor_cue.emit(&"tamlin_beast", &"enter")
+	await wait_seconds(BeastDoorLighting.FADE_IN + 0.1)
+	assert_almost_eq(_fire.omni_attenuation, BeastDoorLighting.FIRE_ATTENUATION, 0.2, "lit")
+	_rig.free()
+	assert_almost_eq(_fire.light_energy, 1.8, 0.001, "its own fire")
+	assert_almost_eq(_fire._base, 1.8, 0.001)
+	assert_almost_eq(_fire.omni_attenuation, 1.2, 0.001, "and its own falloff")
+
+
 func test_another_scene_ending_leaves_it_lit() -> void:
 	EventBus.story_actor_cue.emit(&"tamlin_beast", &"enter")
 	await wait_seconds(BeastDoorLighting.FADE_IN + 0.1)
