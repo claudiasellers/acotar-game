@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://systems/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wpn_gloamer_scythe_glaive"
+display_name = "Scythe-glaive"
+family = &"gloamer"
+kind = &"spear"
+power = 1.6
+swing_s = 0.95
+reach_m = 2.8
+stagger_s = 1.2
+durability = 16
+imbue_slots = 2
+two_handed = true
+trait_id = &"sweep"
+trait_count = 3
+unique = false
+canon = "X"
+description = "A scythe blade set crosswise on a crooked pole, bound in rags and wire and bells."

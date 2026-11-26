@@ -28,14 +28,15 @@ signal player_status_applied(source_id: StringName, tag: StringName, magnitude: 
 signal player_startled(source_id: StringName, amount: float)
 
 ## A hold (puca, briarling snare, prowler, naga coil). She breaks it by mashing interact,
-## each press costs stamina; break_presses = presses needed; hold_seconds = how long before
+## each press costs stamina (with Hold to break free on, holding interact counts one press per
+## VitalsState.GRAB_HOLD_STEP, 0.18 s, and the ring sits steady); break_presses = presses needed; hold_seconds = how long before
 ## the hold resolves as the attacker's follow-up (the attacker decides what that is).
 signal player_grabbed(source_id: StringName, break_presses: int, hold_seconds: float)
 ## The holder let go (it was hit, scared, or finished).
 signal player_released(source_id: StringName)
 ```
 
-`mood_requested(&"dread", intensity, seconds)` (existing, sent by DreadField) is also read as Feyre's ambient dread target. No new signal is needed for that.
+`mood_changed(&"dread", intensity, seconds)` (GradeDirector's settled mood, DreadField's among the requests) is also read as Feyre's ambient dread target.
 
 ### Outbound: Feyre announces these. Hostiles, story, HUD and audio listen.
 
@@ -113,7 +114,6 @@ An unknown attack id logs `push_warning` once and uses the hazard row `generic_h
 | naga_claw (default) | 22 | claw | medium | 2 m | — | 0.15 |
 | naga_lunge | 30 | blunt | heavy | 4 m | — | 0.2 |
 | naga_coil | 0 | — | none (grab: 6 presses, 3 s) | — | — | 0.25 |
-| puca_grab (default) | 0 | — | none (grab: 5 presses, 4 s) | — | — | 0.3 |
 | briarling_lash (default) | 8 | thorn | light | 0.5 m | — | 0.1 |
 | briarling_snare | 0 | — | none (grab: 4 presses, 2.5 s) | — | — | 0.15 |
 | lampwing_swarm (default) | 0 | — | none | — | drowsy +0.15 / 6 s per tick | 0.05 |
@@ -136,6 +136,10 @@ An unknown attack id logs `push_warning` once and uses the hazard row `generic_h
 | fall | (h − 4 m) × 8, h = drop below where she last stood | fall | heavy above 8 m | — | — | 0.1 · knocks down above 16 m |
 | generic_hit | 10 | blunt | light | — | — | 0.1 |
 
+The puca has no row: it never touches her (the Keeper, health-interactions §4.2;
+design reconciliation C6). A grab row's presses, seconds and fail scale are its
+`grab_presses`, `grab_seconds` and `grab_fail_scale`.
+
 ## 4. Status tags (BodyState.effects, extended)
 
 | tag | stacking | decay or growth | cure |
@@ -149,7 +153,7 @@ An unknown attack id logs `push_warning` once and uses the hazard row `generic_h
 | `cold`, `hunger` (gauges) | always listed: magnitude = BodyState.cold / hunger, `stage` 0 calm, 1 uneasy, 2 danger (`StatusRules.stage`; cold 0.4/0.7, hunger 0.5/0.9) | live | warmth, food |
 | `stuffed` | timed, after a big meal | 3 min | — |
 
-Every tag's player-facing name and line live in `StatusRules.INFO` (`title(tag)`, `blurb(tag)`): the HUD teaches each chip once with it and names it on hover, and the Wardrobe stats page reads the same words.
+Every tag's player-facing name and line live in `StatusRules.INFO` (`title(tag)`, `blurb(tag)`): the HUD writes each chip's name under it, teaches it once with its line and names it on hover, and the Wardrobe stats page reads the same words and lists every tag as the legend. Every chip is one pan; a red rim (`VitalsStatusRow.hurts`) marks a debuff or a gauge in danger. A chip shows exactly while the tag is in `statuses()`, in Always and Auto alike, and lingers `VitalsHud.STATUS_LINGER` (2 s) after it leaves (owner, 2026-11-26). A teaching slip waits out `UiMode.quiet` (a staged or held moment, a film, a screen, dread in the air); one cut off mid-showing goes back in the queue untaught. Dread of `EASE_HUSHED_BY_DREAD` (0.3) or any dread mood ends `ease_pulse`, so At ease never shows beside fear.
 
 At most 3 distinct brew-effect tags are active at once; a fourth replaces the one with the least time left (venom, drowsy, roar_shake, well_rested and the hunger states don't use slots).
 

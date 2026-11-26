@@ -1,13 +1,16 @@
 ## Her statuses, over the health bar: up to five round medallions, danger
 ## first, then "+n". Three across and a second row above, so the chips stop
 ## short of the lane spoken lines use (HudLayout.LANE_LEFT).
-## Each is a pan like the paint tin's (one shape for everything she carries or
-## feels): paper in a brass rim with a gold timer ring for a good status, and
-## the dark, cracked pan for a bad one. The ring drains for timed effects
-## (blinking in the last 3 s), creeps for venom and is full for live states. Buffs pop in with a sparkle and a bounce; debuffs shudder (plan §15 B).
-## The cold and hunger gauges (StatusRules.GAUGES) are always there: a good pan
-## with the ring filled to the level, glow when calm and accent when uneasy,
-## turning to the dark cracked pan, with a shudder, when they reach danger.
+## Every chip is the same pan (owner, 2026-11-26: "uniform icons and a uniform
+## legend"): paper in a rim, its icon, its name written under it, and a ring.
+## The rim is the one sign of kind: red for what hurts her (a debuff, or a
+## gauge in danger), plain for the rest. The ring drains for timed effects
+## (blinking in the last 3 s), creeps for venom, fills to the level for cold
+## and hunger (glow when calm, accent when uneasy, red in danger) and is full
+## for live states. Buffs pop in with a sparkle and a bounce; what hurts her
+## shudders (plan §15 B). The cold and hunger gauges (StatusRules.GAUGES)
+## always hold the first two slots; the rest show exactly while she has them
+## (VitalsHud). The satchel's "How I am" page is the legend (StatusPage).
 ## Each chip is taught once (a gauge when it first turns uneasy, the health
 ## bar and the bow when each first changes): the first time, a slip above
 ## the row names it and says what it does (StatusRules.INFO), then never
@@ -20,14 +23,17 @@ const MAX_SHOWN := 5
 const PER_ROW := 3
 const ROWS := 2
 const STEP := 80.0
-const RADIUS := 38.0
-const ICON := 48.0
+## From one row of chips to the row above: a chip and its name.
+const ROW_STEP := 92.0
+const RADIUS := 32.0
+const ICON := 40.0
 const RING_W := 4.0
-## The rim's width as a share of the radius.
+## The rim's width as a share of the radius; a red rim is drawn heavier.
 const RIM := 0.1
-## Cracks across a bad status's dark pan: [from, to] as shares of the radius.
-const CRACKS := [[Vector2(-0.75, -0.3), Vector2(-0.2, 0.1)], [Vector2(-0.2, 0.1), Vector2(-0.35, 0.7)],
-	[Vector2(0.8, -0.15), Vector2(0.3, 0.25)], [Vector2(0.3, 0.25), Vector2(0.45, 0.72)]]
+const RIM_HURT := 0.16
+## The name under each chip: its size, and its baseline below the chip.
+const NAME_SIZE := 15
+const NAME_DROP := 17.0
 const POP_SECONDS := 0.35
 const TAUGHT_SECTION := "status_taught"
 ## How long a teaching slip stays, and its fade.
@@ -120,6 +126,20 @@ func _process(delta: float) -> void:
 
 ## Shows the next untaught status's slip, one at a time, while its chip is up.
 func _step_teach(delta: float) -> void:
+	if _hushed():
+		# A staged moment or dread: a slip mid-showing goes back to wait its
+		# turn, untaught, so the player reads only what the moment needs.
+		if teaching != &"" and _teach_left > TEACH_FADE:
+			_unteach(teaching)
+			teach_queue.push_front(teaching)
+			teaching = &""
+		_slip.visible = teaching != &""
+		if teaching != &"":
+			_teach_left -= delta
+			_slip.modulate.a = clampf(_teach_left / TEACH_FADE, 0.0, 1.0)
+			if _teach_left <= 0.0:
+				teaching = &""
+		return
 	if teaching != &"":
 		_teach_left -= delta
 		if _teach_left <= 0.0 or not _is_up(teaching):
@@ -144,6 +164,21 @@ func forget_taught() -> void:
 func offer(tag: StringName) -> void:
 	if not taught.has(tag) and tag != teaching and not teach_queue.has(tag):
 		teach_queue.append(tag)
+
+
+## Slips wait out what UiMode calls quiet: any staged or held moment, a film,
+## an open screen, or dread in the air.
+func _hushed() -> bool:
+	return is_inside_tree() and UiMode.quiet(get_tree())
+
+
+func _unteach(tag: StringName) -> void:
+	taught.erase(tag)
+	var cfg := ConfigFile.new()
+	cfg.load(settings_path)
+	if cfg.has_section_key(TAUGHT_SECTION, String(tag)):
+		cfg.erase_section_key(TAUGHT_SECTION, String(tag))
+	cfg.save(settings_path)
 
 
 ## A slip only shows while what it names is on screen.
@@ -192,7 +227,7 @@ func _draw() -> void:
 		var c := _slot(i)
 		var age := float(_born.get(tag, 1.0))
 		var gauge := StatusRules.kind(tag) == StatusRules.Kind.GAUGE
-		var debuff := is_dark(s)
+		var debuff := hurts(s)
 		var scale := 1.0
 		if age < POP_SECONDS:
 			var t := age / POP_SECONDS
@@ -202,6 +237,7 @@ func _draw() -> void:
 			c.x += sin(shudder * 70.0) * 3.0 * (1.0 - shudder / 0.45) * Juice.effects_scale
 		var r := RADIUS * scale
 		draw_chip(self, c, r, s, _icon(tag))
+		draw_name(self, Vector2(_slot(i).x, _slot(i).y), tag, get_theme_default_font())
 		if not debuff and not gauge and age < 0.6:
 			var k := age / 0.6
 			for j in 6:
@@ -217,30 +253,29 @@ func _draw() -> void:
 		draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, 6, JournalTheme.color(&"paper"))
 		draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, JournalTheme.color(&"ink"))
 
-## A bad status, or a gauge in danger, wears the dark cracked pan.
-static func is_dark(s: Dictionary) -> bool:
+## A bad status, or a gauge in danger: the red rim.
+static func hurts(s: Dictionary) -> bool:
 	return StatusRules.is_debuff(s.tag) or (StatusRules.kind(s.tag) == StatusRules.Kind.GAUGE and int(s.get("stage", 0)) >= 2)
 
 
-## One chip, radius `r` at `c` on `on`: the pan, its ring and `icon`. The one
-## look a status has, here and on the journal's page (StatusPage).
+## One chip, radius `r` at `c` on `on`: the pan, its rim, its ring and
+## `icon`. The one look a status has, here and on the journal's page
+## (StatusPage).
 static func draw_chip(on: CanvasItem, c: Vector2, r: float, s: Dictionary, icon: Texture2D) -> void:
 	var ink := JournalTheme.color(&"ink")
 	var paper := JournalTheme.color(&"paper")
 	var danger := JournalTheme.color(&"danger")
 	var tag: StringName = s.tag
 	var gauge := StatusRules.kind(tag) == StatusRules.Kind.GAUGE
-	var debuff := is_dark(s)
-	on.draw_circle(c, r, danger if debuff else JournalTheme.color(&"line"), true, -1.0, true)
-	on.draw_circle(c, r * (1.0 - RIM), (JournalTheme.color(&"pall") as Color).lerp(ink, 0.5) if debuff else paper, true, -1.0, true)
-	if debuff:
-		for crack: Array in CRACKS:
-			on.draw_line(c + (crack[0] as Vector2) * r, c + (crack[1] as Vector2) * r, Color(danger, 0.8), 1.5, true)
+	var hurt := hurts(s)
+	var rim := RIM_HURT if hurt else RIM
+	on.draw_circle(c, r, danger if hurt else JournalTheme.color(&"line"), true, -1.0, true)
+	on.draw_circle(c, r * (1.0 - rim), paper, true, -1.0, true)
 	var ring_w := RING_W * r / RADIUS
-	var ring_r := r * (1.0 - RIM) - ring_w * 0.5
-	on.draw_arc(c, ring_r, 0.0, TAU, 48, Color(paper if debuff else ink, 0.16), ring_w, true)
+	var ring_r := r * (1.0 - rim) - ring_w * 0.5
+	on.draw_arc(c, ring_r, 0.0, TAU, 48, Color(ink, 0.16), ring_w, true)
 	var frac := 1.0
-	var col: Color = danger.lightened(0.25) if debuff else JournalTheme.color(&"glow")
+	var col: Color = danger if hurt else JournalTheme.color(&"glow")
 	var total := float(s.total)
 	var left := float(s.seconds_left)
 	if gauge:
@@ -261,6 +296,18 @@ static func draw_chip(on: CanvasItem, c: Vector2, r: float, s: Dictionary, icon:
 		on.draw_texture_rect(icon, Rect2(c - Vector2(sz, sz) * 0.5, Vector2(sz, sz)), false)
 
 
+## A chip's name, centred under the chip at `c`, ink on a paper outline so
+## it reads on snow and in the dark.
+static func draw_name(on: CanvasItem, c: Vector2, tag: StringName, font: Font) -> void:
+	if font == null:
+		return
+	var text := StatusRules.title(tag)
+	var w := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, NAME_SIZE).x
+	var at := c + Vector2(-w * 0.5, RADIUS + NAME_DROP)
+	on.draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, NAME_SIZE, 5, JournalTheme.color(&"paper"))
+	on.draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, NAME_SIZE, JournalTheme.color(&"ink"))
+
+
 ## The sparkle diamond at `p`, half-height `rs`. Empty when it is too small to
 ## triangulate: a zero-area polygon makes the engine log an error.
 static func sparkle_points(p: Vector2, rs: float) -> PackedVector2Array:
@@ -274,7 +321,7 @@ static func sparkle_points(p: Vector2, rs: float) -> PackedVector2Array:
 func _slot(i: int) -> Vector2:
 	@warning_ignore("integer_division")
 	var row := i / PER_ROW
-	return Vector2(RADIUS + 8.0 + (i % PER_ROW) * STEP, size.y - RADIUS - 16.0 - row * STEP)
+	return Vector2(STEP * 0.5 + (i % PER_ROW) * STEP, size.y - RADIUS - NAME_DROP - 11.0 - row * ROW_STEP)
 
 
 func _icon(tag: StringName) -> Texture2D:

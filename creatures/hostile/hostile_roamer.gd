@@ -1,0 +1,821 @@
+## The shared brain of a hostile camp's members (docs/contracts/hostiles.md):
+## the perception ladder, the leash (chase only inside it unless on her
+## scent), the camp blackboard reports, attack tokens, the fight timer and its
+## tell (the model's own telegraph clips, EventBus.hostile_windup), holds,
+## fire, frost and lures.
+## A family is a thin subclass plus its own data: its CreatureData, its rows
+## (data/combat/attacks; a grab row carries its presses, seconds and fail
+## scale) and the values on its scene (strike_reach, strike_cooldown,
+## attack_id, grab_attack, lunge_attack, dread_radius). Nothing here is any
+## one family's: a family that leaves a row empty simply doesn't do that move.
+class_name HostileRoamer
+extends Creature
+
+## CHARGE runs at her; CIRCLE keeps 4-6 m off while it has no attack token
+## or another holds her; STRIKE winds up its strike or its grab; LUNGE winds
+## up the leap, LEAP is the leap; HOLD is the grab on her; RECOVER weaves back.
+enum Fight { CHARGE, STRIKE, RECOVER, CIRCLE, LUNGE, LEAP, HOLD }
+
+## The lunge opens from this far, once per engagement (health-interactions §4).
+const LUNGE_MIN := 4.0
+const LUNGE_MAX := 6.0
+## The leap closes the gap in about this long; it lands if she comes within
+## reach before it runs out, else it misses.
+const LEAP_SECONDS := 0.5
+## Without a token it circles her at this distance.
+const CIRCLE_MIN := 4.0
+const CIRCLE_MAX := 6.0
+## How long a smelled trail lets it run past the leash.
+const TRAIL_SECONDS := 6.0
+## Her scent this thin (Vitals.scent_scale at or under it: a hush draught)
+## breaks the trail.
+const HUSH_SCALE := 0.5
+## Burning ground near it (Creature._step_fire) sends it running this long.
+const FIRE_FLEE_SECONDS := 6.0
+const FROST_SLOW_SECONDS := 10.0
+const LURE_SECONDS := 20.0
+const REPORT_EVERY := 2.0
+## How much of the camp's alert lands on a member's awareness (enough to search).
+const CAMP_ALERT := 0.45
+## Seconds between taunts while it circles (a random span).
+const TAUNT_EVERY := Vector2(6.0, 10.0)
+## A routed member runs from the fight this long, having given her up.
+const ROUT_SECONDS := 10.0
+## A routed member's dread eases to this share until it takes her up again
+## (G25: the fight reads as over).
+const ROUT_DREAD := 0.3
+## Her line the first time one grabs at a glint (G26: the lure is taught).
+const GLINT_LINE := &"hostile_glint_grab"
+## Her line the first time a pack scatters (G25).
+const ROUT_LINE := &"hostile_rout"
+## A glint holds a member that went for it this long (unless it is hurt).
+const GLINT_SECONDS := 8.0
+## Within this of the glint it stops to grab it and squabble.
+const GLINT_REACH := 1.2
+
+## The family's values, set on its own scene (one .tscn per family).
+@export var strike_reach: float = 1.5
+## Wind-up plus this is one member's cycle (health-interactions §3.4).
+@export var strike_cooldown: float = 1.65
+## Its strike row (data/combat/attacks).
+@export var attack_id: StringName = &""
+## Its grab row, &"" for none. The row holds presses, seconds and fail scale.
+@export var grab_attack: StringName = &""
+## Its lunge row, &"" for none.
+@export var lunge_attack: StringName = &""
+## Its DreadField's radius and inner radius; x 0 for none.
+@export var dread_radius: Vector2 = Vector2.ZERO
+## The clip it plays now and then while it circles her (&"" for none).
+@export var taunt_clip: StringName = &""
+## The clip it plays once as it engages her, the cry that sets the camp off
+## (&"" for none).
+@export var call_clip: StringName = &""
+## Once this share of the camp's members is dead, the rest scatter
+## (HostileSite routs them; 0: they fight to the last).
+@export var rout_share: float = 0.0
+## How many of the camp a glint pulls away (a light arrow's spark; 0: none
+## care). They go to it, grab at it and squabble, forgetting her.
+@export var glint_drawn: int = 0
+## Its clips at the glint: the grab, then the squabble while it lasts.
+@export var glint_clip: StringName = &""
+@export var squabble_clip: StringName = &""
+
+## Set by HostileSite before _ready.
+var site: HostileSite
+var home: Vector3 = Vector3.INF
+var member_index: int = 0
+
+var ladder := HostileLadder.new()
+var fight: Fight = Fight.CHARGE
+var routine: StringName = &""
+
+var _fight_left: float = 0.0
+var _trail_left: float = 0.0
+var _flee_left: float = 0.0
+var _flee_from: Vector3 = Vector3.ZERO
+var _lure_at: Vector3 = Vector3.INF
+var _lure_left: float = 0.0
+var _search_at: Vector3 = Vector3.INF
+var _report_left: float = 0.0
+var _last_awareness: float = 0.0
+var _ring_angle: float = 0.0
+var _dread: DreadField
+## The row the current wind-up ends in.
+var _attack: StringName = &""
+## Seconds until a circling member next plays its taunt_clip.
+var _taunt_left: float = 0.0
+var _lunged: bool = false
+var _has_token: bool = false
+var _hold_left: float = 0.0
+var _leap_speed: float = 0.0
+var _circle_sign: float = 1.0
+## The looted weapon it carries in its hand and drops when it dies (its
+## family's LootTable picks it by member_index; &"" for none).
+var carried_weapon: StringName = &""
+var _loot_dropped: bool = false
+var _glint_at: Vector3 = Vector3.INF
+var _glint_left: float = 0.0
+var _glint_grabbed: bool = false
+
+
+func _ready() -> void:
+	super._ready()
+	if home == Vector3.INF:
+		home = global_position
+	_ring_angle = float(member_index) * 1.7
+	if dread_radius.x > 0.0:
+		_dread = DreadField.attach(self, dread_radius.x, dread_radius.y)
+	senses.sensed.connect(_on_sensed)
+	EventBus.player_knocked_down.connect(_on_player_down)
+	EventBus.player_released.connect(_on_player_released)
+	_circle_sign = 1.0 if member_index % 2 == 0 else -1.0
+	_taunt_left = randf_range(TAUNT_EVERY.x, TAUNT_EVERY.y)
+	_grow_hit_box()
+	_arm()
+
+
+## Its weapon (catalogue §1.6): the family's LootTable picks it by its place in
+## the pack, and its model rides the hand_r socket once L88's file exists.
+func _arm() -> void:
+	if data == null:
+		return
+	var table := LootTable.for_family(data.kind)
+	if table and carried_weapon == &"":
+		var count := site.data.count if site and is_instance_valid(site) and site.data else 1
+		carried_weapon = table.carried_by(member_index, count)
+	if carried_weapon == &"" or animator == null:
+		return
+	if not GearModel.exists(carried_weapon):
+		push_error("%s carries %s, which has no model" % [name, carried_weapon])
+		return
+	var hand := animator.socket(&"hand_r")
+	var m: Node3D = GearModel.instance(carried_weapon) if hand else null
+	if m:
+		m.name = "Weapon"
+		hand.add_child(m)
+
+
+## What it leaves when it dies (catalogue §1.6): the weapon in its hand at
+## part of its durability, and each trophy at its chance. Rolls are seeded by
+## the creature and the day; a unique trophy drops once a save.
+func _drop_loot() -> void:
+	if _loot_dropped or not is_inside_tree():
+		return
+	_loot_dropped = true
+	var table := LootTable.for_family(data.kind)
+	if table == null:
+		return
+	var parent := get_parent()
+	var key := "%s:%d" % [creature_id, Clock.day]
+	var n := 0
+	if carried_weapon != &"":
+		var wear := lerpf(table.carried_wear.x, table.carried_wear.y, LootTable.roll(key + ":wear"))
+		WeaponDrop.spawn(parent, _loot_spot(n), carried_weapon, wear)
+		n += 1
+	for i in table.trophies.size():
+		var id := table.trophies[i]
+		var chance := table.trophy_chances[i] if i < table.trophy_chances.size() else 0.0
+		var w := WeaponTable.get_weapon(id)
+		if w == null or LootTable.roll("%s:%s" % [key, id]) >= chance:
+			continue
+		if w.unique:
+			if WeaponRack.unique_dropped(id):
+				continue
+			WeaponRack.mark_unique_dropped(id)
+		WeaponDrop.spawn(parent, _loot_spot(n), id, 1.0)
+		n += 1
+
+
+## Where the `n`th thing it leaves lies: round the body, on its ground.
+func _loot_spot(n: int) -> Vector3:
+	var a := float(n) * 2.1 + float(member_index)
+	return global_position + Vector3(cos(a), 0.0, sin(a)) * (0.5 + 0.25 * float(n))
+
+
+## The trail holds while she was smelled in the last TRAIL_SECONDS, unless a
+## quiet brew has thinned her scent to HUSH_SCALE or less.
+static func trail_holds(seconds_left: float, scent_scale: float) -> bool:
+	return seconds_left > 0.0 and scent_scale > HUSH_SCALE
+
+
+## The family's routine at `hour`: &"hunt" walks the camp's ring; anything
+## else goes home and stays (a family's own routines override _routine).
+func routine_at(_hour: float) -> StringName:
+	return &"hunt"
+
+
+## A member that keeps watch while the rest rest (a family says which).
+func is_on_watch() -> bool:
+	return false
+
+
+## The grab row's terms: presses to break it, seconds it holds, and the scale
+## of the strike that follows when she fails it (AttackData).
+func grab_presses() -> int:
+	var row := AttackTable.resolve(grab_attack) if grab_attack != &"" else null
+	return row.grab_presses if row else 0
+
+
+func grab_seconds() -> float:
+	var row := AttackTable.resolve(grab_attack) if grab_attack != &"" else null
+	return row.grab_seconds if row else 0.0
+
+
+func grab_fail_scale() -> float:
+	var row := AttackTable.resolve(grab_attack) if grab_attack != &"" else null
+	return row.grab_fail_scale if row else 1.0
+
+
+func _player() -> Node3D:
+	return get_tree().get_first_node_in_group(&"player") as Node3D if is_inside_tree() else null
+
+
+func _think(delta: float) -> void:
+	var player := _player()
+	routine = routine_at(Clock.hour())
+	_tune_senses()
+	_amplify_while_wary()
+	_tick_timers(delta, player)
+
+	if _flee_left > 0.0:
+		_flee_left -= delta
+		move_direction = Creature.away_from(global_position, _flee_from) * 10.0
+		move_speed = data.run_speed
+		gait_hint = &""
+		return
+
+	if _glint_left > 0.0:
+		_glint_left -= delta
+		_at_glint(delta)
+		return
+
+	var before := ladder.state
+	var now := ladder.step(senses.awareness, delta)
+	if now != before:
+		_on_ladder_changed(before, now, player)
+
+	if ladder.is_hostile() and player:
+		if now == HostileLadder.State.STARTLE:
+			move_speed = 0.0
+			move_direction = Vector3.ZERO
+			face_towards(player.global_position, delta * 3.0)
+			return
+		if not _may_chase(player.global_position):
+			# Past the leash with no scent: it gives her up and goes home,
+			# rather than staring from the edge and re-startling every second.
+			ladder.give_up()
+			senses.awareness = minf(senses.awareness, HostileLadder.CURIOUS_AT)
+			_last_awareness = senses.awareness
+			_set_fight(Fight.CHARGE)
+			now = ladder.state
+		else:
+			_report_left -= delta
+			if _report_left <= 0.0:
+				_report_left = REPORT_EVERY
+				_report(player.global_position)
+			_fight(player, delta)
+			return
+
+	if fight != Fight.CHARGE:
+		_set_fight(Fight.CHARGE)
+	if _lure_left > 0.0 and _lure_at != Vector3.INF:
+		_go_to(_lure_at, data.walk_speed * 1.5, 1.0)
+		return
+	match now:
+		HostileLadder.State.SEARCHING:
+			var at := _search_at if _search_at != Vector3.INF else senses.last_stimulus_position
+			_go_to(at, data.walk_speed * 2.0, 1.5)
+		HostileLadder.State.CURIOUS:
+			move_speed = 0.0
+			move_direction = Vector3.ZERO
+			face_towards(senses.last_stimulus_position, delta)
+		HostileLadder.State.LOST:
+			_search_at = Vector3.INF
+			_go_to(home, data.walk_speed * 1.5, 1.5)
+		_:
+			_routine(delta)
+
+
+## Sight and hearing for the routine (a family's own scales; 1 by default).
+## Her side (crouch, movement, brews, rain) is CreatureSenses' own.
+func _tune_senses() -> void:
+	senses.sight_range = data.sight_range * sight_scale()
+	senses.hearing_range = data.hearing_range * hearing_scale()
+
+
+func sight_scale() -> float:
+	return 1.0
+
+
+func hearing_scale() -> float:
+	return 1.0
+
+
+## While wary, any new rise in awareness counts for wary_gain times as much.
+func _amplify_while_wary() -> void:
+	var rise := senses.awareness - _last_awareness
+	if rise > 0.0 and ladder.is_wary():
+		senses.awareness = minf(_last_awareness + rise * ladder.sensitivity(), 1.0)
+	_last_awareness = senses.awareness
+
+
+func _tick_timers(delta: float, player: Node3D) -> void:
+	_trail_left = maxf(_trail_left - delta, 0.0)
+	if player and not HostileRoamer.trail_holds(_trail_left, Vitals.scent_scale(player)):
+		_trail_left = 0.0
+	_lure_left = maxf(_lure_left - delta, 0.0)
+
+
+func _on_sensed(kind: StringName, _at: Vector3, _strength: float) -> void:
+	if kind == &"scent":
+		_trail_left = TRAIL_SECONDS
+
+
+## Chase only inside the leash, unless it is on her scent.
+func _may_chase(target: Vector3) -> bool:
+	if site == null or not is_instance_valid(site):
+		return true
+	return site.in_leash(target) or _trail_left > 0.0
+
+
+func _on_ladder_changed(_from: HostileLadder.State, to: HostileLadder.State, player: Node3D) -> void:
+	if _dread and (to == HostileLadder.State.ENGAGED or to == HostileLadder.State.STARTLE):
+		_dread.max_intensity = 1.0
+	match to:
+		HostileLadder.State.STARTLE:
+			_lure_left = 0.0
+			if player:
+				_report(player.global_position)
+				HostileHits.startle(creature_id, 0.15)
+		HostileLadder.State.ENGAGED:
+			_set_fight(Fight.CHARGE)
+			_lunged = false
+			_report_left = REPORT_EVERY
+			if call_clip != &"" and animator:
+				animator.play_oneshot(call_clip)
+		HostileLadder.State.LOST:
+			_set_fight(Fight.CHARGE)
+			_lunged = false
+
+
+func _report(at: Vector3) -> void:
+	if site and is_instance_valid(site):
+		site.report(self, at)
+
+
+## The camp heard from a member: go and look where she was seen.
+func on_camp_alert(at: Vector3) -> void:
+	if not alive or ladder.is_hostile():
+		return
+	_search_at = at
+	senses.stimulate(&"alert", at, maxf(CAMP_ALERT - senses.awareness, 0.0) + 0.01)
+
+
+func _fight(player: Node3D, delta: float) -> void:
+	var to := player.global_position - global_position
+	var flat := Vector2(to.x, to.z).length()
+	gait_hint = &""
+	match fight:
+		Fight.CHARGE, Fight.CIRCLE:
+			var held_by_other := _held_by_other(player)
+			if not held_by_other and _may_lunge() and flat >= LUNGE_MIN and flat <= LUNGE_MAX \
+					and _take_token():
+				_lunged = true
+				if site and is_instance_valid(site):
+					site.claim_lunge()
+				_wind_up(Fight.LUNGE, lunge_attack)
+			elif not held_by_other and flat <= strike_reach and _take_token():
+				_wind_up(Fight.STRIKE, pick_strike(player))
+			elif flat <= CIRCLE_MAX and (held_by_other or not _token_free()):
+				fight = Fight.CIRCLE
+				_circle(player, to, flat, delta)
+			else:
+				fight = Fight.CHARGE
+				move_direction = to
+				move_speed = data.run_speed
+		Fight.STRIKE:
+			_hold_still(player, delta)
+			_fight_left -= delta
+			if _fight_left <= 0.0:
+				# Flat reach, capped in height: a step doesn't save her, a ledge does.
+				var in_reach := Creature.within_reach(global_position, player.global_position, strike_reach + 0.6)
+				# The blow plays whether or not she is still there to take it.
+				if animator:
+					animator.play_strike(_attack)
+				if in_reach and grab_attack != &"" and _attack == grab_attack:
+					_coil(player)
+				else:
+					if in_reach:
+						HostileHits.strike(creature_id, _attack, 1.0, global_position)
+					_recover()
+		Fight.LUNGE:
+			_hold_still(player, delta)
+			_fight_left -= delta
+			if _fight_left <= 0.0:
+				fight = Fight.LEAP
+				if animator:
+					animator.play_strike(lunge_attack)
+				_fight_left = LEAP_SECONDS
+				_leap_speed = maxf(flat, LUNGE_MIN) / LEAP_SECONDS * 1.5
+		Fight.LEAP:
+			move_direction = to
+			move_speed = _leap_speed
+			_fight_left -= delta
+			if Creature.within_reach(global_position, player.global_position, strike_reach):
+				HostileHits.strike(creature_id, lunge_attack, 1.0, global_position)
+				_recover()
+			elif _fight_left <= 0.0:
+				_recover()
+		Fight.HOLD:
+			_hold_still(player, delta)
+			_hold_left -= delta
+			if not _holds_her(player) or _hold_left <= 0.0:
+				# Her own timer ends the hold as ours does: that is the failure.
+				if _hold_left <= 0.1:
+					HostileHits.strike(creature_id, attack_id, grab_fail_scale(), global_position)
+				_recover()
+		Fight.RECOVER:
+			# Weave back a step, then come again.
+			move_direction = Creature.away_from(global_position, player.global_position).rotated(Vector3.UP, 0.9)
+			move_speed = data.walk_speed * 2.0
+			_fight_left -= delta
+			if _fight_left <= 0.0:
+				_set_fight(Fight.CHARGE)
+
+
+## Which row a strike in reach winds up: its strike row (a family picks its
+## grab here).
+func pick_strike(_player: Node3D) -> StringName:
+	return attack_id
+
+
+## The lunge opens a fight: once per engagement, and once per camp until the
+## camp calms (HostileSite.claim_lunge), so one naga bursts out, not four.
+func _may_lunge() -> bool:
+	if _lunged or lunge_attack == &"":
+		return false
+	return site == null or not is_instance_valid(site) or site.lunge_ready()
+
+
+## The node whose -Z is the way she faces: her model (GroundMotor turns it),
+## else the body.
+static func facing_node(player: Node3D) -> Node3D:
+	var m: Node3D = player.get(&"model") as Node3D if &"model" in player else null
+	return m if m and m.is_inside_tree() else player
+
+
+## Tell to contact for a row: AttackData.windup_s, the one home.
+static func windup_of(attack: StringName) -> float:
+	var row := AttackTable.resolve(attack)
+	return row.windup_s if row else 0.55
+
+
+func _wind_up(next: Fight, attack: StringName) -> void:
+	fight = next
+	_attack = attack
+	_fight_left = HostileRoamer.windup_of(attack)
+	EventBus.hostile_windup.emit(creature_id, data.kind, attack, global_position, _fight_left)
+	# Its own telegraph clip, stretched to the row's windup_s and held to
+	# contact. No fallback: a member without the rig or the clip is an error.
+	if animator:
+		animator.play_windup(attack, _fight_left)
+	else:
+		push_error("%s has no rig to telegraph %s" % [name, attack])
+
+
+func _hold_still(player: Node3D, delta: float) -> void:
+	move_speed = 0.0
+	move_direction = Vector3.ZERO
+	face_towards(player.global_position, delta * 4.0)
+
+
+## No token: keep 4-6 m off and pace round her, facing her.
+func _circle(player: Node3D, to: Vector3, flat: float, delta: float) -> void:
+	var radial := Vector3(to.x, 0.0, to.z) / maxf(flat, 0.001)
+	var tangent := radial.cross(Vector3.UP) * _circle_sign
+	var pull := 0.0
+	if flat < CIRCLE_MIN:
+		pull = -1.0
+	elif flat > CIRCLE_MAX - 0.5:
+		pull = 1.0
+	move_direction = tangent + radial * pull
+	move_speed = data.walk_speed * 1.5
+	face_towards(player.global_position, delta * 3.0)
+	gait_hint = &"stalk"
+	_taunt(delta)
+
+
+## Now and then while it circles, its taunt (the family's `taunt_clip`).
+func _taunt(delta: float) -> void:
+	_taunt_left -= delta
+	if _taunt_left > 0.0:
+		return
+	_taunt_left = randf_range(TAUNT_EVERY.x, TAUNT_EVERY.y)
+	if taunt_clip != &"" and animator and not animator.is_acting():
+		animator.play_oneshot(taunt_clip)
+
+
+## The coil closes: Vitals takes the hold (one at a time) and we keep it until
+## she breaks it, cuts it, or her time runs out.
+func _coil(player: Node3D) -> void:
+	EventBus.player_grabbed.emit(creature_id, grab_presses(), grab_seconds())
+	if not _holds_her(player):
+		_recover()
+		return
+	fight = Fight.HOLD
+	_hold_left = grab_seconds()
+
+
+func _recover() -> void:
+	_set_fight(Fight.RECOVER)
+	_fight_left = strike_cooldown
+
+
+## The strike or lunge it is telegraphing, until contact.
+func winding_up() -> StringName:
+	return _attack if alive and (fight == Fight.STRIKE or fight == Fight.LUNGE) else &""
+
+
+## The wind-up's one timer is the fight timer, set from the row's windup_s.
+func windup_left() -> float:
+	return maxf(_fight_left, 0.0) if winding_up() != &"" else 0.0
+
+
+## Every fight change goes through here so the token and a hold never outlive
+## the move that took them. The token is kept through the recovery: a member's
+## whole cycle is one turn.
+func _set_fight(next: Fight) -> void:
+	# A tell that ends before contact (stagger, sleep, death) is called off.
+	if (fight == Fight.STRIKE or fight == Fight.LUNGE) and _fight_left > 0.0 and next != fight:
+		EventBus.hostile_windup_cancelled.emit(creature_id)
+		if animator:
+			animator.cancel_attack()
+	if fight == Fight.HOLD and next != Fight.HOLD:
+		_free_her()
+	if next == Fight.CHARGE or next == Fight.CIRCLE:
+		_release_token()
+	fight = next
+
+
+func _take_token() -> bool:
+	if _has_token:
+		return true
+	if site == null or not is_instance_valid(site):
+		_has_token = true
+	else:
+		_has_token = site.take_token(self)
+	return _has_token
+
+
+func _token_free() -> bool:
+	return _has_token or site == null or not is_instance_valid(site) or site.tokens_free() > 0
+
+
+func _release_token() -> void:
+	if _has_token and site and is_instance_valid(site):
+		site.release_token(self)
+	_has_token = false
+
+
+func has_token() -> bool:
+	return _has_token
+
+
+func _is_held(player: Node3D) -> bool:
+	var v := Vitals.of(player)
+	return v != null and v.is_grabbed()
+
+
+func _holds_her(player: Node3D) -> bool:
+	var v := Vitals.of(player)
+	return v != null and v.is_grabbed() and v.grab_source == creature_id
+
+
+## Another holds her: the rest hold off (health-interactions §5.4).
+func _held_by_other(player: Node3D) -> bool:
+	var v := Vitals.of(player)
+	return v != null and v.is_grabbed() and v.grab_source != creature_id
+
+
+## We let go (stagger, sleep, death): she is free at once.
+func _free_her() -> void:
+	var player := _player()
+	if player and _holds_her(player):
+		EventBus.player_released.emit(creature_id)
+
+
+func _on_player_released(source_id: StringName) -> void:
+	if source_id == creature_id and fight == Fight.HOLD and alive:
+		# She broke the coil or cut it: it reels back.
+		fight = Fight.RECOVER
+		_fight_left = strike_cooldown
+
+
+
+
+func _routine(_delta: float) -> void:
+	match routine:
+		&"hunt":
+			var r := site.data.territory_radius * 0.7 if site and is_instance_valid(site) and site.data else 20.0
+			var centre := site.global_position if site and is_instance_valid(site) else home
+			var target := centre + Vector3(cos(_ring_angle), 0.0, sin(_ring_angle)) * r
+			if Vector2(target.x - global_position.x, target.z - global_position.z).length() < 3.0:
+				_ring_angle += 0.5
+			_go_to(target, data.walk_speed, 0.5)
+			gait_hint = &"stalk"
+		_:
+			_go_to(home, data.walk_speed, 1.5)
+			gait_hint = &""
+
+
+func _go_to(target: Vector3, speed: float, stop_at: float) -> void:
+	var to := target - global_position
+	if Vector2(to.x, to.z).length() <= stop_at:
+		move_speed = 0.0
+		move_direction = Vector3.ZERO
+		return
+	move_direction = to
+	move_speed = speed
+
+
+## Burning ground or a fire arrow (Creature._step_fire): it runs from the flame.
+func _on_fire_near(from: Vector3) -> void:
+	_set_fight(Fight.CHARGE)
+	_flee_from = from
+	_flee_left = FIRE_FLEE_SECONDS
+	_lure_left = 0.0
+
+
+## A bow bash or a knife wound: the strike it was winding up is lost, and
+## when it has its feet again it backs off before it comes again.
+func stagger(seconds: float) -> void:
+	if not alive:
+		return
+	if fight != Fight.RECOVER:
+		_recover()
+	super.stagger(seconds)
+
+
+## A steeped arrow's damage takes the family's element row (HostileElements).
+func on_arrow_hit(arrow: Node3D) -> void:
+	if not alive:
+		return
+	if not HostileElements.arrow_hit(self, arrow):
+		super.on_arrow_hit(arrow)
+
+
+## Frost slows it (Creature slow). Fire, sleep, barbs and lures are the base's.
+## Asleep, it lets her go. An element goes through the family's row first:
+## resisted, it takes nothing and doesn't look; weak, the effect runs 1.5x and
+## it thrashes away from the wound.
+func on_arrow_effect(effect: StringName, arrow: Node3D) -> void:
+	if not alive:
+		return
+	var mult := 1.0
+	if effect in HostileElements.ELEMENTS:
+		var at := Creature.read_impact(arrow) if arrow else global_position
+		mult = HostileElements.react(self, effect, at)
+		if mult <= HostileElements.RESISTED:
+			return
+	if effect == &"sleep" and fight != Fight.CHARGE:
+		_set_fight(Fight.CHARGE)
+	if effect == &"frost":
+		slowed_left = maxf(slowed_left, FROST_SLOW_SECONDS * mult)
+	super.on_arrow_effect(effect, arrow)
+	if mult > HostileElements.NORMAL:
+		match effect:
+			&"sleep":
+				asleep_left *= mult
+			&"fire":
+				ignite(ARROW_BURN_SECONDS * mult)
+		if effect != &"sleep":
+			_thrash_away(arrow.global_position if arrow else global_position)
+
+
+## Small foes are easy to hit: the body box grows by data.hit_box_scale.
+func _grow_hit_box() -> void:
+	if data.hit_box_scale <= 1.0:
+		return
+	var shape := get_node_or_null(^"Collision") as CollisionShape3D
+	if shape and shape.shape is BoxShape3D:
+		var box := (shape.shape as BoxShape3D).duplicate() as BoxShape3D
+		box.size *= data.hit_box_scale
+		shape.shape = box
+		shape.position.y = box.size.y * 0.5
+
+
+## Weak to it: it thrashes and runs from where the element struck.
+func _thrash_away(from: Vector3) -> void:
+	_set_fight(Fight.CHARGE)
+	_flee_from = from
+	_flee_left = maxf(_flee_left, HostileElements.WEAK_FLEE_SECONDS)
+	_lure_left = 0.0
+	if animator:
+		animator.hit(from)
+
+
+func _on_wounded(from: Vector3, _cause: StringName) -> void:
+	senses.stimulate(&"pain", from, 1.0)
+	_search_at = from
+	# A wound ends a squabble over a glint: she is the thing that matters again.
+	_glint_left = 0.0
+
+
+## The camp has lost too many: it gives her up and runs from `from` for
+## ROUT_SECONDS (HostileSite, at rout_share), then goes home.
+func rout(from: Vector3) -> void:
+	if not alive:
+		return
+	_set_fight(Fight.CHARGE)
+	_glint_left = 0.0
+	ladder.give_up()
+	senses.awareness = 0.0
+	_last_awareness = 0.0
+	_flee_from = from
+	_flee_left = ROUT_SECONDS
+	_lure_left = 0.0
+	if _dread:
+		_dread.max_intensity = ROUT_DREAD
+
+
+## True while it runs from a fight (a rout, a flame, a hard element hit).
+func is_fleeing() -> bool:
+	return _flee_left > 0.0
+
+
+## True while it would go for a glint (its family cares and it isn't busy
+## running or dying).
+func wants_glint() -> bool:
+	return alive and glint_drawn > 0 and _flee_left <= 0.0 and _glint_left <= 0.0
+
+
+## A glint fell at `at` (HostileSite.glint): it forgets her, goes for it,
+## grabs at it and squabbles over it for GLINT_SECONDS.
+func distract(at: Vector3) -> void:
+	if not alive:
+		return
+	_set_fight(Fight.CHARGE)
+	_glint_at = at
+	_glint_left = GLINT_SECONDS
+	_glint_grabbed = false
+
+
+## True while a glint holds it.
+func is_distracted() -> bool:
+	return _glint_left > 0.0
+
+
+func _at_glint(delta: float) -> void:
+	var to := _glint_at - global_position
+	gait_hint = &""
+	if Vector2(to.x, to.z).length() > GLINT_REACH:
+		move_direction = to
+		move_speed = data.run_speed
+		return
+	move_speed = 0.0
+	move_direction = Vector3.ZERO
+	face_towards(_glint_at, delta * 4.0)
+	if animator == null or animator.is_acting():
+		return
+	if not _glint_grabbed:
+		_glint_grabbed = true
+		if glint_clip != &"":
+			animator.play_oneshot(glint_clip)
+		HostileRoamer.say_once(get_tree(), GLINT_LINE)
+	elif squabble_clip != &"":
+		animator.play_oneshot(squabble_clip)
+
+
+## Her once-line `id` (DialogueDirector), when nothing else is speaking.
+static func say_once(tree: SceneTree, id: StringName) -> void:
+	if tree == null or WorldState.has_flag("dlg.%s" % id):
+		return
+	var d := DialogueDirector.of(tree)
+	var her := tree.get_first_node_in_group(&"player") as Node3D
+	if d and her and not d.busy():
+		DialogueDirector.line(her, id)
+
+
+func _on_lured(at: Vector3) -> void:
+	if ladder.is_hostile():
+		return
+	_lure_at = at
+	_lure_left = LURE_SECONDS
+
+
+func _on_player_down(_source_id: Variant = null, _cause: Variant = null, _at: Variant = null) -> void:
+	if not alive or not ladder.is_hostile():
+		return
+	ladder.give_up()
+	senses.awareness = 0.0
+	_last_awareness = 0.0
+	_set_fight(Fight.CHARGE)
+
+
+func die(cause: StringName) -> void:
+	_set_fight(Fight.CHARGE)
+	super.die(cause)
+	_drop_loot()
+	if _dread and is_instance_valid(_dread):
+		_dread.queue_free()
+		_dread = null

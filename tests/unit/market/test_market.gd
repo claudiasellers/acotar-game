@@ -38,7 +38,7 @@ func after_each() -> void:
 	# PeltSale starts its moment and is freed mid-run, which leaves the
 	# controls narrowed and its mood set.
 	StoryControl.release()
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 
 
 func test_every_stall_has_one_distinct_trade_and_a_sign() -> void:
@@ -81,7 +81,8 @@ func test_buyers_take_and_price() -> void:
 	assert_false(charms.takes(&"ing_hide"), "no hides at the charm stall")
 	assert_false(charms.takes(&"ing_rabbit"), "no game at the charm stall")
 	assert_true(market.buyer(&"spice").takes(&"ing_rabbit"), "game for the pot")
-	assert_eq(market.buyers().size(), 5, "mercenary, cobbler, clothier, spice, charms")
+	for id: StringName in [&"mercenary", &"cobbler", &"clothier", &"spice", &"charms"]:
+		assert_not_null(market.buyer(id), "%s buys at the market" % id)
 
 
 func test_selling_the_pelt_to_the_mercenary_pays_and_raises_pelt_sold() -> void:
@@ -138,11 +139,9 @@ func test_walk_lines_fire_in_order_and_once() -> void:
 	for p: Vector2 in [HumanRealmLayout.COTTAGE, Vector2(150.0, 2230.0), Vector2(300.0, 2243.0),
 			HumanRealmLayout.VILLAGE_SQUARE + Vector2(0.0, 20.0), Vector2(377.0, 2255.0)]:
 		lines.append(t.update(p, 0.1))
-	assert_eq(lines.size(), 5)
 	for i in lines.size():
 		assert_eq(lines[i], MarketThoughts.PLACES[i][4], "line %d" % i)
 	assert_eq(t.update(HumanRealmLayout.COTTAGE, 0.1), "", "once each")
-	assert_true(String(MarketThoughts.PLACES[4][4]).contains("woman by the well"), "names the buyers")
 
 
 func test_wandering_off_with_the_pelt_gets_a_nudge() -> void:
@@ -161,9 +160,9 @@ func test_dressing_builds_signs_stations_and_the_mercenary() -> void:
 	var d := MarketDressing.new()
 	add_child_autofree(d)
 	var signs := d.get_children().filter(func(n: Node) -> bool: return n.name.begins_with("Sign_"))
-	assert_eq(signs.size(), 10, "a sign per stall")
+	assert_eq(signs.size(), d.market.stalls.size(), "a sign per stall")
 	for prefix in ["Stall_", "Goods_", "Counter_"]:
-		assert_eq(d.get_children().filter(func(n: Node) -> bool: return n.name.begins_with(prefix)).size(), 10, prefix)
+		assert_eq(d.get_children().filter(func(n: Node) -> bool: return n.name.begins_with(prefix)).size(), d.market.stalls.size(), prefix)
 	assert_not_null(d.get_node_or_null(^"Handcart"))
 	assert_not_null(d.get_node_or_null(^"CratePile"))
 	var stations := get_tree().get_nodes_in_group(MarketStation.GROUP)

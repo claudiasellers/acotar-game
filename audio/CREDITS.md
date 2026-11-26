@@ -45,6 +45,7 @@ Licence: CC0 1.0 (public domain dedication). Rebuild any file with
 | audio/sfx/beast/roar.ogg | The beast's roar at the door | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/beast/snap_arrow.ogg | The beast snaps the ash arrow | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/beast/snarl_loop.ogg | The beast's continuous snarl (loop) | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/beast/throw_glance.ogg | Her knife or iron bracelets glance off the beast's hide | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bogge/passed.ogg | The Bogge passes: the cold lets go | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bogge/presence.ogg | The Bogge near: sub throb, icy whine, chattering teeth (loop) | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bogge/whisper_1.ogg | The Bogge begs inside her head, variant 1 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
@@ -63,7 +64,6 @@ Licence: CC0 1.0 (public domain dedication). Rebuild any file with
 | audio/sfx/bow/hit_stone.ogg | An arrow clatters off stone | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/hit_wood.ogg | Arrow hits wood, shaft quivering | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/let_down.ogg | The string eased forward, nothing loosed | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
-| audio/sfx/bow/nock.ogg | An arrow seats on the string: a wood click | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/release.ogg | Bow release: string twang and slap | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/release_ash.ogg | The ash arrow leaves: a deeper thrum with a faint chime tail | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/release_gilded.ogg | Gilded bow release: a ringing note | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
@@ -71,6 +71,7 @@ Licence: CC0 1.0 (public domain dedication). Rebuild any file with
 | audio/sfx/bow/release_warbow.ogg | Sentry warbow release: a heavy thwack | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/retrieve.ogg | An arrow pulled out of what it stuck in | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/whoosh.ogg | Arrow in flight | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bow/winded.ogg | Out of breath: a short gasp when she can't sidestep | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/foot/grass_1.ogg | Footstep on grass, variant 1 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/foot/grass_2.ogg | Footstep on grass, variant 2 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/foot/grass_3.ogg | Footstep on grass, variant 3 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
@@ -112,6 +113,7 @@ Licence: CC0 1.0 (public domain dedication). Rebuild any file with
 | audio/sfx/suriel/voice_2.ogg | The Suriel answers (wordless rasp), variant 2 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/suriel/voice_3.ogg | The Suriel answers (wordless rasp), variant 3 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/suriel/warning.ogg | The Suriel: 'We are not alone', a hiss far off | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/tamlin/blood_drip.ogg | Three drops of his blood onto the infirmary marble | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/wolf/bark_pain.ogg | The great wolf barks in pain (ash arrow) | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/wolf/death.ogg | The great wolf dies: whine, whimper, slowing breaths | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/wolf/growl_low.ogg | The great wolf's low reverberating growl | self-made, `tools/audio/gen_act1_audio.py` | CC0 |

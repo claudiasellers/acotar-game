@@ -37,13 +37,13 @@ var hud: HudLayout
 func before_each() -> void:
 	hud = HudLayout.of(get_tree())
 	StoryControl.set_mode(StoryControl.Mode.FULL)
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	ChapterHeading.clear(get_tree())
 
 
 func after_each() -> void:
 	StoryControl.set_mode(StoryControl.Mode.FULL)
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	ChapterHeading.clear(get_tree())
 
 
@@ -124,8 +124,16 @@ func test_the_status_row_stops_short_of_the_line_lane() -> void:
 	var row := VitalsStatusRow.new()
 	add_child_autofree(row)
 	var left := HudLayout.CORNERS[HudLayout.Zone.VITALS][1].x + VitalsHud.STATUS_AT.x as float
+	# Each chip's name is written under it: the widest stays inside its own
+	# column, so names never run into each other or into the lane.
+	var font := row.get_theme_default_font()
+	var half := VitalsStatusRow.RADIUS
+	for tag: StringName in StatusRules.ORDER:
+		var w := font.get_string_size(StatusRules.title(tag), HORIZONTAL_ALIGNMENT_LEFT, -1, VitalsStatusRow.NAME_SIZE).x
+		assert_lte(w, VitalsStatusRow.STEP, "%s's name fits its column" % tag)
+		half = maxf(half, w * 0.5)
 	for i in VitalsStatusRow.MAX_SHOWN + 1:
-		assert_lte(left + row._slot(i).x + VitalsStatusRow.RADIUS, HudLayout.LANE_LEFT, "chip %d" % i)
+		assert_lte(left + row._slot(i).x + half, HudLayout.LANE_LEFT, "chip %d and its name" % i)
 
 
 ## The controls slip sits beside the strap, never under it, at every text size.

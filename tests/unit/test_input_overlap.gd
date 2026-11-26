@@ -13,21 +13,14 @@ const SHARED_OK := [[&"focus", &"sprint"]]
 ## The game scripts that call InputMap.add_action. A new one goes here and in
 ## _register_runtime(), or test_every_runtime_action_is_checked fails.
 const RUNTIME_SOURCES := [
-	"res://characters/feyre/movement/crouch_motor.gd",
 	"res://core/input_settings.gd",
-	"res://systems/chemistry/element_field.gd",
-	"res://systems/interaction/interactor.gd",
-	"res://systems/mount/mount_director.gd",
 	"res://ui/guide/guide_journal.gd",
 	"res://ui/journal/story_journal.gd",
 	"res://ui/map/map_settings.gd",
-	"res://ui/satchel/satchel_hud.gd",
 ]
 
 const RUNTIME_ACTIONS := [
-	&"crouch", &"debug_chemistry", &"open_collection",
-	&"call_mount", &"guide_open", &"journal_open", &"map_open", &"map_minimap",
-	&"satchel_open", &"quick_chord", &"quick_1", &"quick_2", &"quick_3", &"quick_4",
+	&"guide_open", &"journal_open", &"map_open", &"map_minimap",
 ]
 
 
@@ -46,7 +39,9 @@ func test_no_two_gameplay_actions_share_an_event() -> void:
 			if actions.size() < 2:
 				continue
 			actions.sort_custom(func(a, b): return String(a) < String(b))
-			assert_true(SHARED_OK.has(actions), "%s is bound to %s (scheme %s)" % [sig, actions, InputSettings.SCHEME_NAMES[scheme]])
+			assert_true(SHARED_OK.has(actions), ("%s is bound to %s (scheme %s): one press would do both. Fix: give one "
+					+ "of them another key in project.godot / core/input_settings.gd, or, if they can never be live at "
+					+ "once, add the sorted pair to SHARED_OK here with why.") % [sig, actions, InputSettings.SCHEME_NAMES[scheme]])
 
 
 func test_strike_is_checked_and_on_its_own() -> void:
@@ -97,20 +92,11 @@ func _register_runtime() -> void:
 	for action: StringName in RUNTIME_ACTIONS:
 		if InputMap.has_action(action) and not ProjectSettings.has_setting("input/%s" % action):
 			InputMap.erase_action(action)
-	CrouchMotor.ensure_action()
-	MountDirector._ensure_action()
 	StoryJournal.ensure_action()
 	MapSettings.ensure_actions()
-	SatchelHud.ensure_actions()
 	var guide := GuideJournal.new()
 	guide._ensure_action()
 	guide.free()
-	var interactor := Interactor.new()
-	interactor._ensure_actions()
-	interactor.free()
-	var field := ElementField.new()
-	field._ensure_action()
-	field.free()
 
 
 static func _sigs(events: Array) -> Array:

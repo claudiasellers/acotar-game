@@ -6,7 +6,9 @@ extends GutTest
 
 const PHASES := "res://data/phases/spring_court_phases.tres"
 ## Deed facts the story lane raises outside the phase ladder.
-const FACTS := ["fact.wolf_skinned", "fact.father_hearth_sat", "fact.mother_bed_seen", "fact.wolf_spotted"]
+const FACTS := ["fact.wolf_skinned", "fact.father_hearth_sat", "fact.mother_bed_seen", "fact.wolf_spotted",
+	"fact.evening.table_laid", "fact.evening.fire_fed", "fact.evening.changed", "fact.evening.sat_down",
+	"fact.evening.supper_eaten", "fact.evening.slept"]
 ## Regions with no world yet (the family's new house, the pass) need no lines.
 const NO_WORLD := ["archeron_estate", "the_pass"]
 ## Unseen before the glamour lifts (Keeper, ch24); never spawned before it.
@@ -51,6 +53,10 @@ func _known_flags() -> Dictionary:
 		known[m.get_string(1)] = true
 	for f in FACTS:
 		known[f] = true
+	# Bond facts are the bond engine's (docs/contracts/relationships.md).
+	for bond: StringName in Relationships.defs():
+		for f in Relationships.def(bond).facts():
+			known[f] = true
 	return known
 
 

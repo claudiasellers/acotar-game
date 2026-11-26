@@ -1,6 +1,7 @@
 ## Drives Act I end to end through the signals other lanes will emit: food
-## tally -> wolf -> skinning -> pelt sale -> beast at the door -> ride and
-## wall crossing, and checks the ladder lands in p2_grounds.
+## tally -> wolf -> skinning -> pelt sale -> the evening at home (deeds,
+## supper, the bed) -> beast at the door -> the ride, played, and the wall crossing, and checks
+## the ladder lands in p2_grounds.
 extends GutTest
 
 const PHASES := preload("res://data/phases/spring_court_phases.tres")
@@ -65,6 +66,10 @@ func before_each() -> void:
 	path.curve.add_point(Vector3.ZERO)
 	path.curve.add_point(Vector3(0, 0, -120))
 	ride.add_child(path)
+	var seam := Marker3D.new()
+	seam.name = "Seam"
+	seam.position = Vector3(0, 0, -60)
+	ride.add_child(seam)
 
 
 func after_each() -> void:
@@ -79,7 +84,7 @@ func _on_cue(actor: StringName, cue: StringName) -> void:
 	cues.append([actor, cue])
 
 
-func _on_grade(to_grade: StringName, seconds: float) -> void:
+func _on_grade(_source: Object, to_grade: StringName, seconds: float) -> void:
 	grade_requests.append([to_grade, seconds])
 
 
@@ -139,12 +144,44 @@ func test_act_one_plays_through_to_the_grounds() -> void:
 	assert_eq(PhaseManager.current_phase, &"p1_wolf_and_crossing")
 	assert_true(PhaseManager.is_region_unlocked(&"border_woods"))
 
-	# The beast: only at night, only with Feyre home.
+	# The evening at home (CottageEvening): three deeds, then supper, then the bed.
+	var evening := CottageEvening.new()
+	root.add_child(evening)
+	var stations := {}
+	for spec in CottageEvening.DEEDS:
+		var station := EveningStation.new()
+		station.fact = spec[2]
+		if spec[2] == CottageEvening.SAT:
+			station.needs = PackedStringArray([CottageEvening.TABLE, CottageEvening.FIRE, CottageEvening.CHANGED])
+			station.wait_beats = PackedStringArray(["wait_table", "wait_fire", "wait_clothes"])
+		root.add_child(station)
+		stations[spec[2]] = station
+	var supper := _space(CottageSupper.new(), Vector3.ZERO) as CottageSupper
+	var bed := CottageBed.new()
+	bed.fact = "fact.mother_bed_seen"
+	root.add_child(bed)
+	assert_false(bed.can_sleep(), "supper first")
+	stations[CottageEvening.SAT].use(null)
+	assert_false(WorldState.has_flag(CottageEvening.SAT), "the table, the fire and her clothes first")
+	for fact in [CottageEvening.TABLE, CottageEvening.FIRE, CottageEvening.CHANGED, CottageEvening.SAT]:
+		stations[fact].use(null)
+		assert_true(WorldState.has_flag(fact), fact)
+	assert_true(supper.start())
+	_run(supper, 10.0)
+	assert_true(WorldState.has_flag(CottageEvening.SUPPER))
+	assert_true(bed.can_sleep())
+	bed.use(null)
+	await wait_seconds(bed.fade_seconds * 2.4 + bed.hold_seconds + 0.3)
+	assert_true(WorldState.has_flag(CottageEvening.SLEPT))
+
+	# The beast: only at night, only with Feyre home, once she has slept.
 	beast.set_player_inside(true)
+	Clock.from_dict({"time_of_day": 0.45, "day": 2})
 	assert_false(beast.can_start(), "daytime")
 	Clock.from_dict({"time_of_day": 0.92, "day": 2})
 	assert_true(beast.start())
-	_run(beast, 5.0)
+	# The fire thought, Tomas, the door, his "Murderers!": about 6 s to the window.
+	_run(beast, 8.0)
 	assert_true(WorldState.has_flag("fact.cottage_door_broken"))
 	assert_eq(WorldDeltas.get_region_value(&"cottage", "door"), "broken")
 	assert_true(cues.has([&"family", &"gather"]))
@@ -159,15 +196,30 @@ func test_act_one_plays_through_to_the_grounds() -> void:
 	assert_true(WorldState.has_flag("fact.ash_arrow_burned"))
 	assert_eq(Gameplay.inventory.count(&"arrow_ash"), 0, "he burns her ash arrow")
 
-	# The ride and the wall.
+	assert_false(beast.running, "the cottage scene ends (his 'Now', her father's goodbye) before she goes out")
+	# The ride and the wall: no cut. She walks out to the mare, gets up (E) and
+	# rides behind him; the test moves the mare along his road as she would.
 	assert_true(ride.start())
-	assert_eq(StoryControl.mode, StoryControl.Mode.LOOK)
-	_run(ride, 60.0)
-	assert_true(cues.has([&"feyre", &"smell_metal"]))
+	assert_eq(StoryControl.mode, StoryControl.Mode.WALK, "she walks out to the mare herself")
+	assert_not_null(ride.horse, "the mare waits")
+	ride.mount(feyre)
+	_run(ride, 0.2)
+	assert_eq(ride.step, RideNorth.Step.RIDING, "up in the saddle")
+	# From where the mare waits on his road (RideNorth.MARE_AT): a jump back
+	# along it would read as her turning back, and he would turn on her.
+	var along := ride.progress
+	while ride.running and ride.step == RideNorth.Step.RIDING and along < ride.path_length():
+		along += 2.0
+		ride.horse.global_transform = ride.pose_at(along)
+		ride.tick(STEP)
+	assert_true(cues.has([&"feyre", &"smell_metal"]), "her thoughts on the road, the metal at the Wall")
 	assert_eq(grade_requests, [[&"spring", 2.0]])
 	assert_true(WorldState.has_flag("wall_crossed"))
+	assert_eq(ride.step, RideNorth.Step.AT_STEPS, "the mare stops at the end of his road")
+	ride.get_down()
+	_run(ride, 1.0)
 	assert_false(ride.running)
-	assert_almost_eq(feyre.global_position.z, -120.0, 0.5, "she rode to the end of the line")
+	assert_almost_eq(feyre.global_position.z, -120.0, 2.0, "she got down at the end of the road")
 	assert_eq(StoryControl.mode, StoryControl.Mode.FULL)
 
 	assert_eq(PhaseManager.current_phase, &"p2_grounds")

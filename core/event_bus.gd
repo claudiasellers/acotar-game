@@ -43,12 +43,20 @@ signal line_spoken(actor: StringName, text: String, emotion: StringName, seconds
 ## Story: an anchored scene space began or ended.
 signal scene_space_started(space_id: StringName)
 signal scene_space_finished(space_id: StringName)
-## Story to world: blend the colour grade (the wall crossing, cold to spring).
-signal grade_swap_requested(to_grade: StringName, seconds: float)
-## Story to world/audio: set a scene mood. &"dread" (the wolf, the beast) means
-## silence the ambience, gutter the fire, cold low light; &"calm" restores.
-## intensity 0..1, blended over `seconds`.
-signal mood_requested(mood: StringName, intensity: float, seconds: float)
+## Story to world: hold a colour grade for `source` (the wall crossing, cold to
+## spring) until the source sends &"" or leaves the tree. GradeDirector decides
+## what shows; an indoor room always wins.
+signal grade_swap_requested(source: Object, to_grade: StringName, seconds: float)
+## Story/world to GradeDirector: `source` asks for a scene mood. &"dread" (the
+## wolf, the beast) means silenced ambience and her fear, never a darker screen;
+## &"enchanted_sleep" is the soft fade into sleep; &"calm" ends that source's
+## request (a null source's calm ends them all). intensity 0..1, blended over
+## `seconds`. Nobody else listens: the mood that counts is the one
+## GradeDirector settles on (mood_changed).
+signal mood_requested(source: Object, mood: StringName, intensity: float, seconds: float)
+## GradeDirector to sound, vitals and the HUD: the mood now in force, the
+## strongest request.
+signal mood_changed(mood: StringName, intensity: float, seconds: float)
 ## Creatures: an arrow or blade struck a creature without (yet) killing it.
 ## part: &"side", &"eye", &"leg"... as the creatures lane resolves it.
 signal creature_hit(creature_id: StringName, kind: StringName, cause: StringName, part: StringName)
@@ -58,6 +66,9 @@ signal creature_hit(creature_id: StringName, kind: StringName, cause: StringName
 signal hostile_windup(creature_id: StringName, kind: StringName, attack_id: StringName, at: Vector3, seconds: float)
 ## The tell was called off before contact (stagger, sleep, death).
 signal hostile_windup_cancelled(creature_id: StringName)
+## A light arrow came to rest glowing at `at` (ArrowEffects). Shiny-greedy
+## hostiles nearby go for it (HostileSite.glint, the gloamers).
+signal arrow_light_landed(at: Vector3)
 ## Story to world: change the weather now (&"snow_heavy", &"snow_slow",
 ## &"snow_pause", &"clear"), blended over `seconds`.
 signal weather_requested(weather: StringName, seconds: float)
@@ -106,5 +117,12 @@ signal player_imbue_changed(item_slot: StringName, imbue_id: StringName, seconds
 signal site_settled(site_id: StringName)
 ## A hostile site noticed her; level 0..1 (curious to alerted).
 signal hostile_alerted(site_id: StringName, level: float)
+## A fight with a hostile is over (HostileEncounters): `source_id` is the site
+## or the lone roamer, `outcome` one of killed, driven_off, slipped, lured,
+## knockdown. Killed, driven off and slipped count toward fact.plain_fights.
+signal hostile_encounter_ended(source_id: StringName, family: StringName, outcome: StringName)
+## A steeped arrow's element struck a hostile (HostileElements): `reaction` is
+## weak, normal or resisted, for the reaction she sees and her first thought.
+signal hostile_element_reacted(creature_id: StringName, kind: StringName, element: StringName, reaction: StringName)
 ## Feyre crouched or stood.
 signal player_stance_changed(crouched: bool)

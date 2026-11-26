@@ -87,7 +87,7 @@ func test_one_rigged_horse_under_budget() -> void:
 			var arrays := mi.mesh.surface_get_arrays(s)
 			var idx: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
 			tris += idx.size() / 3 if idx.size() > 0 else (arrays[Mesh.ARRAY_VERTEX] as PackedVector3Array).size() / 3
-	assert_between(tris, 4000, 15000, "R4 creature budget")
+	assert_between(tris, 4000, 15000, "R4 creature budget is 15k triangles (docs/contracts/creatures.md): decimate in the horse's generator, not by hand")
 	var gaits := CreatureAnimator.read_gaits(GAITS)
 	assert_gt(float(gaits[&"gallop"][0]), 14.0, "a horse's gallop clip, long-striding")
 	assert_eq(h.animator.gait_for(0.0)[0], &"idle")
@@ -100,6 +100,16 @@ func test_nothing_before_the_first_dinner() -> void:
 	assert_false(director.available())
 	assert_eq(director.block_reason(rider.global_position), &"not_yet")
 	assert_false(director.whistle())
+
+
+func test_in_the_stables_from_the_arrival_but_not_ridden_before_dinner() -> void:
+	WorldState.set_flag("fact.manor_arrived", true)
+	assert_true(director.present(), "the mare that carried her north waits in the stables")
+	assert_false(director.available(), "riding still waits for the first dinner")
+	assert_eq(director.block_reason(rider.global_position), &"not_yet")
+	var m := director.spawn_mare(Vector3(12, 0.05, 10), 0.0)
+	assert_false(director.mount(rider), "she can't be ridden yet")
+	assert_true(is_instance_valid(m))
 
 
 func test_first_ride_is_a_deed_and_unlocks_the_whistle() -> void:
@@ -123,12 +133,14 @@ func test_first_ride_is_a_deed_and_unlocks_the_whistle() -> void:
 func test_no_riding_in_scenes_south_of_the_wall_or_in_dread() -> void:
 	_ready_mare()
 	WorldState.set_flag("fact.mare_ridden", true)
-	EventBus.scene_space_started.emit(&"bogge")
-	assert_eq(director.block_reason(rider.global_position), &"scene")
-	assert_false(director.whistle())
-	EventBus.scene_space_finished.emit(&"bogge")
+	# A background moment (the hall marks, the manor map) runs for the whole
+	# act and holds nothing: she can still be ridden (T148).
+	EventBus.scene_space_started.emit(&"hall_mark_1")
+	assert_eq(director.block_reason(rider.global_position), &"", "a scene that holds nothing doesn't stop her")
+	EventBus.scene_space_finished.emit(&"hall_mark_1")
 	StoryControl.set_mode(StoryControl.Mode.WALK)
 	assert_eq(director.block_reason(rider.global_position), &"story")
+	assert_false(director.whistle())
 	StoryControl.set_mode(StoryControl.Mode.FULL)
 	assert_eq(director.block_reason(Vector3(0, 0, 1500)), &"realm", "not in the human realm")
 	var dread := Node3D.new()
@@ -141,10 +153,13 @@ func test_no_riding_in_scenes_south_of_the_wall_or_in_dread() -> void:
 
 func test_a_scene_takes_her_out_of_the_saddle() -> void:
 	_ready_mare()
-	director.mount(rider)
-	EventBus.scene_space_started.emit(&"puca")
-	assert_false(director.riding)
-	EventBus.scene_space_finished.emit(&"puca")
+	director.mount(rider, true)
+	var scene := Node.new()
+	add_child_autofree(scene)
+	StoryControl.hold(scene, StoryControl.Mode.WALK)
+	await wait_process_frames(2)
+	assert_false(director.riding, "a scene taking her controls takes her down")
+	StoryControl.release(scene)
 
 
 func test_the_whistle_brings_her() -> void:

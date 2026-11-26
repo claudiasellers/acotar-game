@@ -36,7 +36,7 @@ func after_each() -> void:
 	StoryControl.release()
 
 
-func _on_mood(mood: StringName, intensity: float, _seconds: float) -> void:
+func _on_mood(_source: Object, mood: StringName, intensity: float, _seconds: float) -> void:
 	_moods.append([mood, intensity])
 
 

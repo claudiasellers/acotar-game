@@ -38,10 +38,10 @@ func test_six_body_arrows_kill() -> void:
 	assert_false(n.alive)
 
 
-func test_frost_slows_for_ten_seconds() -> void:
+func test_frost_slows_for_ten_seconds_times_its_row() -> void:
 	var n := _roamer()
 	n.on_arrow_effect(&"frost", _arrow_at(1.0, &"frost"))
-	assert_almost_eq(n.slowed_left, 10.0, 0.5)
+	assert_almost_eq(n.slowed_left, 10.0 * HostileElements.WEAK, 0.5, "the naga is weak to rime (plan §7)")
 
 
 func test_a_wound_wakes_it_fully() -> void:

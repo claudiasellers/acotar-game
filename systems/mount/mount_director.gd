@@ -11,7 +11,9 @@
 ## of the Wall, or into dread: she balks at the Bogge's DreadField and won't
 ## enter the Suriel glade or the naga reeds. Riding never skips a deed
 ## trigger: every ActionTrigger the mare passes through fires as if Feyre
-## walked it.
+## walked it. A story scene is one that holds StoryControl; the background
+## moments that only wait on deeds (the hall marks, the manor map) leave her
+## free and never stop the mare (T148).
 ##
 ## Getting on and off is one motion (MountMotion, L47-6): a vault up from her
 ## near side and a slide down it, never a teleport. The whistle is a gesture
@@ -52,6 +54,9 @@ const RIDE_PITCH := -0.314
 const RIDE_BLEND := 0.6
 const ACTION := &"call_mount"
 const UNLOCK_AFTER := "first_dinner_eaten"
+## From the arrival she stands in the stables (the mare that carried Feyre
+## north, owner 2026-11-26); she can be ridden only from the first dinner.
+const IN_STABLES_AFTER := "fact.manor_arrived"
 const RIDDEN_FLAG := "fact.mare_ridden"
 ## She waits at home only while Feyre is this near the stables.
 const HOME_RADIUS := 220.0
@@ -74,7 +79,6 @@ var last_block: StringName = &""
 ## Probes and clips steer without input: returns [Vector3 world direction, bool gallop].
 var autopilot: Callable
 
-var _spaces: Dictionary = {}
 var _e_down: float = -1.0
 var _since_look: float = 99.0
 var _sweep: float = 0.0
@@ -94,13 +98,11 @@ var _far_voice: AudioStreamPlayer3D
 var _last_yaw: float = NAN
 var _bank: float = 0.0
 
-## Hold E this long beside her to tend her instead of mounting (s).
-const HOLD_TEND := 0.4
-const TEND_HINT := "Hold E beside her to brush her, feed her and dress her up."
+## Tending her (brush, treats, dress-up, her page) is her second action, so
+## it is on the second interact key (T, a hold of X; Interactor); E rides.
+const TEND_HINT := "Press %s beside her to brush her, feed her and dress her up."
 
 var tending: MareTendingView
-var _use_held: float = -1.0
-var _use_user: Node
 
 ## The whistle gesture's length (s), and when she answers after it (s).
 const GESTURE_TIME := 0.95
@@ -123,12 +125,12 @@ const BALK_HOLD := 1.5
 const MEET_NEAR := 16.0
 const MEET_PACE := 5.0
 
-var _tier_triggers: Dictionary = {}
 var _moment: int = -1
 var _last_ride_at: Vector3 = Vector3.INF
 var _region_t: float = 0.0
 var _at_edge: bool = false
 var _balking: bool = false
+var _tips: RideTips
 var _balk_t: float = 0.0
 var _away: bool = false
 var _met: bool = false
@@ -137,12 +139,6 @@ var _gust: AudioStreamPlayer
 
 func _ready() -> void:
 	name = "MountDirector"
-	_ensure_action()
-	EventBus.scene_space_started.connect(func(id: StringName) -> void:
-		_spaces[id] = true
-		if riding or motion:
-			dismount(true))
-	EventBus.scene_space_finished.connect(func(id: StringName) -> void: _spaces.erase(id))
 	_whistle = AudioStreamPlayer.new()
 	_whistle.stream = WHISTLE
 	_whistle.volume_db = -6.0
@@ -160,19 +156,10 @@ func _ready() -> void:
 	_unlock.fire_on_body_enter = false
 	_unlock.monitoring = false
 	add_child(_unlock)
-	for t in MareBond.TIERS.slice(2):
-		var trig := ActionTrigger.new()
-		trig.name = "MareBondTrigger_%s" % String(t["fact"]).get_slice(".", 1)
-		trig.flag = t["fact"]
-		trig.fire_on_body_enter = false
-		trig.monitoring = false
-		add_child(trig)
-		_tier_triggers[t["fact"]] = trig
-	MareBond.raise = _raise_fact
 	if not MareCare.on_care.has(MareBond.on_care):
 		MareCare.on_care.append(MareBond.on_care)
-	if not MareBond.on_tier.has(_on_tier):
-		MareBond.on_tier.append(_on_tier)
+	if not EventBus.flag_changed.is_connected(_on_flag):
+		EventBus.flag_changed.connect(_on_flag)
 	_gust = AudioStreamPlayer.new()
 	_gust.stream = WIND
 	_gust.volume_db = -14.0
@@ -180,21 +167,14 @@ func _ready() -> void:
 	_add_thoughts.call_deferred()
 
 
-static func _ensure_action() -> void:
-	if InputMap.has_action(ACTION):
-		return
-	InputMap.add_action(ACTION)
-	var key := InputEventKey.new()
-	key.physical_keycode = KEY_H
-	InputMap.action_add_event(ACTION, key)
-	var pad := InputEventJoypadButton.new()
-	pad.button_index = JOY_BUTTON_MISC1
-	InputMap.action_add_event(ACTION, pad)
-
-
 ## True once the first dinner is eaten: the mare is in the stables.
 func available() -> bool:
 	return WorldState.has_flag(UNLOCK_AFTER)
+
+
+## True from the arrival: she is in the stables (not yet to be ridden).
+func present() -> bool:
+	return available() or WorldState.has_flag(IN_STABLES_AFTER)
 
 
 ## True once Feyre has ridden her: the whistle works.
@@ -217,8 +197,6 @@ func dread_at(at: Vector3) -> float:
 func block_reason(at: Vector3) -> StringName:
 	if not available():
 		return &"not_yet"
-	if not _spaces.is_empty():
-		return &"scene"
 	if StoryControl.mode != StoryControl.Mode.FULL:
 		return &"story"
 	if not WorldMap.is_in_prythian(at) or WorldMap.distance_to_wall(at) < 12.0:
@@ -260,6 +238,7 @@ func spawn_mare(at: Vector3, yaw: float) -> MareMount:
 	mare.global_position = at
 	mare.rotation.y = yaw
 	mare.used.connect(_on_used)
+	mare.tend_asked.connect(_on_tend_asked)
 	return mare
 
 
@@ -326,16 +305,14 @@ func _too_far() -> void:
 		WorldState.set_flag(MareBond.TOO_FAR_FACT, true)
 
 
-func _raise_fact(fact: String) -> void:
-	var t := _tier_triggers.get(fact) as ActionTrigger
-	if t:
-		t.fire()
-	else:
-		WorldState.set_flag(fact, true)
-
-
-func _on_tier(_tier: int) -> void:
-	_moment = _tier
+## A new step of her bond past the first ride (its fact rises): her moment
+## plays when Feyre is next by her.
+func _on_flag(flag: String, value: Variant) -> void:
+	if not WorldState.truthy(value):
+		return
+	for i in range(2, MareBond.TIERS.size()):
+		if String(MareBond.TIERS[i]["fact"]) == flag:
+			_moment = i
 
 
 ## Feyre's bond thoughts join the free-roam dialogue (its DEED lines on the facts).
@@ -452,28 +429,28 @@ func _out_of_sight(p: Node3D, dist: float) -> Vector3:
 
 # ------------------------------------------------------------------ saddle
 
-## E on her: a tap mounts, a hold opens tending (decided on release or at HOLD_TEND).
+## Her first action (E, a tap of X) mounts her.
 func _on_used(user: Node) -> void:
 	if riding or motion or tending:
 		return
-	if not Input.is_action_pressed(&"interact"):
-		mount(user)  # a press already released (or a scripted use)
-		return
-	_use_held = 0.0
-	_use_user = user
+	mount(user)
 
 
-func _tick_use(delta: float) -> void:
-	if _use_held < 0.0:
-		return
-	if Input.is_action_pressed(&"interact"):
-		_use_held += delta
-		if _use_held >= HOLD_TEND:
-			_use_held = -1.0
-			open_tending()
-	else:
-		_use_held = -1.0
-		mount(_use_user)
+## Her second action (T, a hold of X) tends her.
+func _on_tend_asked(_user: Node) -> void:
+	if can_tend():
+		open_tending()
+
+
+## Close enough, on foot, to tend her.
+func can_tend() -> bool:
+	var p := _player()
+	if p == null or mare == null or not is_instance_valid(mare) or riding or motion or tending:
+		return false
+	if mare.state != MareMount.State.STANDING:
+		return false
+	var d := Vector2(mare.global_position.x - p.global_position.x, mare.global_position.z - p.global_position.z).length()
+	return d <= PROMPT_RADIUS
 
 
 ## Opens the tending screen beside her (brush, treats, dress-up). Null if she isn't standing by.
@@ -481,7 +458,7 @@ func open_tending() -> MareTendingView:
 	var p := _player()
 	if p == null or mare == null or riding or motion or tending or mare.state != MareMount.State.STANDING:
 		return null
-	if block_reason(p.global_position) in [&"scene", &"story"]:
+	if block_reason(p.global_position) == &"story":
 		return null
 	tending = MareTendingView.open(self, mare, p, Gameplay.inventory)
 	tending.closed.connect(func() -> void:
@@ -506,6 +483,7 @@ func mount(user: Node = null, instant: bool = false) -> bool:
 		return false
 	feyre = p
 	riding = true
+	_tips = RideTips.attach(self)  # the riding keys she hasn't used yet (KeyHints)
 	var first := not unlocked()
 	if p is CharacterBody3D:
 		(p as CharacterBody3D).velocity = Vector3.ZERO
@@ -549,6 +527,9 @@ func dismount(instant: bool = false) -> void:
 	if not riding:
 		return
 	riding = false
+	if _tips:
+		_tips.queue_free()
+		_tips = null
 	var p := _player()
 	if motion:
 		motion.restore_mare()
@@ -595,7 +576,7 @@ func _finish_dismount(at: Vector3, face_mare: bool = true) -> void:
 		PickupLog.of(get_tree()).note(HINT % KeyPrompt.key(ACTION))
 	elif unlocked() and not WorldDeltas.get_region_value(DELTAS, "tend_taught", false):
 		WorldDeltas.set_region_value(DELTAS, "tend_taught", true)
-		PickupLog.of(get_tree()).note(TEND_HINT)
+		PickupLog.of(get_tree()).note(TEND_HINT % UsePrompt.key_for(&"interact_alt"))
 	dismounted.emit()
 
 
@@ -616,9 +597,9 @@ func _set_bow(on: bool) -> void:
 	var p := _player()
 	if p == null:
 		return
-	var bow := p.get(&"bow_controller") as Node
+	var bow := p.get(&"bow_controller") as BowController
 	if bow:
-		bow.set_physics_process(on)
+		bow.stow(not on)
 
 
 ## Where her hips sit: the saddle, riding the spine bone through each stride.
@@ -706,7 +687,6 @@ func _process(delta: float) -> void:
 	if p == null:
 		return
 	_tick_gesture(p, delta)
-	_tick_use(delta)
 	if _answer_in >= 0.0:
 		_answer_in -= delta
 		if _answer_in < 0.0:
@@ -725,7 +705,7 @@ func _process(delta: float) -> void:
 				_finish_dismount(_off_at, false)
 			else:
 				_last_yaw = NAN
-		elif riding and block_reason(p.global_position) in [&"scene", &"story", &"realm"]:
+		elif riding and block_reason(p.global_position) in [&"story", &"realm"]:
 			dismount(true)
 		return
 	if riding:
@@ -735,7 +715,7 @@ func _process(delta: float) -> void:
 				_e_down = -1.0
 				dismount()
 				return
-		if block_reason(p.global_position) in [&"scene", &"story", &"realm"]:
+		if block_reason(p.global_position) in [&"story", &"realm"]:
 			dismount(true)
 			return
 		_steer()
@@ -900,10 +880,9 @@ func _ride_camera(p: Node, on: bool) -> void:
 
 
 func _exit_tree() -> void:
-	MareBond.on_tier.erase(_on_tier)
+	if EventBus.flag_changed.is_connected(_on_flag):
+		EventBus.flag_changed.disconnect(_on_flag)
 	MareCare.on_care.erase(MareBond.on_care)
-	if MareBond.raise == _raise_fact:
-		MareBond.raise = Callable()
 	# Never leave her camera lifted if the director goes while she rides.
 	var p := _player()
 	if riding and p and &"camera_lift" in p:
@@ -964,7 +943,7 @@ func sweep_triggers() -> int:
 
 
 func _keep_mare(p: Node3D) -> void:
-	if not available() or not WorldMap.is_in_prythian(p.global_position):
+	if not present() or not WorldMap.is_in_prythian(p.global_position):
 		if mare and is_instance_valid(mare):
 			free_mare()
 		return
@@ -1001,10 +980,13 @@ func _meet(p: Node3D, far: float) -> void:
 	mare.nicker()
 
 
-## "E   ride": said by the one use prompt while she stands by the mare.
+## "E   ride   T   tend": her two actions while she stands by the mare, which
+## Interactor ranks and the one use prompt names.
 func _update_prompt(p: Node3D) -> void:
 	if mare == null or not is_instance_valid(mare):
 		return
 	var d := Vector2(mare.global_position.x - p.global_position.x, mare.global_position.z - p.global_position.z).length()
-	var on := d <= PROMPT_RADIUS and mare.state == MareMount.State.STANDING and not riding and not tending
-	UsePrompt.of(get_tree()).offer(self, "ride" if on else "")
+	var on := d <= PROMPT_RADIUS and mare.state == MareMount.State.STANDING and not riding and not tending \
+			and available()
+	mare.use_verb = "ride" if on else ""
+	mare.alt_verb = "tend" if on and unlocked() else ""

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://systems/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wpn_smiths_hammer"
+display_name = "Smith's Hammer"
+family = &""
+kind = &"club"
+power = 2.4
+swing_s = 1.2
+reach_m = 1.8
+stagger_s = 2.0
+durability = 30
+imbue_slots = 1
+two_handed = false
+trait_id = &"stun"
+trait_count = 0
+unique = false
+canon = "X"
+description = "A mortal smith's hammer, iron black with age, rehafted on a gnawed oak root."

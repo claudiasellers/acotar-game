@@ -4,7 +4,8 @@
 ## and her screen edges under everything. It reads her VitalsState and shows
 ## only what matters: meters stay (Always, the default), or appear when they
 ## change and fade at rest (Auto), or go (Off: the grab ring and the edges
-## stay). Nothing shows while she is down. No words, no objectives.
+## stay). A status chip shows exactly while she has it, in Always and Auto
+## alike (owner, 2026-11-26: they seemed to pop up at random). Nothing shows while she is down. No words, no objectives.
 ## The block, the ring and the edges sit in HudLayout's VITALS, WORLD and EDGE
 ## zones, which decide where they are and when they show.
 ## Add one to an entry scene: add_child(VitalsHud.new()).
@@ -22,8 +23,9 @@ const BAR_AT := Vector2(90, 174)
 const HEALTH_SHOW_SECONDS := 4.0
 const HEALTH_FULL_LINGER := 3.0
 const STAMINA_FULL_LINGER := 1.2
-const BUFF_SHOW_SECONDS := 5.0
-const BUFF_TAIL_SECONDS := 15.0
+## A status chip that leaves stays this long (s), fading its ring, so a
+## state on the edge of its line (at ease, giddy) doesn't flicker.
+const STATUS_LINGER := 2.0
 const FADE_SPEED := 3.0
 ## Her thought on waking after a knockdown, by how she wakes (wake_line).
 const WAKE_LINES := {
@@ -56,7 +58,8 @@ var _health_alpha: float = 0.0
 var _stamina_alpha: float = 0.0
 var _status_alpha: float = 0.0
 var _hit: float = 0.0
-var _first_seen: Dictionary = {}
+## tag -> [its last status, seconds since it left], for STATUS_LINGER.
+var _leaving: Dictionary = {}
 var _clock: float = 0.0
 
 
@@ -177,30 +180,27 @@ func _on_health_changed(_health: float, _max_health: float, _delta: float, _sour
 # --- Statuses ------------------------------------------------------------------
 
 func _update_statuses(delta: float, mode: int, play: bool) -> void:
-	var all := _vitals.statuses()
-	var seen: Dictionary = {}
+	var now := _vitals.statuses()
 	var show: Array[Dictionary] = []
-	for s in all:
-		seen[s.tag] = true
-		if not _first_seen.has(s.tag):
-			_first_seen[s.tag] = _clock
-		if mode == Mode.ALWAYS or _status_wanted(s):
-			show.append(s)
-	for tag: StringName in _first_seen.keys():
-		if not seen.has(tag):
-			_first_seen.erase(tag)
+	var here: Dictionary = {}
+	for st in now:
+		here[st.tag] = true
+		_leaving[st.tag] = [st, 0.0]
+		show.append(st)
+	for tag: StringName in _leaving.keys():
+		if here.has(tag):
+			continue
+		var gone: Array = _leaving[tag]
+		gone[1] = float(gone[1]) + delta
+		if float(gone[1]) >= STATUS_LINGER:
+			_leaving.erase(tag)
+		else:
+			show.append(gone[0])
+	show.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return StatusRules.sort_key(a.tag) < StatusRules.sort_key(b.tag))
 	status_row.set_statuses(show if mode != Mode.OFF and play else ([] as Array[Dictionary]))
 	_status_alpha = move_toward(_status_alpha, 1.0 if not status_row.shown.is_empty() else 0.0, delta * FADE_SPEED)
 	status_row.modulate.a = _status_alpha
-
-
-## Contextual: dangers and the half-buff always; buffs when new and near their end.
-func _status_wanted(s: Dictionary) -> bool:
-	if StatusRules.kind(s.tag) != StatusRules.Kind.BUFF:
-		return true
-	if _clock - float(_first_seen.get(s.tag, _clock)) < BUFF_SHOW_SECONDS:
-		return true
-	return float(s.total) > 0.0 and float(s.seconds_left) < BUFF_TAIL_SECONDS
 
 
 # --- Grab ----------------------------------------------------------------------
@@ -211,6 +211,7 @@ func _update_grab() -> void:
 	if grabbed:
 		grab_prompt.presses_total = _vitals.grab_presses_total
 		grab_prompt.presses_left = _vitals.grab_presses_left
+		grab_prompt.steady = _vitals.break_free_hold()
 		grab_prompt.key_text = "A" if SatchelHud.pad_active else _key_label(&"interact")
 
 
@@ -230,7 +231,6 @@ func _update_edges(delta: float) -> void:
 	var v := _vitals
 	var body := _player.get(&"body_state") as BodyState
 	var t := edge_fx.target
-	t[&"dread"] = clampf((v.dread - 0.2) / 0.8, 0.0, 1.0)
 	t[&"low_health"] = clampf((30.0 - v.health) / 30.0, 0.0, 1.0) * 0.8 + (0.2 if v.health < 30.0 and not v.is_down else 0.0)
 	t[&"venom"] = clampf((v.affliction(&"venom") - 0.5) / 0.5, 0.0, 1.0)
 	t[&"cold"] = clampf((body.cold - 0.5) / 0.5, 0.0, 1.0) if body else 0.0

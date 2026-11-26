@@ -60,30 +60,8 @@ static func slot_action(i: int) -> StringName:
 	return SLOT_ACTIONS[i]
 
 
-static func ensure_actions() -> void:
-	for spec in [[ACTION_OPEN, [KEY_I, KEY_TAB], []], [ACTION_CHORD, [], [JOY_BUTTON_LEFT_SHOULDER]]]:
-		_add_action(spec[0], spec[1], spec[2])
-	for i in SLOT_ACTIONS.size():
-		_add_action(SLOT_ACTIONS[i], [SLOT_KEYS[i]], [])
-
-
-static func _add_action(action: StringName, keys: Array, buttons: Array) -> void:
-	if InputMap.has_action(action):
-		return
-	InputMap.add_action(action)
-	for k in keys:
-		var key := InputEventKey.new()
-		key.physical_keycode = k
-		InputMap.action_add_event(action, key)
-	for b in buttons:
-		var pad := InputEventJoypadButton.new()
-		pad.button_index = b
-		InputMap.action_add_event(action, pad)
-
-
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	ensure_actions()
 	bar = QuickBar.current()
 	SaveSystem.register_provider(QuickBar.SAVE_KEY, bar)
 	menu = SatchelMenu.new(bar)

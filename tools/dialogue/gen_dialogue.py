@@ -116,12 +116,11 @@ think(A, "c_snowdrops", "Elain's snowdrops. She coaxes flowers out of frozen dir
 think(A, "c_snowdrops_return", "Her garden came back without her. Snowdrops gone to seed.", "place",
       "elain_garden", ph(7))
 # Nesta: cold, cutting, iron underneath.
-say(A, "A1_03_nesta_beast", "nesta",
-    "You're just a half-wild beast with the nerve to bark orders at all hours of the day and night.",
-    HUMAN, req=["wolf_killed"], pr=5, follow="A1_04_nesta_forget", canon="V",
-    delivery="cold, quick, cutting; not shouted (Keeper, voice-lines-act1)")
-line(A, "A1_04_nesta_forget", "nesta", "Someday, Feyre, you'll have no one left to remember you.", "follow",
-     phases=HUMAN, canon="A", delivery="quieter, meaner")
+# A1_03/A1_04 end the supper fight now (cottage_evening, the Keeper's canon trigger).
+say(A, "n_stink", "nesta",
+    "You stink like a pig covered in its own filth. Can't you at least try to pretend that you're not an ignorant "
+    "peasant? Take those disgusting clothes off.", HUMAN, req=["pelt_sold"],
+    forbid=["fact.evening.changed", "beast_claim_accepted"], pr=5, canon="V", delivery="disgusted, imperious")
 say(A, "n_tomas", "nesta", "Tomas Mandray walked me halfway home. Don't look at me like that.", HUMAN,
     delivery="defensive, chin up")
 say(A, "n_cloak", "nesta", "If you're going to the village, the cloak first. Mine's worn through at the hem.",
@@ -140,8 +139,7 @@ say(A, "e_bird", "elain", "Father carved a little bird today. It looks like it's
 chat(A, "e_fire", "elain", "You look frozen through. Sit by the fire a moment.", HUMAN)
 chat(A, "e_hum", "elain", "I was thinking about summer. Do you remember summer?", HUMAN)
 # Father: defeated, soft, carving by the fire.
-deed(A, "A1_05_father_hope", "fact.father_hearth_sat", "We need hope, or else we cannot endure.",
-     speaker="father", phases=HUMAN, pr=5, canon="V", delivery="tired, then a rare clarity; gentle")
+# A1_05 is said at supper now (cottage_evening.father).
 say(A, "f_sorry", "father", "You shouldn't have to do all this, Feyre. I know that.", HUMAN)
 say(A, "f_ships", "father", "I had three ships at sea once. I thought that was the worst a man could lose.",
     HUMAN)
@@ -152,7 +150,7 @@ chat(A, "f_knee", "father", "The damp's in my knee again. It'll pass.", HUMAN, c
 deed(A, "A1_06_mother_vow", "fact.mother_bed_seen", "Stay together, and look after them.", speaker="mother",
      phases=HUMAN, pr=5, canon="V", inner=True, who="Mother",
      delivery="memory: a whisper in her head, feverish and fading")
-deed(A, "d_wolf_killed", "wolf_killed", "I can carry only one. But it's a shame to leave the wolf.",
+deed(A, "d_wolf_killed", "wolf_killed", "The doe's all I can carry. His pelt comes with me.",
      phases=HUMAN, canon="A", delivery="inner voice, breath coming back, practical")
 deed(A, "d_wolf_skinned", "fact.wolf_skinned", "Heavy. Heavier than any pelt has a right to be.",
      phases=HUMAN, follow="d_wolf_wrap")
@@ -198,6 +196,216 @@ beat("wh_ash", "ash", "He's looking at me. Like he knows. Just in case... the ey
      delivery="inner voice, cold, very fast")
 beat("wh_dying", "kill", "He should be dead, not dying.", delivery="inner voice, shaken")
 beat("wh_still", "kill", "Wolf. Definitely just a wolf.", canon="V", delivery="inner voice, relief she doesn't trust")
+
+# =============================================================================
+# The cottage evening after the sale (ch2-3 as deeds; Keeper,
+# lore/02-locations/archeron-cottage.md "The two cottage evenings", played as
+# one evening, the owner's choice of 2026-11-25). CottageEvening speaks a beat
+# when its deed's fact rises; CottageSupper speaks the supper. Every trigger is
+# something she does (R2); the family never raise a flag.
+# =============================================================================
+A = "cottage_evening"
+EVE = ["pelt_sold"]
+DONE = ["beast_claim_accepted"]
+
+
+def eve(lid, b, speaker, text, canon="V", delivery="", **kw):
+    inner = kw.pop("inner", False)
+    line(A, lid, speaker, text, "scene", "cottage_evening." + b, HUMAN, inner=inner, canon=canon,
+         delivery=delivery, once=False, cd=0.0, **kw)
+
+
+# She lays the venison and the silver on the table.
+eve("ce_father_luck", "table", "father", "What luck you had today—in bringing us such a feast.",
+    delivery="warm, from the hearth; Nesta snorts")
+eve("ce_elain_where", "table", "elain", "Where did you get that?", delivery="wide-eyed, soft")
+eve("ce_feyre_where", "table", "feyre", "Where do you think I got it?", delivery="dry, tired")
+eve("ce_elain_clean", "table", "elain", "Will it take you long to clean it?", delivery="hopeful, careful")
+eve("ce_feyre_half", "table", "feyre", "We can eat half the meat this week. We can dry the other half.",
+    delivery="practical, brisk")
+eve("ce_father_silver", "table", "father", "Feyre. Where did you get this?", canon="A",
+    delivery="quiet, turning the silver over in his hands")
+eve("ce_feyre_same", "table", "feyre", "The same place I got the deer.", delivery="flat")
+eve("ce_father_risk", "table", "father", "Feyre … the risk …", delivery="pained, trailing off")
+eve("ce_feyre_choice", "table", "feyre", "I had no other choice.", delivery="hard, final")
+eve("ce_feyre_knives", "table", "feyre", "Get the knives ready. I'll be out soon.", delivery="practical, already turning away")
+# She feeds a log to the fire: five left.
+eve("ce_feyre_wood", "fire", "feyre", "I thought you were going to chop wood today.", delivery="tired, pointed")
+eve("ce_nesta_splinters", "fire", "nesta", "I hate chopping wood. I always get splinters.", delivery="bored, cutting")
+eve("ce_nesta_rough", "fire", "nesta",
+    "Besides, Feyre, you're so much better at it! Your hands are suited for it—they're already so rough.",
+    delivery="sweet as poison")
+eve("ce_feyre_dawn", "fire", "feyre", "Please get up at dawn to chop that wood. Or we'll be eating a cold breakfast.",
+    delivery="through her teeth, controlled")
+eve("ce_nesta_no", "fire", "nesta", "I will do no such thing!", delivery="scandalised, loud")
+# She changes out of her bloody clothes at the painted dresser.
+eve("ce_drawers", "changed", "feyre", "Violets and roses for Elain. Flames for Nesta. A night sky of yellow stars for me.",
+    canon="A", inner=True, delivery="inner voice: quiet, a little proud of the paint")
+# Supper can't start until the evening's work is done: her thought at the chair.
+eve("ce_wait_table", "wait_table", "feyre", "The meat on the table first, or there's no supper to sit to.", canon="X",
+    inner=True, delivery="inner voice: dry, quiet, close")
+eve("ce_wait_fire", "wait_fire", "feyre", "The fire's sinking. A log on it, or we eat in the cold.", canon="X",
+    inner=True, delivery="inner voice: dry, quiet, close")
+eve("ce_wait_clothes", "wait_clothes", "feyre", "Not in these. I'm still wearing half the forest.", canon="X",
+    inner=True, delivery="inner voice: dry, quiet, close")
+eve("ce_wait_bed", "wait_bed", "feyre", "Not yet. They're waiting on supper.", canon="X",
+    inner=True, delivery="inner voice: dry, quiet, close")
+# Supper: the Tomas fight (A1_03/A1_04 are its end), then her father.
+eve("ce_nesta_decline", "supper", "nesta", "If you think you can just ask me so nonchalantly, sir, I'm going to decline!",
+    delivery="mocking, mimicking a suitor")
+eve("ce_feyre_tomas", "supper", "feyre", "Tomas Mandray? The woodcutter's second son?", delivery="flat disbelief")
+eve("ce_elain_marry", "supper", "elain", "He wants to marry her.", delivery="soft, a little thrilled")
+eve("ce_nesta_problem", "supper", "nesta", "Is there a problem, Feyre?", delivery="cold, daring her")
+eve("ce_feyre_woodcutter", "supper", "feyre", "You can't chop wood for us, but you want to marry a woodcutter's son?",
+    delivery="sharp")
+eve("ce_feyre_not", "supper", "feyre", "But you're not going to marry Tomas.", delivery="low, certain")
+eve("ce_nesta_scraps", "supper", "nesta", "There's nothing you can do. And then I'll never have to eat these scraps again.",
+    delivery="triumphant, cruel")
+eve("ce_feyre_love", "supper", "feyre", "Love won't feed a hungry belly.", delivery="hard")
+eve("ce_feyre_burden", "supper", "feyre", "We have nothing to offer them. You're a burden.", delivery="too far, and she knows it")
+eve("A1_03_nesta_beast", "supper", "nesta",
+    "You're just a half-wild beast with the nerve to bark orders at all hours of the day and night.",
+    delivery="cold, quick, cutting; not shouted (Keeper, voice-lines-act1)")
+eve("A1_04_nesta_forget", "supper", "nesta", "Someday, Feyre, you'll have no one left to remember you.", canon="A",
+    delivery="quieter, meaner")
+eve("ce_feyre_sense", "father", "feyre", "You should talk some sense into her.", delivery="tired, low")
+eve("ce_father_love", "father", "father", "What can I say? If it's love—", delivery="helpless, gentle")
+eve("A1_05_father_hope", "father", "father", "We need hope, or else we cannot endure.",
+    delivery="tired, then a rare clarity; gentle")
+eve("ce_feyre_no_hope", "father", "feyre", "There is no such thing.", delivery="flat, final")
+eve("ce_father_rest", "rest", "father", "Rest, Feyre. The meat will keep till morning.", canon="X",
+    delivery="gentle, tired, a hand toward the bedroom")
+
+# =============================================================================
+# The beast at the door (ch4), spoken by BeastDoorGuide on BeastDoor's beats
+# [Keeper: plans/voice-lines-act1.md, Scene 4 A1_10-A1_19, A1_22, H1_*].
+# This is where the player learns the wolf was a faerie, the Treaty's life for a
+# life, and the deal: Prythian, or die now. Said aloud, except her thoughts.
+# =============================================================================
+A = "beast_door"
+
+
+def door(lid, b, speaker, text, canon="V", delivery="", **kw):
+    inner = kw.pop("inner", False)
+    line(A, lid, speaker, text, "scene", "beast_door." + b, HUMAN, inner=inner, canon=canon,
+         delivery=delivery, once=False, cd=0.0, **kw)
+
+
+BEAST = "The beast"
+# The quiet hour at the fire, before the roar (Keeper: evening 2, rows 20-21).
+door("bd_treaty", "fire", "feyre", "Five hundred years, and the Treaty's all that keeps them on their side of the wall.",
+     canon="A", inner=True, delivery="inner voice: quiet, by the fire")
+door("bd_tomas", "tomas", "feyre", "Nesta. About Tomas Mandray—", canon="A",
+     delivery="turning to her sister; cut off by the roar")
+door("A1_10_beast_murderers", "accuse", "tamlin_beast", "MURDERERS!", who=BEAST,
+     delivery="an animal roar that forms a word; raw throat")
+# The decision window: no press after 3 s, or she backs away.
+door("H1_anything", "anything", "feyre", "Bracelets. Knife. Anything.", canon="X", inner=True,
+     delivery="inner voice, a whisper, frozen")
+door("H1_chin", "chin", "feyre", "Better to die with my chin held high than groveling like a cowering worm.",
+     inner=True, delivery="inner voice, defiant, gritted")
+door("A1_11_beast_who", "who", "tamlin_beast", "Who killed the wolf?", who=BEAST,
+     delivery="menacing, low, each word forced out through a snarl")
+door("A1_12_feyre_idid", "confess", "feyre", "I did.", delivery="short, steady, chin up; terrified underneath")
+door("A1_13_beast_provoked", "provoked", "tamlin_beast", "Did it attack you? Were you provoked?", who=BEAST,
+     delivery="cold, measured, a judge")
+door("A1_14_feyre_deserved", "deserved", "feyre",
+     "No. But considering all that your kind has done to us, it was deserved.", canon="A",
+     delivery="defiance through clenched teeth, low, building contempt")
+door("A1_15_beast_life", "life", "tamlin_beast",
+     "A life for a life. Any unprovoked attacks on faerie-kind by humans are to be paid only by a human life "
+     "in exchange.", who=BEAST, delivery="grave, formal: the Treaty speaking through him, slow and clear")
+door("A1_16_beast_choice", "life", "tamlin_beast",
+     "You can either come live at my home in Prythian, or you can walk outside right now and be shredded to "
+     "ribbons. Your choice.", canon="A", who=BEAST, delivery="quiet menace, very close to her throat")
+# The father begs as he kneels (Keeper: ch3, A1_16a-c); a roar cuts him off.
+door("A1_16a_father_spare", "plead", "father",
+     "Please, good sir—Feyre is my youngest. I beseech you to spare her. She is all … she is all …",
+     delivery="trembling, begging, gripping her shoulder; cut off by a roar")
+door("A1_16b_beast_silence", "silence", "tamlin_beast", "Silence.", who=BEAST, delivery="one word, a growl, final")
+door("A1_16c_father_gold", "gold", "father", "I can get gold—", delivery="desperate, fast; cut off")
+door("A1_17_beast_worth", "worth", "tamlin_beast", "How much is your daughter's life worth to you?", who=BEAST,
+     delivery="contempt for the father, a scoff before it")
+door("A1_18_feyre_when", "when", "feyre", "When do we go?", delivery="quiet, resigned, steady, drained")
+door("A1_19_beast_now", "now", "tamlin_beast", "Now.", who=BEAST, delivery="one low word, flat, final")
+door("A1_22_father_name", "goodbye", "father",
+     "You were always too good for here, Feyre. You go somewhere new, and you make a name for yourself.",
+     canon="A", delivery="trembling, tender, too late; voice cracking")
+
+# The ride north (ch5-6), played: her thoughts as she reaches each stretch of
+# his road, and what happens when she strays (Keeper 2026-11-25,
+# lore/02-locations/the-wall.md "The ride north, played"). He is nearly
+# wordless all the way north; the one thing he says unasked is the block.
+A = "ride_north"
+RIDE = ph(1, 2)   # the claim to the manor steps, either side of the Wall
+
+
+def ride(lid, b, text, canon="X", speaker="feyre", delivery="inner voice: quiet, close, riding", **kw):
+    inner = speaker == "feyre" and kw.pop("inner", True)
+    line(A, lid, speaker, text, "scene", "ride_north." + b, RIDE, inner=inner, canon=canon,
+         delivery=delivery if speaker == "feyre" else kw.pop("beast_delivery", delivery),
+         once=False, cd=0.0, **kw)
+
+
+# Sent out of the broken door (owner 2026-11-25): her choice, then his order at the mare.
+ride("rn_follow", "follow", "I need to follow the beast.", delivery="inner voice: resolve over fear")
+ride("rn_mount_order", "mount_order", "The mare. Get on.", speaker="tamlin_beast", who=BEAST,
+     beast_delivery="low, flat, a command; he doesn't look away from her")
+ride("rn_mare_waits", "mare_waits", "A white mare. Unbound, and waiting, as if she knew.", canon="A",
+     delivery="inner voice: stunned, a breath")
+ride("rn_mount_now", "mount_now", "Now, human.", speaker="tamlin_beast", who=BEAST, beast_delivery="snarled, close")
+ride("rn_look_back", "mounted", "I didn't dare look back.", canon="A")
+ride("rn_still", "still", "I'd never seen the forest so still.", canon="V")
+ride("rn_father", "village", "I could see my father limping through town, pleading for coppers.", canon="A",
+     delivery="inner voice: aching, past the dark houses")
+ride("rn_live", "live", "Live with him. Live, not die.", canon="V", delivery="inner voice: a vow, steadying")
+ride("rn_ash", "ash", "No ash. Not one.", delivery="inner voice: searching the trees, flat")
+ride("rn_what", "faerie", "What manner of faerie are you?", canon="V", inner=False,
+     delivery="aloud, to his back; no answer comes")
+ride("rn_lamb", "lamb", "A lamb in a kingdom of wolves.", canon="V", delivery="inner voice: small, bitter")
+# The tang is his magic putting her under (ch5); awake on the ride she fights
+# it off (Keeper 2026-11-25).
+ride("H1_metal", "smell_metal", "The air tastes like metal. Heavy—everything's going heavy. No. Stay awake.", canon="A",
+     delivery="inner voice: dry and close, slurring, then a sharp pull back")
+# Through the Wall (owner 2026-11-25; Keeper's wording): no way back, what she
+# sees, how she feels, and the human rules she carries to his table.
+ride("rn_through", "through", "Through the Wall. No way back now. My family can never find me.", canon="A",
+     delivery="inner voice: hollow, the gap closing behind her")
+ride("rn_birds", "birds", "Birds. In winter.", delivery="inner voice: disbelief, almost a whisper")
+ride("rn_warm", "warm", "Too warm for winter wool. It's spring here.",
+     delivery="inner voice: sweating, wary")
+ride("rn_beautiful", "beautiful", "Prythian. It has no right to be this beautiful.",
+     delivery="inner voice: awe, resenting it")
+ride("rn_reins", "reins", "I clench the reins to keep my hands from shaking.", canon="A",
+     delivery="inner voice: tight, holding herself together")
+ride("rn_name", "name", "Do you have a name?", canon="V", inner=False, delivery="aloud, careful, to his back")
+ride("rn_name_beast", "name", "Does it even matter to you, human?", canon="V", speaker="tamlin_beast",
+     who=BEAST, beast_delivery="a low growl of annoyance; he doesn't turn")
+# Her beliefs, not the game's facts: "the Fae can't lie" is what humans think (Keeper).
+ride("rn_lore_food", "lore_food", "Never eat their food. Never drink their wine. The first rule they teach us.",
+     canon="A", delivery="inner voice: reciting it like a child, steadying")
+ride("rn_lore_lie", "lore_lie",
+     "They can't lie. Everyone knows that. But they can twist the truth until it strangles you.",
+     delivery="inner voice: wary, certain of it")
+ride("rn_lore_promise", "lore_promise", "And never make them a promise.", delivery="inner voice: low, a warning to herself")
+ride("rn_gate", "gate", "My prison or my salvation—I couldn't decide which.", canon="V",
+     delivery="inner voice: as the gate swings open on its own")
+ride("rn_magic", "magic", "Of course it would be magic, because it was spring here.", canon="V",
+     delivery="inner voice: wonder and dread together")
+ride("rn_paint", "paint", "To paint it would be useless.", canon="A", delivery="inner voice: soft, overwhelmed")
+ride("rn_fool", "stairs", "Only a fool would run with no food, no strength.", canon="V",
+     delivery="inner voice: the mare won't move; reasoning herself down")
+ride("rn_food", "stairs", "Food first. Then run.", canon="A", delivery="inner voice: decided, low")
+# Still in the saddle at his doors (owner 2026-11-26): he waits, looking back.
+ride("rn_get_down", "get_down", "He's waiting at the doors. Get down.", delivery="inner voice: steeling herself")
+# Straying (Keeper's tiers): the mare first, then his growl, his roar, the block.
+ride("rn_stray_mare", "stray_mare", "She won't go. She's his.", delivery="inner voice: the reins useless, rising fear")
+ride("rn_stray_growl", "stray_growl", "Live, not die.", canon="V", delivery="inner voice: a whisper, frozen")
+ride("rn_stray_roar", "stray_roar", "I wouldn't get half a mile before he caught me.", canon="A",
+     delivery="inner voice: shaking, after the roar")
+ride("rn_stray_block", "stray_block", "Shredded to ribbons, human. Your choice.", canon="A", speaker="tamlin_beast",
+     who=BEAST, beast_delivery="very close, fangs at her face; quiet menace")
+ride("rn_stray_not_here", "stray_block", "Not here. Not like this.", delivery="inner voice: breathless, giving in")
 
 # =============================================================================
 # The village (ch3), and the gold she brings back (ch29-30)
@@ -284,10 +492,6 @@ place(A, "ash_grove", "hunting_forest", -700.0, 1580.0, 20.0)
 place(A, "hunting_lodge", "hunting_forest", 480.0, 1650.0, 18.0)
 place(A, "lost_estate", "workshop", -640.0, 2330.0, 22.0)
 place(A, "fathers_workshop", "workshop", -560.0, 2240.0, 10.0)
-# The first time she lets the string down short of a full draw, anywhere, ever
-# (BowGuide; Keeper: "I gripped my bow and drew the string farther back", ch1).
-line(A, "bow_let_down", "feyre", "Not yet. Draw the string farther back.", "scene", "bow.let_down",
-     inner=True, canon="A", cd=0.0, delivery="inner voice: patient with herself, under her breath")
 think(A, "hf_snow", "The snow's already covering the blood. Good.", "region", "hunting_forest", HUMAN,
       req=["wolf_killed"])
 think(A, "hf_oak", "My oak. I've waited out half a winter in those branches.", "place", "waiting_oak", HUMAN,
@@ -459,6 +663,25 @@ chat(A, "l_glare", "lucien", "If you're going to glare, at least do it from the 
 deed(A, "d_bogge_lucien", "bogge_survived", "Breathe. It's gone. You did well.", speaker="lucien",
      phases=COURT, pr=5)
 
+# Lucien as his bond with her stands (L90, docs/contracts/relationships.md):
+# the facts are the bond engine's, raised by her deeds; lines only read them.
+say(A, "l_bond_keep_you", "lucien", "Don't let me keep you.", ph(2, 3), forbid=["fact.luc_bond_patrol"],
+    canon="X", delivery="baiting, a curled lip, already turning back to what he was doing; true sarcasm")
+say(A, "l_bond_patrol", "lucien", "Andras's old patrol. If you're coming, come.", ph(2, 3),
+    req=["fact.luc_warm_patrol"], canon="A", delivery="brisk, by the doors, already pulling on his gloves")
+chat(A, "l_bond_seat", "lucien", "You ride like a sack of grain. Less of one than last time.", ph(2, 4),
+    req=["fact.luc_did_rode_out"], canon="X")
+say(A, "l_bond_help", "lucien", "I wish I could have been there to help.", ph(3, 4), req=["fact.luc_bond_debt"],
+    canon="V", delivery="half-hearted, not meeting her eye")
+say(A, "l_bond_suriel", "lucien", "Tam told me that your first shot was to save the Suriel's life. Not your own.",
+    ph(3, 4), req=["fact.luc_did_freed_suriel_first"], canon="V", pr=5)
+say(A, "l_bond_faerie", "lucien", "Tam says you held him still to the end. Better you than me.", ph(3, 4),
+    req=["fact.luc_did_held_him_still"], canon="A", delivery="light, covering; he won't admit he ran (ch17)")
+say(A, "l_bond_friend", "lucien", "Ride out with me tomorrow. I'll even let you choose the way.", WIDER,
+    req=["fact.luc_warm_friend"], canon="X")
+deed(A, "d_luc_warm_patrol", "fact.luc_warm_patrol", "He's started waiting for me in the mornings.", COURT,
+     canon="X")
+
 # --- Tamlin: terse, gruff, gentle under it -----------------------------------
 A = "tamlin"
 say(A, "t_grounds", "tamlin", "Go where you like on the grounds. Not the woods after dark.", ph(2), canon="A")
@@ -489,6 +712,29 @@ chat(A, "t_hungry", "tamlin", "Are you hungry? You're always hungry. Come and ea
 chat(A, "t_thorns", "tamlin", "Mind the thorns.", COURT, where="manor_grounds")
 chat(A, "t_light", "tamlin", "The light's good today. For painting, I mean.", WIDER, req=["first_painting"])
 deed(A, "d_naga_tamlin", "naga_survived", "You're safe. I've got you.", speaker="tamlin", phases=COURT, pr=5)
+# Tamlin as his bond with her stands (L90). On a cool day he is withdrawn,
+# never menacing (director, 11-25): absent from his evening study, short with
+# her when they do meet (Keeper, 11-25).
+say(A, "t_bond_gate", "tamlin", "Stay inside the gate after dark. Whatever you hear calling.", ph(2, 3),
+    req=["fact.tam_warm_host"], forbid=["fact.tam_mood_cool"], canon="A")
+say(A, "t_bond_lucien_says", "tamlin", "Lucien says you didn't look. Good.", ph(2, 3),
+    req=["fact.tam_did_didnt_look"], forbid=["fact.tam_mood_cool"], canon="A")
+say(A, "t_bond_map", "tamlin", "Leave your map where it is. No one here will touch it.", ph(3, 4),
+    req=["fact.tam_did_mapped_house"], forbid=["fact.tam_mood_cool"], canon="A")
+say(A, "t_bond_letters", "tamlin", "Someone's been at the study desk. Keep the candles lit as long as you like.",
+    ph(3, 4), req=["fact.tam_did_practised_letters"], forbid=["fact.tam_mood_cool"], canon="A")
+say(A, "t_bond_late", "tamlin", "Can't sleep either?", ph(3, 4), req=["fact.tam_warm_wounded"],
+    forbid=["fact.tam_mood_cool"], hours=(22.0, 2.0), canon="X", delivery="low, tired, glad of the company")
+chat(A, "t_bond_quiet", "tamlin", "The house is quiet at this hour. I like it.", ph(3, 4),
+    req=["fact.tam_warm_wounded"], forbid=["fact.tam_mood_cool"], hours=(22.0, 2.0), canon="X")
+say(A, "t_bond_show", "tamlin", "There's another place I'd like to show you. When you're ready.", WIDER,
+    req=["fact.tam_warm_guide"], forbid=["fact.tam_mood_cool"], canon="A")
+say(A, "t_cool_talk", "tamlin", "Not tonight, Feyre.", COURT, req=["fact.tam_mood_cool"], once=False, cd=600.0,
+    canon="X", delivery="withdrawn, tired, not angry; he doesn't look up")
+chat(A, "t_cool_eat", "tamlin", "Eat something. Then rest.", COURT, req=["fact.tam_mood_cool"], canon="X",
+     delivery="quiet, short, still looking after her")
+deed(A, "d_tam_warm_wounded", "fact.tam_warm_wounded", "He walks the halls at night too. I'm not the only one.",
+     COURT, canon="X")
 
 # --- Alis: brisk, practical, sly ---------------------------------------------
 A = "alis"
@@ -809,11 +1055,11 @@ for _area, _l in LINES:
 A = "moments"
 
 
-def moment(lid, scene, text, speaker="feyre", inner=True, canon="X", who=None, delivery="", **kw):
+def moment(lid, scene, text, speaker="feyre", inner=True, canon="X", who=None, delivery="", once=False, **kw):
     if inner and not delivery:
         delivery = "inner voice: dry, quiet, close"
     line(A, lid, speaker, text, "scene", scene + "." + lid, (), inner=inner, canon=canon, who=who,
-         delivery=delivery, once=False, cd=0.0, **kw)
+         delivery=delivery, once=once, cd=0.0, **kw)
 
 
 # The Summer faerie on the dining table (ch 17).
@@ -843,6 +1089,39 @@ for _n, _what, _shape in [(1, "The front doors", "An X"), (2, "The marble stairs
 # not heard: LinePresenter holds it up as a loose page until she puts it back.
 moment("sentry_chest_tag", "sentry_chest", "For whoever puts an arrow in all three butts.", speaker="note",
        inner=False, who="A tag on the hasp", delivery="not voiced: written")
+
+# A steeped arrow meets a monster's weakness, or is shrugged off (L75, L81 G24;
+# HostileElements.react speaks them). Once per save each: the Director records
+# dlg.<id> only when she has heard it. The Keeper's lines, canon X
+# (lore/04-creatures/lesser-fae-and-ambient.md).
+for _lid, _text in [
+        ("hostile_element_weak", "That hurt it. Remember what did that."),
+        ("hostile_element_weak_ember", "Fire, then. Even they burn."),
+        ("hostile_element_weak_rime", "The cold bit deep. It hated that."),
+        ("hostile_element_weak_glimmer", "It flinched from the light like something out of a cellar."),
+        ("hostile_element_weak_hush", "Its eyes went heavy. It's fighting sleep."),
+        ("hostile_element_resisted", "Like shooting a stone. Not that, then.")]:
+    moment(_lid, "hostile_elements", _text, canon="X", once=True)
+
+# The first trophy taken from a speaking family (the naga talk and call each
+# other "brothers" [C]): her sentence began with skinning a fae (L75 monster
+# gear §2.2; the Keeper's line, canon X). Once per save.
+moment("loot_first_trophy", "monster_gear", "Like the pelt. I know what this makes me.", canon="X", once=True)
+
+# Gloamer packs (G25, G26): the first pack that scatters from her, and the
+# first one she sees grab at a light arrow's glow. Canon X, once per save.
+moment("hostile_rout", "hostile_packs", "Let them run. They'll come back hungrier.", canon="X", once=True)
+moment("hostile_glint_grab", "hostile_packs", "Greedy things. Anything that shines.", canon="X", once=True)
+
+# The first charm she cuts from the sleeping Hollow Hob's necklace (bestiary
+# §10; the first on the cord is an iron horseshoe [C: iron does nothing to
+# them]). Canon X, once per save; the Keeper's to tune.
+# G29: the first time she comes within 25 m of it asleep, she sees what it
+# wears (bestiary §10.3). Canon X, once per save; the Keeper's to tune.
+moment("hob_first_sight", "hollow_hob",
+       "Iron, pewter, a child's bracelet. Mortal things, strung round that neck. And it's asleep.",
+       canon="X", once=True)
+moment("hob_charm_cut", "hollow_hob", "Iron. Someone thought this would keep them safe.", canon="X", once=True)
 
 # =============================================================================
 # Who stands where (CastPresence). House spots are in house space (x, z) on the
@@ -921,7 +1200,7 @@ spot("lucien_drawing", "lucien", CAST % ("lucien", "lucien"), "manor_estate", -1
 spot("tamlin_armory", "tamlin", CAST % ("tamlin", "tamlin"), "manor_estate", -36.0, -34.5, ph(2, 3),
      room="armory", hours=(7.0, 10.0), canon="A", notes="a warrior; arms before he rides out")
 spot("tamlin_study", "tamlin", CAST % ("tamlin", "tamlin"), "manor_estate", -15.0, -66.0, COURT,
-     room="tamlin_study", hours=(17.0, 21.0), canon="X")
+     room="tamlin_study", hours=(17.0, 21.0), forbid=["fact.tam_mood_cool"], canon="X")
 spot("tamlin_garden", "tamlin", CAST % ("tamlin", "tamlin"), "manor_estate", 18.0, -160.0, WIDER,
      hours=(9.0, 13.0), canon="A", notes="the rose garden his father planted (ch19)")
 spot("sentry_gate_w", "sentry", PEOPLE % "sentry_1", "manor_estate", -7.0, 292.0, COURT, yaw=0.0, canon="C",
@@ -980,6 +1259,13 @@ for i, (near, dx, dz) in enumerate([("long_tables", -6, 3), ("long_tables", 6, -
     spot("reveler_solstice_%d" % (i + 1), "reveler", PEOPLE % ("reveler_%d" % (i + 1)), "solstice_meadow",
          x + dx, z + dz, ph(6), wander=3.0, canon="C")
 
+# Where they are because of her (L90, docs/contracts/relationships.md): bond facts only.
+spot("lucien_doors_waiting", "lucien", CAST % ("lucien", "lucien"), "manor_estate", 4.5, -33.0, ph(2, 3),
+     room="entrance_hall", yaw=180.0, hours=(6.5, 8.0), req=["fact.luc_warm_patrol"], canon="A",
+     notes="waits by the front doors for her before Andras's old patrol (ch11)")
+spot("tamlin_halls_late", "tamlin", CAST % ("tamlin", "tamlin"), "manor_estate", -4.0, -34.0, ph(3, 4),
+     room="entrance_hall", yaw=90.0, hours=(22.0, 2.0), req=["fact.tam_warm_wounded"],
+     forbid=["fact.tam_mood_cool"], canon="A", notes="late at night in the halls, as she is (ch12)")
 
 # =============================================================================
 # Writing

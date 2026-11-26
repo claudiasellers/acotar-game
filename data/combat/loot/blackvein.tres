@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="LootTable" format=3]
+
+[ext_resource type="Script" path="res://systems/weapons/loot_table.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+family = &"blackvein"
+carried = Array[StringName]([])
+leader_at = 0
+leader_weapon = &""
+carried_wear = Vector2(0.5, 0.9)
+trophies = Array[StringName]([&"wpn_blackvein_veinhook", &"wpn_blackvein_jaw_shears"])
+trophy_chances = PackedFloat32Array(0.25, 0.1)
+camp_weapon = &""
+camp_coins = Vector2i(1, 5)
+camp_container = &"camp_blackvein_cocoon"

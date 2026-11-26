@@ -1,0 +1,56 @@
+[gd_resource type="Resource" script_class="KeyHintSet" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://ui/hud/key_hint_row.gd" id="1"]
+[ext_resource type="Script" path="res://ui/hud/key_hint_set.gd" id="2"]
+
+[sub_resource type="Resource" id="bow"]
+script = ExtResource("1")
+id = &"bow"
+priority = 250
+keys = Array[StringName]([&"cycle_bow"])
+says = PackedStringArray("change bow")
+always = false
+
+[sub_resource type="Resource" id="craft"]
+script = ExtResource("1")
+id = &"craft"
+priority = 260
+keys = Array[StringName]([&"craft_arrow"])
+says = PackedStringArray("make an arrow")
+always = false
+
+[sub_resource type="Resource" id="satchel"]
+script = ExtResource("1")
+id = &"satchel"
+priority = 270
+keys = Array[StringName]([&"satchel_open"])
+says = PackedStringArray("open the satchel")
+always = false
+
+[sub_resource type="Resource" id="collection"]
+script = ExtResource("1")
+id = &"collection"
+priority = 280
+keys = Array[StringName]([&"open_collection"])
+says = PackedStringArray("open the collection")
+always = false
+
+[sub_resource type="Resource" id="map"]
+script = ExtResource("1")
+id = &"map"
+priority = 290
+keys = Array[StringName]([&"map_open"])
+says = PackedStringArray("open the map")
+always = false
+
+[sub_resource type="Resource" id="thought"]
+script = ExtResource("1")
+id = &"thought"
+priority = 300
+keys = Array[StringName]([&"guide_open"])
+says = PackedStringArray("think on it again")
+always = false
+
+[resource]
+script = ExtResource("2")
+rows = Array[ExtResource("1")]([SubResource("bow"), SubResource("craft"), SubResource("satchel"), SubResource("collection"), SubResource("map"), SubResource("thought")])

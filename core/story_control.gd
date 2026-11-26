@@ -120,8 +120,12 @@ func can_look() -> bool:
 	return mode != Mode.NONE
 
 
+## The bow itself. A scene that only wants the fire button (the bracelets at
+## the beast door) allows "fire"; one that hands her the bow allows "shoot".
+## Never while a screen is open (ScreenStack.takes_play): a screen that
+## doesn't pause still owns the click.
 func can_shoot() -> bool:
-	return mode == Mode.FULL or allowed_actions.has("fire")
+	return (mode == Mode.FULL or allowed_actions.has("shoot")) and not ScreenStack.takes_play()
 
 
 func can_interact() -> bool:

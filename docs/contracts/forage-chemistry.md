@@ -24,7 +24,7 @@ station, and what comes out reaches the world through an element.
 - `ChemistryStations.bind(node, station_id)`: ManorStation ids `hearth`,
   `kitchen`, `bread_oven`, `stillroom` and nodes in group `hearth` (the cottage)
   get a CookingStation child (unlit, not in group `station`).
-- `BrewMenu.open_for(feyre, cooking_station)`; root node name `HearthPanel`.
+- `BrewMenu.open_for(feyre, cooking_station)`; root node name `HearthPanel`. The page lists the recipes she knows (`RecipeUnlocks` entries the collection has recorded, or brews she has made) beside her bags; `BrewMenu.pick(id)` lays one in the pot (ui-frame step 8p).
 - `BrewEffects.scent_scale(player)` (CreatureSenses scent range; beasts and
   lesser fae only, never High Fae, Keeper 2026-11-03).
 - `BrewTells` on Feyre: scene-lit particles for bright (motes), warm (haze)

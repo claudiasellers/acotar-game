@@ -130,7 +130,8 @@ wet grass won't light. Free climb/glide: skipped by design.
 
 Outdoors: ambient from the sky at 0.7 (world.tscn + GradePreset default, 19 outdoor grades; `manor_interior` keeps
 1.0), reflections from the sky, SSAO radius 1.0 / intensity 1.2 at half size, SSIL low and half size on the `high`
-profile only (BounceLight, world/shared/world/bounce_light.gd, follows GameSettings.shadow_profile_changed).
+profile only (GradeDirector.screen_space_bounce, follows GameSettings.shadow_profile_changed; BounceLight was folded into
+GradeDirector in L89).
 candy_lit `ground_bounce` 0.35, colour = terrain albedo mean (0.523, 0.548, 0.545). It applies to directional
 lights only and is scaled by sun height and by how far the face looks down. The surface's own shadow does not
 block it, and the lit band does not take it. The manor's room shells opt out (SDFGI lights them).

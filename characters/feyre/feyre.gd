@@ -157,7 +157,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(CrouchMotor.ACTION) and StoryControl.can_move() and not is_mantling:
 		crouch.toggle(is_on_floor())
 	if event.is_action_pressed(&"interact") and StoryControl.can_interact():
-		interactor.interact()
+		interactor.press(event is InputEventJoypadButton)
+	elif event.is_action_released(&"interact"):
+		interactor.release()
+	if event.is_action_pressed(&"interact_alt") and StoryControl.can_interact() and interactor.interact_alt():
+		# The screen it opens (the mare's tending) closes on this key: not this press.
+		get_viewport().set_input_as_handled()
 
 
 func _process(delta: float) -> void:
@@ -166,9 +171,12 @@ func _process(delta: float) -> void:
 	if look != Vector2.ZERO and StoryControl.can_look():
 		# Real seconds: Focus and hit-stop slow the world, never her aim (the
 		# mouse is event-based and already is).
-		var s := stick_sensitivity * GameSettings.stick_sensitivity * TimeScale.real(delta) * _aim_look_scale()
+		var s := stick_sensitivity * GameSettings.stick_sensitivity * TimeScale.real(delta) * _aim_look_scale() \
+				* _stick_friction()
 		_look(look.x * s, look.y * s)
 	sidestep.wait(TimeScale.real(delta), hit_stop != null and hit_stop.active())
+	_hold_sidestep_hint()
+	_hold_jump_hint()
 	camera_control.update(delta)
 	if _breath:
 		_breath.update(delta)
@@ -185,7 +193,7 @@ func _physics_process(delta: float) -> void:
 	if not StoryControl.can_move():
 		input = Vector2.ZERO
 	var yaw := _camera_rig.rotation.y
-	var steer := steer_frame.yaw(input, yaw, steer_exclusion(), is_aiming or is_drawing)
+	var steer := steer_frame.yaw(input, yaw, steer_exclusion(), is_aiming)
 	var direction := Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, steer)
 	# Sprint or jump stands her up from a crouch, and so does a cutscene or a fall.
 	# With the bow raised the sprint key is Focus, and she stays down.
@@ -196,12 +204,12 @@ func _physics_process(delta: float) -> void:
 		crouch.set_crouched(false)
 	# Holding sprint runs at sprint_speed until released: stamina no longer limits it.
 	var sprinting := Input.is_action_pressed(&"sprint") and direction != Vector3.ZERO \
-			and not is_drawing and not is_aiming and not crouch.crouched
+			and not is_aiming and not crouch.crouched
 	_running = sprinting
 	_update_stamina(delta)
 
 	var speed := run_speed
-	if is_aiming or is_drawing:
+	if is_aiming:
 		speed = aim_speed
 	elif sprinting:
 		speed = sprint_speed
@@ -225,8 +233,11 @@ func _physics_process(delta: float) -> void:
 	if jump_motor.jumps_used > maxi(jumps_before, 1) and direction != Vector3.ZERO:
 		horizontal = horizontal.lerp(direction * maxf(horizontal.length(), speed), air_jump_redirect)
 
-	if sidestep.wanted() and _can_sidestep():
-		_begin_sidestep(direction, yaw)
+	if sidestep.wanted() and _free_to_sidestep():
+		if stamina >= SidestepMotor.STAMINA:
+			_begin_sidestep(direction, yaw)
+		else:
+			_refuse_sidestep()
 	var stepping := sidestep.active
 	var side := sidestep.step(delta)
 	if sidestep.safe_now:
@@ -333,22 +344,54 @@ func is_running() -> bool:
 
 ## Gentle Mode (pause menu setting) makes jumps more forgiving.
 func _bow_raised() -> bool:
-	return is_aiming or is_drawing
+	return is_aiming
 
 
-## On her feet, bow up, free to move, with the breath to pay for it, and not
-## inside a hit-stop (a buffered press runs as the freeze ends).
-func _can_sidestep() -> bool:
+## On her feet, bow up, free to move, and not inside a hit-stop (a buffered
+## press runs as the freeze ends). Whether she has the breath is asked after.
+func _free_to_sidestep() -> bool:
 	return _bow_raised() and is_on_floor() and not is_mantling and StoryControl.can_move() \
-			and sidestep.ready() and stamina >= SidestepMotor.STAMINA \
+			and sidestep.ready() \
 			and not (vitals and (vitals.is_down or vitals.is_grabbed())) \
 			and not (hit_stop and hit_stop.active())
+
+
+## The sidestep's key is named while it would save her: bow up, and a hostile
+## close by is after her. Held for the fight, since a wind-up alone is too
+## short to read by.
+func _hold_sidestep_hint() -> void:
+	var hints := KeyHints.of(get_tree())
+	var wanted := hints.teaches(&"sidestep") and _bow_raised() and SoftAim.engaged_near(get_tree(), global_position)
+	hints.hold(self, &"sidestep" if wanted else &"")
+
+
+## The jump key is named while a ledge she could climb is in reach, until
+## she has jumped once.
+func _hold_jump_hint() -> void:
+	var hints := KeyHints.of(get_tree())
+	if not hints.teaches(&"jump"):
+		hints.hold(movement_feel, &"")
+		return
+	if jump_motor.jumps_used > 0 or is_mantling:
+		hints.learn(&"jump")
+		return
+	var ledge := is_on_floor() and not _bow_raised() and StoryControl.can_move() and not mantle.find_ledge().is_empty()
+	hints.hold(movement_feel, &"jump" if ledge else &"")
+
+
+## No breath for it: the press is spent on a gasp, so it never fails in silence
+## (UX review G22), and the stamina bow shakes its head.
+func _refuse_sidestep() -> void:
+	sidestep.cancel()
+	SoundDirector.cue(&"breath_winded", global_position)
+	VitalsHud.stamina_refused(get_tree())
 
 
 ## The way the stick points, or straight back from her aim.
 func _begin_sidestep(direction: Vector3, camera_yaw: float) -> void:
 	sidestep.begin(direction if direction != Vector3.ZERO else Vector3.BACK.rotated(Vector3.UP, camera_yaw))
 	drain_stamina(SidestepMotor.STAMINA)
+	KeyHints.of(get_tree()).learn(&"sidestep")
 	if bow_controller:
 		bow_controller.sidestepped()
 
@@ -383,7 +426,14 @@ func _try_mantle() -> bool:
 
 ## Look speed is lower with the bow raised (BowTuning.aim_sensitivity).
 func _aim_look_scale() -> float:
-	return bow_controller.tuning.aim_sensitivity if is_aiming else 1.0
+	return bow_controller.tuning.aim_sensitivity if bow_controller and bow_controller.is_precise else 1.0
+
+
+## On a pad with the bow raised, her aim slows as it crosses a hostile (SoftAim).
+func _stick_friction() -> float:
+	if not _bow_raised() or camera == null:
+		return 1.0
+	return SoftAim.friction(get_tree(), camera.global_position, -camera.global_basis.z)
 
 
 ## Player look input (already scaled); applies the invert settings.
@@ -425,7 +475,6 @@ func camera_rise() -> float:
 
 
 func _build_components() -> void:
-	CrouchMotor.ensure_action()
 	QUIVER_LOADOUTS.carry(Gameplay.inventory, PhaseManager.current_phase)
 	QUIVER_LOADOUTS.fill(Gameplay.inventory, PhaseManager.current_phase)
 	Gameplay.listen(&"phase_changed", _on_phase_changed)
@@ -472,6 +521,9 @@ func _build_components() -> void:
 	hit_stop.vitals = vitals
 	hit_stop.strike = strike
 	add_child(hit_stop)
+	var warning := OffscreenWarning.new()
+	warning.player = self
+	add_child(warning)
 	_build_breath()
 
 

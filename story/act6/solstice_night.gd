@@ -102,7 +102,7 @@ func _open_party(_s: SceneSpace) -> void:
 	l.global_position = ground_mark(&"lucien_near")
 	_spawn_crowd()
 	_dress_party()
-	EventBus.grade_swap_requested.emit(PARTY_GRADE, 2.0)
+	EventBus.grade_swap_requested.emit(self, PARTY_GRADE, 2.0)
 	SoundDirector.cue(&"music_spring_estate")
 	StoryControl.hold(self, StoryControl.Mode.LOOK)
 	StoryControl.set_focus(t)
@@ -158,14 +158,13 @@ func drink() -> void:
 	if drank:
 		return
 	drank = true
-	note_mood()
-	EventBus.mood_requested.emit(&"enchanted_sleep", 0.32, 2.0)
+	EventBus.mood_requested.emit(self, &"enchanted_sleep", 0.32, 2.0)
 	EventBus.story_item_granted.emit(&"ing_faerie_wine", 0)
 	Juice.burst(player(), &"craft")
 	aside(&"wine_thought")
 	get_tree().create_timer(50.0).timeout.connect(func() -> void:
 		if is_inside_tree():
-			EventBus.mood_requested.emit(&"calm", 0.0, 6.0))
+			EventBus.mood_requested.emit(self, &"calm", 0.0, 6.0))
 	get_tree().create_timer(3.5).timeout.connect(func() -> void:
 		if is_inside_tree() and running:
 			aside(&"lucien_nursemaid"))
@@ -180,7 +179,7 @@ func _night_falls() -> void:
 		t.global_position = ground_mark(&"tamlin_leave")
 	place_feyre(ground_mark(&"tamlin_leave") + Vector3(1.2, 0.0, 1.0))
 	dismiss(&"lucien")
-	EventBus.grade_swap_requested.emit(NIGHT_GRADE, 3.0)
+	EventBus.grade_swap_requested.emit(self, NIGHT_GRADE, 3.0)
 
 
 func _open_wisps(_s: SceneSpace) -> void:
@@ -284,7 +283,7 @@ func _close() -> void:
 		if is_instance_valid(n):
 			n.queue_free()
 	dressing.clear()
-	GradeDirector.release_story_holds(get_tree())
+	EventBus.grade_swap_requested.emit(self, &"", 2.0)
 	for n in crowd:
 		if is_instance_valid(n):
 			n.queue_free()

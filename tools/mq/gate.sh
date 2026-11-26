@@ -65,7 +65,7 @@ matches_on() { # matches "a/*,*.x": true when the change touches a match
 	return 1
 }
 
-gut_cmd() { echo "\"\$MQ_BIN/godot.sh\" -s addons/gut/gut_cmdln.gd -gconfig= -gexit -gtest=$1"; }
+gut_cmd() { echo "\"\$MQ_BIN/godot.sh\" -s addons/gut/gut_cmdln.gd -gconfig= -gexit -gpre_run_script=res://tests/fixtures/reset_hook.gd -gtest=$1"; }
 
 alone=" "
 first_names=(); first_cmds=(); names=(); cmds=(); needs=()

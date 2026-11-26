@@ -21,7 +21,7 @@ func before_each() -> void:
 	feyre.set_physics_process(false)
 	feyre.global_position = Vector3(400.0, 80.0, 400.0)
 	Gameplay.inventory.remove(&"arrow_wood", 999)
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	await wait_physics_frames(5)
 	PickupLog.of(get_tree()).clear()
 	await wait_process_frames(1)

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://systems/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wpn_shepherds_crook"
+display_name = "Shepherd's Crook"
+family = &""
+kind = &"spear"
+power = 1.2
+swing_s = 0.85
+reach_m = 2.6
+stagger_s = 1.6
+durability = 22
+imbue_slots = 1
+two_handed = true
+trait_id = &"hamstring"
+trait_count = 0
+unique = false
+canon = "X"
+description = "A shepherd's iron crook, wool still caught in the hook. It trips what it catches."

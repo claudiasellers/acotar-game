@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://systems/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wpn_briar_rose_shiv"
+display_name = "Rosebriar Shiv"
+family = &"briarling"
+kind = &"knife"
+power = 1.1
+swing_s = 0.45
+reach_m = 1.6
+stagger_s = 1.0
+durability = 10
+imbue_slots = 1
+two_handed = false
+trait_id = &"bleed"
+trait_count = 0
+unique = false
+canon = "X"
+description = "The long heart-thorn from its core, wrapped in a rose leaf."

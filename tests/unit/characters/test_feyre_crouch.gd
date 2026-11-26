@@ -52,7 +52,6 @@ func test_changed_signal_fires_once_per_stance_change() -> void:
 
 
 func test_crouch_action_is_ctrl_and_pad_b() -> void:
-	CrouchMotor.ensure_action()
 	assert_true(InputMap.has_action(CrouchMotor.ACTION))
 	var key := false
 	var pad := false

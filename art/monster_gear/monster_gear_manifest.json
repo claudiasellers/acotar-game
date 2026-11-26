@@ -1,0 +1,1183 @@
+{
+ "assets": [
+  {
+   "bytes": 103188,
+   "family": "gloamer",
+   "file": "wpn_gloamer_hookknife.glb",
+   "group": "weapon",
+   "hands": 1,
+   "id": "wpn_gloamer_hookknife",
+   "imbue": [
+    0,
+    0.3214,
+    -0.08
+   ],
+   "kind": "sickle",
+   "length_m": 0.452,
+   "reach_m": 0.341,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.024,
+   "size_m": [
+    0.043,
+    0.452,
+    0.221
+   ],
+   "tip": [
+    0,
+    0.2755,
+    -0.2001
+   ],
+   "tris": 1282,
+   "tris_lod1": 640,
+   "tris_worn": 1524,
+   "worn_delta": 0.21
+  },
+  {
+   "bytes": 148360,
+   "family": "gloamer",
+   "file": "wpn_gloamer_knuckleclub.glb",
+   "group": "weapon",
+   "hands": 1,
+   "id": "wpn_gloamer_knuckleclub",
+   "imbue": [
+    0,
+    0.5,
+    -0.07
+   ],
+   "kind": "club",
+   "length_m": 0.819,
+   "reach_m": 0.585,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.084,
+   "size_m": [
+    0.164,
+    0.819,
+    0.172
+   ],
+   "tip": [
+    0,
+    0.585,
+    0
+   ],
+   "tris": 1734,
+   "tris_lod1": 865,
+   "tris_worn": 1754,
+   "worn_delta": 0.187
+  },
+  {
+   "bytes": 139072,
+   "cord_at": [
+    0,
+    0.292,
+    0
+   ],
+   "family": "gloamer",
+   "file": "wpn_gloamer_trinket_flail.glb",
+   "group": "weapon",
+   "hands": 1,
+   "id": "wpn_gloamer_trinket_flail",
+   "imbue": [
+    0,
+    1.28,
+    0
+   ],
+   "kind": "whip",
+   "length_m": 0.422,
+   "reach_m": 1.36,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.023,
+   "size_m": [
+    0.371,
+    1.617,
+    0.3
+   ],
+   "tip": [
+    0,
+    1.36,
+    0
+   ],
+   "tris": 2072,
+   "tris_lod1": 1035,
+   "tris_worn": 1248,
+   "worn_delta": 0.116
+  },
+  {
+   "bytes": 208472,
+   "family": "gloamer",
+   "file": "wpn_gloamer_scythe_glaive.glb",
+   "group": "weapon",
+   "hands": 2,
+   "id": "wpn_gloamer_scythe_glaive",
+   "imbue": [
+    0,
+    1.08,
+    -0.3
+   ],
+   "kind": "spear",
+   "length_m": 1.88,
+   "reach_m": 1.172,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.058,
+   "size_m": [
+    0.105,
+    1.88,
+    0.709
+   ],
+   "tip": [
+    0,
+    0.9688,
+    -0.66
+   ],
+   "tris": 2746,
+   "tris_lod1": 1368,
+   "tris_worn": 2902,
+   "worn_delta": 0.076
+  },
+  {
+   "bytes": 69160,
+   "family": "gloamer",
+   "file": "wpn_woodcutter_hatchet.glb",
+   "group": "weapon",
+   "hands": 1,
+   "id": "wpn_woodcutter_hatchet",
+   "imbue": [
+    0,
+    0.235,
+    -0.06
+   ],
+   "kind": "axe",
+   "length_m": 0.413,
+   "reach_m": 0.269,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.029,
+   "size_m": [
+    0.051,
+    0.413,
+    0.134
+   ],
+   "tip": [
+    0,
+    0.25,
+    -0.1
+   ],
+   "tris": 692,
+   "tris_lod1": 346,
+   "tris_worn": 1102,
+   "worn_delta": 0.1
+  },
+  {
+   "bytes": 133672,
+   "family": "gloamer",
+   "file": "wpn_pruning_hook.glb",
+   "group": "weapon",
+   "hands": 1,
+   "id": "wpn_pruning_hook",
+   "imbue": [
+    0,
+    0.6684,
+    -0.062
+   ],
+   "kind": "sickle",
+   "length_m": 0.924,
+   "reach_m": 0.648,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.075,
+   "size_m": [
+    0.125,
+    0.924,
+    0.198
+   ],
+   "tip": [
+    0,
+    0.6356,
+    -0.1258
+   ],
+   "tris": 1582,
+   "tris_lod1": 790,
+   "tris_worn": 1608,
+   "worn_delta": 0.223
+  },
+  {
+   "bytes": 78752,
+   "family": "naga",
+   "file": "wpn_naga_talon_knife.glb",
+   "group": "weapon",
+   "hands": 1,
+   "id": "wpn_naga_talon_knife",
+   "imbue": [
+    0,
+    0.17,
+    -0.03
+   ],
+   "kind": "knife",
+   "length_m": 0.364,
+   "reach_m": 0.259,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.024,
+   "size_m": [
+    0.045,
+    0.364,
+    0.127
+   ],
+   "tip": [
+    0,
+    0.2366,
+    -0.1061
+   ],
+   "tris": 950,
+   "tris_lod1": 474,
+   "tris_worn": 1184,
+   "worn_delta": 0.174
+  },
+  {
+   "bytes": 141036,
+   "family": "naga",
+   "file": "wpn_naga_talon_hook.glb",
+   "group": "weapon",
+   "hands": 1,
+   "id": "wpn_naga_talon_hook",
+   "imbue": [
+    0,
+    0.37,
+    -0.075
+   ],
+   "kind": "sickle",
+   "length_m": 0.523,
+   "reach_m": 0.307,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.023,
+   "size_m": [
+    0.045,
+    0.523,
+    0.2
+   ],
+   "tip": [
+    0,
+    0.2681,
+    -0.1501
+   ],
+   "tris": 1856,
+   "tris_lod1": 928,
+   "tris_worn": 2036,
+   "worn_delta": 0.157
+  },
+  {
+   "bytes": 123860,
+   "family": "naga",
+   "file": "wpn_fishers_gaff.glb",
+   "group": "weapon",
+   "hands": 2,
+   "id": "wpn_fishers_gaff",
+   "imbue": [
+    0,
+    1.14,
+    -0.062
+   ],
+   "kind": "spear",
+   "length_m": 1.96,
+   "reach_m": 1.039,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.038,
+   "size_m": [
+    0.072,
+    1.96,
+    0.155
+   ],
+   "tip": [
+    0,
+    1.0353,
+    -0.0911
+   ],
+   "tris": 1496,
+   "tris_lod1": 742,
+   "tris_worn": 1860,
+   "worn_delta": 0.057
+  },
+  {
+   "bytes": 138524,
+   "family": "briarling",
+   "file": "wpn_briar_thorn_whip.glb",
+   "group": "weapon",
+   "hands": 1,
+   "id": "wpn_briar_thorn_whip",
+   "imbue": [
+    -0.0006,
+    1.0005,
+    -0.1595
+   ],
+   "kind": "whip",
+   "length_m": 1.525,
+   "reach_m": 1.398,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.067,
+   "size_m": [
+    0.126,
+    1.525,
+    0.4
+   ],
+   "tip": [
+    0.0049,
+    1.35,
+    -0.365
+   ],
+   "tris": 1770,
+   "tris_lod1": 884,
+   "tris_worn": 1564,
+   "worn_delta": 0.344
+  },
+  {
+   "bytes": 49704,
+   "family": "briarling",
+   "file": "wpn_briar_rose_shiv.glb",
+   "group": "weapon",
+   "hands": 1,
+   "id": "wpn_briar_rose_shiv",
+   "imbue": [
+    0,
+    0.12,
+    -0.006
+   ],
+   "kind": "knife",
+   "length_m": 0.292,
+   "reach_m": 0.23,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.026,
+   "size_m": [
+    0.046,
+    0.292,
+    0.062
+   ],
+   "tip": [
+    0,
+    0.23,
+    -0.014
+   ],
+   "tris": 496,
+   "tris_lod1": 248,
+   "tris_worn": 772,
+   "worn_delta": 0.271
+  },
+  {
+   "bytes": 79092,
+   "family": "hob",
+   "file": "wpn_smiths_hammer.glb",
+   "group": "weapon",
+   "hands": 1,
+   "id": "wpn_smiths_hammer",
+   "imbue": [
+    0,
+    0.295,
+    -0.06
+   ],
+   "kind": "club",
+   "length_m": 0.431,
+   "reach_m": 0.265,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.029,
+   "size_m": [
+    0.058,
+    0.431,
+    0.157
+   ],
+   "tip": [
+    0,
+    0.255,
+    -0.072
+   ],
+   "tris": 842,
+   "tris_lod1": 420,
+   "tris_worn": 1158,
+   "worn_delta": 0.065
+  },
+  {
+   "bytes": 117504,
+   "family": "hob",
+   "file": "wpn_shepherds_crook.glb",
+   "group": "weapon",
+   "hands": 2,
+   "id": "wpn_shepherds_crook",
+   "imbue": [
+    0,
+    1.03,
+    -0.07
+   ],
+   "kind": "spear",
+   "length_m": 1.793,
+   "reach_m": 0.868,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.029,
+   "size_m": [
+    0.053,
+    1.793,
+    0.171
+   ],
+   "tip": [
+    0,
+    0.8628,
+    -0.0989
+   ],
+   "tris": 1512,
+   "tris_lod1": 756,
+   "tris_worn": 1668,
+   "worn_delta": 0.125
+  },
+  {
+   "bytes": 129452,
+   "family": "hob",
+   "file": "wpn_hob_tooth_cleaver.glb",
+   "group": "weapon",
+   "hands": 1,
+   "id": "wpn_hob_tooth_cleaver",
+   "imbue": [
+    0,
+    0.32,
+    -0.07
+   ],
+   "kind": "axe",
+   "length_m": 0.656,
+   "reach_m": 0.44,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.052,
+   "size_m": [
+    0.101,
+    0.656,
+    0.174
+   ],
+   "tip": [
+    0,
+    0.44,
+    -0.02
+   ],
+   "tris": 1570,
+   "tris_lod1": 784,
+   "tris_worn": 1978,
+   "unique": true,
+   "worn_delta": 0.077
+  },
+  {
+   "bytes": 116308,
+   "family": "blackvein",
+   "file": "wpn_blackvein_veinhook.glb",
+   "group": "weapon",
+   "hands": 1,
+   "id": "wpn_blackvein_veinhook",
+   "imbue": [
+    0,
+    0.39,
+    -0.062
+   ],
+   "kind": "sickle",
+   "length_m": 0.477,
+   "reach_m": 0.352,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.021,
+   "size_m": [
+    0.04,
+    0.477,
+    0.146
+   ],
+   "tip": [
+    0,
+    0.3298,
+    -0.1226
+   ],
+   "tris": 1408,
+   "tris_lod1": 698,
+   "tris_worn": 1742,
+   "worn_delta": 0.164
+  },
+  {
+   "bytes": 137144,
+   "family": "blackvein",
+   "file": "wpn_blackvein_jaw_shears.glb",
+   "group": "weapon",
+   "hands": 1,
+   "id": "wpn_blackvein_jaw_shears",
+   "imbue": [
+    0,
+    0.19,
+    -0.05
+   ],
+   "kind": "knife",
+   "length_m": 0.347,
+   "reach_m": 0.245,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.022,
+   "size_m": [
+    0.043,
+    0.347,
+    0.104
+   ],
+   "tip": [
+    0,
+    0.2331,
+    -0.076
+   ],
+   "tris": 1804,
+   "tris_lod1": 898,
+   "tris_worn": 1792,
+   "worn_delta": 0.211
+  },
+  {
+   "bytes": 197372,
+   "family": "martax",
+   "file": "wpn_martax_tooth_club.glb",
+   "group": "weapon",
+   "hands": 2,
+   "id": "wpn_martax_tooth_club",
+   "imbue": [
+    0,
+    0.42,
+    -0.07
+   ],
+   "kind": "club",
+   "length_m": 0.9,
+   "reach_m": 0.565,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.058,
+   "size_m": [
+    0.113,
+    0.9,
+    0.132
+   ],
+   "tip": [
+    0,
+    0.56,
+    -0.075
+   ],
+   "tris": 2502,
+   "tris_lod1": 1250,
+   "tris_worn": 2782,
+   "worn_delta": 0.085
+  },
+  {
+   "bytes": 100432,
+   "family": "martax",
+   "file": "wpn_martax_fang_knife.glb",
+   "group": "weapon",
+   "hands": 1,
+   "id": "wpn_martax_fang_knife",
+   "imbue": [
+    0,
+    0.15,
+    -0.03
+   ],
+   "kind": "knife",
+   "length_m": 0.362,
+   "reach_m": 0.237,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.022,
+   "size_m": [
+    0.043,
+    0.362,
+    0.054
+   ],
+   "tip": [
+    0,
+    0.235,
+    -0.028
+   ],
+   "tris": 1040,
+   "tris_lod1": 511,
+   "tris_worn": 1318,
+   "worn_delta": 0.296
+  },
+  {
+   "bytes": 84244,
+   "family": "crow",
+   "file": "wpn_crow_beak_awl.glb",
+   "group": "weapon",
+   "hands": 1,
+   "id": "wpn_crow_beak_awl",
+   "imbue": [
+    0,
+    0.1,
+    -0.012
+   ],
+   "kind": "knife",
+   "length_m": 0.272,
+   "reach_m": 0.137,
+   "rest_deg": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "rest_lift_m": 0.013,
+   "size_m": [
+    0.026,
+    0.272,
+    0.053
+   ],
+   "tip": [
+    0,
+    0.133,
+    -0.034
+   ],
+   "tris": 1046,
+   "tris_lod1": 522,
+   "tris_worn": 1182,
+   "worn_delta": 0.443
+  },
+  {
+   "bytes": 139624,
+   "family": "gloamer",
+   "file": "camp_gloamer_hoard_log.glb",
+   "group": "camp",
+   "id": "camp_gloamer_hoard_log",
+   "kind": "hoard",
+   "lid_at": [
+    -0.2,
+    0.2201,
+    0.3327
+   ],
+   "loot": [
+    -0.2,
+    0.0505,
+    0.2468
+   ],
+   "size_m": [
+    2.795,
+    1.123,
+    0.89
+   ],
+   "tris": 2866,
+   "tris_lod1": 1426
+  },
+  {
+   "bytes": 45040,
+   "family": "gloamer",
+   "file": "camp_gloamer_shiny_line.glb",
+   "group": "camp",
+   "id": "camp_gloamer_shiny_line",
+   "kind": "tell",
+   "size_m": [
+    1.003,
+    0.586,
+    1.032
+   ],
+   "tris": 847,
+   "tris_lod1": 422
+  },
+  {
+   "bytes": 138644,
+   "family": "gloamer",
+   "file": "camp_gloamer_trinket_cords.glb",
+   "group": "camp",
+   "id": "camp_gloamer_trinket_cords",
+   "kind": "tell",
+   "size_m": [
+    3.815,
+    2.447,
+    0.265
+   ],
+   "tris": 2784,
+   "tris_lod1": 1377
+  },
+  {
+   "bytes": 103132,
+   "family": "gloamer",
+   "file": "camp_gloamer_squabble_pile.glb",
+   "group": "camp",
+   "id": "camp_gloamer_squabble_pile",
+   "kind": "dressing",
+   "size_m": [
+    1.333,
+    0.726,
+    1.054
+   ],
+   "tris": 1998,
+   "tris_lod1": 990
+  },
+  {
+   "bytes": 59324,
+   "family": "gloamer",
+   "file": "camp_gloamer_rag_nest.glb",
+   "group": "camp",
+   "id": "camp_gloamer_rag_nest",
+   "kind": "rest",
+   "rest": [
+    0,
+    0.06,
+    0
+   ],
+   "size_m": [
+    1.68,
+    0.416,
+    1.677
+   ],
+   "tris": 1152,
+   "tris_lod1": 575
+  },
+  {
+   "bytes": 103676,
+   "family": "naga",
+   "file": "camp_naga_reed_cache.glb",
+   "group": "camp",
+   "id": "camp_naga_reed_cache",
+   "kind": "hoard",
+   "lid_at": [
+    0.0,
+    0.47,
+    -0.33
+   ],
+   "loot": [
+    0,
+    0.42,
+    0
+   ],
+   "size_m": [
+    1.231,
+    0.873,
+    1.273
+   ],
+   "tris": 2178,
+   "tris_lod1": 1084
+  },
+  {
+   "bytes": 52224,
+   "family": "naga",
+   "file": "camp_naga_basking_stone.glb",
+   "group": "camp",
+   "id": "camp_naga_basking_stone",
+   "kind": "dressing",
+   "rest": [
+    0,
+    0.45,
+    0
+   ],
+   "size_m": [
+    2.203,
+    0.533,
+    2.161
+   ],
+   "tris": 1108,
+   "tris_lod1": 542
+  },
+  {
+   "bytes": 150036,
+   "family": "naga",
+   "file": "camp_naga_midden.glb",
+   "group": "camp",
+   "id": "camp_naga_midden",
+   "kind": "dressing",
+   "size_m": [
+    1.495,
+    0.416,
+    1.193
+   ],
+   "tris": 2710,
+   "tris_lod1": 1236
+  },
+  {
+   "bytes": 131924,
+   "family": "naga",
+   "file": "camp_naga_reed_nest.glb",
+   "group": "camp",
+   "id": "camp_naga_reed_nest",
+   "kind": "rest",
+   "rest": [
+    0,
+    0.06,
+    0
+   ],
+   "size_m": [
+    3.128,
+    0.938,
+    3.372
+   ],
+   "tris": 1610,
+   "tris_lod1": 735
+  },
+  {
+   "bytes": 125620,
+   "family": "briarling",
+   "file": "camp_briar_seedpods.glb",
+   "group": "camp",
+   "id": "camp_briar_seedpods",
+   "kind": "hoard",
+   "loot": [
+    0,
+    0.24,
+    0.14
+   ],
+   "size_m": [
+    0.92,
+    0.741,
+    0.77
+   ],
+   "tris": 2634,
+   "tris_lod1": 1316
+  },
+  {
+   "bird_at": [
+    0.0,
+    1.13,
+    -0.0
+   ],
+   "bytes": 142436,
+   "cut": [
+    0,
+    1.13,
+    0.22
+   ],
+   "family": "briarling",
+   "file": "camp_briar_thorn_cage.glb",
+   "group": "camp",
+   "id": "camp_briar_thorn_cage",
+   "kind": "deed",
+   "size_m": [
+    0.572,
+    1.46,
+    0.538
+   ],
+   "tris": 2956,
+   "tris_lod1": 1475
+  },
+  {
+   "bytes": 173644,
+   "family": "briarling",
+   "file": "camp_briar_uprooted_ring.glb",
+   "group": "camp",
+   "id": "camp_briar_uprooted_ring",
+   "kind": "dressing",
+   "size_m": [
+    7.373,
+    0.562,
+    6.67
+   ],
+   "tris": 2880,
+   "tris_lod1": 1440
+  },
+  {
+   "bytes": 144952,
+   "family": "hob",
+   "file": "camp_hob_loot_pile.glb",
+   "group": "camp",
+   "id": "camp_hob_loot_pile",
+   "kind": "hoard",
+   "loot": [
+    0.0,
+    0.35,
+    0.9
+   ],
+   "size_m": [
+    2.895,
+    1.836,
+    3.065
+   ],
+   "tris": 2926,
+   "tris_lod1": 1454
+  },
+  {
+   "bytes": 84972,
+   "family": "hob",
+   "file": "camp_hob_sleep_stone.glb",
+   "group": "camp",
+   "id": "camp_hob_sleep_stone",
+   "kind": "rest",
+   "rest": [
+    -0.1,
+    0.5,
+    -0.05
+   ],
+   "size_m": [
+    4.24,
+    0.896,
+    3.584
+   ],
+   "tris": 1874,
+   "tris_lod1": 936
+  },
+  {
+   "bytes": 143316,
+   "family": "hob",
+   "file": "camp_hob_sheep_bones.glb",
+   "group": "camp",
+   "id": "camp_hob_sheep_bones",
+   "kind": "dressing",
+   "size_m": [
+    1.432,
+    0.273,
+    1.126
+   ],
+   "tris": 2840,
+   "tris_lod1": 1400
+  },
+  {
+   "bytes": 55200,
+   "cut": [
+    0.0,
+    -0.45,
+    -0.2
+   ],
+   "family": "blackvein",
+   "file": "camp_blackvein_cocoon.glb",
+   "group": "camp",
+   "hangs": true,
+   "id": "camp_blackvein_cocoon",
+   "kind": "container",
+   "loot": [
+    0.0,
+    -0.6,
+    -0.22
+   ],
+   "size_m": [
+    0.478,
+    1.227,
+    0.497
+   ],
+   "tris": 1178,
+   "tris_lod1": 582
+  },
+  {
+   "bytes": 74132,
+   "family": "blackvein",
+   "file": "camp_blackvein_silk_drape.glb",
+   "group": "camp",
+   "hangs": true,
+   "id": "camp_blackvein_silk_drape",
+   "kind": "dressing",
+   "size_m": [
+    4.321,
+    1.935,
+    0.87
+   ],
+   "span_m": 4.0,
+   "tris": 1404,
+   "tris_lod1": 691
+  },
+  {
+   "bytes": 117772,
+   "family": "blackvein",
+   "file": "camp_blackvein_bone_rain.glb",
+   "group": "camp",
+   "id": "camp_blackvein_bone_rain",
+   "kind": "dressing",
+   "size_m": [
+    1.758,
+    0.057,
+    1.808
+   ],
+   "tris": 2330,
+   "tris_lod1": 1164
+  },
+  {
+   "bytes": 127236,
+   "family": "martax",
+   "file": "camp_martax_den_hoard.glb",
+   "group": "camp",
+   "id": "camp_martax_den_hoard",
+   "kind": "container",
+   "loot": [
+    -0.2,
+    0.25,
+    -0.45
+   ],
+   "size_m": [
+    3.709,
+    1.439,
+    2.193
+   ],
+   "tris": 2582,
+   "tris_lod1": 1291
+  },
+  {
+   "bytes": 125692,
+   "family": "martax",
+   "file": "camp_martax_bone_heap.glb",
+   "group": "camp",
+   "id": "camp_martax_bone_heap",
+   "kind": "dressing",
+   "size_m": [
+    2.095,
+    0.664,
+    2.033
+   ],
+   "tris": 2538,
+   "tris_lod1": 1258
+  },
+  {
+   "bytes": 105428,
+   "carcass": [
+    2.25,
+    0.0,
+    0.13
+   ],
+   "family": "martax",
+   "file": "camp_martax_drag_furrow.glb",
+   "group": "camp",
+   "id": "camp_martax_drag_furrow",
+   "kind": "dressing",
+   "size_m": [
+    6.066,
+    0.327,
+    1.342
+   ],
+   "tris": 2294,
+   "tris_lod1": 1146
+  },
+  {
+   "bytes": 44892,
+   "family": "lampwing",
+   "file": "camp_lampwing_roost_lantern.glb",
+   "fire": [
+    0.0,
+    -0.458,
+    -0.0
+   ],
+   "group": "camp",
+   "hangs": true,
+   "id": "camp_lampwing_roost_lantern",
+   "kind": "dressing",
+   "size_m": [
+    0.209,
+    0.634,
+    0.237
+   ],
+   "tris": 710,
+   "tris_lod1": 354
+  },
+  {
+   "bytes": 109856,
+   "family": "any",
+   "file": "camp_fire_spit.glb",
+   "fire": [
+    0,
+    0.2,
+    0
+   ],
+   "group": "camp",
+   "id": "camp_fire_spit",
+   "kind": "fire",
+   "size_m": [
+    1.586,
+    0.885,
+    1.185
+   ],
+   "tris": 2438,
+   "tris_lod1": 1218
+  },
+  {
+   "bytes": 136340,
+   "family": "any",
+   "file": "camp_bone_totem.glb",
+   "group": "camp",
+   "id": "camp_bone_totem",
+   "kind": "marker",
+   "size_m": [
+    0.947,
+    2.761,
+    0.445
+   ],
+   "tris": 2860,
+   "tris_lod1": 1416
+  },
+  {
+   "bytes": 53948,
+   "family": "any",
+   "file": "camp_skull_stake.glb",
+   "group": "camp",
+   "id": "camp_skull_stake",
+   "kind": "marker",
+   "size_m": [
+    0.296,
+    1.194,
+    0.226
+   ],
+   "tris": 1032,
+   "tris_lod1": 506
+  },
+  {
+   "bytes": 101816,
+   "family": "any",
+   "file": "camp_hide_lean_to.glb",
+   "group": "camp",
+   "id": "camp_hide_lean_to",
+   "kind": "shelter",
+   "loot": [
+    0.0,
+    0.1,
+    -0.65
+   ],
+   "size_m": [
+    2.3,
+    1.443,
+    1.656
+   ],
+   "tris": 2182,
+   "tris_lod1": 1084
+  }
+ ]
+}

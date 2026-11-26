@@ -77,13 +77,11 @@ static func _laurel(tamlin: Node3D) -> void:
 	crown.position = Vector3(0.0, 0.135, -0.004)
 
 
-## Story grade on the hill (indigo sky, bonfire gold); release hands the look
-## back to the region grades.
-static func night_grade(tree: SceneTree, on: bool, seconds: float = 3.0) -> void:
-	if on:
-		EventBus.grade_swap_requested.emit(NIGHT_GRADE, seconds)
-		return
-	GradeDirector.release_story_holds(tree)
+## Story grade on the hill (indigo sky, bonfire gold). The rite's fires raise
+## it and the cave path lets it go, so the hold belongs to the kit, not to
+## either scene; release hands the look back to the region grades.
+static func night_grade(on: bool, seconds: float = 3.0) -> void:
+	EventBus.grade_swap_requested.emit(CalanmaiKit, NIGHT_GRADE if on else &"", seconds)
 
 
 ## A gown fills her top and bottom at once (WardrobePiece.slots).

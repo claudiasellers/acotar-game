@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://creatures/hostile/hostile_site.gd" id="1"]
+[ext_resource type="Resource" path="res://data/creatures/hostile_sites/gloamer_sealed_road_bend.tres" id="2"]
+[ext_resource type="Script" path="res://creatures/hostile/camp_dressing.gd" id="3"]
+
+[node name="GloamerSealedRoadBend" type="Node3D"]
+script = ExtResource("1")
+data = ExtResource("2")
+
+[node name="CampDressing" type="Node3D" parent="."]
+script = ExtResource("3")
+pieces = Array[StringName]([&"camp_gloamer_rag_nest", &"camp_gloamer_squabble_pile", &"camp_gloamer_shiny_line", &"camp_gloamer_trinket_cords", &"camp_skull_stake"])
+offsets = PackedVector2Array(-0.0, 0.0, 3.2, -4.48, 2.76, 5.89, -13.0, 0.12, -16.97, -6.02)
+yaws = PackedFloat32Array(1.58, 0.08, -2.703, 3.151, 1.23)

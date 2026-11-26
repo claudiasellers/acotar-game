@@ -5,13 +5,17 @@ extends Resource
 
 @export var id: StringName
 @export var display_name: String
-## Seconds of holding fire (left mouse / right trigger) to draw the string to
-## full. Releasing at full draw looses a full-power arrow; releasing earlier
-## lets the string down and looses nothing. There are no weak shots.
-@export var draw_time: float = 0.3
+## Seconds from the fire press (left mouse / right trigger) to a full draw.
+## Every arrow leaves at full draw: let go sooner and it flies the moment the
+## draw completes.
+@export var draw_time: float = 0.2
 ## Arrow launch speed in m/s. Every shot is full power.
 @export var max_speed: float = 48.0
-## Degrees of aim sway at full draw before settle, stance, breath and body state.
+## Metres the arrow flies dead straight to the crosshair before it starts to
+## drop (gravity eases in after that over BowTuning.gravity_blend_s).
+@export var true_range: float = 30.0
+## Degrees her aim shakes with this bow when her body is failing her (a
+## tired arm, no breath, hunger, cold, dread). Calm and rested it is still.
 @export var sway_degrees: float = 1.5
 ## Noise of a release, 0..1, for creature hearing.
 @export var loudness: float = 0.45

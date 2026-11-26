@@ -23,7 +23,7 @@ func before_each() -> void:
 	add_child_autofree(hill)
 	feyre = hill.feyre
 	feyre.set_physics_process(false)
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	await wait_physics_frames(5)
 
 
@@ -145,7 +145,7 @@ func test_the_prompt_names_the_use() -> void:
 	_station(&"pianoforte")
 	await wait_seconds(Interactor.PROMPT_REFRESH * 2.0 + 0.05)
 	var offer := UsePrompt.of(get_tree()).offered()
-	assert_eq(String(offer[0]) if not offer.is_empty() else "", "play a few notes")
+	assert_eq(String(offer[0][0]) if not offer.is_empty() else "", "play a few notes")
 
 
 func test_letters_wait_for_p3_and_count_once_a_day() -> void:

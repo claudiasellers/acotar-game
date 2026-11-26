@@ -19,7 +19,14 @@ const STOCK := {
 const FRAMES_AFTER := 12
 const OPENS := 3
 const WARM_FRAMES := 120
-const SHOT_PAGES: Array[StringName] = [&"collection", &"map", &"satchel", &"wardrobe", &"sketchbook", &"settings"]
+const SHOT_PAGES: Array[StringName] = [&"collection", &"map", &"satchel", &"wardrobe", &"sketchbook", &"bonds", &"weapons", &"settings"]
+## What has happened by the time of the shots, and on which day, so the
+## Bonds page has people on it.
+const SHOT_PAST := {
+	"beast_claim_accepted": 2, "wall_crossed": 2, "first_dinner_eaten": 3, "fact.alis_tripped": 4,
+	"bogge_survived": 5, "puca_resisted": 6, "fact.mare_ridden": 6, "tamlin_wound_dressed": 9,
+	"fact.mare_did_answered": 10, "suriel_bound": 12, "naga_survived": 12, "starlight_pool_found": 16,
+}
 
 var feyre: Feyre
 
@@ -52,6 +59,13 @@ func _go() -> void:
 		if args.size() >= 3:
 			PhaseManager.current_phase = StringName(args[2])
 			JournalTheme.apply()
+		for flag: String in SHOT_PAST:
+			Clock.day = SHOT_PAST[flag]
+			WorldState.set_flag(flag, true)
+		for bond: StringName in Relationships.defs():
+			Relationships.check(bond)
+		Relationships.deed(&"tamlin", &"ate_at_table")
+		Relationships.deed(&"tamlin", &"bound_hand")
 		await _shots(args[1])
 	else:
 		for page in _pages():
@@ -65,12 +79,14 @@ func _go() -> void:
 func _setup() -> void:
 	add_child(SettingsTab.new())
 	add_child(StoryJournal.new())
+	add_child(BondsTab.new())
+	add_child(WeaponsTab.new())
 	add_child(WorldMapHud.new())
 	add_child(SatchelHud.new())
 
 
 func _pages() -> Array[StringName]:
-	return [&"none", &"satchel", &"wardrobe", &"collection", &"sketchbook", &"map", &"settings"]
+	return [&"none", &"satchel", &"wardrobe", &"collection", &"sketchbook", &"bonds", &"weapons", &"map", &"settings"]
 
 
 ## &"none" times plain frames, the baseline the hitch is read against.
@@ -153,6 +169,11 @@ func _check_overlap(page: StringName) -> void:
 ## statuses (two rows and "+1"), two E cards, the controls hint.
 func _dress_hud() -> void:
 	add_child(VitalsHud.new())
+	var rack := WeaponRack.of(feyre)
+	rack.add(&"wpn_gloamer_hookknife", 0.9)
+	rack.add(&"wpn_blackvein_jaw_shears", 0.5)
+	rack.add(&"wpn_fishers_gaff", 0.2)
+	rack.imbue(1, &"ember", 1)
 	var vitals := Vitals.of(feyre)
 	if vitals:
 		for tag: StringName in [&"venom", &"steady", &"swift", &"warm"]:

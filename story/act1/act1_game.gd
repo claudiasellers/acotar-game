@@ -75,6 +75,8 @@ func _ready() -> void:
 	PlayerPlacement.attach.call_deferred(feyre)
 	add_child(GuideJournal.new())
 	add_child(StoryJournal.new())
+	add_child(BondsTab.new())
+	add_child(WeaponsTab.new())
 	add_child(KeyPrompts.new())
 	add_child(OpeningHunt.new())
 	add_child(Act1Wayfinding.new())
@@ -92,6 +94,7 @@ func _ready() -> void:
 	add_child(SoundDirector.new())
 	add_child(Wayside.new())
 	add_child(MountDirector.new())
+	add_child(RelationshipDirector.new())
 	add_child(WhorlStones.new())
 
 

@@ -23,12 +23,18 @@ needs the director's OK (R13). The riding itself is `docs/contracts/mount.md`.
 
 ## Tending (L47-7)
 
-- **Hold E** (0.4 s) beside her while she stands opens the tending screen
+- **T** beside her while she stands opens the tending screen; E only rides. She is a station with two actions (`use_verb` "ride", `alt_verb` "tend", `use_alt` emitting `tend_asked`), so Interactor puts ride on `interact` and tend on `interact_alt` (T in project.godot) and the use prompt says "E   ride  ·  T   tend" (ui-frame step 8u, owner 2026-11-26). On a pad a tap of X rides and a hold (`Interactor.HOLD_SECOND`, 0.4 s) tends, the generic hold for any second thing in reach; the prompt says "Hold X   tend". No KeyHints row of its own: the prompt names the key. T, E or Esc closes the screen. While it's open the screen is on ScreenStack, and no shot is allowed while any screen is open (`ScreenStack.takes_play()`, read by `StoryControl.can_shoot()`), so the click that brushes her never reaches the bow
   (`MareTendingView`, `ui/mare/`); a tap of E still mounts. It's taught once
   after a dismount (a card note, WorldDeltas `mount/tend_taught`).
 - The screen keeps the world running (no pause): Feyre's physics is off, a
-  camera frames the mare's near side on the left, the satchel-themed panel
-  sits on the right. Esc, E or Done close it.
+  camera frames the mare from the side Feyre is not standing on (so Feyre
+  never blocks her), and a loose page of the journal sits on the right.
+  Esc, T, E or Done close it. The screen itself is the UI lane's
+  (`docs/contracts/ui-frame.md` step 8w): her coat and her Closeness as
+  `MeterRow` meters, picture tabs in two groups (Care: brush and treats, her
+  page; Dress her: one per `MareTack` slot), treats as the satchel's
+  pictures, pieces with enamel colour swatches, a brush under the pointer
+  and a soft rising chime as it strokes.
 - **Care** (`MareCare`): stroke her coat with the brush (hold the mouse and
   drag over her, or hold A and move the stick). `BRUSH_TO_FULL` (9 screen
   widths of stroke) takes her from dull to gleaming; the shine is pearl on
@@ -56,16 +62,18 @@ needs the director's OK (R13). The riding itself is `docs/contracts/mount.md`.
 
 ## The bond (L47-8, redesigned 2026-11-18)
 
-`MareBond` (`systems/mount/mare_bond.gd`) runs beside the main story and never
-touches a phase flag (R2). It grows on what Feyre and the mare do together,
+`MareBond` (`systems/mount/mare_bond.gd`) runs beside the main story on the one
+bond engine (`docs/contracts/relationships.md`, L90) and never touches a phase
+flag (R2). It grows on what Feyre and the mare do together,
 never on days: there are no points, no daily caps and no time gates. Each step
 opens when its milestones are done (`MareBond.MILESTONES`), one-off deeds of
 which the last is a threshold behind a real barrier. A milestone can be done
 early, but a step still needs the one before it. Bond facts are WorldState
-keys under `fact.mare_bond_*`, raised through the director's ActionTriggers
-(`MareBondTrigger_*`); each milestone also raises `fact.mare_did_<id>`. State
-lives in WorldDeltas region `mount` (`bond_done`, `bond_regions`,
-`bareback_run_m`, `balks`, `balm`, `blight_m`, `page_hints`).
+keys under `fact.mare_bond_*`, raised through RelationshipDirector's
+ActionTriggers (`BondTrigger_*`); each milestone is done when its
+`fact.mare_did_<id>` is up, and nothing else records it. Her own state
+lives in WorldDeltas region `mount` (`bond_regions`, `bareback_run_m`, `balks`,
+`balm`, `blight_m`, `page_hints`).
 
 | tier | fact | milestones (the last is the barrier) | hears the whistle from | carries Feyre out to |
 |---|---|---|---|---|

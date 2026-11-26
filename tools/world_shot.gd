@@ -32,6 +32,10 @@ const SHOTS := {
 	"eastern_bogge": [Vector3(1500, 0, -380), Vector3(1560, 0, -430), 0.45, &"bogge"],
 	"eastern_bogge_dusk": [Vector3(1500, 0, -380), Vector3(1560, 0, -430), 0.74, &"bogge"],
 	"wall_crossing_spring": [Vector3(-100, 0, 1420), Vector3(-100, 0, 1300), 0.55, &"spring"],
+	# Hostile plan R3 check (L75): the Reed Marsh naga camp at dusk, from about
+	# 20 m and about 5 m off its core (1180, 330), the camp raised as play does.
+	"reed_marsh_dusk_20m": [Vector3(1192, 0, 346), Vector3(1180, 0, 330), 0.74, &"spring"],
+	"reed_marsh_dusk_5m": [Vector3(1183, 0, 334), Vector3(1180, 0, 330), 0.74, &"spring"],
 }
 
 
@@ -43,7 +47,7 @@ func _run() -> void:
 	var args := OS.get_cmdline_user_args()
 	var id := args[0] if args.size() > 0 else "cottage_snow"
 	var out := args[1] if args.size() > 1 else "user://%s.png" % id
-	var shot: Array = SHOTS[id]
+	var shot: Array = SHOTS[id] if SHOTS.has(id) else _camp_shot(id)
 	Clock.paused = true
 	Clock.time_of_day = shot[2]
 	var root := get_tree().root
@@ -81,6 +85,10 @@ func _run() -> void:
 				Clock.time_of_day = m.get_meta(&"time_of_day")
 	if id.begins_with("hunting_arrow"):
 		_land_ash_arrow(world, eye, at)
+	if id.begins_with("reed_marsh"):
+		_raise_camp(world, &"naga_reed_marsh")
+	if id.begins_with("camp_"):
+		_raise_camp(world, StringName(id.trim_prefix("camp_")))
 	if id == "opening_dawn":
 		# Feyre (placeholder model) at her start mark.
 		for a in get_tree().get_nodes_in_group(&"story_anchor"):
@@ -107,6 +115,42 @@ func _run() -> void:
 	var objs := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_OBJECTS_IN_FRAME)
 	print("SHOT %s -> %s | draw_calls %d | primitives %d | objects %d" % [id, out, draw, prims, objs])
 	get_tree().quit(0)
+
+
+## A hostile camp as play raises it once its gate is set: its site scene (the
+## HostileSite, its camp gear and loot container), its members held still where
+## they rise so the frame shows them at home.
+func _raise_camp(world: Node, site_id: StringName) -> void:
+	var scene := load("res://creatures/hostile/sites/%s.tscn" % site_id) as PackedScene
+	var site := scene.instantiate() as HostileSite
+	for f in site.data.require_flags:
+		WorldState.set_flag(f, true)
+	world.add_child(site)
+	for m in site.members:
+		m.set_physics_process(false)
+	var gear := site.get_node_or_null("CampDressing") as CampDressing
+	print("SHOT camp %s: %d members, %d gear pieces at %s" % [site_id, site.members.size(),
+			gear.laid.size() if gear else 0, site.global_position])
+
+
+## `camp_<site_id>`: the camp from its approach (the side its far tell faces,
+## toward the road), 24 m out and 2 m up, at dusk when the packs are out.
+func _camp_shot(id: String) -> Array:
+	var d := load("res://data/creatures/hostile_sites/%s.tres" % id.trim_prefix("camp_")) as HostileSiteData
+	var scene := load("res://creatures/hostile/sites/%s.tscn" % d.id) as PackedScene
+	var node := scene.instantiate()
+	var gear := node.get_node_or_null("CampDressing") as CampDressing
+	var dir := Vector2(1, 0)
+	if gear and not gear.offsets.is_empty():
+		var far := gear.offsets[0]
+		for o in gear.offsets:
+			if o.length() > far.length():
+				far = o
+		if far.length() > 0.1:
+			dir = far.normalized()
+	node.free()
+	var eye := d.core + dir.rotated(0.35) * 24.0
+	return [Vector3(eye.x, 0, eye.y), Vector3(d.core.x, 0, d.core.y), 0.74, &"spring", 2.2]
 
 
 ## An ash arrow stuck at a slant in the ground 12 m from the eye, toward `at`.

@@ -80,10 +80,20 @@ const BOOK := {
 ## The pastel washes she paints with: one per index tab of the book, and the
 ## blot behind a thing drawn on a page. The same in both acts.
 const WASHES: Array[Color] = [
-	Color("#f4c6d4"), Color("#d9c9f4"), Color("#bfe6cf"), Color("#f3e2a4"), Color("#bcd3f0"),
+	Color("#f4c6d4"), Color("#d9c9f4"), Color("#bfe6cf"), Color("#f3e2a4"), Color("#bcd3f0"), Color("#f6cdb0"), Color("#c9e3e6"),
 ]
 
 ## Label variation -> [size, font: "display" | "body" | "hand", weight, colour token]
+## The bond measures' paints (BondBook.MEASURES): one each, the same on every
+## page, for its meter's fill and its glyph (tools/ui/measure_icons keeps
+## the glyphs equal). The glyph and the name carry it without the colour.
+const MEASURE_PAINTS := {
+	&"closeness": Color("#d9476f"),
+	&"warmth": Color("#dd6e3a"),
+	&"deeds": Color("#d8a23f"),
+	&"memories": Color("#7b5ab8"),
+	&"since": Color("#2e9e9e"),
+}
 const LABELS := {
 	&"SatchelHeading": [34, "display", 400, &"ink"],
 	&"MenuTitle": [40, "display", 400, &"ink"],
@@ -443,7 +453,16 @@ static func build(of_act: Act) -> Theme:
 		t.set_type_variation(meter[0], &"ProgressBar")
 		t.set_stylebox(&"background", meter[0], _pill(c.paper_deep, Color(c.line, 0.5), 1, Vector2(0, 4)))
 		t.set_stylebox(&"fill", meter[0], _pill(meter[1], Color(c.line, 0.5), 1, Vector2(0, 4)))
+	for id: StringName in MEASURE_PAINTS:
+		t.set_type_variation(measure_meter(id), &"ProgressBar")
+		t.set_stylebox(&"background", measure_meter(id), _pill(c.paper_deep, Color(c.line, 0.5), 1, Vector2(0, 4)))
+		t.set_stylebox(&"fill", measure_meter(id), _pill(MEASURE_PAINTS[id], Color(c.line, 0.5), 1, Vector2(0, 4)))
 	return t
+
+
+## The ProgressBar variation that is a bond measure's meter.
+static func measure_meter(id: StringName) -> StringName:
+	return StringName("MeasureMeter_%s" % id)
 
 
 ## A sheet of the journal's paper, tinted to a token.

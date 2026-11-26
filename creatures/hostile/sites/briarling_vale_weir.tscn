@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://creatures/hostile/hostile_site.gd" id="1"]
+[ext_resource type="Resource" path="res://data/creatures/hostile_sites/briarling_vale_weir.tres" id="2"]
+[ext_resource type="Script" path="res://creatures/hostile/camp_dressing.gd" id="3"]
+
+[node name="BriarlingValeWeir" type="Node3D"]
+script = ExtResource("1")
+data = ExtResource("2")
+
+[node name="CampDressing" type="Node3D" parent="."]
+script = ExtResource("3")
+pieces = Array[StringName]([&"camp_briar_uprooted_ring", &"camp_briar_thorn_cage", &"camp_briar_thorn_cage"])
+offsets = PackedVector2Array(-0.0, -0.0, 1.28, -4.83, -0.61, 5.97)
+yaws = PackedFloat32Array(2.04, -0.26, 5.04)

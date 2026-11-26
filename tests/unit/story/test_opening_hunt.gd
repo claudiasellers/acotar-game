@@ -206,6 +206,36 @@ func test_crouch_is_offered_near_the_doe_until_she_crouches() -> void:
 	assert_eq(prompts.want(), &"")
 
 
+## The owner, 2026-11-25: meeting the wolf names the keys of that moment one
+## at a time, each until she has used it there, whatever she learnt before him.
+func test_meeting_the_wolf_names_ash_then_the_shot_then_her_breath() -> void:
+	for learnt: StringName in [&"draw", &"ash", &"crouch", &"walk", &"look"]:
+		hints.learn(learnt)
+	Gameplay.inventory.add(&"arrow_wood", 2)
+	Gameplay.inventory.add(&"arrow_ash", 1)
+	var bow := feyre.bow_controller
+	bow.set_physics_process(false)
+	assert_eq(prompts.want(), &"", "nothing before the hunt")
+	EventBus.scene_space_started.emit(&"wolf_kill")
+	assert_eq(prompts.want(), &"", "nor before she has seen him")
+	WorldState.set_flag("fact.wolf_spotted", true)
+	assert_eq(prompts.want(), &"wolf_ash", "first the arrow that matters")
+	bow.select_arrow(&"arrow_ash")
+	prompts._learn(0.016)
+	assert_eq(prompts.want(), &"wolf_draw", "then the shot, though she has shot before")
+	feyre.arrow_fired.emit(Arrow.create())
+	assert_true(hints.taught.get(&"wolf_draw", false))
+	assert_eq(prompts.want(), &"", "her breath is named only with an arrow on the string")
+	bow.update_bow(0.016, true, false)
+	assert_eq(prompts.want(), &"focus")
+	bow.update_bow(0.016, true, false, true)
+	prompts._learn(0.016)
+	assert_eq(prompts.want(), &"", "each of the three, once")
+	EventBus.scene_space_finished.emit(&"wolf_kill")
+	for row: StringName in [&"wolf_ash", &"wolf_draw"]:
+		assert_eq((KeyHints.rows()[row] as Array).size(), 1, "one key at a time")
+
+
 func test_hints_off_hides_every_taught_key() -> void:
 	var stuck := Node3D.new()
 	add_child_autofree(stuck)
@@ -221,9 +251,9 @@ func test_hints_off_hides_every_taught_key() -> void:
 
 
 func test_every_prompt_names_a_key() -> void:
-	for id: StringName in KeyHints.ROWS:
+	for id: StringName in KeyHints.rows():
 		for pair: Array in KeyHints.row(id):
-			if (KeyHints.ROWS[id] as Array).size() == 1:
+			if (KeyHints.rows()[id] as Array).size() == 1:
 				assert_ne(pair[0], "", "%s has a key cap" % id)
 	assert_eq(KeyHints.cap(&"move"), String(InputSettings.SCHEME_NAMES[InputSettings.scheme]), "the keys she chose")
 	assert_eq(KeyHints.cap(&"look"), "Mouse")
@@ -285,6 +315,26 @@ func test_her_empty_belly_is_thought_once_when_she_first_runs_low() -> void:
 	for path: String in OpeningHunt.THOUGHTS.values():
 		assert_true(ResourceLoader.exists(path), path)
 		assert_true(load(path) is GuideThread, path)
+
+
+## UX review O6: the ash arrow is named as the one that matters before the wolf.
+func test_her_first_nock_names_her_three_arrows_once() -> void:
+	var hunt := OpeningHunt.new()
+	add_child_autofree(hunt)
+	Gameplay.inventory.add(&"arrow_ash", 1)
+	Gameplay.inventory.add(&"arrow_wood", 2)
+	feyre.bow_controller.set_physics_process(false)
+	hunt._watch_first_nock(feyre)
+	assert_false(hunt.arrows_shown, "not before an arrow is on the string")
+	feyre.bow_controller.update_bow(1.0 / 60.0, false, true)
+	assert_true(feyre.bow_controller.is_nocked)
+	hunt._queued.clear()
+	hunt._watch_first_nock(feyre)
+	assert_true(hunt.arrows_shown)
+	assert_true(hunt._queued == [&"three_arrows"] or hunt._queued.is_empty(), "queued for the journal (or dropped with no journal in Auto)")
+	assert_eq(hunt.save_state().arrows, true, "saved, so never twice")
+	var thread := load(OpeningHunt.THOUGHTS[&"three_arrows"]) as GuideThread
+	assert_false(thread.lines.is_empty() or String(thread.lines[0]).strip_edges().is_empty(), "the three-arrows thought has words")
 
 
 func test_the_rabbit_wears_a_brown_coat_that_reads_on_snow() -> void:

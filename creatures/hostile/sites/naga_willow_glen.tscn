@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://creatures/hostile/hostile_site.gd" id="1"]
+[ext_resource type="Resource" path="res://data/creatures/hostile_sites/naga_willow_glen.tres" id="2"]
+[ext_resource type="Script" path="res://creatures/hostile/camp_dressing.gd" id="3"]
+
+[node name="NagaWillowGlen" type="Node3D"]
+script = ExtResource("1")
+data = ExtResource("2")
+
+[node name="CampDressing" type="Node3D" parent="."]
+script = ExtResource("3")
+pieces = Array[StringName]([&"camp_naga_reed_nest", &"camp_naga_basking_stone", &"camp_naga_basking_stone", &"camp_naga_midden"])
+offsets = PackedVector2Array(-1.09, 1.68, 2.55, 7.58, -8.45, 7.04, 1.05, -5.91)
+yaws = PackedFloat32Array(3.666, -2.817, 4.466, 0.624)

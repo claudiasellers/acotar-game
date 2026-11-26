@@ -55,6 +55,11 @@ var _cast: Node3D
 ## Blocks Feyre (world layer) while he is visible.
 var body: AnimatableBody3D
 var _moving: bool = false
+## Where he looks while he stands (menace, block); INF to look where he goes.
+var _face: Vector3 = Vector3.INF
+## Out on the road (the ride north): his feet keep to the ground whatever he is
+## doing, not only while he leads.
+var outdoors: bool = false
 
 
 func _ready() -> void:
@@ -136,11 +141,51 @@ func speak() -> void:
 	_set_stage(Stage.SPEAK)
 
 
-## The ride north: he walks ahead, the pressure low, and keeps going.
+## The ride north: he walks ahead, the pressure low, and keeps going. Called
+## again while leading (the ride's escort, every tick), it only moves the goal.
 func lead(toward: Vector3) -> void:
 	visible = true
 	_destination = toward
-	_set_stage(Stage.LEAD)
+	_face = Vector3.INF
+	if stage != Stage.LEAD:
+		_set_stage(Stage.LEAD)
+
+
+## The ride north when she strays (Keeper's tiers, lore/02-locations/the-wall.md):
+## he stops where he is and turns on her. 1: a low growl, hot breath. 2: hackles
+## up and the roar, the field at its height. The next lead() sends him on.
+func menace(level: int, toward: Vector3) -> void:
+	visible = true
+	_destination = global_position
+	_face = toward
+	if level <= 1:
+		_set_stage(Stage.SPEAK)
+		return
+	_set_stage(Stage.LOOM)
+	_play_once(&"roar")
+	if is_inside_tree():
+		CreatureSenses.emit_noise(get_tree(), global_position, 1.0)
+
+
+## The last tier: he circles round in front of her and blocks the road, horns
+## low and fangs at her face, roaring, as at the cottage.
+func block(at: Vector3, toward: Vector3) -> void:
+	visible = true
+	_destination = at
+	_face = toward
+	_set_stage(Stage.LOOM)
+	_play_once(&"roar")
+	if is_inside_tree():
+		CreatureSenses.emit_noise(get_tree(), global_position, 1.0)
+
+
+## Leading, he stops and looks back for her where she has fallen behind.
+func wait_for(toward: Vector3) -> void:
+	visible = true
+	_destination = global_position
+	_face = toward
+	if stage != Stage.LEAD:
+		_set_stage(Stage.LEAD)
 
 
 ## Night patrol (BeastPatrol): walks `points` in a loop until withdrawn.
@@ -222,6 +267,47 @@ func _animate(moving: bool) -> void:
 	_moving = moving
 
 
+## Seconds standing in place, leading, before he walks his goal straight.
+const LEAD_STUCK_AFTER := 1.5
+var _stuck_goal := Vector3.INF
+var _stuck_at := Vector3.INF
+var _stuck_t := 0.0
+
+
+func _lead_stuck(delta: float) -> bool:
+	if not _stuck_goal.is_equal_approx(_destination):
+		_stuck_goal = _destination
+		_stuck_at = global_position
+		_stuck_t = 0.0
+	if _stuck_t < 0.0:
+		return true  # straight for the rest of this goal
+	if global_position.distance_to(_stuck_at) > 0.6:  # jitter on the spot is still stuck
+		_stuck_at = global_position
+		_stuck_t = 0.0
+		return false
+	_stuck_t += delta
+	if _stuck_t >= LEAD_STUCK_AFTER:
+		_stuck_t = -1.0
+	return _stuck_t < 0.0
+
+
+## Walking over rising or falling ground (the ride's road, the estate's
+## drive), his feet stay on it: the ground just under him (a short ray, so a
+## roof or ceiling overhead is never taken for it), else the height of where
+## he is going, eased by the distance walked.
+func _keep_to_ground(step: float) -> void:
+	# Outdoors only: in the cottage he keeps to the floor he was put on.
+	if not is_inside_tree() or not (outdoors or stage in [Stage.LEAD, Stage.PATROL]):
+		return
+	var from := global_position + Vector3.UP * 0.8
+	var hit := get_world_3d().direct_space_state.intersect_ray(
+			PhysicsRayQueryParameters3D.create(from, from + Vector3.DOWN * 3.0, 1))
+	if not hit.is_empty():
+		global_position.y = (hit["position"] as Vector3).y
+	else:
+		global_position.y = move_toward(global_position.y, _destination.y, step)
+
+
 func _process(delta: float) -> void:
 	var goal: float = STAGE_INTENSITY[stage]
 	# The break is a spike; everything else eases.
@@ -234,9 +320,19 @@ func _process(delta: float) -> void:
 	if to.length() > 0.05:
 		# Round the walls on the navmesh (T5); straight when there is none.
 		var dir := NavMover.on(self).steer(_destination) if to.length() >= NavMover.MIN_DISTANCE else to
+		# Leading her, a navmesh path that gets him nowhere (the manor's front
+		# door: a path baked short of the hall, and he stood on the step for
+		# good) gives way to the straight line until his goal moves.
+		if stage == Stage.LEAD and to.length() >= NavMover.MIN_DISTANCE and _lead_stuck(delta):
+			dir = to
 		var step := minf((burst_speed if _bursting else walk_speed) * delta, to.length())
 		global_position += dir.normalized() * step
+		_keep_to_ground(step)
 		rotation.y = lerp_angle(rotation.y, atan2(-dir.x, -dir.z), 4.0 * delta)
+	elif _face != Vector3.INF:
+		var look := _face - global_position
+		if Vector2(look.x, look.z).length() > 0.3:
+			rotation.y = lerp_angle(rotation.y, atan2(-look.x, -look.z), 6.0 * delta)
 	elif _bursting:
 		_bursting = false
 	elif stage == Stage.PATROL:

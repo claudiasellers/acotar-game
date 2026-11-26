@@ -92,7 +92,7 @@ static func hints_shown() -> PackedStringArray:
 	var out := PackedStringArray()
 	if n:
 		for k in mini(ladder().shown(n.id), n.hints.size()):
-			out.append(n.hints[k])
+			out.append(_keyed(n.hints[k]))
 	return out
 
 
@@ -108,7 +108,12 @@ static func think() -> String:
 		return ""
 	var k := ladder().reveal(n.id, n.hints.size())
 	_flush()
-	return n.hints[k] if k >= 0 else ""
+	return _keyed(n.hints[k]) if k >= 0 else ""
+
+
+## A hint's {tend} names the tending key as it's bound now.
+static func _keyed(hint: String) -> String:
+	return hint.format({"tend": UsePrompt.key_for(&"interact_alt")})
 
 
 ## Memories of every milestone done, in bond order.

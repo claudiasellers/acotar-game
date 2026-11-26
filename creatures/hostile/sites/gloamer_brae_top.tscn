@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://creatures/hostile/hostile_site.gd" id="1"]
+[ext_resource type="Resource" path="res://data/creatures/hostile_sites/gloamer_brae_top.tres" id="2"]
+[ext_resource type="Script" path="res://creatures/hostile/camp_dressing.gd" id="3"]
+
+[node name="GloamerBraeTop" type="Node3D"]
+script = ExtResource("1")
+data = ExtResource("2")
+
+[node name="CampDressing" type="Node3D" parent="."]
+script = ExtResource("3")
+pieces = Array[StringName]([&"camp_gloamer_rag_nest", &"camp_gloamer_rag_nest", &"camp_gloamer_trinket_cords", &"camp_gloamer_squabble_pile", &"camp_skull_stake"])
+offsets = PackedVector2Array(-0.79, 2.89, 0.73, -3.42, -2.32, -9.73, 6.44, 0.9, 8.63, 14.65)
+yaws = PackedFloat32Array(2.874, 1.691, 1.434, -1.409, -2.609)

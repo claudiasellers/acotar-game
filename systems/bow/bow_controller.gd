@@ -1,20 +1,28 @@
 ## Feyre's bow as a component of Feyre (plans/combat/bow-combat-design.md).
 ##
-## Controls: hold aim (right mouse / left trigger) to raise the bow; an arrow
-## is on the string as it comes up. Hold fire (left mouse / right trigger) to
-## draw the string over BowData.draw_time, and release at full draw to loose a
-## full-power arrow. A release within BowTuning.release_buffer_s of full draw
-## still looses, at full draw; an earlier one lets the string down and looses
-## nothing. There are no weak shots. The bow stays raised while aim is held,
-## and the next draw can start after the follow-through.
+## Controls, as in other bow games on a PC: press fire (left mouse / right
+## trigger) and the bow is up with an arrow on the string, already coming back
+## over BowData.draw_time; let go and the arrow flies at full power. She never
+## readies an arrow herself: if the quiver has one, it is there on the press.
+## The arrow key (Q) only changes which type that is. Every arrow is
+## a full-power arrow: letting go early is remembered, and the arrow leaves the
+## moment the draw is complete, so a quick click is a quick shot. Holding keeps
+## the string back until she lets go. Aim (right mouse / left trigger) is
+## optional: it brings the camera in over her shoulder. Letting go of aim while
+## the string is held eases it down and looses nothing: the one way to take a
+## shot back. The bow stays in her hands for BowTuning.stay_up_s after the
+## last shot.
 ##
-## Sway is visible: the same offset turns the shot and the reticle's ring, and
-## it settles while she holds the raised bow still. Focus (hold Shift / L3
-## while raised) slows the world through TimeScale, steadies the sway and
-## costs stamina.
+## The arrow goes to the crosshair in the middle of the screen: straight for
+## the bow's true range, dropping beyond it (Ballistics). When she is calm it
+## goes exactly there. Sway is her body failing her, and only that: a draw held
+## too long, no breath, cold or hurt hands. The same offset turns the shot and
+## moves the crosshair, so what is seen is where it goes. Focus (hold Shift /
+## L3 while raised) slows the world through TimeScale, steadies what sway
+## there is and costs stamina.
 ##
-## Reads arrows from Gameplay.inventory's quiver. Body state adds sway and
-## bow-hand tremor; wet clothing makes wet fletching.
+## Reads arrows from Gameplay.inventory's quiver. Wet clothing makes wet
+## fletching.
 class_name BowController
 extends Node
 
@@ -24,12 +32,9 @@ signal bow_changed(bow: BowData)
 signal bow_shown(bow: BowData)
 ## She tried to make an arrow and couldn't: `why` says what is short, in words.
 signal craft_failed(arrow_item_id: StringName, why: String)
-## Released too early: the string came down and nothing flew.
+## The shot was taken back: the string came down and nothing flew.
 signal let_down
-## An arrow has seated on the string: on the raise, and again after each
-## shot's follow-through. The id is the arrow item on the string.
-signal nocked(arrow_item_id: StringName)
-## The draw has just reached the anchor: letting go now looses.
+## The draw has just reached the anchor.
 signal full_draw
 ## She reached for an arrow with the bow raised and the quiver empty.
 signal quiver_empty
@@ -43,11 +48,14 @@ const SLOW_ID := &"bow_slow"
 ## The only type drawn automatically when the chosen one runs out. Special
 ## arrows (ash above all) are never spent by accident.
 const FALLBACK_ARROW := &"arrow_wood"
-## Horizontal speed (m/s) above which she counts as moving for sway.
-const MOVING_SPEED := 0.5
+## An aim point nearer the bow than this (m) can't be shot at across her own
+## body: the arrow leaves along the camera's line.
+const NEAR_AIM := 2.0
+## The crosshair dims when the arrow's line stops this far (m) short of it.
+const BLOCKED_SHORT := 0.75
 ## The satchel's quick slots use the D-pad while this is held; the bow's
 ## D-pad presses wait.
-const QUICK_CHORD := &"quick_chord"
+const QUICK_CHORD := SatchelHud.ACTION_CHORD
 
 ## item id -> ArrowData, from data/arrows (adding an arrow needs no code).
 static var _arrow_data: Dictionary = {}
@@ -55,13 +63,17 @@ static var _arrow_data: Dictionary = {}
 var feyre: Feyre
 var bow: BowData
 var tuning: BowTuning = TUNING
-## 0..1 progress of the draw (visuals, sound). A shot always flies at full power.
+## 0..1 progress of the draw. The arrow leaves at 1.
 var draw_amount: float = 0.0
-## The bow is up (aim held and the scene allows shooting).
+## The bow is up and in use: fire or aim is held and the scene allows shooting.
 var is_aiming: bool = false
+## Put away and kept away (stow()).
+var stowed := false
+## Aim is held: the camera is in over her shoulder.
+var is_precise: bool = false
 ## Up with an arrow on the string: she can draw, and Focus.
 var is_nocked: bool = false
-## The string is coming back or held back (fire held, or a buffered release).
+## The string is coming back or held back (fire held, or a shot owed).
 var is_drawing: bool = false
 ## Focus is on: the world is slowed and the sway steadied.
 var is_focused: bool = false
@@ -73,23 +85,24 @@ var reticle: AimReticle
 
 ## Game time for the sway wobble (it slows with the world, so Focus looks steady).
 var _time: float = 0.0
-## 1.0 unsettled, down to tuning.settle_floor when held still.
-var _settle: float = 1.0
 ## Real seconds held at full draw (the trembling arm).
 var _held_full: float = 0.0
 ## Real seconds left of the follow-through before the next draw.
 var _recover: float = 0.0
-## Released inside the buffer: looses the moment the draw is full.
-var _loose_pending: bool = false
-## An arrow is seated on the string; fire was held last tick.
-var _seated: bool = false
+## Aim was held at some point in this draw, so letting go of it takes the shot back.
+var _aimed_this_draw: bool = false
+## The shot was taken back with fire still down: that press is spent.
+var _taken_back: bool = false
+## She has let go of the string before the draw was complete (or clicked in
+## the follow-through): one arrow is owed, and leaves when the draw is full.
+var _owed: bool = false
+## Fire was held last tick.
 var _fire_was_held: bool = false
 ## Real seconds Focus holds after a Focused release.
 var _focus_linger: float = 0.0
 ## Focus ended (a shot, a hit, no breath) with its key still down: it needs a
 ## fresh press.
 var _focus_used: bool = false
-var _last_aim: Vector3 = Vector3.ZERO
 
 
 func _ready() -> void:
@@ -99,8 +112,6 @@ func _ready() -> void:
 	HudLayout.of(get_tree()).place(reticle, HudLayout.Zone.WORLD, self)
 	visual = BowVisual.new(self)
 	add_child(visual)
-	# Her one thought about an early release (systems/dialogue/scene_guides/).
-	add_child(BowGuide.new())
 	quiver_card = QuiverCard.new(self)
 	add_child(quiver_card)
 	if Gameplay.inventory.count(&"bow_%s" % bow.id) == 0:
@@ -115,7 +126,7 @@ func _exit_tree() -> void:
 ## The wheel is read in _input: with the bow raised it is the bow's, before
 ## anything else can take the scroll.
 func _input(event: InputEvent) -> void:
-	if not is_aiming:
+	if not is_up():
 		return
 	if event.is_action_pressed(&"arrow_next"):
 		cycle_arrow()
@@ -124,7 +135,7 @@ func _input(event: InputEvent) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if InputMap.has_action(QUICK_CHORD) and Input.is_action_pressed(QUICK_CHORD):
+	if stowed or Input.is_action_pressed(QUICK_CHORD):
 		return
 	if event.is_action_pressed(&"cycle_arrow"):
 		cycle_arrow()
@@ -136,69 +147,99 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	update_bow(delta, Input.is_action_pressed(&"aim"), Input.is_action_pressed(&"fire"),
+	# A click shorter than a tick is still a click.
+	update_bow(delta, Input.is_action_pressed(&"aim"),
+		Input.is_action_pressed(&"fire") or Input.is_action_just_pressed(&"fire"),
 		Input.is_action_pressed(&"focus"))
 
 
 ## One tick of the bow, separated from input so tests can drive it. `delta` is
-## game time; her own hands (the draw, the follow-through, the settle) run on
-## real time, so in the Focus hush the world slows and she does not. Returns the arrow loosed this
-## tick, if any.
+## game time; her own hands (the draw, the follow-through) run on real time,
+## so in the Focus hush the world slows and she does not. Returns the arrow
+## loosed this tick, if any.
 func update_bow(delta: float, aim_held: bool, fire_held: bool, focus_held: bool = false) -> Arrow:
 	var real := TimeScale.real(delta)
 	_time += delta
 	_recover = maxf(_recover - real, 0.0)
-	is_aiming = aim_held and can_shoot()
-	is_nocked = is_aiming and _available() != &""
-	if not is_nocked:
-		_loose_pending = false
+	var allowed := can_shoot()
+	if not allowed or arrow_ready() == &"":
+		_owed = false
+	elif _fire_was_held and not fire_held and not _taken_back:
+		# She has let go of the string: an arrow will fly, now or when the draw is full.
+		_owed = true
+	if not fire_held:
+		_taken_back = false
+	elif is_drawing and _aimed_this_draw and not aim_held:
+		# Aim let go with the string still held: the shot is taken back.
+		_let_down()
+		_taken_back = true
+		_owed = false
+	var drawing_hand := (fire_held and not _taken_back) or _owed
+	is_precise = aim_held and allowed
+	is_aiming = allowed and (aim_held or drawing_hand)
+	is_nocked = is_aiming and arrow_ready() != &""
 	_note_string(fire_held)
+	if drawing_hand and is_aiming and visual:
+		# Her draw keeps the bow up a moment for the next arrow; a bow raised
+		# only to aim comes down with the aim.
+		visual.hold_ready(tuning.stay_up_s)
 	var arrow: Arrow = null
-	if not is_nocked or _recover > 0.0:
-		# Lowered, empty, or still in the follow-through: nothing on the draw.
+	if not is_nocked or _recover > 0.0 or not drawing_hand:
+		# Lowered, empty, in the follow-through, or the string not held.
 		is_drawing = false
 		draw_amount = 0.0
 		_held_full = 0.0
-	elif fire_held and not _loose_pending:
+		_aimed_this_draw = false
+	else:
 		is_drawing = true
+		_aimed_this_draw = _aimed_this_draw or aim_held
 		var before := draw_amount
 		draw_amount = minf(draw_amount + real / maxf(bow.draw_time, 0.001), 1.0)
 		if draw_amount >= 1.0 and before < 1.0:
 			full_draw.emit()
-	elif is_drawing:
-		# She has let go of the string.
-		if _loose_pending:
-			draw_amount = minf(draw_amount + real / maxf(bow.draw_time, 0.001), 1.0)
-		if draw_amount >= 1.0:
+		if _owed and draw_amount >= 1.0:
 			arrow = _loose()
-		elif _loose_pending or (1.0 - draw_amount) * bow.draw_time <= tuning.release_buffer_s:
-			_loose_pending = true
-		else:
-			_let_down()
-	_update_sway(real)
+			# Nothing is owed now: she is aiming only if something is still held.
+			is_aiming = aim_held or fire_held
+			is_nocked = is_aiming and arrow_ready() != &""
+	_update_hold(real)
 	_update_focus(real, focus_held)
 	return arrow
 
 
-## Story control (story lane autoload) can forbid shooting in anchored scenes.
+## The bow is hers to use: not stowed, and the story has not taken it.
 func can_shoot() -> bool:
-	var control := Gameplay.autoload(&"StoryControl")
-	if control and control.has_method(&"can_shoot"):
-		return bool(control.can_shoot())
-	return true
+	return not stowed and StoryControl.can_shoot()
+
+
+## Puts the bow away and keeps it away (in the saddle), or gives it back.
+## Stowed, it comes down on the next tick, the Focus hush ends, and Q, F, B
+## and the wheel do nothing.
+func stow(away: bool) -> void:
+	stowed = away
+	if away:
+		_focus_linger = 0.0
+		if visual:
+			visual.ready_timer = 0.0
+
+
+## Makes `id` the arrow on the string.
+func select_arrow(id: StringName) -> void:
+	selected = id
+	arrow_type_changed.emit(id)
 
 
 func _loose() -> Arrow:
 	var in_focus := is_focused
 	var arrow := release()
-	_loose_pending = false
+	_owed = false
 	is_drawing = false
+	_aimed_this_draw = false
 	draw_amount = 0.0
 	_held_full = 0.0
 	if arrow == null:
 		return null
 	_recover = tuning.follow_through_s
-	_settle = maxf(_settle, tuning.settle_after_shot)
 	if in_focus:
 		# The hush holds a moment more, so she sees the arrow leave in it.
 		_focus_linger = tuning.focus_hold_after_release_s
@@ -208,13 +249,8 @@ func _loose() -> Arrow:
 	return arrow
 
 
-## What the string tells whoever listens (sound, the reticle): an arrow
-## seating, and her hand finding the quiver empty.
+## Her hand finds the quiver empty on a press of fire.
 func _note_string(fire_held: bool) -> void:
-	var seated := is_nocked and _recover <= 0.0
-	if seated and not _seated:
-		nocked.emit(_available())
-	_seated = seated
 	if is_aiming and not is_nocked and fire_held and not _fire_was_held:
 		quiver_empty.emit()
 	_fire_was_held = fire_held
@@ -224,29 +260,23 @@ func _let_down() -> void:
 	is_drawing = false
 	draw_amount = 0.0
 	_held_full = 0.0
+	_aimed_this_draw = false
 	let_down.emit()
 
 
-func _update_sway(real: float) -> void:
-	var aim := -feyre.camera.global_basis.z if feyre.camera else Vector3.ZERO
-	var turn := 0.0
-	if _last_aim != Vector3.ZERO and real > 0.0:
-		turn = rad_to_deg(_last_aim.angle_to(aim)) / real
-	_last_aim = aim
-	if not is_nocked:
-		_settle = 1.0
+## The bow is in her hands: in use, or still up after the last shot.
+func is_up() -> bool:
+	return is_aiming or (visual != null and visual.wants_raised())
+
+
+## The trembling arm: a full draw held past fatigue_after_s costs stamina.
+func _update_hold(real: float) -> void:
+	if not (is_drawing and draw_amount >= 1.0):
 		_held_full = 0.0
 		return
-	if turn > tuning.settle_reset_turn_dps or _moving():
-		_settle = minf(_settle + tuning.unsettle_rate * real, 1.0)
-	else:
-		var speed := tuning.focus_settle_speed if is_focused else 1.0
-		var rate := (1.0 - tuning.settle_floor) / maxf(tuning.settle_s, 0.01) * speed
-		_settle = maxf(_settle - rate * real, tuning.settle_floor)
-	if is_drawing and draw_amount >= 1.0:
-		_held_full += real
-		if _held_full > tuning.fatigue_after_s:
-			feyre.drain_stamina(tuning.hold_drain * real)
+	_held_full += real
+	if _held_full > tuning.fatigue_after_s:
+		feyre.drain_stamina(tuning.hold_drain * real)
 
 
 func _update_focus(real: float, focus_held: bool) -> void:
@@ -293,16 +323,6 @@ func _dread() -> float:
 	return feyre.vitals.dread if feyre.vitals else 0.0
 
 
-func _moving() -> bool:
-	return Vector2(feyre.velocity.x, feyre.velocity.z).length() > MOVING_SPEED
-
-
-## How unsettled the aim is, 0 (steady as it gets) to 1 (just raised, turning
-## or walking). The reticle's ring is larger while unsettled.
-func unsettled() -> float:
-	return inverse_lerp(tuning.settle_floor, 1.0, _settle) if is_nocked else 1.0
-
-
 ## How tired her draw arm is from holding at full draw: 0 until
 ## fatigue_after_s, then rising to 1 at the sway's fatigue_max.
 func fatigue() -> float:
@@ -311,43 +331,47 @@ func fatigue() -> float:
 	return minf((_held_full - tuning.fatigue_after_s) * tuning.fatigue_rate / (tuning.fatigue_max - 1.0), 1.0)
 
 
-## Degrees of aim sway right now (design doc §5.2).
+## Degrees of aim sway right now: none while she is calm and whole. Each of
+## these adds its share of the bow's own sway: a draw held too long, low
+## breath, and what BodyState reports once it is past ordinary hunger, cold
+## and fear (BowTuning.steady_body, steady_tremor); a tremor adds degrees
+## outright. Focus steadies all of it.
 func sway_degrees() -> float:
 	if not is_nocked:
 		return 0.0
 	var body := feyre.body_state
-	var body_mult := body.sway_multiplier() if body else 1.0
-	var tremor := body.tremor_degrees() if body else 0.0
-	var tired := 1.0 + fatigue() * (tuning.fatigue_max - 1.0)
-	var crouched := feyre.crouch != null and feyre.crouch.crouched
-	var stance := tuning.stance_still
-	if _moving():
-		stance = tuning.stance_crouch_walking if crouched else tuning.stance_walking
-	elif crouched:
-		stance = tuning.stance_crouched
-	var breath := 1.0
+	var failing := maxf(body.sway_multiplier() - tuning.steady_body, 0.0) if body else 0.0
+	var tremor := maxf(body.tremor_degrees() - tuning.steady_tremor, 0.0) if body else 0.0
+	failing += fatigue() * (tuning.fatigue_max - 1.0)
 	if feyre.is_winded():
-		breath = tuning.breath_winded
+		failing += tuning.breath_winded - 1.0
 		tremor += tuning.breath_winded_tremor
 	elif feyre.stamina < feyre.max_stamina * tuning.breath_low_fraction:
-		breath = tuning.breath_low
+		failing += tuning.breath_low - 1.0
 	var focus := 1.0
 	if is_focused:
 		focus = tuning.focus_sway_panic if _dread() > tuning.panic_dread else tuning.focus_sway
-	return bow.sway_degrees * _settle * tired * stance * breath * focus * body_mult + tremor
+	return (bow.sway_degrees * maxf(failing, 0.0) + tremor) * focus
+
+
+## The sway right now as a turn of the aim: radians of yaw (x) and pitch (y).
+func sway_angles() -> Vector2:
+	var degrees := deg_to_rad(sway_degrees())
+	if degrees <= 0.0:
+		return Vector2.ZERO
+	return degrees * Vector2(0.7 * sin(_time * 1.9) + 0.3 * sin(_time * 5.3),
+			0.7 * sin(_time * 1.3 + 1.0) + 0.3 * sin(_time * 4.1))
 
 
 ## Turns `v` by the current sway.
 func sway_offset(v: Vector3) -> Vector3:
-	var degrees := sway_degrees()
-	if degrees <= 0.0 or v == Vector3.ZERO:
+	var turn := sway_angles()
+	if turn == Vector2.ZERO or v == Vector3.ZERO:
 		return v
-	var yaw := deg_to_rad(degrees) * (0.7 * sin(_time * 1.9) + 0.3 * sin(_time * 5.3))
-	var pitch := deg_to_rad(degrees) * (0.7 * sin(_time * 1.3 + 1.0) + 0.3 * sin(_time * 4.1))
 	var right := v.cross(Vector3.UP).normalized()
 	if right == Vector3.ZERO:
 		right = Vector3.RIGHT
-	return v.rotated(Vector3.UP, yaw).rotated(right, pitch).normalized()
+	return v.rotated(Vector3.UP, turn.x).rotated(right, turn.y).normalized()
 
 
 ## The camera FOV change for the bow right now (MovementFeel, the one FOV
@@ -355,7 +379,7 @@ func sway_offset(v: Vector3) -> Vector3:
 func fov_offset() -> float:
 	if is_focused:
 		return tuning.fov_focus
-	return tuning.fov_raised if is_aiming else 0.0
+	return tuning.fov_raised if is_precise else 0.0
 
 
 static func arrow_data() -> Dictionary:
@@ -460,32 +484,38 @@ func muzzle() -> Vector3:
 	return feyre.global_position + Vector3.UP * 1.45 - feyre.model.global_basis.z * 0.45
 
 
-## The direction an arrow loosed this instant would leave the bow: the aim
-## turned by the sway. The reticle and the shot both use it, so the ring is
-## where the arrow goes.
+## The direction an arrow loosed this instant would leave the bow: from the
+## bow to the point under the crosshair, turned by the sway, then by soft aim
+## on a pad. The crosshair shows the same sway, so it is where the arrow goes.
 func shot_direction() -> Vector3:
-	return sway_offset((feyre.aim_point() - muzzle()).normalized())
-
-
-## Where an arrow released now would land (F5): the same gravity, drag, wind
-## and sway as the real flight, stepped and ray-checked. Every shot is full
-## power. The flight itself stays real physics; this only shows where it ends.
-func predict_impact() -> Dictionary:
-	var item := _available()
-	var d: ArrowData = arrow_data().get(item if item != &"" else FALLBACK_ARROW)
-	var wet := feyre.element_state != null and feyre.element_state.is_wet()
-	var speed := bow.max_speed * (d.wet_speed_multiplier if wet and d else 1.0)
-	var drag := (d.drag * (d.wet_drag_multiplier if wet else 1.0)) if d else 0.0022
 	var from := muzzle()
-	var wind := get_tree().get_first_node_in_group(&"wind_source")
-	return BowController.predict_path(from, shot_direction() * speed, drag,
-		feyre.get_world_3d().direct_space_state, [feyre.get_rid()], wind)
+	var forward := -feyre.camera.global_basis.z
+	var to := feyre.aim_point() - from
+	var aim := forward if to.length() < NEAR_AIM or to.dot(forward) <= 0.0 else to.normalized()
+	return SoftAim.bend(get_tree(), from, aim, sway_offset(aim))
 
 
-## Steps a shot through the world until it hits something (or `max_time`).
-## Returns {"point", "hit": bool, "time", "collider"}.
+## Something stands between the bow and the point under the crosshair (a
+## trunk beside her, a rock at her knee): the arrow would stop short of it.
+func line_blocked() -> bool:
+	var from := muzzle()
+	var to := feyre.aim_point()
+	var query := PhysicsRayQueryParameters3D.create(from, to, Feyre.WORLD_MASK, [feyre.get_rid()])
+	var hit := feyre.get_world_3d().direct_space_state.intersect_ray(query)
+	return not hit.is_empty() and (hit.position as Vector3).distance_to(to) > BLOCKED_SHORT
+
+
+## Seconds an arrow from this bow flies dead straight (Ballistics.gravity_share's hold).
+func true_flight_s() -> float:
+	return bow.true_range / maxf(bow.max_speed, 0.001)
+
+
+## Steps a shot through the world until it hits something (or `max_time`),
+## as the arrow itself flies: `true_flight_s` and `gravity_blend_s` are
+## Arrow.launch's. Returns {"point", "hit": bool, "time", "collider"}.
 static func predict_path(from: Vector3, velocity: Vector3, drag: float, space: PhysicsDirectSpaceState3D,
-		exclude: Array[RID] = [], wind_source: Node = null, max_time: float = 3.0, dt: float = 1.0 / 60.0) -> Dictionary:
+		exclude: Array[RID] = [], wind_source: Node = null, max_time: float = 3.0, dt: float = 1.0 / 60.0,
+		true_flight_s: float = 0.0, gravity_blend_s: float = 0.0) -> Dictionary:
 	var gravity := float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
 	var p := from
 	var v := velocity
@@ -494,7 +524,8 @@ static func predict_path(from: Vector3, velocity: Vector3, drag: float, space: P
 		var wind := Vector3.ZERO
 		if wind_source and wind_source.has_method(&"wind_at"):
 			wind = wind_source.wind_at(p)
-		v = Ballistics.step(v, wind, drag, gravity, dt)
+		t += dt
+		v = Ballistics.step(v, wind, drag, gravity, dt, Ballistics.gravity_share(t, true_flight_s, gravity_blend_s))
 		var next := p + v * dt
 		if space:
 			var query := PhysicsRayQueryParameters3D.create(p, next, Arrow.MASK_WORLD_AND_TARGETS, exclude)
@@ -502,14 +533,14 @@ static func predict_path(from: Vector3, velocity: Vector3, drag: float, space: P
 			if hit:
 				return {"point": hit.position, "hit": true, "time": t, "collider": hit.collider}
 		p = next
-		t += dt
 		if p.y < Arrow.KILL_DEPTH:
 			break
 	return {"point": p, "hit": false, "time": t, "collider": null}
 
 
+## Looses the nocked arrow, at the bow's full speed.
 func release() -> Arrow:
-	var arrow_item := _available()
+	var arrow_item := arrow_ready()
 	if arrow_item == &"" or Gameplay.inventory.remove(arrow_item, 1) == 0:
 		return null
 	var muzzle := muzzle()
@@ -518,14 +549,16 @@ func release() -> Arrow:
 	feyre.get_parent().add_child(arrow)
 	arrow.add_collision_exception_with(feyre)
 	var wet := feyre.element_state != null and feyre.element_state.is_wet()
-	arrow.launch(muzzle, direction, bow.max_speed, wet, bow.id)
+	arrow.launch(muzzle, direction, bow.max_speed, wet, bow.id, true_flight_s(), tuning.gravity_blend_s)
 	feyre.quiver_changed.emit(Gameplay.inventory.arrow_count())
 	feyre.arrow_fired.emit(arrow)
 	feyre.bow_released.emit(muzzle, bow.loudness)
 	return arrow
 
 
-func _available() -> StringName:
+## The arrow a press of fire would put on the string: the chosen type, or a
+## plain one when that has run out (FALLBACK_ARROW), or &"" with none.
+func arrow_ready() -> StringName:
 	if Gameplay.inventory.arrow_count(selected) > 0:
 		return selected
 	if Gameplay.inventory.arrow_count(FALLBACK_ARROW) > 0:

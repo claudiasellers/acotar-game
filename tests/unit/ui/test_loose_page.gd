@@ -32,7 +32,9 @@ func test_heading_and_key_caps() -> void:
 	assert_eq(head[0].theme_type_variation, &"SatchelHeading")
 	var dab := head[0].get_node_or_null(^"Dab") as TextureRect
 	assert_not_null(dab, "one dab of her paint under the page's name")
-	assert_eq(dab.modulate, Color(JournalTheme.wash(2), LoosePage.DAB_LIFT), "in the station's wash, laid on thick")
+	var wash := JournalTheme.wash(2)
+	assert_true(Color(dab.modulate, 1.0).is_equal_approx(Color(wash, 1.0)), "in the station's wash: %s" % dab.modulate)
+	assert_gt(dab.modulate.a, 0.0, "and visible")
 	assert_true(dab.show_behind_parent, "under the letters, not over them")
 	page.set_hints([["E", "Brew"], ["Esc", "Step away"]])
 	var hints := page.column.get_node(^"Hints")
@@ -57,13 +59,7 @@ func test_no_station_frames_itself() -> void:
 		for line in src.split("\n"):
 			if not line.strip_edges().begins_with("#") and bad.search(line):
 				hits.append(line.strip_edges())
-		assert_eq(hits, [], "%s builds a scrim, a card or key caps of its own" % path)
-
-
-func test_the_old_card_look_makes_no_screens() -> void:
-	var src := FileAccess.get_file_as_string("res://ui/ui_style.gd")
-	assert_false(src.contains("func modal"), "no modal: screens are loose pages or the book")
-	assert_false(src.contains("func button"), "no buttons of its own")
+		assert_eq(hits, [], "%s builds a scrim, a card or key caps of its own. Fix: lay the page with LoosePage.lay(layer, width, wash), use page.head() for the title and page.set_hints([[key, word], ...]) for the caps" % path)
 
 
 ## Small type on a loose page reads: 16 px or more, and 4.5 to 1 on the

@@ -30,6 +30,14 @@ enum BodyPlan { QUADRUPED, BIRD }
 ## Uniform scale on the model scene, so one Blender mesh can serve a bigger cousin
 ## (the songbird body as a hawk, the lamb as a ewe).
 @export var model_scale: float = 1.0
+## A mimic's body from the court's flora table (CourtAssets id) instead of
+## model_scene, so it is always the very plant it hides among: when the flora
+## lane swaps that plant's model, the mimic follows (briarlings).
+@export var flora_id: StringName = &""
+## R9: the body's meshes stop drawing past this many metres (with a short
+## fade), set once the creature is built, its face and anything in its hands
+## included. 0 draws it at any distance.
+@export var draw_distance: float = 0.0
 
 @export_group("Movement")
 @export var walk_speed: float = 1.2
@@ -67,7 +75,22 @@ enum BodyPlan { QUADRUPED, BIRD }
 @export var weak_zone_mult: float = 3.0
 ## What story beats and sound call the weak spot (EventBus.creature_hit part).
 @export var weak_zone_name: StringName = &"weak"
+## Her knife on this family, as a multiple of arrow_damage on top of the
+## strike's own (StrikeController.knife_mult): 1 cuts like a wood arrow. The
+## one per-family knife value (Creature.resolve_hit); the common tier's 1.5
+## lands "2 knife hits" on 24 HP.
+@export var knife_scale: float = 1.0
 
+## Small means fragile and easy to hit (owner, 2026-11-25): above 1 the box
+## arrows and the knife find is this much bigger than the body.
+@export var hit_box_scale: float = 1.0
+## A body too big to stand at the middle of (the Hollow Hob): the knife's
+## reach, and the sneak's, are measured this much past its origin.
+@export var reach_margin: float = 0.0
+## A hostile family's element row (HostileElements; hostile plan §7):
+## element (fire, frost, light, sleep) -> multiplier, 1.5 weak, 1.0 normal,
+## 0 resisted. An element with no entry is normal.
+@export var element_rows: Dictionary = {}
 @export_group("Fire")
 ## Health lost per second while it burns (a fire arrow, or burning ground under
 ## it). 0: fire never takes hold on it.

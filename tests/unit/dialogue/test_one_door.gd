@@ -121,14 +121,17 @@ func test_nothing_else_puts_speech_on_the_presenter() -> void:
 	var seen := {}
 	for root in ["res://story", "res://systems"]:
 		_search(root, said, hits, seen)
-	assert_eq(hits, [] as Array[String], "a line shown past the director")
+	assert_eq(hits, [] as Array[String], ("a said or thought line shown past the director. Fix: replace "
+			+ "LinePresenter.say(...) with DialogueDirector.staged(self, &\"<line_id>\", who, text) (who = \"\" "
+			+ "for her thought), or DialogueDirector.line(self, &\"<id>\") for a line of the books. Only a "
+			+ "film, the Bogge's whisper and the Suriel's dread may call say() directly (ALSO_SPEAK here)."))
 	for path: String in ALSO_SPEAK:
-		assert_true(seen.has(path), "%s no longer speaks: take it off the list" % path)
+		assert_true(seen.has(path), "%s no longer calls LinePresenter.say: delete its row from ALSO_SPEAK in this test" % path)
 	var direct := RegEx.create_from_string("LinePresenter\\.line\\(")
 	var old: Array[String] = []
 	for root in ["res://story", "res://systems", "res://ui"]:
 		_search(root, direct, old, {}, false)
-	assert_eq(old, [] as Array[String], "the door that was taken out")
+	assert_eq(old, [] as Array[String], "LinePresenter.line() was taken out: use DialogueDirector.line(self, &\"<id>\") or DialogueDirector.staged(...)")
 
 
 func _search(dir: String, pattern: RegEx, hits: Array[String], seen: Dictionary, by_voice: bool = true) -> void:

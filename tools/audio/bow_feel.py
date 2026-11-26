@@ -2,12 +2,13 @@
 gen_act1_audio.py's SOUNDS and CUES. Self-made from seeded noise and
 partials, CC0, like the rest.
 
-What each one is for: the nock click says an arrow is on the string; the
+What each one is for: the
 creak loop is a held full draw; the let-down is the string eased forward with
-nothing loosed; the pat is her hand on an empty quiver; each bow has its own
+nothing loosed; the pat is her hand on an empty quiver; a short gasp when
+she has no breath left for a sidestep; each bow has its own
 release and the ash arrow a deeper one with a chime tail; Focus is an inhale
 and, let go, an exhale, with her heartbeat under it; each arrow type has a
-short sound of its own, so what is nocked can be heard; an arrow pulled out
+short sound of its own, so what is chosen can be heard; an arrow pulled out
 of what it stuck in; the bow limb as a club; an arrow on stone. Two more for
 tracking: what a lost deer and a lost rabbit give away (CreatureData.lost_cue).
 """
@@ -22,15 +23,6 @@ ARROW_TYPES = ("wood", "ash", "fire", "frost", "sleep", "lure", "light", "barbed
 
 def _t(n):
     return np.arange(n) / SR
-
-
-def nock():
-    r = rng(1301)
-    s = 0.16
-    n = secs(s)
-    click = sum(g * reso(white(r, n), f, 18) for f, g in ((1900, 1.0), (3150, 0.5), (760, 0.4))) * env_exp(n, 0.012, 0.0003)
-    seat = thump(210, s, 0.015, 0.3) * 0.35
-    return normalize(fade(click + seat, 0.0003, 0.03), -8)
 
 
 def creak_loop():
@@ -113,6 +105,11 @@ def focus_in():
 
 def focus_out():
     return normalize(fade(_breath(1321, 1.1, 1300, 500, False), 0.01, 0.3), -15)
+
+
+def winded():
+    # A short, sharp breath in through the teeth: she has nothing left to move on.
+    return normalize(fade(_breath(1322, 0.32, 1500, 3200, True), 0.01, 0.08), -12)
 
 
 def heartbeat():
@@ -217,7 +214,6 @@ def hare_lost():
 
 
 SOUNDS = {
-    "sfx/bow/nock": (nock, 4, "An arrow seats on the string: a wood click"),
     "sfx/bow/creak_loop": (creak_loop, 4, "A held full draw: string and limb creak (loop)"),
     "sfx/bow/let_down": (let_down, 4, "The string eased forward, nothing loosed"),
     "sfx/bow/empty_pat": (empty_pat, 4, "Her hand pats an empty quiver"),
@@ -227,6 +223,7 @@ SOUNDS = {
     "sfx/bow/release_ash": (release_ash, 4, "The ash arrow leaves: a deeper thrum with a faint chime tail"),
     "sfx/bow/focus_in": (focus_in, 4, "Focus: a steadying inhale"),
     "sfx/bow/focus_out": (focus_out, 4, "Focus let go: an exhale"),
+    "sfx/bow/winded": (winded, 4, "Out of breath: a short gasp when she can't sidestep"),
     "sfx/bow/heartbeat": (heartbeat, 4, "Her heartbeat in the hush, one slow beat (loop)"),
     "sfx/bow/retrieve": (retrieve, 4, "An arrow pulled out of what it stuck in"),
     "sfx/bow/bash": (bash, 4, "The bow limb as a club: a wooden thud"),
@@ -238,7 +235,6 @@ SOUNDS.update({"sfx/arrow/select_%s" % k: (_selector(k), 4, "The %s arrow comes 
 
 # cue id: (files, volume_db, pitch_jitter, loop, music, max_distance)
 CUES = {
-    "bow_nock": (["sfx/bow/nock"], -8, 0.05, False, False, 20),
     "bow_creak": (["sfx/bow/creak_loop"], -10, 0, True, False, 20),
     "bow_let_down": (["sfx/bow/let_down"], -8, 0.05, False, False, 20),
     "bow_empty": (["sfx/bow/empty_pat"], -8, 0.05, False, False, 20),
@@ -248,6 +244,7 @@ CUES = {
     "bow_release_ash": (["sfx/bow/release_ash"], -2, 0, False, False, 60),
     "bow_focus_in": (["sfx/bow/focus_in"], -10, 0.03, False, False, 0),
     "bow_focus_out": (["sfx/bow/focus_out"], -11, 0.03, False, False, 0),
+    "breath_winded": (["sfx/bow/winded"], -7, 0.04, False, False, 0),
     "bow_heartbeat": (["sfx/bow/heartbeat"], -8, 0, True, False, 0),
     "arrow_retrieve": (["sfx/bow/retrieve"], -8, 0.06, False, False, 20),
     "bow_bash": (["sfx/bow/bash"], -3, 0.06, False, False, 40),

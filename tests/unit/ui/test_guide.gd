@@ -4,9 +4,10 @@ const BOOK := preload("res://data/guide/act1_guide.tres")
 const SETTINGS_PATH := "user://test_guide_settings.cfg"
 ## Every Act I flag state in story order, up to the first evening past the wall.
 const LADDER: Array[String] = ["wolf_killed", "fact.wolf_skinned", "pelt_sold",
-	"beast_claim_accepted", "wall_crossed", "first_dinner_eaten"]
-## The thread each prefix of LADDER should resolve to ("" = deliberate silence).
-const EXPECTED: Array[String] = ["hunt", "skin", "sell", "home", "", "quiet", ""]
+	"fact.evening.supper_eaten", "fact.evening.slept", "beast_claim_accepted", "wall_crossed", "first_dinner_eaten"]
+## The thread each prefix of LADDER should resolve to ("" = deliberate silence:
+## the ride).
+const EXPECTED: Array[String] = ["hunt", "skin", "sell", "home", "rest", "night", "", "quiet", ""]
 
 var _flags: Dictionary = {}
 
@@ -152,3 +153,29 @@ func test_card_shows_one_line_and_obeys_off() -> void:
 	assert_false(journal.showing)
 	assert_eq(lines.showing, "", "and the slip is put away")
 	journal.on_mode_changed(GuideSettings.get_mode())
+
+
+func test_g_stays_in_the_court_with_no_need_and_dread() -> void:
+	WorldState.clear()
+	for flag in LADDER:
+		WorldState.set_flag(flag)
+	StoryControl.set_mode(StoryControl.Mode.FULL)
+	EventBus.mood_changed.emit(&"dread", 1.0, 0.0)
+	var journal := GuideJournal.new(BOOK)
+	add_child_autofree(journal)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_null(journal.director.thread, "the ride: no need is open")
+	assert_true(UiMode.quiet(get_tree()), "dread lingers")
+	journal._update_tab(10.0)
+	assert_true(journal._tab.visible, "the tab stays while she is free")
+	journal.press()
+	assert_true(journal.showing, "G thinks even with no need and dread")
+	assert_true(journal.line in journal.book_reflections(), "a wider thought when none came before")
+	journal.hide_thought()
+	StoryControl.set_mode(StoryControl.Mode.NONE)
+	journal._update_tab(10.0)
+	assert_false(journal._tab.visible, "a held moment still takes it away")
+	StoryControl.set_mode(StoryControl.Mode.FULL)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
+	WorldState.clear()

@@ -1,7 +1,7 @@
 ## Contract for the bow's feedback (plans/combat/bow-combat-design.md §13 B3):
 ## every sound of §5.8 is a cue in the bank and plays on its own event, the
-## reticle shows the draw closing and catches at full draw, an early release
-## is heard, an empty quiver is heard and nocks nothing, the Focus hush is a
+## crosshair catches at full draw and pulses on a hit, an empty quiver is
+## heard and puts nothing on the string, the Focus hush is a
 ## bus effect on Ambience, and a blow costs her half the draw.
 extends GutTest
 # gate: when:systems/bow/*,systems/audio/*,data/audio/*,data/bows/*,ui/aim_reticle.gd,characters/feyre/*,systems/interaction/*
@@ -10,7 +10,7 @@ const TEST_SET := preload("res://data/phases/m0_test_phases.tres")
 const SCENE := preload("res://world/shared/test_hill/test_hill.tscn")
 const TICK := 1.0 / 60.0
 ## §5.8, by cue id.
-const CUES: Array[StringName] = [&"bow_nock", &"bow_creak", &"bow_let_down", &"bow_empty",
+const CUES: Array[StringName] = [&"bow_creak", &"bow_let_down", &"bow_empty",
 	&"bow_release", &"bow_release_sentry_warbow", &"bow_release_fae_recurve", &"bow_release_gilded_bow",
 	&"bow_release_ash", &"bow_focus_in", &"bow_focus_out", &"bow_heartbeat", &"arrow_retrieve",
 	&"bow_bash", &"bow_hit_stone", &"deer_lost", &"hare_lost"]
@@ -77,14 +77,15 @@ func test_every_sound_of_the_bow_is_in_the_bank() -> void:
 		assert_not_null(sound.bank.cue(data.lost_cue), "%s gives itself away with a sound" % data.kind)
 
 
-func test_an_empty_quiver_looses_nothing_and_nocks_nothing() -> void:
+func test_an_empty_quiver_looses_nothing_and_is_heard() -> void:
 	for id: StringName in [&"arrow_wood", &"arrow_ash"]:
 		Gameplay.inventory.remove(id, Gameplay.inventory.count(id))
 	_hold(0.2, true, false)
 	assert_false(bow.is_nocked)
 	assert_null(bow.release(), "no arrow, nothing leaves the bow")
 	assert_eq(Gameplay.inventory.arrow_count(), 0)
-	assert_eq(_played(&"bow_nock"), 0)
+	_hold(0.1, true, true)
+	assert_eq(_played(&"bow_empty"), 1, "her hand pats the empty quiver once on the press")
 
 
 func test_each_bow_and_the_ash_arrow_have_their_own_release() -> void:

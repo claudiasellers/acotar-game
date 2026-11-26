@@ -8,8 +8,8 @@ const SH := FX + "shaders/"
 const GRADE_SCRIPT := "res://world/shared/grades/grade_preset.gd"
 ## Tonal pass on the grade table, to the experience bar's tested spring grade
 ## (plans/experience-bar.md 2.1): LUT ramps blended this far from identity,
-## fog thin, contrast 1.12, sun up to 1.8, shadows tinted lilac; glow per the
-## book's light (see _tame).
+## fog thin, contrast 1.12, sun up to 1.8, shadows tinted lilac. Glow is not
+## a grade's: the World's environment blooms only real light sources.
 ## grade_blight is horror (bar 1.5): it withdraws instead.
 const LUT_STRENGTH := 0.3
 const FOG_CAP := 0.0012
@@ -27,13 +27,6 @@ const CONTRAST := 1.12
 const DAY_EXPOSURE_CAP := 0.6
 const DAY_LUT_STRENGTH := 0.075
 const DAY_CONTRAST := 1.16
-## Glow: daylight blooms only real highlights (threshold above white, no
-## bloom wash); golden hour and night keep a soft glow for fire and lanterns.
-const DAY_GLOW := 0.1
-const DAY_THRESHOLD := 1.4
-const NIGHT_GLOW := 0.7
-const NIGHT_BLOOM := 0.04
-const NIGHT_THRESHOLD := 1.1
 ## Foliage rim shimmer by day: faint before the glamour lifts (ch 23).
 const DAY_MAGIC := 0.35
 const VOLUMETRIC_CAP := 0.008
@@ -103,73 +96,73 @@ func _grade_rows() -> Array[Dictionary]:
 			"sky_top": "8fb4ff", "sky_horizon": "ffd6ec", "ground_horizon": "fbe3d6", "ground_bottom": "9fd6a0",
 			"sun_color": "fff0d8", "sun_energy": 1.4, "ambient_color": "f7d9ff", "ambient_energy": 1.0,
 			"fog_color": "fde3f4", "fog_density": 0.0022, "volumetric_density": 0.012, "volumetric_albedo": "fff0fa",
-			"exposure": 1.08, "saturation": 1.38, "contrast": 0.95, "brightness": 1.06, "glow_intensity": 1.0, "glow_bloom": 0.2,
+			"exposure": 1.08, "saturation": 1.38, "contrast": 0.95, "brightness": 1.06,
 			"magic": 1.0, "lut": ["5a4a86", "e7a9cf", "fffaf2"]},
 		{"id": "grade_starlight_pool_sparkle", "purpose": "Starlight Pool daytime swim: bright sun-glitter, pearly, pastel",
 			"sky_top": "7fb0ff", "sky_horizon": "ffe0f2", "ground_horizon": "fff0e0", "ground_bottom": "a8e3c4",
 			"sun_color": "fff6e2", "sun_energy": 1.6, "ambient_color": "e8e4ff", "ambient_energy": 1.1,
 			"fog_color": "f6eaff", "fog_density": 0.0016, "volumetric_density": 0.008, "volumetric_albedo": "ffffff",
-			"exposure": 1.12, "saturation": 1.4, "contrast": 0.94, "brightness": 1.08, "glow_intensity": 1.25, "glow_bloom": 0.28,
+			"exposure": 1.12, "saturation": 1.4, "contrast": 0.94, "brightness": 1.08,
 			"magic": 1.0, "lut": ["4e5a9a", "a9c8f2", "fffdf6"]},
 		{"id": "grade_fells", "purpose": "Western Fells: airy periwinkle heights, cool pearl haze",
 			"sky_top": "7d9cf0", "sky_horizon": "e6dcff", "ground_horizon": "e9e2f0", "ground_bottom": "9db8a8",
 			"sun_color": "fff2e6", "sun_energy": 1.3, "ambient_color": "dcd8ff", "ambient_energy": 0.95,
 			"fog_color": "e4e0ff", "fog_density": 0.0035, "volumetric_density": 0.016, "volumetric_albedo": "f2f0ff",
-			"exposure": 1.04, "saturation": 1.22, "contrast": 0.97, "brightness": 1.03, "glow_intensity": 0.8, "glow_bloom": 0.14,
+			"exposure": 1.04, "saturation": 1.22, "contrast": 0.97, "brightness": 1.03,
 			"magic": 0.8, "lut": ["4a4e80", "a7a9e0", "fbf9ff"]},
 		{"id": "grade_fae_village", "purpose": "Fae village at lantern-lit dusk: rose-gold sky, warm lanterns",
 			"sky_top": "6f5fb8", "sky_horizon": "ffb38f", "ground_horizon": "f2a7a8", "ground_bottom": "6c5a7a",
 			"sun_color": "ffbf8a", "sun_energy": 0.75, "ambient_color": "e0a8d8", "ambient_energy": 0.85,
 			"fog_color": "f1b7c8", "fog_density": 0.003, "volumetric_density": 0.02, "volumetric_albedo": "ffd9c2",
-			"exposure": 1.05, "saturation": 1.32, "contrast": 0.98, "brightness": 1.02, "glow_intensity": 1.3, "glow_bloom": 0.3,
+			"exposure": 1.05, "saturation": 1.32, "contrast": 0.98, "brightness": 1.02,
 			"magic": 1.0, "lut": ["40306a", "e2919b", "fff1d8"]},
 		{"id": "grade_solstice", "purpose": "Solstice Meadow midsummer day: butter-gold, golden bloom",
 			"sky_top": "86b6ff", "sky_horizon": "fff0b8", "ground_horizon": "ffe9c4", "ground_bottom": "a6d98f",
 			"sun_color": "fff0c4", "sun_energy": 1.55, "ambient_color": "fff0dc", "ambient_energy": 1.05,
 			"fog_color": "fff3d6", "fog_density": 0.002, "volumetric_density": 0.011, "volumetric_albedo": "fff8e8",
-			"exposure": 1.1, "saturation": 1.36, "contrast": 0.95, "brightness": 1.07, "glow_intensity": 1.05, "glow_bloom": 0.22,
+			"exposure": 1.1, "saturation": 1.36, "contrast": 0.95, "brightness": 1.07,
 			"magic": 1.0, "lut": ["5d4d7a", "f2c48f", "fffbea"]},
 		{"id": "grade_solstice_twilight", "purpose": "Solstice Meadow twilight: violet-peach sky, will-o'-the-wisps",
 			"sky_top": "4f4aa8", "sky_horizon": "ff9fb8", "ground_horizon": "d792c4", "ground_bottom": "4f5a6e",
 			"sun_color": "ffaa9a", "sun_energy": 0.45, "ambient_color": "b9a2f0", "ambient_energy": 0.8,
 			"fog_color": "c8a6e6", "fog_density": 0.0035, "volumetric_density": 0.024, "volumetric_albedo": "e8d6ff",
-			"exposure": 1.04, "saturation": 1.3, "contrast": 0.98, "brightness": 1.0, "glow_intensity": 1.45, "glow_bloom": 0.34,
+			"exposure": 1.04, "saturation": 1.3, "contrast": 0.98, "brightness": 1.0,
 			"magic": 1.0, "lut": ["2e2a66", "b27fc8", "ffe6f0"]},
 		{"id": "grade_hill_of_the_rite_dusk", "purpose": "Hill of the Rite at dusk: deep rose sunset, ember gold",
 			"sky_top": "5a4aa0", "sky_horizon": "ff8f7a", "ground_horizon": "e0838e", "ground_bottom": "4a3e58",
 			"sun_color": "ff9c70", "sun_energy": 0.7, "ambient_color": "d08cb8", "ambient_energy": 0.75,
 			"fog_color": "e5939e", "fog_density": 0.0032, "volumetric_density": 0.022, "volumetric_albedo": "ffc9b8",
-			"exposure": 1.02, "saturation": 1.28, "contrast": 1.0, "brightness": 1.0, "glow_intensity": 1.2, "glow_bloom": 0.26,
+			"exposure": 1.02, "saturation": 1.28, "contrast": 1.0, "brightness": 1.0,
 			"magic": 0.9, "lut": ["362a58", "d97a86", "ffe2c8"]},
 		{"id": "grade_rite_calanmai_night", "purpose": "Calanmai night: indigo sky, bonfire gold, heavy glow",
 			"sky_top": "1e1c52", "sky_horizon": "6a3f8f", "ground_horizon": "4a2f66", "ground_bottom": "1c1828",
 			"sun_color": "a9a8ff", "sun_energy": 0.25, "ambient_color": "7a62b8", "ambient_energy": 0.55,
 			"fog_color": "5a3f80", "fog_density": 0.004, "volumetric_density": 0.03, "volumetric_albedo": "ffb48a",
-			"exposure": 1.1, "saturation": 1.25, "contrast": 1.04, "brightness": 0.98, "glow_intensity": 1.6, "glow_bloom": 0.38,
+			"exposure": 1.1, "saturation": 1.25, "contrast": 1.04, "brightness": 0.98,
 			"magic": 1.0, "lut": ["140f30", "8a4f9c", "ffd7a0"]},
 		{"id": "grade_rosewild", "purpose": "Rosewild: rose-pink haze, blush light, oversized blooms",
 			"sky_top": "9aa8ff", "sky_horizon": "ffc6dc", "ground_horizon": "ffd0dc", "ground_bottom": "8fcf98",
 			"sun_color": "ffe8e0", "sun_energy": 1.4, "ambient_color": "ffcfe6", "ambient_energy": 1.0,
 			"fog_color": "ffcfe2", "fog_density": 0.0028, "volumetric_density": 0.016, "volumetric_albedo": "ffe2ee",
-			"exposure": 1.07, "saturation": 1.42, "contrast": 0.95, "brightness": 1.05, "glow_intensity": 1.05, "glow_bloom": 0.22,
+			"exposure": 1.07, "saturation": 1.42, "contrast": 0.95, "brightness": 1.05,
 			"magic": 1.0, "lut": ["5e3a6e", "f09abc", "fff4f6"]},
 		{"id": "grade_blossom_vale", "purpose": "Blossom Vale: cherry-blossom white-pink, pearl sky",
 			"sky_top": "a4c0ff", "sky_horizon": "ffe4f0", "ground_horizon": "fff0f4", "ground_bottom": "a8dca8",
 			"sun_color": "fff4ec", "sun_energy": 1.45, "ambient_color": "ffe6f2", "ambient_energy": 1.05,
 			"fog_color": "ffeaf4", "fog_density": 0.0024, "volumetric_density": 0.013, "volumetric_albedo": "fff6fa",
-			"exposure": 1.1, "saturation": 1.3, "contrast": 0.94, "brightness": 1.08, "glow_intensity": 1.0, "glow_bloom": 0.2,
+			"exposure": 1.1, "saturation": 1.3, "contrast": 0.94, "brightness": 1.08,
 			"magic": 1.0, "lut": ["5a4a80", "f1bcd6", "fffcfa"]},
 		{"id": "grade_autumn_foothills", "purpose": "Autumn Foothills (sealed): amber-crimson glow, honey haze",
 			"sky_top": "8a9ae8", "sky_horizon": "ffcc9a", "ground_horizon": "f2b088", "ground_bottom": "9a6a4a",
 			"sun_color": "ffd2a0", "sun_energy": 1.25, "ambient_color": "ffcfb0", "ambient_energy": 0.9,
 			"fog_color": "f6c8a8", "fog_density": 0.003, "volumetric_density": 0.016, "volumetric_albedo": "ffe2c8",
-			"exposure": 1.05, "saturation": 1.3, "contrast": 0.98, "brightness": 1.03, "glow_intensity": 0.95, "glow_bloom": 0.18,
+			"exposure": 1.05, "saturation": 1.3, "contrast": 0.98, "brightness": 1.03,
 			"magic": 0.8, "lut": ["4a2a3a", "e08a5a", "fff0d8"]},
 		{"id": "grade_blight", "purpose": "Blighted Reaches (HORROR): grey, desaturated, heavy fog, near-dark, low glow",
 			"sky_top": "3e4044", "sky_horizon": "55575a", "ground_horizon": "45474a", "ground_bottom": "1c1d1f",
 			"sun_color": "a8a6a0", "sun_energy": 0.4, "ambient_color": "4a4c50", "ambient_energy": 0.35,
 			"fog_color": "4c4e50", "fog_density": 0.014, "volumetric_density": 0.05, "volumetric_albedo": "5a5c5e",
-			"exposure": 0.82, "saturation": 0.22, "contrast": 1.18, "brightness": 0.86, "glow_intensity": 0.08, "glow_bloom": 0.0,
+			"exposure": 0.82, "saturation": 0.22, "contrast": 1.18, "brightness": 0.86,
 			"magic": 0.0, "lut": ["0c0d0e", "4e5052", "a4a5a6"]},
 	]
 
@@ -183,20 +176,13 @@ func _tame(p: Resource, ramp: PackedColorArray) -> void:
 	p.set("sky_top", (p.get("sky_top") as Color).lerp(Color("7361D1") if golden else Color("6B94FA"), 0.5))
 	p.set("fog_density", minf(float(p.get("fog_density")), FOG_CAP))
 	# Book light (Keeper, lore/08-aesthetic/tone-and-palette.md): rich, warm and
-	# "thick", never glaring. Daylight has no glow but true highlights; dusk and
-	# night keep a soft glow for fires and lanterns. Vibrancy is colour contrast.
+	# "thick", never glaring. Vibrancy is colour contrast.
 	if golden:
 		p.set("cloud_cover", GOLDEN_CLOUDS)
 		p.set("cloud_color", GOLDEN_CLOUD_COLOR)
 		p.set("cloud_shade", GOLDEN_CLOUD_SHADE)
-		p.set("glow_intensity", NIGHT_GLOW)
-		p.set("glow_bloom", NIGHT_BLOOM)
-		p.set("glow_hdr_threshold", NIGHT_THRESHOLD)
 	else:
 		p.set("cloud_cover", DAY_CLOUDS)
-		p.set("glow_intensity", DAY_GLOW)
-		p.set("glow_bloom", 0.0)
-		p.set("glow_hdr_threshold", DAY_THRESHOLD)
 		p.set("magic", minf(float(p.get("magic")), DAY_MAGIC))
 		p.set("fog_color", DEPTH_HAZE.lerp(p.get("fog_color"), DEPTH_TINT))
 		p.set("volumetric_albedo", DEPTH_VOLUMETRIC.lerp(p.get("volumetric_albedo"), DEPTH_TINT))
@@ -235,17 +221,17 @@ func _build_grades() -> int:
 	md.append("RegionGrade  grade = &\"grade_rosewild\"  bounds = Rect2(-600, -800, 1100, 300)  blend_seconds = 4.0")
 	md.append("```\n")
 	md.append("`lut` is an embedded GradientTexture1D (dark, mid, light): a gentle pastel colour-correction ramp,")
-	md.append("no image files. Recommended GradeDirector Environment for all of these: tonemap AgX, glow on")
-	md.append("(hdr threshold 1.4 by day, 1.1 at dusk/night, no bloom wash by day), fog + volumetric fog on, SDFGI on, SSAO on at intensity ~0.8.")
+	md.append("no image files. Recommended GradeDirector Environment for all of these: tonemap AgX, the World's")
+	md.append("light-source-only glow (no grade sets glow), fog + volumetric fog on, SDFGI on, SSAO on at intensity ~0.8.")
 	md.append("grade_blight is horror: keep it grey and silent, never tone it down.\n")
-	md.append("| id | purpose | sky top / horizon | sun colour, energy | fog colour, density, volumetric | exposure | saturation | contrast | glow int / bloom | magic |")
-	md.append("|---|---|---|---|---|---|---|---|---|---|")
+	md.append("| id | purpose | sky top / horizon | sun colour, energy | fog colour, density, volumetric | exposure | saturation | contrast | magic |")
+	md.append("|---|---|---|---|---|---|---|---|---|")
 	for r: Dictionary in rows:
 		var p: Resource = script.new()
 		p.set("id", StringName(r["id"]))
 		for key: String in ["sky_top", "sky_horizon", "ground_horizon", "ground_bottom", "sun_color", "ambient_color", "fog_color", "volumetric_albedo"]:
 			p.set(key, _c(r[key]))
-		for key: String in ["sun_energy", "ambient_energy", "fog_density", "volumetric_density", "exposure", "saturation", "contrast", "brightness", "glow_intensity", "glow_bloom", "magic"]:
+		for key: String in ["sun_energy", "ambient_energy", "fog_density", "volumetric_density", "exposure", "saturation", "contrast", "brightness", "magic"]:
 			p.set(key, float(r[key]))
 		p.set("snow_cover", 0.0)
 		var lut_cols: Array = r["lut"]
@@ -262,10 +248,10 @@ func _build_grades() -> int:
 		gt.width = 256
 		p.set("lut", gt)
 		_save(p, FX + "grades/" + String(r["id"]) + ".tres")
-		md.append("| %s | %s | #%s / #%s | #%s, %.2f | #%s, %.4f, %.3f | %.2f | %.2f | %.2f | %.2f / %.2f | %.1f |" % [
+		md.append("| %s | %s | #%s / #%s | #%s, %.2f | #%s, %.4f, %.3f | %.2f | %.2f | %.2f | %.1f |" % [
 			r["id"], r["purpose"], r["sky_top"], r["sky_horizon"], r["sun_color"], p.get("sun_energy"),
 			(p.get("fog_color") as Color).to_html(false), p.get("fog_density"), p.get("volumetric_density"), p.get("exposure"), p.get("saturation"),
-			p.get("contrast"), p.get("glow_intensity"), p.get("glow_bloom"), r["magic"]])
+			p.get("contrast"), r["magic"]])
 	md.append("\nSuggested region mapping: starlight_glen -> grade_starlight_glen_day (Starlight Pool area:")
 	md.append("grade_starlight_pool_sparkle, a daytime swim), western_fells -> grade_fells, fae_village ->")
 	md.append("grade_fae_village, solstice_meadow -> grade_solstice (story swap to grade_solstice_twilight for the")

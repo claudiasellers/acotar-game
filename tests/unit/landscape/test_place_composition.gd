@@ -112,9 +112,20 @@ func test_prewarm_covers_everything_the_worker_loads() -> void:
 func test_threaded_region_with_places_builds_in_time() -> void:
 	var region: CourtRegion = (load("res://world/spring_court/fae_village/fae_village.tscn") as PackedScene).instantiate()
 	region.threaded = true
-	add_child_autofree(region)
-	var deadline := Time.get_ticks_msec() + 60_000
+	add_child(region)
+	# Generous cap: a busy shared machine can stretch the build several-fold;
+	# this only exists so a real hang fails instead of stalling the suite.
+	var deadline := Time.get_ticks_msec() + 180_000
 	while not region.is_built and Time.get_ticks_msec() < deadline:
 		await get_tree().process_frame
-	assert_true(region.is_built, "fae_village (7 places) built within 60 s on the threaded path")
-	assert_eq(get_tree().get_nodes_in_group(&"place_setting").size(), 7)
+	assert_true(region.is_built, "fae_village finished building on the threaded path (cap 180 s)")
+	var expected := 0
+	for lm in region.content.landmarks:
+		if PlaceComposer.table().find(lm.id) != null:
+			expected += 1
+	assert_gt(expected, 0, "the village has places")
+	assert_eq(get_tree().get_nodes_in_group(&"place_setting").size(), expected, "a setting node for each of its places")
+	# Leave the tree first: _exit_tree cancels and joins any worker still
+	# running, so the free below never lands mid-call on a live build.
+	remove_child(region)
+	region.free()

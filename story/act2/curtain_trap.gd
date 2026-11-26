@@ -369,7 +369,7 @@ func _open_curtains(_s: SceneSpace) -> void:
 	if alis:
 		alis.global_position = mark(&"curtains_floor")
 	StoryControl.set_focus(_marker(&"curtains"))
-	EventBus.mood_requested.emit(&"calm", 0.0, 2.0)
+	EventBus.mood_requested.emit(self, &"calm", 0.0, 2.0)
 	if is_inside_tree():
 		Juice.burst(null, &"unlock", mark(&"curtains"))
 

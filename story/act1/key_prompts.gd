@@ -5,9 +5,15 @@
 ##   E  check the snare at her empty snare on the doe trail (OpeningHunt)
 ##   E  pick up the arrow  beside a stuck or fallen arrow
 ##   Ctrl crouch        standing, within 70 m of the doe clearing
-##   Shift steady your breath  nocked in the wolf hunt once he's seen (Focus)
-##   Q  ash arrow       the doe or the great wolf is near and the ash arrow isn't nocked
-##   RMB aim, LMB draw and let go  prey is near or the hunt is on, until her first shot
+##   Q  ash arrow       the doe or the great wolf is near and the ash arrow isn't the one chosen
+##   LMB draw and let go, RMB a closer view  prey is near, until her first shot
+##   The great wolf, from the moment she sees him, one key at a time, each
+##   until she has used it there (whatever she learnt before him):
+##     Q  switch to the ash arrow    while it isn't the arrow chosen
+##     LMB hold to draw, let go to shoot   until her first arrow at him
+##     Shift steady your breath  with an arrow on the string (Focus)
+##   He never comes for her, so no sidestep or knife is named here: those
+##   show in a fight where they would save her (Feyre, StrikeController).
 ##   E  skin            standing over the great wolf's carcass
 ##   E  sell the pelt   at the fur stall with Andras's pelt
 ##   E  sleep           at the ironwood bed once the pelt is sold, by day
@@ -90,6 +96,8 @@ func _learn(delta: float) -> void:
 		_hints.learn(&"crouch")
 	if feyre.bow_controller and feyre.bow_controller.is_focused:
 		_hints.learn(&"focus")
+	if _facing_the_wolf() and feyre.bow_controller and feyre.bow_controller.selected == &"arrow_ash":
+		_hints.learn(&"wolf_ash")
 	for hunt in get_tree().get_nodes_in_group(OpeningHunt.GROUP):
 		if (hunt as OpeningHunt).snare_checked:
 			_hints.learn(&"snare")
@@ -109,7 +117,10 @@ func want() -> StringName:
 	var at := feyre.global_position
 	if not _fire_hooked:
 		_fire_hooked = true
-		feyre.arrow_fired.connect(func(_a: Node) -> void: _hints.learn(&"draw"))
+		feyre.arrow_fired.connect(func(_a: Node) -> void:
+			_hints.learn(&"draw")
+			if _facing_the_wolf():
+				_hints.learn(&"wolf_draw"))
 	# The decision has no flag of its own: watch the door's beat.
 	for door in get_tree().get_nodes_in_group(BeastDoor.GROUP):
 		if (door as BeastDoor).running and (door as BeastDoor).current_beat_label().begins_with("decision"):
@@ -137,9 +148,15 @@ func want() -> StringName:
 		_by_arrow = true
 		if _hints.teaches(&"retrieve"):
 			return &"retrieve"
-	if _hints.teaches(&"focus") and _hunting and WorldState.has_flag("fact.wolf_spotted") \
-			and feyre.bow_controller and feyre.bow_controller.is_nocked:
-		return &"focus"
+	if _facing_the_wolf() and feyre.bow_controller:
+		var bow := feyre.bow_controller
+		if _hints.teaches(&"wolf_ash") and bow.selected != &"arrow_ash" \
+				and Gameplay.inventory.arrow_count(&"arrow_ash") > 0:
+			return &"wolf_ash"
+		if _hints.teaches(&"wolf_draw") and bow.can_shoot() and Gameplay.inventory.arrow_count() > 0:
+			return &"wolf_draw"
+		if _hints.teaches(&"focus") and bow.is_nocked:
+			return &"focus"
 	if _hints.teaches(&"ash") and feyre.bow_controller:
 		if feyre.bow_controller.selected == &"arrow_ash":
 			_hints.learn(&"ash")
@@ -149,7 +166,7 @@ func want() -> StringName:
 					if _near(prey, at, NEAR_PREY):
 						return &"ash"
 	if _hints.teaches(&"draw") and feyre.bow_controller and StoryControl.can_shoot() \
-			and Gameplay.inventory.arrow_count() > 0 and (_hunting or _prey_near(at)):
+			and Gameplay.inventory.arrow_count() > 0 and _prey_near(at):
 		return &"draw"
 	if _hints.teaches(&"crouch") and not feyre.crouch.crouched \
 			and not WorldState.has_flag("fact.wolf_spotted") \
@@ -160,6 +177,11 @@ func want() -> StringName:
 	if _hints.teaches(&"look") and _control >= LOOK_AFTER:
 		return &"look"
 	return &""
+
+
+## The wolf hunt is on and she has seen him.
+func _facing_the_wolf() -> bool:
+	return _hunting and WorldState.has_flag("fact.wolf_spotted")
 
 
 func _prey_near(at: Vector3) -> bool:

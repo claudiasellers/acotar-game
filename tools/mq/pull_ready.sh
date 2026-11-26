@@ -87,8 +87,31 @@ push_result() { # sigf tagname message
 	fi
 }
 
+# Pushes the complete failing log as an orphan commit on mq/rej-<key>. Prints
+# the "Full log:" line on success and nothing otherwise (MQ_PUSH=0, push failed).
+publish_rej() { # key diag-file full-file batch-file
+	local key="$1" idx tree commit f blob d
+	[ "$(mq_config_or MQ_PUSH 1)" = 1 ] || return 0
+	d=$(mktemp -d "${TMPDIR:-/tmp}/rej.XXXXXX") || return 0
+	[ -f "$3" ] && cp "$3" "$d/failing.log" || echo "(no log was kept)" > "$d/failing.log"
+	[ -s "$2" ] && cp "$2" "$d/diagnosis.txt" || echo "(no diagnosis)" > "$d/diagnosis.txt"
+	[ -f "$4" ] && cp "$4" "$d/batch.txt" || echo "(no batch information)" > "$d/batch.txt"
+	idx="$d.idx"
+	for f in failing.log diagnosis.txt batch.txt; do
+		blob=$(git hash-object -w "$d/$f") &&
+			GIT_INDEX_FILE="$idx" git update-index --add --cacheinfo "100644,$blob,$f" || { rm -rf "$d" "$idx"; return 0; }
+	done
+	tree=$(GIT_INDEX_FILE="$idx" git write-tree); rm -rf "$d" "$idx"
+	commit=$(GIT_AUTHOR_NAME="ACOTAR build lane" GIT_AUTHOR_EMAIL="mq@localhost" GIT_COMMITTER_NAME="ACOTAR build lane" \
+		GIT_COMMITTER_EMAIL="mq@localhost" git commit-tree "$tree" -m "rejection log $key") || return 0
+	if mq_timeout "$NET" git push -q "$REMOTE" "$commit:refs/heads/mq/rej-$key" 2>/dev/null; then
+		"$here/mark.sh" add remote_branch "mq/rej-$key" 1209600 "rejection log for $key"
+		echo "Full log: git fetch origin mq/rej-$key && git show FETCH_HEAD:failing.log"
+	fi
+}
+
 answer() { # sigf
-	local f="$1" key sha st entry msg m
+	local f="$1" key sha st entry msg m line
 	st=$(kv_get "$f" state)
 	key=$(kv_get "$f" key); sha=$(kv_get "$f" sha); entry=$(kv_get "$f" entry)
 	case "$st" in
@@ -108,12 +131,20 @@ Start the next slice from $REMOTE/main, not from this branch."
 	elif [ -n "$entry" ] && [ -f "$MQ_DIR/done/rejected/$entry.entry" ]; then
 		msg="$(kv_get "$MQ_DIR/done/rejected/$entry.entry" reason)
 Merge origin/main, fix it, and push the next number; tags are never reused."
+		if [ -s "$MQ_DIR/done/rejected/$entry.diag" ]; then
+			msg="$(cat "$MQ_DIR/done/rejected/$entry.diag")
+
+$msg"
+		fi
 		if [ -f "$MQ_DIR/done/rejected/$entry.log" ]; then
 			msg="$msg
 
 End of the failing test's log:
 $(tail -30 "$MQ_DIR/done/rejected/$entry.log")"
 		fi
+		line=$(publish_rej "$key" "$MQ_DIR/done/rejected/$entry.diag" "$MQ_DIR/done/rejected/$entry.full" "$MQ_DIR/done/rejected/$entry.batch")
+		[ -n "$line" ] && msg="$line
+$msg"
 		push_result "$f" "rejected/$key" "$msg"
 	fi
 }

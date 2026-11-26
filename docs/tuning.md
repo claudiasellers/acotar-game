@@ -43,7 +43,7 @@ direct highlight), `CANDY_LOBES`/`CANDY_COAT` (per-pixel light rim and clearcoat
 | Tunable | Where | Default | Range | What it does | Lane |
 |---|---|---|---|---|---|
 | `GameSettings.shadow_profile` | systems/settings/game_settings.gd:SHADOW_PROFILES (`--shadow-profile=` user arg) | auto (mac on Apple silicon: 2048 atlas / 2 splits / 160 m; high: 4096 / 4 splits / 220 m) | high, mac | Sun shadow crispness and reach on world-scale suns (shadow distance ≥150 m) | L57 |
-| `manor_interior` fog/volumetric density, glow, ambient_color, saturation | world/shared/grades/manor_interior.tres | fog 0, volumetric 0, glow 0.3 / bloom 0 / threshold 1.4, ambient (0.92, 0.90, 0.88), saturation 1.05 | volumetric 0..0.008 | Clear indoor air; raise volumetric_density for haze | T075 |
+| `manor_interior` fog/volumetric density, ambient_color, saturation | world/shared/grades/manor_interior.tres | fog 0, volumetric 0, ambient (0.92, 0.90, 0.88), saturation 1.05 | volumetric 0..0.008 | Clear indoor air; raise volumetric_density for haze | T075 |
 | `manor_interior` ambient / tone mapper | world/shared/grades/manor_interior.tres | no GI; ambient_color (0.92, 0.90, 0.88) flat (sky contribution 0.0), energy 0.25 (was 1.1: the dining hall clipped 37–39% of pixels, L18-12/13; nothing in the rooms self-lights any more), contrast 1.05; tonemap = the manor's (ACES) so nothing pops at a doorway | energy 0.15..0.6 | The ambient is a fill; windows, lamps and hero lights model the rooms. Check greyscale clipping (>235) before raising it. SDFGI is never on indoors (T117) | T117, L18 |
 | `night_look` / `manor_interior_night` | grade_preset.gd; world/shared/grades/manor_interior_night.tres | manor_interior → manor_interior_night by GradeDirector.night; night ambient (0.9, 0.8, 0.78) × 0.13, glow 0.45 / threshold 1.0 | preset id or empty | After dark the rooms' lamps carry the light (pools, falloff) instead of the day's fill; outdoor grades have none | L18 |
 
@@ -58,10 +58,10 @@ thrown back up into the shade band. Probe: `tools/lighting/bounce_probe.tscn`.
 | `ambient_light_source` | world/shared/world/world.tscn | SKY (3) (unchanged) | | Ambient from the sky's radiance, not a flat colour | L60 |
 | `reflected_light_source` | world.tscn | SKY (2) (unchanged) | | Reflections from the sky | L60 |
 | `ambient_light_sky_contribution` | world.tscn; GradePreset default (every grade but `manor_interior`) | 0.7 (was 0.6) | 0–1 | Sky share of the ambient; the rest is the grade's `ambient_color`. `manor_interior` uses 0.0, a flat ambient (T117) | L60 |
-| `ssao_radius` / `ssao_intensity` | world.tscn, BounceLight.SSAO_RADIUS / SSAO_INTENSITY | 1.0 / 1.2 (were 1.5 / 1.5) | 0.01–16 / 0–16 | Contact shadow in corners and under things; ambient only | L60 |
-| SSAO quality | BounceLight.apply (RenderingServer) | medium, half size (Godot's defaults) | | Global to the renderer | L60 |
-| `ssil_enabled` | BounceLight.SSIL_PROFILES | on for `high`, off for `mac` (GameSettings.shadow_profile_name()) | | Screen-space colour bleed; `BOUNCE_SSIL=0/1` forces it for a perf pass | L60 |
-| SSIL quality / `ssil_radius` / `ssil_intensity` | BounceLight | low, half size / 5.0 / 1.0 (Godot's defaults but quality) | | Cost and reach of the bleed | L60 |
+| `ssao_radius` / `ssao_intensity` | GradeDirector.SSAO_RADIUS / SSAO_INTENSITY | 1.0 / 1.2 (were 1.5 / 1.5) | 0.01–16 / 0–16 | Contact shadow in corners and under things; ambient only | L60 |
+| SSAO quality | GradeDirector.screen_space_bounce (RenderingServer) | medium, half size (Godot's defaults) | | Global to the renderer | L60 |
+| `ssil_enabled` | GradeDirector.SSIL_PROFILES | on for `high`, off for `mac` (GameSettings.shadow_profile_name()) | | Screen-space colour bleed; `BOUNCE_SSIL=0/1` forces it for a perf pass | L60 |
+| SSIL quality / `ssil_radius` / `ssil_intensity` | GradeDirector.screen_space_bounce | low, half size / 5.0 / 1.0 (Godot's defaults but quality) | | Cost and reach of the bleed | L60 |
 | SDFGI outdoors | GradePreset.sdfgi (off outdoors) | off | | Not enabled: waits for the Mac measurement with volumetric fog (`BOUNCE_SDFGI=1 make perf`) | L60 |
 | `ground_bounce` | candy_lit.gdshaderinc (`CANDY_BOUNCE_DEFAULT`) | 0.35; 0.0 on the manor's room shells (boiserie, plaster_ceiling, sky_ceiling: the flat interior ambient lights the rooms) | 0–1 | Bounce strength. Directional lights only, scaled by the light's height over the horizon and by how much the face looks down (1 down, 0.5 sideways, 0 up); the surface's own shadow does not block it; the lit band does not take it | L60 |
 | `ground_bounce_color` | candy_lit.gdshaderinc | (0.523, 0.548, 0.545) sRGB | colour | Mean albedo of the 11 terrain textures, equal weights, averaged in linear light (`tools/lighting/terrain_albedo_average.gd`). Per texture: snow (0.79,0.83,0.91), frozen_earth (0.42,0.39,0.37), rock (0.48,0.50,0.56), winter_grass (0.62,0.59,0.45), spring_grass (0.27,0.36,0.21), moss (0.22,0.43,0.30), forest_floor (0.40,0.31,0.24), path (0.50,0.40,0.31), riverbed (0.50,0.52,0.52), blight (0.46,0.44,0.48), ice (0.72,0.86,0.92). Snow and ice make it near-neutral; a greener Spring bounce is an art-direction call | L60 |
@@ -98,7 +98,11 @@ the book's shapes; anything else here is taste.
 | Depth haze, court by day | world/spring_court/wider/fx/tools/build_court_fx.gd `DEPTH_*` | haze (0.70,0.74,0.96), tint 0.25, density 0.0005 (was 0.0011), volumetric 0.0008 (was 0.002), aerial 0.1, sky affect 0.1 | tint 0–0.5; density 0.0004–0.0008 | The same layering in each daytime region grade, keeping a quarter of the region's own fog hue. Dusk, night and the blight keep their own fog. | wider-court-world |
 | Day light, court | build_court_fx.gd `DAY_EXPOSURE_CAP` | 0.6 (was 0.8) | 0.55–0.7 | Clear colours by day (owner, 2026-11-16: "clear colors and not have it look misty or washed out or overly bright"). The court's day grades stood a third brighter than the estate's (sun x exposure 1.29 against the manor grade's 0.94), so every pale leaf, bank and stretch of water went to white. At 0.6 they stand at the estate's light (0.97). Dusk and night grades keep 0.8. A day grade's own evening and night come down with it: clear and readable in the renders (clear-2, clear-4). | wider-court-world |
 | Day ramp, court | build_court_fx.gd `DAY_LUT_STRENGTH` | 0.075 (was 0.3) | 0.05–0.15 | How far a day grade's colour ramp pulls from identity. At 0.3 black sat at 0.1 and the middle at 0.6: a veil over everything. At 0.075 the shadows keep their lilac and black is 0.026. Dusk and night grades keep 0.3. | wider-court-world |
-| Day contrast and glow, court | build_court_fx.gd `DAY_CONTRAST`, `DAY_GLOW` | 1.16 (was 1.12); 0.1 (was 0.3) | 1.12–1.2; 0–0.3 | A step more contrast by day; the glow on true highlights only just there. | wider-court-world |
+| Day contrast, court | build_court_fx.gd `DAY_CONTRAST` | 1.16 (was 1.12) | 1.12–1.2 | A step more contrast by day. | wider-court-world |
+| Light-source glow (the only glow) | world/shared/grades/grade_director.gd `GLOW_THRESHOLD`, `GLOW_INTENSITY`, `GLOW_LUMINANCE_CAP`, `GLOW_LEVELS`; `light_source_glow()` | raw HDR threshold 2.6, screen 0.35, luminance cap 3.5, levels 2–4 (0.6, 1.0, 0.4), bloom 0 | threshold 2.2–3.0 | Owner 11-25: "normal". Only emission well above white (flames, lamps, faelights, eyes, sparkles) blooms; a sunlit pastel (≤ ~2.0 raw) stays crisp. No grade or mood sets glow. | soft-light |
+| Pearl rim (manor whites) | world/spring_court/manor_estate/shared/estate_kit.gd `PEARL_RIM` | 0.15 (was 0.6), rim_tint 0.7 | 0–0.3 | The faint sheen on pearl frames, columns and trim; at 0.6 every white edge read as a glowing outline. | soft-light |
+| Furniture finishes | world/spring_court/manor_estate/props/prop_finish.gdshaderinc finish table; props/shapes/prop_mats.gd (the same numbers) | roughness: matte 0.85, satin 0.62, fabric 0.95, gilt 0.42, china/marble 0.5, leaf 0.75; no clearcoat or rim on any of them (were satin 0.42 + coat 0.3, fabric rim 0.18, gilt 0.3 + rim 0.3, pearl 0.18 + coat 0.7 + rim 0.6, leaf rim 0.35); glass 0.08, coat 0.6, rim 0.15; albedo cap 0.85 | roughness 0.4–0.95; coat and rim stay 0 off glass | What furniture is made of, lit by the room alone (owner, 2026-11-25: "almost like a glow or a gloss to them that i dont like"). Only glass, mirror and water are glossy; only flames and faelights emit. | manor-matte |
+| Light rim reach | world/shared/shaders/candy_lit.gdshaderinc light rim lobe (`v_rim`) | × ATTENUATION (was unattenuated) | — | A rim comes from a light, so it fades with distance and stops at the light's cone and shadow. Unattenuated, every lamp within range rimmed a surface at full energy: a room of candles self-lit its furniture. | manor-matte |
 | Water colours | world/spring_court/wider/fx/shaders/court_water.gdshader `shallow_color`, `deep_color` | aqua (0.30,0.70,0.74) over azure (0.16,0.44,0.76); were mint (0.62,0.93,0.88) over periwinkle (0.52,0.56,0.92) | | The lakes', brooks' and river's own colour. Azure, not periwinkle: the sky and the Weeping Lady are periwinkle, and the water has to stand apart from both. The Starlight Pool keeps its own (navy under teal). | wider-court-world |
 | Water at low angles | court_water.gdshader `fresnel_color`, `sheen`, `mirror`, `roughness_value` | sky blue (0.46,0.72,0.95), 0.4, 0.2, 0.1; were pink (1.0,0.86,0.94), 0.6, 0.6, 0.06 | sheen 0.3–0.6; mirror 0.15–0.3 | Seen along the surface a lake was a sheet of the pale pink horizon. `sheen` is how far the surface goes to the sheen colour at the lowest angle; `mirror` is SPECULAR, and the most of the sky the surface gives back is about 50 x 0.16 x mirror² (0.32 at 0.2, all of it from 0.36 up). At night the pool keeps 0.6 and 0.24. The Starlight Pool's sheen is (0.38,0.54,0.92). | wider-court-world |
 | Foam line | court_water.gdshader `foam_width`, `foam_strength` | 0.14 m, 0.6 (were 0.45, 0.8) | 0.1–0.3 | The depth of water, along the view, the foam fades over. On the eased lake shores 0.45 was a white band metres wide. The river keeps its strength 1.0. | wider-court-world |
@@ -208,29 +212,34 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 
 | Tunable | Where | Default | Range | What it does | Lane |
 |---|---|---|---|---|---|
-| `draw_time` | data/bows/*.tres (BowData) | hunting 0.3 s; fae 0.2, gilded 0.25, yew 0.4, warbow 0.55 | 0.1–0.8 s | Seconds of holding fire (LMB / RT) to draw the string. Releasing at full draw looses a full-power arrow; earlier lets the string down. No weak shots | L80 |
+| `draw_time` | data/bows/*.tres (BowData) | hunting 0.2 s; fae 0.14, gilded 0.17, yew 0.27, warbow 0.37 | 0.1–0.8 s | Seconds from the press of fire (LMB / RT) to a full draw. Every arrow leaves at full power: on letting go at full draw, or, if she let go sooner (a quick click), the moment the draw completes. A click during the follow-through is the next arrow. Measured: a 0.05 s click looses at 200 ms at 48 m/s | L80 |
+| `true_range` | data/bows/*.tres (BowData) | hunting 30 m; fae 34, yew 38, gilded 40, warbow 45 | 20–60 m | Metres the arrow flies dead straight to the crosshair (gravity and wind have no share for `true_range / max_speed` seconds); past it the arrow drops and the crosshair shows a bar where it will fall | L80 |
+| `gravity_blend_s` | bow_tuning.tres | 0.4 s | 0.2–0.8 | Past the true range, gravity and wind ease in over this long, so the drop begins gently | L80 |
 | `kick_degrees` | data/bows/*.tres (BowData) | hunting 0.35; yew 0.35, fae 0.2, warbow 0.6, gilded 0.3 | 0–1 | Camera kick on release; off under Reduced Effects | L80 |
 | `follow_through_s` | data/bows/bow_tuning.tres (BowTuning) | 0.25 | 0.15–0.4 | Seconds after a shot before the next draw can start: shot-to-shot rhythm | L80 |
-| `release_buffer_s` | bow_tuning.tres | 0.15 | 0.1–0.2 | A release this close to full draw still looses, at full draw | L80 |
-| `settle_s` / `settle_floor` | bow_tuning.tres | 0.6 / 0.35 | 0.3–1.0 / 0.2–0.6 | Sway falls from 1.0 to the floor over this long held still: the reward for patience | L80 |
-| `settle_reset_turn_dps` / `unsettle_rate` | bow_tuning.tres | 30 / 3.0 | 15–60 / 1–6 | Turning faster than this (deg/s) or moving unsettles the aim, at this rate per second | L80 |
-| `settle_after_shot` | bow_tuning.tres | 0.7 | 0.35–1.0 | A shot's recoil leaves the aim at least this unsettled | L80 |
-| `fatigue_after_s` / `fatigue_rate` / `fatigue_max` | bow_tuning.tres | 3.0 / 0.25 / 2.0 | | How long a full draw holds before the arm trembles, how fast, and the cap | L80 |
+| `stay_up_s` | bow_tuning.tres | 1.6 | 1–3 | Seconds the bow stays in her hands after the last shot or hold | L80 |
+| `BowVisual.SWING_SPEED` | systems/bow/bow_visual.gd | 6 per second (about 0.17 s up or down) | 4–10 | How fast the bow comes up into her hands and goes back down, on real time | L80 |
+| `BowVisual.DRAW_SWING_SPEED` | systems/bow/bow_visual.gd | 20 per second (0.05 s up) | 12–30 | How fast the bow comes up when a press of fire starts a draw, so the whole draw is seen and nothing reads as a wait before it. The arrow is on the string from the moment the bow leaves her back | L80 |
+| `BowVisual.READY_HOLD` | systems/bow/bow_visual.gd | 2.5 s | 1.5–4 | Seconds the bow stays in her hands after she changes or makes an arrow without drawing | L80 |
+| `steady_body` / `steady_tremor` | bow_tuning.tres | 2.2 / 0.45° | 1.6–3.0 / 0.3–0.8 | Her hands are steady, and the arrow goes exactly to the crosshair, until BodyState's sway multiplier passes `steady_body` or its tremor passes `steady_tremor`. Hungry (0.55) and cold (0.5) in the winter wood is inside both; frozen and starving, venom or a roar are not. Walking, turning and shooting from the hip never add sway | L80 |
+| `Arrow.CATCH_RADIUS` | systems/bow/arrow.gd | 0.15 m | 0.08–0.25 | How near a creature's body the arrow's line may pass and still strike it; the crosshair's aim point reaches for creatures by the same margin. World geometry still stops only the arrow's point | L80 |
+| `FeyreCamera.AIM_KEEP_S` | characters/feyre/camera/feyre_camera.gd | 0.6 s | 0.4–1.0 | While the bow is up and this long after, a shoulder change turns the camera so the middle of the screen stays on the same thing (measured: 0.007 m of drift at 35 m from press to full draw) | L80 |
+| `CreatureSenses.RELEASE_HEAD_START` / `RELEASE_ARROW_PACE` | creatures/senses/creature_senses.gd | 0.15 s / 30 m/s | 0–0.4 / 20–45 | A creature hears the bow's release this long after it plus its distance at this pace, so an arrow aimed at unaware prey arrives first. The chapter 1 rabbit keeps its own staged bolt (OpeningHunt) | L80 (L75's file) |
+| `FeyreCamera.HIP_SHOULDER` | characters/feyre/camera/feyre_camera.gd | 0.85 m (aim held: `AIM_SHOULDER` 0.55) | 0.7–1.1 | How far over her right shoulder the lens sits with the bow up and no aim held, on the full arm; it shrinks to the aim offset on a short arm. Sets how far the ring stands from her body | L80 |
+| `HIP_RING_CLEAR_PX` | tests/unit/characters/test_hip_framing.gd | 64 px at 1080 high (measured 93–104; was 41–47 at 0.55) | 48–96 | The least distance on screen between her capsule's right edge and the crosshair from the hip, at rest, at full draw and looking down | L80 |
+| `fatigue_after_s` / `fatigue_rate` / `fatigue_max` | bow_tuning.tres | 3.0 / 0.25 / 2.0 |  | How long a full draw holds before the arm trembles, how fast, and the cap: up to (max − 1) of the bow's own sway | L80 |
 | `hold_drain` | bow_tuning.tres | 6/s | 0–10 | Stamina per second while the arm trembles | L80 |
-| `stance_*` | bow_tuning.tres | still 1.0, crouched 0.8, walking 1.6, crouch-walking 1.3 | | Sway multiplier by stance | L80 |
-| `breath_low` / `breath_winded` (+tremor) | bow_tuning.tres | 1.5 below 25% stamina / 2.0 + 0.4° winded | | Stamina's tie to aim | L80 |
+| `breath_low` / `breath_winded` (+tremor) | bow_tuning.tres | 1.5 below 25% stamina / 2.0 + 0.4° winded |  | Stamina's tie to aim: each adds (value − 1) of the bow's own `sway_degrees` (hunting 1.5°: 0.75° low, 1.5° + 0.4° winded) | L80 |
 | `focus_scale` | bow_tuning.tres | 0.4 | 0.25–0.6 | Time scale while Focus is held (TimeScale request `bow_slow`) | L80 |
 | `focus_drain` / `focus_dread_drain` | bow_tuning.tres | 28/s real / 0.5 | 18–40 | Stamina per real second of Focus, times (1 + 0.5 × dread) | L80 |
 | `focus_sway` / `focus_sway_panic` / `panic_dread` | bow_tuning.tres | 0.4 / 0.6 / 0.6 | | How steady Focus is, and above what dread it's the shakier kind | L80 |
-| `focus_settle_speed` | bow_tuning.tres | 2.0 | 1–3 | Settle runs this much faster in Focus | L80 |
 | `focus_hold_after_release_s` | bow_tuning.tres | 0.3 | 0–0.5 | The hush holds this long after a Focused shot | L80 |
 | `fov_raised` / `fov_focus` | bow_tuning.tres | −10 / −16 | | FOV change from 70 while raised and while Focused (MovementFeel applies it) | L80 |
 | `aim_sensitivity` | bow_tuning.tres | 0.7 | 0.4–1.0 | Look speed while the bow is raised | L80 |
 | `kick_rise_s` / `kick_fall_s` | bow_tuning.tres | 0.06 / 0.15 | | Timing of the release kick | L80 |
-| `ring_unsettled_grow` | bow_tuning.tres | 0.3 | 0–0.5 | The reticle ring is this much larger while fully unsettled | L80 |
 | `draw_kept_when_hit` | bow_tuning.tres | 0.5 | 0–1 | Share of the draw she keeps when a blow lands (the arrow stays nocked) | L80 |
-| `draw_arc_gap` / `full_draw_catch_s` | bow_tuning.tres | 5 px / 0.18 s | 3–8 / 0.1–0.3 | The reticle's draw arc sits this far outside the ring and brightens this long when the draw closes: the cue for "now you can let go" | L80 |
-| `hit_pulse_s` | bow_tuning.tres | 0.22 s | 0.15–0.35 | The ring's one pulse (act accent) when her arrow finds a creature; off with Hit marks. Same pulse for every part of the body | L80 |
+| `full_draw_catch_s` | bow_tuning.tres | 0.18 s | 0.1–0.3 | The crosshair's ring, which closes from 13 px to 7 px as she draws (`AimReticle.RADIUS_OPEN` / `RADIUS_DRAWN`), thickens this long when the draw is full | L80 |
+| `hit_pulse_s` | bow_tuning.tres | 0.22 s | 0.15–0.35 | The crosshair's one pulse (act accent) when her arrow finds a creature; off with Hit marks. Same pulse for every part of the body | L80 |
 | `hush_duck_db` / `hush_fade_s` | bow_tuning.tres | -12 dB / 0.12 s | -18–-6 / 0.08–0.3 | The Focus hush: the Ambience bus's amplify drops this far and its low-pass closes to 800 Hz, over this long | L80 |
 
 ## White mare saddle and seat (L47-8)
@@ -269,7 +278,7 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | `TitleChoice` / `PageChoice` | `ui/theme/journal_theme.gd` | 40 px Marcellus `paper`, `glow` in focus, 6 px `ink` edge / 28 px Marcellus `ink`, `accent` in focus | 34–44 / 24–30 | the title's menu; a story on the first page | L77 |
 | `ClosedBook.SIZE` / `LIFT_SECONDS` / `ROSE_REACH` / `WHORLS` | `ui/title/closed_book.gd` | 700 x 800 px / 1.1 s / 136 px / 64 | / 0.8–1.5 / 110–150 / 40–90 | the shut book's boards, how long the cover takes to lift, the rose's ring of thorns, the stars on the endpaper | L77 |
 | `TitleScreen.BAND_PAD` | `ui/title/title_screen.gd` | 64 x 44 px | 40–90 / 30–60 | how far the smear under the title's menu reaches past the type | L77 |
-| `AimReticle.RING` / `RING_MISS` / `LINE` | `ui/aim_reticle.gd` | `glow` at 0.95 / `paper` at 0.45 / first wash at 0.35 | | the ring where the arrow lands, where it won't, and the line down to it | L77 |
+| `AimReticle.RING_OPEN` / `RING_DRAWN` / `RING_BLOCKED` | `ui/aim_reticle.gd` | `glow` at 0.6 / `glow` at 0.95 / `paper` at 0.35 | | the crosshair before the draw, at full draw, and dimmed when the arrow can't reach what it is on (something in the way of the bow, or no arrow) | L80 |
 | `TitleScreen.WASH_SECONDS` / `INTRO_SECONDS` | `ui/title/title_screen.gd` | 0.9 s / 2.2 s | 0.6–1.4 / 1.5–3 | the first page washing up over the screen; the fade in from dark | L77 |
 | `ChapterHeading.HOLD` / `FADE` | `ui/hud/chapter_heading.gd` | 3.2 s / 0.6 s | 2.5–4.5 / 0.4–0.9 | how long a chapter heading stays and how slowly it comes | L77 |
 | `PaintTin.TIN` / `PAN_STEP` / `Pan.RADIUS` / `Pan.PROUD` / `NAME_SECONDS` | `ui/satchel/paint_tin.gd` | 468 x 84 px (38 px above it for a pan's name) / 86 px / 32 px / 9 px / 2.2 s | tin no wider than 488 | the tin's size, the pans' spacing and size, how far a pan stands proud while LB is held, how long a pan's name shows | L77 |
@@ -281,10 +290,18 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | `KeyHints.NUDGE_SECONDS` | `ui/hud/key_hints.gd` | 6 s | 4–10 | how long a key hint stays up after the event that called for it (her first find, a second bow) | L77 |
 | `VitalsHud.HIDDEN_FULL` | `ui/hud/vitals/vitals_hud.gd` | 0.5 | 0.4–0.7 | the `Vitals.sight_scale` at which the page's edge is fully drawn in around a hidden Feyre (crouched is 0.55) | L77 |
 | `VitalsHud.REFUSED_SHAKE` | `ui/hud/vitals/vitals_hud.gd` | 9° | 5–14 | how far the stamina bow shakes its head when she asks for more stamina than she has (`VitalsHud.stamina_refused`) | L77 |
+| `BrewMenu.UNMADE_ALPHA` | `ui/chemistry/brew_menu.gd` | 0.55 | 0.4–0.7 | how faint a known recipe is on the brewing page when she can't make it here and now | L77 |
+| `WeaponWords.POWER_BANDS` | `ui/weapons/weapon_words.gd` | 0.95, 1.15, 1.7 | n/a | where a weapon's power beside the knife's 1 reads lighter, about the same, harder, twice as hard | L77 |
+| `WeaponWords.SWING_BANDS` / `REACH_BANDS` | `ui/weapons/weapon_words.gd` | 0.6, 0.85 s / 1.7, 2.0 m | n/a | where a weapon reads quick or slow, short or long on the Weapons page | L77 |
+| `WeaponWords.SOUND_FROM` | `ui/weapons/weapon_words.gd` | 0.7 | 0.5–0.9 | the share of durability left from which a weapon reads "Sound." | L77 |
+| `MeterRow.SIZE` / `GLYPH` / `NOT_OURS_ALPHA` | `ui/menu/meter_row.gd` | 200x14 px / 22 px / 0.35 | 160–260 wide / 18–28 / 0.25–0.5 | a meter row's meter and glyph (bond measures, the mare's coat), and how faint a measure that does not apply is | L77 |
+| `JournalTheme.MEASURE_PAINTS` | `ui/theme/journal_theme.gd` | rose d9476f, ember dd6e3a, gold d8a23f, violet 7b5ab8, teal 2e9e9e | n/a | each bond measure's own colour (meter and glyph); change the glyph script with it | L77 |
+| `MareTendingView.TAB_SIZE` / `TAB_ICON` / `TREAT_ICON` / `SWATCH` | `ui/mare/mare_tending_view.gd` | 104x84 / 40 / 52 / 26 px | n/a | the tending screen's picture tabs, treat pictures and colour swatches | L77 |
+| `MareTendingView.CHIME_GAP` / `CHIME_DB` / `CHIME_PITCH` | `ui/mare/mare_tending_view.gd` | 0.42 s / -20 dB / 0.9 to 1.5 | 0.3–0.7 / -26 to -14 / n/a | the brushing chime: how often, how quiet, and how far its pitch climbs as her coat comes up | L77 |
 | hidden edge reach and weight | `ui/hud/vitals/edge_fx.gdshader` (`hidden`) | starts 0.78–0.88 of the way out, 0.55 opacity | reach 0.7–0.9; opacity 0.4–0.7 | how far the paper edge comes in and how solid it is | L77 |
 | `VitalsEdgeFx.WARN_OPACITY` / `WARN_RATE` / `WARN_START` | `ui/hud/vitals/edge_fx.gd` | 0.85; 11 rad/s; 0.4 | 0.6–1.0; 8–14; 0.2–0.6 | the unseen-attack beat on the side it comes from: how solid at its peak, how fast it beats, and how strong it starts before rising to full as the blow nears. Its length is the wind-up's own seconds (the caller's) | L77 |
 | `StatusPage.CHIP` / `STAGE_WORDS` | `ui/dressing_room/status_page.gd` | 60 px; Fine, Rising, Danger | chip 48–72 | a status's chip on the "How I am" page, and what a gauge's three stages are called beside its name | L77 |
-| `VitalsStatusRow.RIM` / `CRACKS`, `VitalsHealthBar.TRACK_DEPTH`, `VitalsFigure` | `ui/hud/vitals/status_row.gd`, `health_bar.gd`, theme `LABELS` | rim 0.1 of the radius; four cracks; track `ink` at 0.42; 15 px Nunito 800 `paper` | | a status pan's rim and a bad pan's cracks; the empty health track; the "58 / 100" figure | L77 |
+| `VitalsStatusRow.RIM` / `RIM_HURT` / `NAME_SIZE`, `VitalsHud.STATUS_LINGER`, `VitalsHealthBar.TRACK_DEPTH`, `VitalsFigure` | `ui/hud/vitals/status_row.gd`, `vitals_hud.gd`, `health_bar.gd`, theme `LABELS` | rim 0.1 of the radius, 0.16 and `danger` when it hurts; names 15 px; a chip lingers 2 s after it leaves; track `ink` at 0.42; 15 px Nunito 800 `paper` | | a status pan's rim, the heavier red rim of what hurts her, the name under each chip, how long a leaving chip stays; the empty health track; the "58 / 100" figure | L77 |
 | `KeyPrompt.FADE` / `BETWEEN` | `ui/hud/key_prompt.gd` | 0.2 s / 34 px | 0.12–0.3 / 24–44 | a prompt's fade; the space between one key's words and the next key | L77 |
 | `LoosePage.DAB_LIFT` | `ui/menu/loose_page.gd` | 1.5 | 1.0–1.5 | how thick the paint of a loose page's heading dab is laid on (the wash texture peaks at 0.66 alpha) | L77 |
 | whisper tremble / dread tremble / dread writing | `ui/lines/line_presenter.gd` `VOICES` | 1.6 px (times 1 to 4 as she acknowledges it) / 0.8 px / 38 letters a second | 1–3; 0.5–1.5; 30–45 | carried over from the old whisper and Suriel voice | L77 |
@@ -296,14 +313,46 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | Arrow glimmer | systems/bow/arrow_glimmer.gd `ASH_GLINT`, `WOOD_GLINT`, `PULSE_HZ`, `LIGHT_ENERGY`, `LIGHT_RANGE`, `BEACON_HEIGHT`, `WOOD_CAP`, `CORE`, `RIM` | ash: glint 0.05 (fixed screen size), one unshadowed gold light 2.5 energy / 6 m, 6 m beacon, pulse 1.1 Hz; wood: glint 0.02 only, at most 3 at once | glint 0.02-0.1, energy 1-4, beacon 3-10 m | A landed arrow glimmers until picked up so a missed ash arrow is never lost in the snow (owner, 2026-11-24, first hunt). Gold with an amber rim so it reads on white. | T121 |
 | Arrow glimmer | systems/bow/arrow_glimmer.gd `ASH_GLINT`, `WOOD_GLINT`, `PULSE_HZ`, `LIGHT_ENERGY`, `LIGHT_RANGE`, `BEACON_HEIGHT`, `BEACON_WIDTH`, `WOOD_CAP`, `CORE`, `RIM` | ash: crisp glint a four-point star about 32 px on screen (pixel_size 0.0005, fixed size), one unshadowed gold light 0.8 energy / 1.8 m, beam 0.22 m wide (about 8 px at 12 m) and 7 m tall, saturated gold with amber edges, fading upward, plus a 3 m warm amber pool on the snow, pulse 1.1 Hz; wood: glint 0.00008 only, at most 3 at once; all colours <= 1.0 so nothing blooms | glint 0.00005-0.0004, energy 0.4-1.5, range 1-3 m, beam 5-8 m, pool 2-4 m | A landed arrow glimmers until picked up so a missed ash arrow is never lost in the snow (owner, 2026-11-24, first hunt). Gold with an amber rim so it reads on white. First version was a haze; now a point and a thin beam. | T121 |
 
+## Settled sites (L75, hostile plan §3.3, slice 2(d))
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| Settle swell | creatures/hostile/settle_swell.gd `SWELL_SECONDS`, `PETAL_SECONDS`, `SWARM_SHARE`, `SWARM_RADIUS` | fliers fill back over 16 s; rose petals fall 12 s; swarm radius half the territory, kept to 4-12 m; one sparkle burst at the core | swell 8-20 s (the plan's limit is 20), petals 6-16 s | The payoff for settling a site is the place coming back to life, not loot (plan §2.5). Slow enough to watch it happen from the fight's end, inside the plan's 20 s. | L75 |
+
+## Puca (L75, hostile plan §5.2, slice 2(b))
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| Puca tell reach | creatures/hostile/puca_roamer.gd `TELL_RANGE`, `KEEN_TELL_RANGE`, `TELL_FULL`, `TELL_SHOWN` | bare eyes 8 m, a full keen brew 40 m; full strength inside 40% of that reach; 0.25 is readable | bare 5-12 m, keen 30-45 m (the plan's floor is 30) | How far its wrongness (wrong colour, rippling edges) shows. Without keen it is only what she wants until she is nearly on it; with keen she can refuse it from far off. The disguise material reads it as `puca_tell`. | L75 |
+| Puca lure distances | creatures/hostile/puca_roamer.gd `KEEP_M`, `CLOSE_M`, `FOLLOW_M`, `NOTICE_M` | keeps 9 m ahead, slips away inside 4 m, waits past 25 m, startles at 30 m | keep 6-12 m | Just out of reach, never caught, never touching her (the Keeper, ch11). | L75 |
+
+## Gloamer packs (L75, bestiary §16, hostile plan §7)
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| Knife scale | `CreatureData.knife_scale` (gloamer_roamer in tools/creatures/gen_hostile_sites.py) | 1.0; gloamer 1.5 (12 a cut on 24 HP) | 1.0-2.0 | Her knife on that family as a multiple of its arrow damage, on top of the strike's own (Creature.resolve_hit). The common tier dies to 2 knife hits (owner's numbers) without touching the knife itself. | L75 |
+| Pack rout and glint | gloamer_roamer.tscn `rout_share`, `glint_drawn`; hostile_roamer.gd `ROUT_SECONDS`, `GLINT_SECONDS`, `GLINT_REACH` | half the pack down routs the rest for 10 s; a light arrow pulls the 2 nearest off for 8 s, grabbing within 1.2 m | share 0.3-0.7; drawn 1-2; glint 5-12 s | The pack's two outs: break half and the rest run; a glint thrown the other way buys time to pick them off. | L75 |
+
+## The Hollow Hob (L75, bestiary §10, hostile plan §5.7)
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| Reach margin | `CreatureData.reach_margin` (hob_roamer in tools/creatures/gen_hostile_sites.py) | 0; Hob 1.6 m | 0-2.5 | The knife's and the sneak's reach measured past the origin of a body too big to stand in. | L75 |
+| Charm cut | hob_roamer.gd `STIR_AWARENESS`, `SEARCH_SECONDS` | a cut stirs it 0.1 (under curious); it searches 40 s at dusk for a charm gone | stir 0-0.14; search 20-90 s | Robbing it asleep is a sneak blow per charm; it never wakes from a clean cut. | L75 |
+| Rock throw | hob_roamer.gd `THROW_RANGE`, `THROW_COOLDOWN`, `THROW_SPLASH`; row `hob_throw` | 6-25 m, every 8 s, lands where she stood and hits within 2.5 m; 30 blunt, 1.0 s tell | range 15-35; cooldown 5-12 s; splash 1.5-4 m | Distance isn't safety, but moving after the boulder goes up is. | L75 |
+
 ## Wolf hunt light (L18-11)
 
 | Tunable | Where | Default | Range | What it does | Lane |
 |---|---|---|---|---|---|
-| `dread_day_look` | grade_preset.gd (set in human_winter.tres) | `&"dread_winter_day"` | preset id or empty | The look dread blends toward while the sun is up; empty = the night `dread` preset. Night always takes `dread`, so the beast at the door (L55) is unchanged. | L18 |
-| `dread_winter_day` exposure / sky / fog | world/shared/grades/dread_winter_day.tres | 0.56 / grey overcast / 0.016 | — | Winter-day horror: drained colour, the fog closing in pale (ambient_inject 0.6), the overcast and snow as the light. | L18 |
 | `BREAK_ENERGY`, `BREAK_ANGLE`, `BREAK_FROM` | story/staging/wolf_hunt_lighting.gd | 8, 24°, (-6, 34, 14) | — | The break in the overcast over the doe's clearing (shadowed, shows in the fog). | L18 |
 | `RIM_ENERGY`, `RIM_BACK`, `RIM_UP` | story/staging/wolf_hunt_lighting.gd | 18, 1.6 m, 2.4 m | — | Cold rim behind the doe and the great wolf, opposite the camera. | L18 |
+
+## Beast at the door light (L55, rescaled L89)
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| `MOON_ENERGY`, `FIRE_GAIN`, `FIRE_FLARE`, `RIM_ENERGY`, `GLOW_ENERGY` | story/staging/beast_door_lighting.gd | 8, 3, 5, 6.5, 1.6 (were 35, 14, 22, 30, 7 under the dread grade, scaled ×0.22 when fear stopped darkening the screen) | — | Moon through the broken door, the hearth turned up, the rim and back glow on the beast, on a winter night at the grade's own exposure. | L89 |
 
 ## Standing arms (owner, 2026-11-24: "arms out so far to the sides")
 
@@ -317,10 +366,39 @@ over (`docs/contracts/creature_motion.md`, "People: clips without a rebuild").
 | `POSTURE["idle"]["arms"]` | tools/blender/feyre_moves/retarget_moves.py | -2 (was 3) | -4–3 | Degrees the player Feyre's arms are moved out from the captured standing pose; negative brings them in. | arms-rest |
 | `ARM_CLEAR` / `arm_clear` | tools/blender/cast/cast_<id>.py; `DESIGNS` rows in cast_minor.py, cast_village.py | 0; Alis 8, Elain 10; 2 to 10 on 20 court and village rows | 0–10 | Degrees one body's arms hang further out, for what it wears at the hip. Measured, not chosen: the least that keeps `arm_clip_probe.gd` under 5 mm. Bring a skirt in, or pose the hands on it, before lowering one. | arms-rest |
 | `arm_out` | tools/blender/fae_people.py `CAST` rows, default in person_rig.py `animate()` | -0.03 rad (was 0.06); fox, greenbrown, gardener_1 0.0; stag 0.04 | -0.06–0.06 | Added to the older fae figures' bind pose, which holds the arms about 11 degrees out. | arms-rest |
-| `dread_winter_day` exposure / sky / fog | world/shared/grades/dread_winter_day.tres | 0.8 / grey overcast / 0.012 | — | Winter-day horror that darkens little (L18-14): drained colour, pale fog closing in (ambient_inject 0.6), the overcast and snow as the light. | L18 |
 | `RIM_ENERGY`, `RIM_BACK`, `RIM_UP` | story/staging/wolf_hunt_lighting.gd | 12, 1.6 m, 2.4 m | — | Cold rim behind the doe and the great wolf, opposite the camera; the only light the hunt adds. | L18 |
 | `size_by_phase` / `Inventory.FULL_QUIVER` | data/bows/quiver_loadouts.tres; systems/inventory/inventory.gd | 3, 3, 10, 20, then 30 | — | Arrows her quiver holds by phase (bow design §8.1): three in her hand through the wolf, 10 on the grounds, 20 from the house and woods, 30 after. It only grows. | L80 |
 | `COMBO_PITCH`, `COMBO_MAX` | systems/interaction/interactor.gd | 0.06, 8 | 0.03–0.1 | Each further arrow pulled from one body in one press chimes this much higher, up to this many steps. | L80 |
-| `HitStop.FRAMES`, `WEAK_SPOT_FRAMES`, `KILL_FRAMES`, `SCALE` | systems/feedback/hit_stop.gd | 4 / 6 / 9, +3, 10, at 0.05 | — | Frames (at 60) the world holds on a light, medium or heavy hit, the extra for a weak spot, and a kill; the time scale it holds at (health-interactions §3.5 #6). Reduced Effects halves the frames. | L80 |
+| `HitStop.FRAMES`, `WEAK_SPOT_FRAMES`, `KILL_FRAMES`, `SCALE` | systems/feedback/hit_stop.gd | 4 / 6 / 9, +3, 10, at 0.05 | — | Frames (at 60) the world holds on a light, medium or heavy hit, the extra for a weak spot, and a kill; the time scale it holds at (health-interactions §3.5 #6). The Hit-stop setting (Full, Half, Off) is the one thing that shortens it. | L80 |
 | `SidestepMotor.DISTANCE`, `TIME`, `IFRAMES`, `IFRAMES_GENTLE`, `STAMINA`, `COOLDOWN`, `BUFFER` | characters/feyre/movement/sidestep_motor.gd | 2.2 m, 0.25 s, 0.2 s, 0.3 s, 12, 0.45 s, 0.15 s | — | The sidestep (health-interactions §3.5 #9): how far and how fast, how long nothing can hurt her (from its second frame), its stamina, the wait before the next, and how long a press waits for its moment. | L80 |
 | `draw_kept_when_sidestepping` | data/bows/bow_tuning.gd | 0.5 | 0.3–0.7 | The share of her draw a sidestep keeps. | L80 |
+| `SoftAim.CONE_DEG`, `RANGE` | systems/bow/soft_aim.gd | 4°, 35 m | 3–6°, 25–45 m | How close her aim must be to a hostile that is hunting her, and how far off it may be, for soft aim to help (pad only; health-interactions §3.5 #14). | L80 |
+| `SoftAim.MODES` light / strong | systems/bow/soft_aim.gd | turn speed kept 0.6 / 0.45; bend 1.5° / 3.5° | 0.4–0.8; 1–4° | The stick's turn speed kept inside the cone, and the most a shot that would miss may bend toward the body (never the weak spot). Light helps without aiming for her (72% of 50 seeded shots at 25 m against 18% off); strong is the nine-in-ten setting. | L80 |
+| `SoftAim.NEAR`, `PULL_BACK` | systems/bow/soft_aim.gd | 12 m, 0.6 m | — | A hostile after her this close steps the camera back by this much. | L80 |
+
+## Hostile checks (L75, hostile-fae plan §8.4)
+
+Numbers the slice tests hold the game to, derived from the systems' own rates.
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| `REED_FIRE_CLEAR_S` | tests/unit/hostile/test_naga_slice1.gd | 3.0 s | 2.5–5 s | Slice 1 (c): after a fire arrow lights a lured camp's reed bed, every naga has fled or died within this. From the fire's numbers: a lured naga stands within 1 m of the lure (`_go_to` stop) and fears flame within `fire_fear_radius` 3 m, so it sees it on its first `Creature.FIRE_SCAN` (0.3 s); one that wandered to 5 m waits for the front to cross 2 m at about 1 / `ElementField.HEAT_RATE` (1.1 s) a metre at calm: 0.3 + 2.2 = 2.5 s, rounded up. | L75 |
+| `LOSE_WITHIN_S` | tests/unit/hostile/test_naga_slice1.gd | 20 s, 9 of 10 seeded runs | — | Slice 1 (b): a pack trailing her by scent past the leash loses her once she drinks a hush draught (quiet 2, scent_scale 0.5 = `NagaRoamer.HUSH_SCALE`), and keeps her without it. | L75 |
+
+## Feyre's breath (L76)
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| `FeyreBreath.PUFF_ALPHA` | characters/feyre/feyre_breath.gd | 0.35 | 0.2–0.6 | How solid a fresh cold-breath puff is (the color_ramp's start alpha; it fades to 0 over the puff's life). Each puff is a soft radial disc, albedo 0.85. | L76 |
+
+## Monster weapons and camp gear (L88)
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| `grim()` lift | tools/blender/monster_gear_kit.py | 0.62 | 0.55–0.75 | The power every grim palette colour is raised to before it is stored. Lower is lighter. At 1.0 the darks crush to black under the game's tonemap; under 0.55 bone and silk reach the 0.85 albedo cap. | L88 |
+| `Prop.add` `sharp_deg` | tools/blender/monster_gear_kit.py | 72 | 48–80 | Edges sharper than this shade hard. 72 keeps bone, root and stone rounded and leaves only a blade's edge and a cut end crisp. | L88 |
+| `lash()` sleeve | tools/blender/monster_gear_kit.py | r + 0.35 × cord | 0.2–0.6 | How far the solid binding under a wound cord stands off the shaft, so a gap between coils shows binding and not bare wood. | L88 |
+| Stolen-thing colours | tools/blender/monster_gear_kit.py `STOLEN_ROSE`, `STOLEN_PERI`, `STOLEN_MINT`, `SILVER`, `GILT` | court palette, not lifted | – | The one clean colour on a piece: what the gloamers and the Hob took from the court and from mortals. Everything else is the grim palette. | L88 |
+| `WORN_DELTA` | tools/blender/monster_gear.py; the same in tests/unit/monster_gear/test_monster_gear_models.gd | 0.04 | 0.04–0.15 | The least a worn weapon's side-on outline must differ from its clean twin's, as a share of the clean outline, so "near breaking" reads in her hand. The build prints each weapon's figure and fails under it. | L88 |
+| `wear()` darkening | tools/blender/monster_gear_kit.py | × 0.62, 30% toward grey | 0.5–0.8 | How much darker and duller every colour on a worn weapon is. | L88 |
+| `wear()` bite | tools/blender/monster_gear_kit.py | 14% of the weapon's depth, at least 12 mm | 8–20% | How much is broken off whatever stands furthest forward on a worn weapon (a hook's point, a blade's belly, a hammer's face). Past 20% hooks lose their hook. | L88 |

@@ -17,6 +17,8 @@ extends MenuTab
 const TITLE_SCENE := "res://ui/title/title_screen.tscn"
 ## Width kept for a slider's name, so the sliders line up.
 const NAME_WIDTH := 250.0
+## A setting with its meaning written beside it is this wide.
+const OPTION_WIDTH := 215.0
 ## Seconds the controls hint shows after the book closes on this page.
 const HINT_SECONDS := 8.0
 ## Space above a section's heading.
@@ -60,7 +62,7 @@ func _ready() -> void:
 	keys.visible = false
 	right_sheet().add_child(keys)
 	set_hints([["Q E", "Page"], ["Esc", "Resume"]] if in_game else [["Esc", "Back"]])
-	InputSettings.scheme_changed.connect(func(_s: InputSettings.Scheme) -> void: _sync())
+	InputSettings.keys_changed.connect(_sync)
 	GameSettings.changed.connect(func(_k: StringName) -> void: _sync())
 	if in_game:
 		ScreenStack.pause_requested.connect(open)
@@ -156,6 +158,7 @@ func _sync() -> void:
 	for i in _text_buttons.size():
 		_text_buttons[i].set_pressed_no_signal(i == int(GameSettings.get_value(&"text_size")))
 	_recenter.text = "%s brings it back behind her." % KeyPrompt.key(&"camera_recenter")
+	_minimap_check.text = "Minimap (%s)" % KeyPrompt.key(&"map_minimap")
 	keys.refresh()
 	if _hint:
 		_hint.refresh()
@@ -194,7 +197,7 @@ func _build_left(col: VBoxContainer) -> void:
 	_section(col, "Movement keys")
 	var schemes := _row(col)
 	var scheme_group := ButtonGroup.new()
-	for scheme: InputSettings.Scheme in [InputSettings.Scheme.ARROWS, InputSettings.Scheme.WASD]:
+	for scheme: InputSettings.Scheme in [InputSettings.Scheme.WASD, InputSettings.Scheme.ARROWS]:
 		var b := _chip(schemes, InputSettings.SCHEME_NAMES[scheme], scheme_group)
 		b.pressed.connect(func() -> void: InputSettings.set_scheme(scheme))
 		_scheme_buttons[scheme] = b
@@ -204,29 +207,31 @@ func _build_left(col: VBoxContainer) -> void:
 		keys.visible = on
 		_right.visible = not on)
 
-	_section(col, "Map")
-	_minimap_check = _check_box(col, "Show the minimap (N)")
-	_minimap_check.toggled.connect(func(on: bool) -> void: MapSettings.set_minimap_shown(on))
-
+	# What each one does is said beside it: none of the three explains itself.
 	_section(col, "Bow and fights")
-	var bow := _row(col)
-	_stepper(bow, &"soft_aim", "Pad aim pull: %s", GameSettings.SOFT_AIM_LEVELS)
-	_stepper(bow, &"hit_stop", "Hit-stop: %s", GameSettings.HIT_STOP_LEVELS)
-	_check(bow, &"break_free_hold", "Hold to break free")
+	var aim := _row(col)
+	_option(_stepper(aim, &"soft_aim", "Aim help: %s", GameSettings.SOFT_AIM_LEVELS))
+	_says(aim, "On a controller, eases her aim onto her target.")
+	var stop := _row(col)
+	_option(_stepper(stop, &"hit_stop", "Hit pause: %s", GameSettings.HIT_STOP_LEVELS))
+	_says(stop, "The split-second freeze when a blow lands.")
+	var free := _row(col)
+	_option(_check(free, &"break_free_hold", "Hold to break free"))
+	_says(free, "When grabbed, hold the key; no fast tapping.")
 
 
 func _build_right(col: VBoxContainer) -> void:
 	_section(col, "Camera", false)
 	_slider(col, &"mouse_sensitivity", "Mouse sensitivity")
-	_slider(col, &"stick_sensitivity", "Stick sensitivity")
+	_slider(col, &"stick_sensitivity", "Controller stick sensitivity")
 	var turns := GridContainer.new()
 	turns.columns = 2
 	turns.add_theme_constant_override(&"h_separation", 18)
 	col.add_child(turns)
-	_check(turns, &"invert_x", "Invert X")
-	_check(turns, &"invert_y", "Invert Y")
+	_check(turns, &"invert_x", "Flip left and right")
+	_check(turns, &"invert_y", "Flip up and down")
 	_check(turns, &"camera_follow", "Follows behind as she runs")
-	_check(turns, &"mouse_steers", "Turning it steers her")
+	_check(turns, &"mouse_steers", "Turning the camera steers her")
 	_recenter = BookKit.label("", &"SatchelSmall")
 	col.add_child(_recenter)
 
@@ -245,7 +250,7 @@ func _build_right(col: VBoxContainer) -> void:
 		_note.text = "Every tip will show once more.")
 
 	# Her HUD on one row: when the meters show, how strong the screen's edges
-	# are, and the hit marks.
+	# are, the hit marks and the minimap.
 	_section(col, "Her HUD")
 	var hud := _row(col)
 	var modes := HBoxContainer.new()
@@ -259,7 +264,9 @@ func _build_right(col: VBoxContainer) -> void:
 	_controls[&"hud_mode"] = modes
 	_stepper(hud, &"edge_fx", "Edges: %s", GameSettings.EDGE_FX_LEVELS).size_flags_horizontal = Control.SIZE_FILL
 	_check(hud, &"hit_marks", "Hit marks")
-	col.add_child(BookKit.label("When her health and stamina show, how strongly the screen's edges warn of cold, hurt and fear, and a mark where a hit came from.", &"SatchelSmall", true))
+	_minimap_check = _check_box(hud, "")
+	_minimap_check.toggled.connect(func(on: bool) -> void: MapSettings.set_minimap_shown(on))
+	col.add_child(BookKit.label("When her health and stamina show, how strongly the screen's edges warn of cold, hurt and fear, a mark where a hit came from, and the small map in the corner.", &"SatchelSmall", true))
 
 	_section(col, "Feyre's thoughts")
 	var thoughts := HFlowContainer.new()
@@ -343,10 +350,25 @@ func _slider(parent: Control, key: StringName, text: String) -> void:
 	_controls[key] = s
 
 
-func _check(parent: Control, key: StringName, text: String) -> void:
+func _check(parent: Control, key: StringName, text: String) -> CheckBox:
 	var c := _check_box(parent, text)
 	c.toggled.connect(func(on: bool) -> void: GameSettings.set_value(key, on))
 	_controls[key] = c
+	return c
+
+
+## A setting that opens a row which says what it does: every such row's
+## words start on the same line down the sheet.
+func _option(control: Control) -> void:
+	control.custom_minimum_size.x = OPTION_WIDTH
+	control.size_flags_horizontal = Control.SIZE_FILL
+
+
+## What the setting beside it does, in plain words.
+func _says(row: HBoxContainer, text: String) -> void:
+	var l := BookKit.label(text, &"SatchelSmall")
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(l)
 
 
 func _check_box(parent: Control, text: String) -> CheckBox:

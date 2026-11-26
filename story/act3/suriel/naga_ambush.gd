@@ -172,7 +172,7 @@ func strike() -> void:
 	_grace = STRIKE_GRACE
 	strikes += 1
 	StoryControl.shake = 0.6
-	EventBus.mood_requested.emit(&"dread", 1.0, 0.15)
+	EventBus.mood_requested.emit(self, &"dread", 1.0, 0.15)
 	if strikes >= STRIKES_TO_FALL:
 		_fall()
 
@@ -181,7 +181,7 @@ func _fall() -> void:
 	falls += 1
 	_falling = FALL_SECONDS
 	StoryControl.hold(self, StoryControl.Mode.NONE)
-	EventBus.mood_requested.emit(&"dread", 1.0, 0.6)
+	EventBus.mood_requested.emit(self, &"dread", 1.0, 0.6)
 
 
 func _on_hit(_id: StringName, kind: StringName, cause: StringName, _part: StringName) -> void:
@@ -267,7 +267,7 @@ func _wake() -> void:
 	_rest = REST_SECONDS
 	running = false
 	StoryControl.release(self)
-	EventBus.mood_requested.emit(&"dread", 0.5, 2.0)
+	EventBus.mood_requested.emit(self, &"dread", 0.5, 2.0)
 	EventBus.scene_space_finished.emit(space_id)
 
 

@@ -67,8 +67,7 @@ sunrise).
 - **True sight** (world/shared/grades/grade_director.gd):
   `GradeDirector.with_true_sight(preset, amount)`; the director eases `sight`
   0 -> 1 over 6 s when `glamour_lifted` rises (saturation ×1.16, contrast ×1.05,
-  bloom and glow up, warm ambient, fog ×0.75, magic +0.25). Dread is applied on
-  top, so horror still drains it.
+  bloom and glow up, warm ambient, fog ×0.75, magic +0.25).
 - **Props** (art/p6/, tools/blender/p6_props.py): head_severed, paint_tins_spilled,
   picnic_blanket, picnic_basket, fiddle, garden_streamer_post, paintings_bundle,
   wine_table_solstice, maypole_solstice, solstice_lantern_string.

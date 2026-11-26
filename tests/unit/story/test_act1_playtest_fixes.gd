@@ -20,7 +20,7 @@ func after_each() -> void:
 	StoryControl.release()
 	# A scene stopped mid-run never sends its closing calm (the beast door
 	# leaves dread up for HudLayout.DREAD_LAPSE_MS), which hushes later cards.
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	var ride := Act1Anchors.find_ride(get_tree())
 	if ride:
 		ride.free()
@@ -90,6 +90,7 @@ func test_a_lost_ash_arrow_comes_back_once() -> void:
 func test_the_knife_press_does_not_use_the_bed() -> void:
 	WorldState.set_flag("wolf_killed")
 	WorldState.set_flag("pelt_sold")
+	WorldState.set_flag(CottageEvening.SLEPT)
 	Clock.paused = true
 	Clock.from_dict({"time_of_day": 0.9, "day": 1})
 	var door := BeastDoor.new()
@@ -103,7 +104,8 @@ func test_the_knife_press_does_not_use_the_bed() -> void:
 		guard += 1
 	assert_true(door.current_beat_label().begins_with("decision"), "at the window")
 	assert_false(StoryControl.can_interact(), "E doesn't reach the stations")
-	assert_true(StoryControl.can_shoot(), "the bracelets (fire) still can")
+	assert_true(StoryControl.allowed_actions.has("fire"), "the bracelets (fire) still can")
+	assert_false(StoryControl.can_shoot(), "and the button is never the bow")
 	var press := InputEventAction.new()
 	press.action = &"interact"
 	press.pressed = true
@@ -114,16 +116,80 @@ func test_the_knife_press_does_not_use_the_bed() -> void:
 
 
 func test_the_ride_ends_up_the_manor_drive() -> void:
+	var drive := RideNorth.drive_points()
+	var first := drive[0]
+	var last := drive[drive.size() - 1]
+	var gate := ManorSitePlan.SENTRY_GATE
+	assert_almost_eq(first.distance_to(gate), RideNorth.GATE_INSIDE, 0.01, "just inside the sentry gate")
+	assert_true(first.y < gate.y, "on the manor side")
+	var door := Vector2(ManorSitePlan.FRONT_DOOR.x, ManorSitePlan.FRONT_DOOR.z)
+	assert_almost_eq(last.distance_to(door), RideNorth.STOP_OUT, 0.2, "to the front steps")
+	var road := RideNorth.route_points()
+	assert_true(road.has(gate), "his road comes in through the sentry gate")
+
+func test_the_ride_waits_until_the_cottage_scene_is_over() -> void:
 	var ride := RideNorth.new()
 	ride.auto_tick = false
-	add_child_autofree(ride)
-	var drive := ride.drive_path()
-	var first := drive.global_transform * drive.curve.get_point_position(0)
-	var last := drive.global_transform * drive.curve.get_point_position(drive.curve.point_count - 1)
-	var gate := ManorSitePlan.SENTRY_GATE
-	assert_almost_eq(Vector2(first.x, first.z).distance_to(gate), RideNorth.GATE_INSIDE, 0.01, "just inside the sentry gate")
-	assert_true(first.z < gate.y, "on the manor side")
-	assert_almost_eq(last.z, ManorSitePlan.SPAWN.z, 0.01, "to where the house first shows")
-	assert_almost_eq(last.y, WorldHeight.height_at(last.x, last.z), 0.01, "on the estate's ground")
-	if WorldStreamer.get_region(RideNorth.MANOR) == null:
-		assert_eq(ride._to_the_manor(), [], "without the estate she gets down at the path's end")
+	add_child(ride)  # after_each frees the ride
+	WorldState.set_flag("beast_claim_accepted")
+	var cottage := SceneSpace.new()
+	cottage.auto_tick = false
+	add_child_autofree(cottage)
+	cottage.set_meta(&"story_space_id", &"beast_door")
+	cottage.add_to_group(&"story_space_live")
+	cottage.running = true
+	assert_false(ride.can_start(), "not while he says 'Now' and her father says goodbye")
+	# A finished space stays in the live group; only running counts.
+	cottage.running = false
+	assert_true(ride.can_start(), "then out to the mare")
+
+
+func test_the_ridden_mare_is_gone_from_the_manor_once_she_is_down() -> void:
+	var ride := RideNorth.new()
+	ride.auto_tick = false
+	add_child(ride)  # after_each frees the ride
+	var feyre := Node3D.new()
+	add_child_autofree(feyre)
+	ride._rider = feyre
+	ride.horse = MareMount.new()
+	ride.horse.data = RideNorth.MARE_DATA
+	ride.add_child(ride.horse)
+	ride.horse.global_position = Vector3(3, 0, 0)
+	ride.horse.go_home()
+	ride.step = RideNorth.Step.DONE
+	ride._process(1.0)
+	assert_not_null(ride.horse, "she walks off first, not gone the moment Feyre is down")
+	ride._process(RideNorth.MARE_GONE_BY)
+	assert_null(ride.horse, "then gone from the drive: the only mare is the one in the stables")
+
+
+func test_the_rides_end_leaves_him_to_the_arrival() -> void:
+	var ride := RideNorth.new()
+	ride.auto_tick = false
+	add_child(ride)  # after_each frees the ride
+	var beast := BeastActor.new()
+	add_child_autofree(beast)
+	ride.beast = beast
+	var arrival := SceneSpace.new()
+	arrival.auto_tick = false
+	add_child_autofree(arrival)
+	arrival.set_meta(&"story_space_id", &"manor_arrival")
+	arrival.add_to_group(&"story_space_live")
+	arrival.running = true
+	var hall := Vector3(0, 0, -38)
+	beast.lead(hall)  # the arrival's one order: down the hall
+	ride._end(ride)
+	assert_eq(beast._destination, hall, "the ride ending (her slide down done) never sends him back to the steps")
+
+
+func test_leading_he_never_stands_stuck_on_a_doorstep() -> void:
+	var beast := BeastActor.new()
+	add_child_autofree(beast)
+	beast.lead(Vector3(0, 0, -12))
+	var moved_straight := false
+	for i in 120:  # two seconds held in place (a path baked short of the hall)
+		moved_straight = beast._lead_stuck(1.0 / 60.0)
+	assert_true(moved_straight, "after standing in place for LEAD_STUCK_AFTER he takes the straight line")
+	beast.lead(Vector3(5, 0, -12))
+	assert_false(beast._lead_stuck(1.0 / 60.0), "a new goal gives the navmesh another chance")
+

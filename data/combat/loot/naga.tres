@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="LootTable" format=3]
+
+[ext_resource type="Script" path="res://systems/weapons/loot_table.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+family = &"naga"
+carried = Array[StringName]([])
+leader_at = 0
+leader_weapon = &""
+carried_wear = Vector2(0.5, 0.9)
+trophies = Array[StringName]([&"wpn_naga_talon_knife", &"wpn_naga_talon_hook"])
+trophy_chances = PackedFloat32Array(0.25, 0.15)
+camp_weapon = &"wpn_fishers_gaff"
+camp_coins = Vector2i(2, 6)
+camp_container = &"camp_naga_reed_cache"

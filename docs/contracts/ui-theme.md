@@ -54,7 +54,7 @@ Colours, read from theme type `Journal` or `JournalTheme.color(token)`:
 Fonts (`ui/theme/fonts/`, all SIL OFL): Marcellus for display, Nunito for
 body and buttons, Cormorant Garamond Italic for Feyre's hand.
 
-Washes: `JournalTheme.WASHES`, the five pastels of the index tabs and of the
+Washes: `JournalTheme.WASHES`, the seven pastels of the index tabs and of the
 blot behind a thing drawn on a page (`JournalTheme.wash(i)`).
 
 Paper (`ui/theme/paper/`): `page.png` and `slip.png`, near-white canvas with a

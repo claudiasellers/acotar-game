@@ -67,7 +67,7 @@ func test_the_slip_is_her_hand_on_paper_above_the_book() -> void:
 
 
 func test_every_page_has_a_short_line_that_asks_nothing() -> void:
-	assert_eq(TabNote.LINES.keys(), [&"satchel", &"wardrobe", &"collection", &"sketchbook", &"map"])
+	assert_eq(TabNote.LINES.keys(), [&"satchel", &"wardrobe", &"collection", &"sketchbook", &"map", &"bonds", &"weapons"])
 	var asks := RegEx.create_from_string("(?i)\\bpress\\b|\\bopen\\b|\\bfind\\b|\\bgo\\b|\\bcollect\\b|\\d")
 	for id: StringName in TabNote.LINES:
 		var line: String = TabNote.LINES[id]

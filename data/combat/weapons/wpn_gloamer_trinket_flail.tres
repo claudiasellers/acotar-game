@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://systems/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wpn_gloamer_trinket_flail"
+display_name = "Trinket Flail"
+family = &"gloamer"
+kind = &"whip"
+power = 1.1
+swing_s = 0.75
+reach_m = 2.6
+stagger_s = 0.8
+durability = 14
+imbue_slots = 1
+two_handed = false
+trait_id = &"glint"
+trait_count = 0
+unique = false
+canon = "X"
+description = "A cord ending in a fist of stolen keys, spoons and a bell. Gloamers can't look away from it."

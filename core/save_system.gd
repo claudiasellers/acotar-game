@@ -26,8 +26,6 @@ var _providers: Dictionary = {}
 var _loading: Dictionary = {}
 ## An autosave asked for while it wasn't safe; it happens when the moment ends.
 var _autosave_due: bool = false
-## Scene spaces and films that have started and not yet finished.
-var _open_spaces: Dictionary = {}
 var autosave_enabled: bool = true
 ## The slot the game in play saves to. A load or a new game sets it.
 var active_slot: String = "slot_0"
@@ -37,10 +35,7 @@ var play_seconds: float = 0.0
 
 func _ready() -> void:
 	EventBus.phase_changed.connect(_on_phase_changed)
-	EventBus.scene_space_started.connect(func(id: StringName) -> void: _open_spaces[id] = true)
-	EventBus.scene_space_finished.connect(func(id: StringName) -> void:
-		_open_spaces.erase(id)
-		_autosave_if_due())
+	EventBus.scene_space_finished.connect(func(_id: StringName) -> void: _autosave_if_due())
 	StoryControl.mode_changed.connect(func(_m: int) -> void: _autosave_if_due())
 
 
@@ -114,11 +109,12 @@ func _provider_states() -> Dictionary:
 
 
 ## True when a save now would be a whole, settled game: not mid-load, a game
-## scene is up with Feyre placed, and no cutscene or staged moment is running.
+## scene is up with Feyre placed, and no cutscene or staged moment holds her controls. (Background moments that
+## wait on deeds all act hold nothing and never block a save.)
 func can_autosave() -> bool:
 	if not autosave_enabled or not _loading.is_empty():
 		return false
-	if PhaseManager.current_phase == &"" or not _open_spaces.is_empty():
+	if PhaseManager.current_phase == &"":
 		return false
 	if StoryControl.mode != StoryControl.Mode.FULL:
 		return false
@@ -236,7 +232,7 @@ func begin_new(slot: String) -> void:
 ## narrows her controls, and no dread it raised lingers.
 func _settle_story_control() -> void:
 	StoryControl.release()
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_requested.emit(null, &"calm", 0.0, 0.0)
 
 
 func delete_save(slot: String) -> void:

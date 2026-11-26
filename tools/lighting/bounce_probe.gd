@@ -35,7 +35,7 @@ func _ready() -> void:
 	for i in 12:
 		await get_tree().process_frame
 	var before := await _shoot(0.6, 0.0, 1.5, 1.5, false)
-	var after := await _shoot(0.7, 0.35, BounceLight.SSAO_RADIUS, BounceLight.SSAO_INTENSITY, true)
+	var after := await _shoot(0.7, 0.35, GradeDirector.SSAO_RADIUS, GradeDirector.SSAO_INTENSITY, true)
 	for key: StringName in POINTS:
 		var a: Color = before[key]
 		var b: Color = after[key]

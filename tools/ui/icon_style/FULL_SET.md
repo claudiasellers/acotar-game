@@ -44,3 +44,9 @@ file's name, so the `.webp.import` files next to them stay as they are.
 Not covered here: the collection book, find cards and pickup toasts draw their own
 shapes in `ui/collection_book/item_icon.gd`, and the status medallions live in
 `ui/theme/icons/status/`.
+
+## Bonds page portraits
+- `set_bonds.mjs` — head-and-shoulders portraits, one per `BondBook` id (tamlin, lucien, alis, mare,
+  nesta, elain, father, stranger), plus `tamlin_beast` and `alis_true` (her face after `glamour_lifted`).
+  No frame: they sit on the journal page's own watercolour dab. Masks follow the Keeper (lore/03-characters/minor-characters.md).
+- `bonds.mjs` — `node bonds.mjs rv` (sheet at 160, 64 and 40 px) and `node bonds.mjs export` (256 px into `ui/theme/icons/bonds/`).

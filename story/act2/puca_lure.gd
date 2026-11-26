@@ -163,8 +163,7 @@ func _father_appears() -> void:
 		# Watching for Tamlin back from hunting the Bogge, by moonlight (ch10, Keeper).
 		aside(&"puca_watch")
 	# The garden hushes: no crickets, no fountain, only her boots.
-	note_mood()
-	EventBus.mood_requested.emit(&"dread", 0.35, 4.0)
+	EventBus.mood_requested.emit(self, &"dread", 0.35, 4.0)
 	sound(&"drone", -30.0, 0.8)
 
 
@@ -194,7 +193,7 @@ func _caught() -> void:
 		t.global_position = feyre.global_position + side * 0.9 + feyre.global_basis.z * 0.4
 	EventBus.story_actor_cue.emit(&"tamlin", &"stops_her")
 	StoryControl.shake = 0.15
-	EventBus.mood_requested.emit(&"dread", 0.6, 0.6)
+	EventBus.mood_requested.emit(self, &"dread", 0.6, 0.6)
 
 
 func _on_image(image: StringName) -> void:
@@ -206,7 +205,7 @@ func _on_image(image: StringName) -> void:
 
 func _snarl() -> void:
 	StoryControl.shake = 0.45
-	EventBus.mood_requested.emit(&"dread", 0.8, 0.2)
+	EventBus.mood_requested.emit(self, &"dread", 0.8, 0.2)
 	EventBus.story_actor_cue.emit(&"tamlin", &"snarls")
 	var p := puca()
 	if p:
@@ -217,7 +216,7 @@ func _snarl() -> void:
 func _after() -> void:
 	StoryControl.shake = 0.0
 	sound(&"drone", -80.0)
-	EventBus.mood_requested.emit(&"calm", 0.0, 4.0)
+	EventBus.mood_requested.emit(self, &"calm", 0.0, 4.0)
 	_let_go()
 
 

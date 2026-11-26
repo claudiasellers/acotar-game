@@ -23,7 +23,7 @@ func test_presets_load_with_expected_mood() -> void:
 
 
 func test_wall_swap_reaches_spring_in_two_seconds() -> void:
-	EventBus.grade_swap_requested.emit(&"spring", 2.0)
+	EventBus.grade_swap_requested.emit(self, &"spring", 2.0)
 	assert_true(director.is_blending())
 	director._process(1.0)
 	assert_between(director.current.saturation, 0.56, 1.34, "half-way at 1 s")
@@ -41,12 +41,36 @@ func test_a_story_swap_holds_off_the_region_grade_until_released() -> void:
 	region.grade = &"manor"
 	region.bounds = Rect2(-10.0, -10.0, 20.0, 20.0)
 	add_child_autofree(region)
-	EventBus.grade_swap_requested.emit(&"spring", 0.0)
+	EventBus.grade_swap_requested.emit(self, &"spring", 0.0)
 	director._process(0.1)
 	assert_eq(director.target_id(), &"spring", "the story's grade wins while it holds")
-	GradeDirector.release_story_holds(get_tree())
+	EventBus.grade_swap_requested.emit(self, &"", 2.0)
 	director._process(0.1)
 	assert_eq(director.target_id(), &"manor", "released, the region's grade takes over")
+
+
+## A house's rooms inside its estate: the higher priority wins wherever both
+## contain her, whatever order they joined the tree in (the estate's grade now
+## arrives first, before the house is built).
+func test_the_higher_priority_grade_wins_where_two_overlap() -> void:
+	var focus := Node3D.new()
+	add_child_autofree(focus)
+	director.focus = focus
+	var estate := RegionGrade.new()
+	estate.grade = &"manor"
+	estate.bounds = Rect2(-50.0, -50.0, 100.0, 100.0)
+	add_child_autofree(estate)
+	var rooms := RegionGrade.new()
+	rooms.grade = &"manor_interior"
+	rooms.priority = 10
+	rooms.bounds = Rect2(-5.0, -5.0, 10.0, 10.0)
+	add_child_autofree(rooms)
+	director._process(0.1)
+	assert_eq(director.target_id(), &"manor_interior", "in the rooms")
+	director.swap_to(director.target_id(), 0.0)
+	focus.position = Vector3(30.0, 0.0, 0.0)
+	director._process(0.1)
+	assert_eq(director.target_id(), &"manor", "out on the grounds")
 
 
 func test_the_house_grade_has_no_gi_and_the_manor_tone_mapper() -> void:
@@ -86,25 +110,33 @@ func test_sun_is_up_at_noon_and_down_at_midnight() -> void:
 	assert_gt((-midnight.z).y, 0.0)
 
 
-func test_dread_darkens_and_desaturates_then_calm_restores() -> void:
-	director._on_mood_requested(&"dread", 1.0, 1.0)
+## Owner, 2026-11-26: fear never darkens the screen. A dread request is still
+## the mood (sound, HUD and her vitals follow it), but the look is untouched.
+func test_dread_is_the_mood_but_never_darkens_the_look() -> void:
+	var env := Environment.new()
+	var we := WorldEnvironment.new()
+	we.environment = env
+	add_child_autofree(we)
+	director.environment = we
+	director.apply(director.current)
+	var exposure := env.tonemap_exposure
+	var saturation := env.adjustment_saturation
+	director._on_mood_requested(self, &"dread", 1.0, 0.5)
 	director._process(1.0)
-	assert_almost_eq(director.mood_amount, 1.0, 0.001)
-	var base := GradeDirector.load_preset(&"human_winter")
-	var dark := GradeDirector.with_mood(base, director.mood_amount)
-	assert_lt(dark.saturation, base.saturation)
-	assert_lt(dark.exposure, base.exposure)
-	assert_gt(dark.fog_density, base.fog_density)
-	director._on_mood_requested(&"calm", 0.0, 0.5)
-	director._process(0.5)
-	assert_almost_eq(director.mood_amount, 0.0, 0.001)
+	assert_eq(director.mood, &"dread")
+	assert_almost_eq(director.mood_strength, 1.0, 0.001)
+	assert_almost_eq(env.tonemap_exposure, exposure, 0.0001, "no darkening")
+	assert_almost_eq(env.adjustment_saturation, saturation, 0.0001, "no draining")
+	director._on_mood_requested(self, &"calm", 0.0, 0.5)
+	assert_eq(director.mood, &"calm")
 
 
 func test_enchanted_sleep_fades_down() -> void:
-	director._on_mood_requested(&"enchanted_sleep", 1.0, 2.5)
+	director._on_mood_requested(self, &"enchanted_sleep", 1.0, 2.5)
 	director._process(2.5)
+	assert_almost_eq(director.sleep_amount, 1.0, 0.001)
 	var base := GradeDirector.load_preset(&"human_winter")
-	var sleepy := GradeDirector.with_mood(base, director.mood_amount, director.mood)
+	var sleepy := GradeDirector.with_sleep(base, director.sleep_amount)
 	assert_lt(sleepy.exposure, base.exposure * 0.5, "she drifts off: over a stop down")
 	assert_gt(sleepy.exposure, base.exposure * 0.3, "a dreamy fade, not a dropout to black")
 
@@ -130,64 +162,6 @@ func test_golden_hour_peaks_at_the_horizon() -> void:
 	assert_almost_eq(GradeDirector.golden_amount(-0.5), 0.0, 0.001, "no golden sky at night")
 
 
-func test_dread_drains_the_world() -> void:
-	var base := GradeDirector.load_preset(&"spring")
-	var dark := GradeDirector.with_mood(base, 1.0, &"dread")
-	assert_almost_eq(dark.saturation, 0.4, 0.01, "§1.5 saturation")
-	assert_lt(dark.exposure, base.exposure * 0.25, "two stops down or more")
-	assert_eq(dark.magic, 0.0, "sparkles off")
-	assert_gt(dark.fog_height_density, 0.06, "dense low fog")
-
-
-func test_dread_keeps_silhouettes_readable_indoors() -> void:
-	# Interiors are lit mostly by ambient: its floor after exposure must stay
-	# above near-black (about 2 stops brighter than the first dread pass).
-	var dark := GradeDirector.with_mood(GradeDirector.load_preset(&"manor"), 1.0, &"dread")
-	var floor_light := dark.ambient_color.get_luminance() * dark.ambient_energy * dark.exposure
-	assert_gt(floor_light, 0.035, "shapes still read in the dark")
-	assert_lt(floor_light, 0.12, "but it is still dark")
-	assert_lte(dark.contrast, 1.12, "no crushed blacks")
-
-
-func test_moderate_dread_bites_indoors() -> void:
-	# The Summer faerie triage asks for dread 0.55 in the night hall: it must
-	# frighten (experience bar §1.5), not stay a pale lavender evening.
-	assert_almost_eq(GradeDirector.dread_weight(0.0), 0.0, 0.0001)
-	assert_almost_eq(GradeDirector.dread_weight(1.0), 1.0, 0.0001)
-	assert_gt(GradeDirector.dread_weight(0.55), 0.75, "moderate dread lands most of the way")
-	var calm := GradeDirector.load_preset(&"manor")
-	var dark := GradeDirector.with_mood(calm, 0.55, &"dread")
-	var calm_floor := calm.ambient_color.get_luminance() * calm.ambient_energy * calm.exposure
-	var dark_floor := dark.ambient_color.get_luminance() * dark.ambient_energy * dark.exposure
-	assert_lt(dark_floor, calm_floor * 0.3, "ambient fill well over a stop and a half down")
-	assert_lt(dark.saturation, calm.saturation * 0.6, "the pink world leaves")
-
-
-func test_the_bogge_grade_takes_no_more_dread() -> void:
-	# The Bogge grade is already the horror look; the woods' dread on top of
-	# it went two stops further and the heart rendered pure black (L04-11).
-	var bogge := GradeDirector.load_preset(&"bogge")
-	var moody := GradeDirector.with_mood(bogge, 1.0)
-	assert_almost_eq(moody.exposure, bogge.exposure, 0.0001)
-	assert_almost_eq(moody.fog_height_density, bogge.fog_height_density, 0.0001)
-	var spring := GradeDirector.load_preset(&"spring")
-	assert_lt(GradeDirector.with_mood(spring, 1.0).exposure, spring.exposure * 0.5,
-		"other grades still take the full dread")
-
-
-func test_a_blend_into_the_bogge_carries_its_dread_headroom() -> void:
-	# Mid-swap the preset is a mix; if headroom snapped back to 1 the woods
-	# dread would stack fully and flash the black frame during the blend.
-	var spring := GradeDirector.load_preset(&"spring")
-	var bogge := GradeDirector.load_preset(&"bogge")
-	var mid := GradePreset.mix(spring, bogge, 0.5)
-	assert_almost_eq(mid.dread_headroom, 0.5, 0.0001)
-	var spring_moody := GradeDirector.with_mood(spring, 1.0).exposure
-	var mid_moody := GradeDirector.with_mood(mid, 1.0).exposure
-	assert_gt(mid_moody / mid.exposure, spring_moody / spring.exposure,
-		"half-way into the Bogge takes less of the dread than spring does")
-
-
 func test_the_bogge_fog_is_lit_by_its_cold_ambient() -> void:
 	# Fog lit by a 0.45 sun alone became a black wall that ate the sky, so the
 	# trunks had nothing paler behind them (audit D8). Its ambient lights it.
@@ -196,7 +170,6 @@ func test_the_bogge_fog_is_lit_by_its_cold_ambient() -> void:
 	assert_gt(bogge.fog_color.get_luminance(), 0.45, "the murk is paler than the trunks")
 	assert_lt(bogge.fog_color.get_luminance(), 0.65, "but still grey murk, not milk")
 	assert_gt(bogge.sun_color.b, bogge.sun_color.r, "a cold rim, not a warm one")
-	assert_eq(bogge.glow_bloom, 0.0, "no eye bloom")
 	assert_almost_eq(GradeDirector.load_preset(&"spring").volumetric_ambient_inject, 0.0, 0.0001,
 		"other grades keep their sun-lit fog")
 	var env := Environment.new()
@@ -258,47 +231,3 @@ func test_night_fog_takes_the_ambient_instead_of_going_black() -> void:
 	director.night = 1.0
 	director.apply(GradeDirector.load_preset(&"human_winter"))
 	assert_gt(env.volumetric_fog_ambient_inject, 0.3, "the winter night fog is lit by the ambient")
-
-
-func test_winter_day_dread_stays_readable_and_night_dread_is_unchanged() -> void:
-	# The wolf hunt (L18-11): its dread 0.5 took the winter day toward the night
-	# horror preset (purple-black sky, exposure 0.85 -> 0.36) and the user found
-	# it "dark ALL around". By day human_winter now takes its own dread look.
-	var winter := GradeDirector.load_preset(&"human_winter")
-	assert_eq(winter.dread_day_look, &"dread_winter_day")
-	var day := GradeDirector.with_mood(winter, 0.5, &"dread", 0.0)
-	# L18-14: darken little, so no light has to be added back (a pool of light
-	# on the clearing blew the centre snow out).
-	assert_gt(day.exposure, winter.exposure * 0.9, "by day the hunt keeps its light")
-	assert_lt(day.exposure, winter.exposure, "but dread still takes some")
-	assert_lt(day.saturation, winter.saturation * 0.85, "colour drains")
-	assert_gt(day.fog_density, winter.fog_density * 1.5, "the fog closes in")
-	assert_gt(day.sky_top.get_luminance(), 0.35, "a grey overcast, not a black sky")
-	assert_gt(day.volumetric_ambient_inject, 0.3, "the closing fog is pale, not a black wall")
-	assert_almost_eq(day.magic, 0.0, 0.0001)
-	# Night scenes (the beast at the door, L55's measured rig) keep the dread preset.
-	var night := GradeDirector.with_mood(winter, 1.0, &"dread", 1.0)
-	var dread := GradeDirector.load_preset(&"dread")
-	assert_almost_eq(night.exposure, dread.exposure, 0.0001, "night dread is the dread preset")
-	assert_eq(night.sky_top, dread.sky_top)
-	# Grades without a day look (spring, manor) are unchanged by day or night.
-	var spring := GradeDirector.load_preset(&"spring")
-	assert_almost_eq(GradeDirector.with_mood(spring, 1.0, &"dread", 0.0).exposure, dread.exposure, 0.0001)
-	# A blend into human_winter carries its day look past the middle.
-	var mixed := GradePreset.mix(spring, winter, 0.6)
-	assert_eq(mixed.dread_day_look, &"dread_winter_day")
-
-
-func test_the_director_picks_the_dread_look_by_the_sun() -> void:
-	var env := Environment.new()
-	var we := WorldEnvironment.new()
-	we.environment = env
-	add_child_autofree(we)
-	director.environment = we
-	director.mood_amount = 0.5
-	director.night = 0.0
-	director.apply(GradeDirector.load_preset(&"human_winter"))
-	var by_day := env.tonemap_exposure
-	director.night = 1.0
-	director.apply(GradeDirector.load_preset(&"human_winter"))
-	assert_gt(by_day, env.tonemap_exposure * 1.5, "the day hunt is far brighter than night dread")

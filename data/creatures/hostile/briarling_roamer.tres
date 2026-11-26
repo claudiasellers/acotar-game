@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/fae/briarling.gltf" id="2"]
+
+[resource]
+script = ExtResource("1")
+kind = &"briarling"
+display_name = "Briarling"
+fae = true
+canon = "X"
+body_length = 0.8
+body_height = 0.7
+body_width = 0.8
+coat_color = Color(0.93, 0.66, 0.74, 1)
+walk_speed = 1.5
+run_speed = 6.0
+turn_speed = 8.0
+sight_range = 31.5
+hearing_range = 48.0
+scent_range = 35.0
+max_health = 8.0
+arrow_damage = 8.0
+lethal_arrow_ids = Array[StringName]([&"ash"])
+lethal_delay = 0.0
+weak_zone_height = 0.5
+weak_zone_name = &"heart_knot"
+burn_dps = 8.0
+leaves_prints = true
+draw_distance = 120.0
+stride = 0.3
+print_size = 0.05
+hit_box_scale = 1.5
+element_rows = {
+&"fire": 1.5,
+&"frost": 1.0,
+&"sleep": 1.5
+}
+model_scene = ExtResource("2")

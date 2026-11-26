@@ -32,7 +32,14 @@ func test_the_bar_and_the_pans_draw_without_error() -> void:
 	assert_eq(row.overflow, 2)
 	await wait_process_frames(4)
 	assert_eq(get_theme_font_size_of(&"VitalsFigure"), 15)
-	assert_eq(VitalsStatusRow.CRACKS.size(), 4, "a bad status's pan is cracked")
+	# One pan for every chip; only the rim says it hurts (owner, 2026-11-26).
+	assert_true(VitalsStatusRow.hurts({"tag": &"venom", "magnitude": 0.5}), "a debuff has the red rim")
+	assert_true(VitalsStatusRow.hurts({"tag": &"cold", "magnitude": 0.9, "stage": 2}), "so does a gauge in danger")
+	assert_false(VitalsStatusRow.hurts({"tag": &"cold", "magnitude": 0.5, "stage": 1}), "not an uneasy one")
+	assert_false(VitalsStatusRow.hurts({"tag": &"steady", "magnitude": 1.0}), "nor a buff")
+	var src := FileAccess.get_file_as_string("res://ui/hud/vitals/status_row.gd")
+	assert_false(src.contains("CRACKS") or src.contains("&\"pall\""), "no second, dark pan")
+	assert_true(src.contains("draw_name("), "each chip's name is written under it")
 
 
 func get_theme_font_size_of(variation: StringName) -> int:

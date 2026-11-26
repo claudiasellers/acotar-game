@@ -23,6 +23,12 @@ func before_each() -> void:
 	bank = load(SoundDirector.BANK_PATH) as SoundBank
 
 
+## Dread moods are held by HudLayout (30 s lapse) and outlive the director;
+## left on, they hush the pickup log for the next test in the same engine.
+func after_each() -> void:
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
+
+
 func _director() -> SoundDirector:
 	director = SoundDirector.new()
 	add_child_autofree(director)
@@ -94,11 +100,11 @@ func test_dread_silences_the_world_and_calm_brings_it_back() -> void:
 	var d := _director()
 	d._set_space(&"hunting_forest")
 	EventBus.scene_space_started.emit(&"test_space")
-	EventBus.mood_requested.emit(&"dread", 1.0, 0.05)
+	EventBus.mood_changed.emit(&"dread", 1.0, 0.05)
 	await wait_seconds(0.2)
 	assert_almost_eq(d.dread, 1.0, 0.01)
 	assert_false(d.played.has(&"horror_wrong"), "story scenes bring their own horror")
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.05)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.05)
 	await wait_seconds(0.2)
 	assert_almost_eq(d.dread, 0.0, 0.01)
 	EventBus.scene_space_finished.emit(&"test_space")
@@ -106,7 +112,7 @@ func test_dread_silences_the_world_and_calm_brings_it_back() -> void:
 
 func test_roaming_dread_ends_on_the_wrong_sound() -> void:
 	var d := _director()
-	EventBus.mood_requested.emit(&"dread", 0.8, 0.05)
+	EventBus.mood_changed.emit(&"dread", 0.8, 0.05)
 	assert_eq(int(d.played.get(&"horror_wrong", 0)), 1)
 
 
@@ -283,5 +289,5 @@ func test_a_space_freed_unfinished_stops_holding_the_film_duck_and_the_sting() -
 	space.free()
 	await wait_seconds(3.4)
 	assert_almost_eq(d.film_hold, 0.0, 0.01, "the film duck returns when its node is gone")
-	EventBus.mood_requested.emit(&"dread", 0.8, 0.05)
+	EventBus.mood_changed.emit(&"dread", 0.8, 0.05)
 	assert_eq(int(d.played.get(&"horror_wrong", 0)), 1, "the sting plays again after the leak")

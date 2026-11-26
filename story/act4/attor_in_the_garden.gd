@@ -179,7 +179,7 @@ func _build_beats() -> Array:
 			watching = false
 			sound(&"heartbeat", -60.0)
 			sound(&"drone", -60.0)
-			EventBus.mood_requested.emit(&"calm", 0.0, 4.0)
+			EventBus.mood_requested.emit(self, &"calm", 0.0, 4.0)
 			_walk(&"tamlin", [&"tamlin_round", &"tamlin_back"], 3.4), "silence"),
 		Beats.until(func() -> bool: return not _walkers.has(&"tamlin"), "he comes back"),
 		Beats.run(func(_s: SceneSpace) -> void:
@@ -315,7 +315,7 @@ func _detected() -> void:
 			_speak(true, 2.0)
 			_play(&"shriek", 0.0)
 			StoryControl.shake = 0.7
-			EventBus.mood_requested.emit(&"dread", 1.0, 0.4)
+			EventBus.mood_requested.emit(self, &"dread", 1.0, 0.4)
 			veil(0.75, 0.5), "found"),
 		Beats.wait(1.4),
 		Beats.run(func(_s: SceneSpace) -> void:

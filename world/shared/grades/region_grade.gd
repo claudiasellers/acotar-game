@@ -1,6 +1,6 @@
 ## Put one in a region scene to give it its own grade (the per-region LUT
 ## slot). GradeDirector blends to `grade` while Feyre is inside `bounds`, unless
-## a story swap is holding a grade.
+## a story swap is holding a grade (an indoor area wins even then).
 class_name RegionGrade
 extends Node
 
@@ -16,8 +16,12 @@ const GROUP := &"region_grade"
 ## Rectangles inside `rects` that belong to someone else.
 @export var holes: Array[Rect2] = []
 @export var blend_seconds := 4.0
+## Where two contain her, the higher wins (a house's rooms over its grounds).
+@export var priority := 0
 ## How long the blend takes on the way out of here; 0 uses the next area's.
 @export var leave_seconds := 0.0
+## Rooms: wins over any story grade, and outdoor-only fear stays outside.
+@export var indoor := false
 
 
 func _ready() -> void:

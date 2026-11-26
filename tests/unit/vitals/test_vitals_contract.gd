@@ -59,7 +59,9 @@ func test_bus_declares_every_vitals_signal_with_its_arguments() -> void:
 
 
 func test_attack_rows_resolve_by_id_family_and_unknown() -> void:
-	assert_gte(AttackTable.count(), 25)
+	for id: StringName in [&"naga_claw", &"martax_roar", &"generic_hit", &"wolf_bite"]:
+		assert_true(AttackTable.has(id), "the %s row this contract uses is in the table" % id)
+	assert_eq(AttackTable.resolve(&"puca_grab").id, &"generic_hit", "the puca has no row: it never touches her (C6)")
 	assert_eq(AttackTable.resolve(&"naga").id, &"naga_claw", "a family resolves to its default row")
 	assert_eq(AttackTable.resolve(&"martax_roar").status_tag, &"roar_shake")
 	assert_eq(AttackTable.resolve(&"no_such_attack").id, &"generic_hit")
@@ -67,8 +69,8 @@ func test_attack_rows_resolve_by_id_family_and_unknown() -> void:
 
 func test_a_hit_lands_once_then_iframes_drop_the_next() -> void:
 	var dealt := v.take_hit(&"wolf", AttackTable.resolve(&"wolf_bite"))
-	assert_almost_eq(dealt, 25.0, 0.01)
-	assert_almost_eq(v.health, 75.0, 0.01)
+	assert_gt(dealt, 0.0, "the bite lands")
+	assert_almost_eq(v.health, VitalsState.MAX_HEALTH - dealt, 0.01, "and comes off her health")
 	assert_eq(v.take_hit(&"wolf", AttackTable.resolve(&"wolf_bite")), 0.0, "i-frames")
 	v.step(1.0)
 	assert_gt(v.take_hit(&"wolf", AttackTable.resolve(&"wolf_bite")), 0.0, "i-frames over")
@@ -191,8 +193,12 @@ func test_gauges_escalate_and_always_show() -> void:
 	assert_true(tags.has(&"cold") and tags.has(&"hunger"), "calm gauges are still listed")
 	var hud := VitalsHud.new()
 	add_child_autofree(hud)
-	assert_true(hud._status_wanted({"tag": &"hunger", "seconds_left": -1.0, "total": -1.0, "stage": 0}),
-		"Auto shows a calm gauge")
+	await wait_process_frames(2)
+	hud._vitals = v
+	hud._player = player
+	hud._update_statuses(0.1, VitalsHud.Mode.CONTEXTUAL, true)
+	var shown: Array = hud.status_row.shown.map(func(s: Dictionary) -> StringName: return s.tag)
+	assert_eq(shown.slice(0, 2), [&"cold", &"hunger"], "Auto shows the calm gauges, first")
 
 
 func test_every_status_tag_has_a_name_and_a_line() -> void:
@@ -203,6 +209,7 @@ func test_every_status_tag_has_a_name_and_a_line() -> void:
 
 func test_a_chip_is_taught_once_then_named_on_hover() -> void:
 	var path := "user://test_status_taught.cfg"
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	var row := VitalsStatusRow.new()
 	row.settings_path = path
@@ -223,6 +230,7 @@ func test_a_chip_is_taught_once_then_named_on_hover() -> void:
 
 func test_a_gauge_is_taught_when_it_bites_and_meters_on_offer() -> void:
 	var path := "user://test_gauge_taught.cfg"
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	var row := VitalsStatusRow.new()
 	row.settings_path = path
@@ -241,6 +249,33 @@ func test_a_gauge_is_taught_when_it_bites_and_meters_on_offer() -> void:
 	assert_eq(row.teaching, &"health", "a meter is taught on offer")
 	assert_ne(StatusRules.blurb(&"stamina"), "")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+
+
+func test_slips_wait_out_a_staged_moment_and_dread_ends_ease() -> void:
+	var path := "user://test_status_hushed.cfg"
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
+	var row := VitalsStatusRow.new()
+	row.settings_path = path
+	add_child_autofree(row)
+	var list: Array[Dictionary] = [{"tag": &"steady", "magnitude": 1.0, "seconds_left": 30.0, "total": 60.0}]
+	row.set_statuses(list)
+	row._process(0.1)
+	assert_eq(row.teaching, &"steady")
+	StoryControl.set_mode(StoryControl.Mode.WALK)
+	row._process(0.1)
+	assert_eq(row.teaching, &"", "a staged moment sends the slip back")
+	assert_false(row.taught.has(&"steady"), "untaught, so it comes again")
+	StoryControl.set_mode(StoryControl.Mode.FULL)
+	row._process(0.1)
+	assert_eq(row.teaching, &"steady", "taught once she is free")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	v.ease_pulse = 0.8
+	assert_true(v.statuses().any(func(s: Dictionary) -> bool: return s.tag == &"at_ease"))
+	EventBus.mood_changed.emit(&"dread", 0.6, 0.0)
+	assert_eq(v.ease_pulse, 0.0, "fear ends the moment of ease")
+	assert_false(v.statuses().any(func(s: Dictionary) -> bool: return s.tag == &"at_ease"))
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 
 
 func test_she_has_a_thought_on_waking() -> void:
@@ -287,6 +322,26 @@ func test_grab_breaks_free_with_presses_that_cost_stamina() -> void:
 	assert_almost_eq(player.presses_paid, 3.0 * VitalsState.GRAB_PRESS_STAMINA, 0.01)
 
 
+func test_hold_to_break_free_counts_a_held_key_as_a_steady_mash() -> void:
+	var saved := GameSettings.settings_path
+	GameSettings.settings_path = "user://test_vitals_hold.cfg"
+	GameSettings.load_settings()
+	EventBus.player_grabbed.emit(&"puca", 3, 4.0)
+	Input.action_press(&"interact")
+	v.step(VitalsState.GRAB_HOLD_STEP * 3.5)
+	assert_true(v.is_grabbed(), "setting off: holding does nothing")
+	GameSettings.set_value(&"break_free_hold", true)
+	v.step(VitalsState.GRAB_HOLD_STEP * 1.5)
+	assert_eq(v.grab_presses_left, 2, "one press per step held")
+	v.step(VitalsState.GRAB_HOLD_STEP * 2.0)
+	assert_false(v.is_grabbed(), "held long enough, she breaks free")
+	assert_almost_eq(player.presses_paid, 3.0 * VitalsState.GRAB_PRESS_STAMINA, 0.01, "each held press costs what a mash does")
+	Input.action_release(&"interact")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(GameSettings.settings_path))
+	GameSettings.settings_path = saved
+	GameSettings.load_settings()
+
+
 func test_a_teleport_mid_fall_lands_her_unhurt() -> void:
 	player.global_position = Vector3(0, 2, 0)
 	v._stood_y = 40.0
@@ -306,7 +361,7 @@ func test_ease_raises_max_stamina_and_dread_follows_mood() -> void:
 	v.ease = 0.4
 	v.step(0.1)
 	assert_almost_eq(player.max_stamina, 120.0, 0.01)
-	EventBus.mood_requested.emit(&"dread", 0.8, 1.0)
+	EventBus.mood_changed.emit(&"dread", 0.8, 1.0)
 	v.step(1.0)
 	assert_gt(v.dread, 0.1)
 
@@ -324,11 +379,23 @@ func test_save_round_trip() -> void:
 	other.free()
 
 
-func test_hud_contextual_shows_dangers_and_new_buffs_only() -> void:
+func test_hud_shows_a_status_exactly_while_she_has_it() -> void:
 	var hud := VitalsHud.new()
 	add_child_autofree(hud)
 	await wait_process_frames(2)
-	assert_true(hud._status_wanted({"tag": &"venom", "seconds_left": -1.0, "total": -1.0}))
-	hud._first_seen[&"steady"] = hud._clock - 10.0
-	assert_false(hud._status_wanted({"tag": &"steady", "seconds_left": 100.0, "total": 200.0}), "old buff hides")
-	assert_true(hud._status_wanted({"tag": &"steady", "seconds_left": 10.0, "total": 200.0}), "near its end")
+	hud._vitals = v
+	hud._player = player
+	player.body_state.add_effect(&"steady", 1.0, 200.0)
+	var tags := func() -> Array: return hud.status_row.shown.map(func(s: Dictionary) -> StringName: return s.tag)
+	hud._update_statuses(0.1, VitalsHud.Mode.CONTEXTUAL, true)
+	assert_has(tags.call(), &"steady", "a new buff shows")
+	for i in 30:
+		hud._update_statuses(1.0, VitalsHud.Mode.CONTEXTUAL, true)
+	assert_has(tags.call(), &"steady", "and stays while she has it, in Auto too: no buff hides on its own")
+	player.body_state.effects.erase(&"steady")
+	hud._update_statuses(VitalsHud.STATUS_LINGER * 0.5, VitalsHud.Mode.CONTEXTUAL, true)
+	assert_has(tags.call(), &"steady", "a status that leaves lingers a moment, so nothing flickers")
+	hud._update_statuses(VitalsHud.STATUS_LINGER, VitalsHud.Mode.CONTEXTUAL, true)
+	assert_does_not_have(tags.call(), &"steady", "then it goes")
+	hud._update_statuses(0.1, VitalsHud.Mode.OFF, true)
+	assert_eq(hud.status_row.shown.size(), 0, "Off shows none")

@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="KeyHintSet" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://ui/hud/key_hint_row.gd" id="1"]
+[ext_resource type="Script" path="res://ui/hud/key_hint_set.gd" id="2"]
+
+[sub_resource type="Resource" id="crouch"]
+script = ExtResource("1")
+id = &"crouch"
+priority = 210
+keys = Array[StringName]([&"crouch"])
+says = PackedStringArray("crouch")
+always = false
+
+[sub_resource type="Resource" id="jump"]
+script = ExtResource("1")
+id = &"jump"
+priority = 220
+keys = Array[StringName]([&"jump"])
+says = PackedStringArray("jump")
+always = false
+
+[sub_resource type="Resource" id="walk"]
+script = ExtResource("1")
+id = &"walk"
+priority = 230
+keys = Array[StringName]([&"move"])
+says = PackedStringArray("walk")
+always = false
+
+[sub_resource type="Resource" id="look"]
+script = ExtResource("1")
+id = &"look"
+priority = 240
+keys = Array[StringName]([&"look"])
+says = PackedStringArray("look around")
+always = false
+
+[resource]
+script = ExtResource("2")
+rows = Array[ExtResource("1")]([SubResource("crouch"), SubResource("jump"), SubResource("walk"), SubResource("look")])

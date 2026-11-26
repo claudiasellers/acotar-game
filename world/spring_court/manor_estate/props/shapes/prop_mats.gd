@@ -1,5 +1,5 @@
-## Materials for procedural props (R3 princess look): glossy pearl, gold accents,
-## candy colours, glowing candle flames and faelights. All cached and shared.
+## Materials for procedural props (R3 princess look): candy colours, china white,
+## brushed gold, glass, and glowing candle flames and faelights. All cached and shared.
 class_name PropMats
 extends RefCounted
 
@@ -20,46 +20,63 @@ const BOOKS := [Color(0.98, 0.55, 0.70), Color(0.80, 0.68, 0.96), Color(0.66, 0.
 static var _cache: Dictionary = {}
 
 
+## One lit, opaque-or-clear surface with no clearcoat and no rim. The numbers
+## are prop_finish.gdshaderinc's finish table, so a procedural prop and a
+## Blender model of the same stuff look the same.
+static func _lit(c: Color, roughness: float, metallic: float = 0.0) -> CandyMaterial:
+	var k := "lit|%s|%.2f|%.2f" % [c.to_html(), roughness, metallic]
+	if _cache.has(k):
+		return _cache[k]
+	var m := MaterialLibrary.surface(c, roughness, metallic)
+	if c.a < 0.999:
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		m.cull_mode = BaseMaterial3D.CULL_DISABLED
+	_cache[k] = m
+	return m
+
+
 static func gold() -> CandyMaterial:
-	return EstateKit.mat(EstateKit.GOLD, 0.22, 0.9, "prop|gold")
+	return _lit(EstateKit.GOLD, 0.42, 1.0)
 
 
+## China, marble and white paint: a soft satin, lit by the room.
 static func pearl(c: Color = EstateKit.PEARL) -> CandyMaterial:
-	return EstateKit.pearl(c)
+	return _lit(c, 0.5)
 
 
 static func gloss(c: Color) -> CandyMaterial:
-	return EstateKit.mat(c, 0.28)
+	return _lit(c, 0.5)
 
 
 static func satin(c: Color) -> CandyMaterial:
-	return EstateKit.mat(c, 0.55)
+	return _lit(c, 0.62)
 
 
 static func fabric(c: Color) -> CandyMaterial:
-	return EstateKit.mat(c, 0.9)
+	return _lit(c, 0.95)
 
 
 static func wood(c: Color) -> CandyMaterial:
-	return EstateKit.mat(c, 0.6)
+	return _lit(c, 0.62)
 
 
 static func metal(c: Color) -> CandyMaterial:
-	return EstateKit.mat(c, 0.3, 0.75)
+	return _lit(c, 0.42, 0.75)
 
 
 ## The natural material for a catalogue colour: gold stays metallic gold, near-white
-## goes pearlescent, everything else glossy satin.
+## goes to china white, clear colours to glass, everything else satin.
 static func body(c: Color) -> CandyMaterial:
 	if absf(c.r - EstateKit.GOLD.r) < 0.02 and absf(c.g - EstateKit.GOLD.g) < 0.02 and absf(c.b - EstateKit.GOLD.b) < 0.02:
 		return gold()
 	if c.s < 0.1 and c.v > 0.9:
 		return pearl(c)
 	if c.a < 0.99:
-		return EstateKit.mat(c, 0.08)
+		return glass(c)
 	return satin(c)
 
 
+## Flames and faelights only: nothing else in the house lights itself.
 static func glow(c: Color, energy: float = 2.0) -> CandyMaterial:
 	var k := "glow|%s|%.1f" % [c.to_html(), energy]
 	if _cache.has(k):
@@ -78,27 +95,26 @@ static func flame() -> CandyMaterial:
 	return glow(FLAME, 3.0)
 
 
+## Real glass: the one glossy finish, with a faint rim lit by the lamps near it.
 static func glass(c: Color = Color(0.92, 0.96, 1.0, 0.3)) -> CandyMaterial:
 	var k := "glass|" + c.to_html()
 	if _cache.has(k):
 		return _cache[k]
-	var m := EstateKit.mat(c, 0.05, 0.0, k + "|b").duplicate() as CandyMaterial
+	var m := MaterialLibrary.surface(c, 0.08, 0.1)
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.cull_mode = BaseMaterial3D.CULL_DISABLED
+	m.clearcoat_enabled = true
+	m.clearcoat = 0.6
+	m.clearcoat_roughness = 0.3
 	m.rim_enabled = true
-	m.rim = 0.5
+	m.rim = 0.15
 	_cache[k] = m
 	return m
 
 
+## Cut crystal (chandelier drops): tinted glass. It catches the candles; it has no light of its own.
 static func crystal() -> CandyMaterial:
-	var k := "crystal"
-	if _cache.has(k):
-		return _cache[k]
-	var m := glass(Color(0.96, 0.88, 1.0, 0.6)).duplicate() as CandyMaterial
-	m.emission_enabled = true
-	m.emission = Color(1.0, 0.85, 0.95)
-	m.emission_energy_multiplier = 0.35
-	_cache[k] = m
-	return m
+	return glass(Color(0.96, 0.88, 1.0, 0.6))
 
 
 static func water() -> CandyMaterial:

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://systems/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wpn_crow_beak_awl"
+display_name = "Crow-beak Awl"
+family = &"crow"
+kind = &"knife"
+power = 0.9
+swing_s = 0.4
+reach_m = 1.5
+stagger_s = 0.8
+durability = 8
+imbue_slots = 1
+two_handed = false
+trait_id = &"weakspot"
+trait_count = 0
+unique = false
+canon = "X"
+description = "A hollow-crow's too-long beak on a twig, an eye-spot feather tied on."

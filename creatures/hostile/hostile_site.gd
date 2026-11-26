@@ -16,6 +16,11 @@ const ALERT_DECAY := 0.05
 ## tiny.
 const TOKENS := {&"martax": 1, &"crow": 3}
 const DEFAULT_TOKENS := 2
+## The day a pack last scattered from her here (G25; the camp is not cleared).
+const ROUTED_FLAG := "fact.site_routed.%s"
+## An encounter ends as "slipped" once no member has been hostile or
+## searching for this long (she got away, or they lost her).
+const ENCOUNTER_CALM_S := 8.0
 
 @export var data: HostileSiteData
 
@@ -28,10 +33,19 @@ var members: Array[Creature] = []
 var alert_level: float = 0.0
 var last_known: Vector3 = Vector3.INF
 var is_settled: bool = false
+## A fight is on: a member reported her, and it hasn't ended (HostileEncounters).
+var engaged: bool = false
+var _calm_left: float = 0.0
+## The life that comes back once it settles (SettleSwell); null until then.
+var swell: SettleSwell
+## Its camp's loot container (CampContainer), or null when the family's camps hold nothing.
+var camp_loot: CampContainer
 ## {member: Creature, at: Vector3, left: float}
 var _pending: Array[Dictionary] = []
 var _token_holders: Array[Creature] = []
 var _lunge_ready: bool = true
+## The camp broke and ran this fight (rout_share); cleared when the next begins.
+var _routed: bool = false
 
 
 func _ready() -> void:
@@ -49,12 +63,17 @@ func _ready() -> void:
 			return
 	if snap_to_core:
 		global_position = Vector3(data.core.x, float(height_func.call(data.core.x, data.core.y)), data.core.y)
+	# Its loot container (catalogue §1.6), there whether the camp is settled or not.
+	camp_loot = CampContainer.place(self)
 	if HostileSite.stays_settled(WorldState.get_flag(settle_flag(data.id)), Clock.day,
 			data.settle_days, WorldState.has_flag("glamour_lifted")):
 		is_settled = true
+		swell = SettleSwell.grow(self, data.territory_radius, Clock.is_night(), false)
 		return
 	for i in data.count:
 		_spawn_member(i)
+	EventBus.player_knocked_down.connect(_on_player_knocked_down)
+	EventBus.arrow_light_landed.connect(_on_light_landed)
 
 
 static func settle_flag(site_id: StringName) -> String:
@@ -83,6 +102,10 @@ func in_leash(pos: Vector3) -> bool:
 ## A member saw her at `at`: the rest of the camp hears in report_delay seconds,
 ## unless the member dies first.
 func report(member: Creature, at: Vector3) -> void:
+	if not engaged:
+		engaged = true
+		_routed = false
+	_calm_left = ENCOUNTER_CALM_S
 	for p in _pending:
 		if p.member == member:
 			p.at = at
@@ -144,6 +167,7 @@ func living_count() -> int:
 
 func _physics_process(delta: float) -> void:
 	alert_level = maxf(alert_level - ALERT_DECAY * delta, 0.0)
+	_step_encounter(delta)
 	if alert_level <= 0.0:
 		_lunge_ready = true
 	for i in range(_pending.size() - 1, -1, -1):
@@ -155,6 +179,37 @@ func _physics_process(delta: float) -> void:
 		var m := p.member as Creature
 		if is_instance_valid(m) and m.alive:
 			_raise(p.at)
+
+
+## While a fight is on, any member still hostile or searching keeps it on;
+## ENCOUNTER_CALM_S with none and she slipped away.
+func _step_encounter(delta: float) -> void:
+	if not engaged:
+		return
+	for m in members:
+		if is_instance_valid(m) and m.alive:
+			var ladder := m.get(&"ladder") as HostileLadder
+			if ladder and (ladder.is_hostile() or ladder.state == HostileLadder.State.SEARCHING):
+				_calm_left = ENCOUNTER_CALM_S
+				return
+	_calm_left -= delta
+	if _calm_left <= 0.0:
+		end_encounter(HostileEncounters.SLIPPED)
+
+
+## The fight is over, one way or another; it ends once.
+func end_encounter(outcome: StringName) -> void:
+	engaged = false
+	HostileEncounters.ended(data.id, data.family, outcome)
+
+
+func _on_player_knocked_down(source_id: Variant = null, _cause: Variant = null, _at: Variant = null) -> void:
+	if not engaged or source_id == null:
+		return
+	for m in members:
+		if is_instance_valid(m) and m.creature_id == StringName(source_id):
+			end_encounter(HostileEncounters.KNOCKDOWN)
+			return
 
 
 func _raise(at: Vector3) -> void:
@@ -196,12 +251,87 @@ func _on_member_died(_cause: StringName, member: Creature) -> void:
 			_pending.remove_at(i)
 	if living_count() == 0 and not is_settled:
 		settle()
+		return
+	_maybe_rout(member)
 
 
-## Every member is gone: the place settles. Birdsong and sparkle come back
-## (DreadFields leave with their members; the celebration is the chime).
+## Once rout_share of the camp is dead in a fight, the rest give her up and
+## run (HostileRoamer.rout): the fight ends driven off. 0 fights to the last.
+func _maybe_rout(dead: Creature) -> void:
+	if _routed or not engaged or is_settled:
+		return
+	var share := float(dead.get(&"rout_share")) if &"rout_share" in dead else 0.0
+	if share <= 0.0 or members.is_empty():
+		return
+	var fallen := members.size() - living_count()
+	if fallen < int(ceil(members.size() * share)):
+		return
+	_routed = true
+	var from := last_known if last_known != Vector3.INF else dead.global_position
+	for m in members:
+		if is_instance_valid(m) and m.alive and m.has_method(&"rout"):
+			m.call(&"rout", from)
+	end_encounter(HostileEncounters.DRIVEN_OFF)
+	_close_rout()
+
+
+## G25: a rout has an ending. One of them calls as it goes, the dread eases
+## (HostileRoamer.rout), a small swell brings the place back for the night,
+## and she says so once. The camp isn't cleared: `fact.site_routed.<id>` holds
+## the day, and they come back.
+func _close_rout() -> void:
+	WorldState.set_flag(ROUTED_FLAG % data.id, Clock.day)
+	for m in members:
+		if is_instance_valid(m) and m.alive and m is HostileRoamer:
+			var r := m as HostileRoamer
+			if r.call_clip != &"" and r.animator:
+				r.animator.play_oneshot(r.call_clip)
+			break
+	if swell == null:
+		swell = SettleSwell.grow(self, data.territory_radius, Clock.is_night(), false)
+	if is_inside_tree():
+		HostileRoamer.say_once(get_tree(), HostileRoamer.ROUT_LINE)
+
+
+## A glint fell at `at` (a light arrow's glow): the members nearest it that
+## care (wants_glint), up to their glint_drawn, go for it and forget her.
+## Returns how many went.
+func glint(at: Vector3) -> int:
+	if is_settled:
+		return 0
+	var keen: Array[Creature] = []
+	var drawn := 0
+	for m in members:
+		if is_instance_valid(m) and m.alive and m.has_method(&"wants_glint") and bool(m.call(&"wants_glint")):
+			keen.append(m)
+			drawn = maxi(drawn, int(m.get(&"glint_drawn")))
+	if keen.is_empty():
+		return 0
+	keen.sort_custom(func(a: Creature, b: Creature) -> bool:
+		return a.global_position.distance_squared_to(at) < b.global_position.distance_squared_to(at))
+	var n := mini(drawn, keen.size())
+	for i in n:
+		keen[i].call(&"distract", at)
+	return n
+
+
+func _on_light_landed(at: Vector3) -> void:
+	if data and Vector2(at.x - global_position.x, at.z - global_position.z).length() <= leash_radius():
+		glint(at)
+
+
+## Every member is gone: the place settles. Birdsong comes back as the
+## DreadFields leave with their members; the swell (SettleSwell) brings the
+## fliers, petals and sparkle back over 20 s; the celebration is the one chime.
 func settle() -> void:
 	is_settled = true
+	# A camp cleared is a fight won, met head-on or not.
+	end_encounter(HostileEncounters.KILLED)
+	if swell and is_instance_valid(swell):
+		# A rout's small swell gives way to the settle's.
+		remove_child(swell)
+		swell.queue_free()
+	swell = SettleSwell.grow(self, data.territory_radius, Clock.is_night(), true)
 	WorldState.set_flag(settle_flag(data.id), Clock.day)
 	if EventBus.has_signal(&"celebration_requested"):
 		EventBus.emit_signal(&"celebration_requested", &"site_settled", global_position)

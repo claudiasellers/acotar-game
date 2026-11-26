@@ -66,6 +66,8 @@ answered() { # branch
 	case "$1" in
 		lead/ready-*) k=${1#lead/ready-}
 			printf '%s\n' "$ANSWERS" | grep -qx -e "refs/tags/merged/$k" -e "refs/tags/rejected/$k" ;;
+		mq/rej-*) k=${1#mq/rej-}
+			printf '%s\n' "$ANSWERS" | grep -qx "refs/tags/rejected/$k" ;;
 		shots/req-*|shots/res-*) k=${1#shots/re?-}; [ -f "$MQ_DIR/shots/done/$k" ] ;;
 		*) return 1 ;;
 	esac
@@ -116,7 +118,7 @@ do_entry() {
 		say "forget finished entry $id"
 		[ "$DRY" = 1 ] && return 0
 		git update-ref -d "refs/mq/sub/$id" 2>/dev/null
-		rm -f "$e" "${e%.entry}.log"
+		rm -f "$e" "${e%.entry}.log" "${e%.entry}.full" "${e%.entry}.batch" "${e%.entry}.diag"
 	fi
 	drop "$f"
 }

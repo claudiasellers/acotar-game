@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/fae/gloamer.gltf" id="2"]
+
+[resource]
+script = ExtResource("1")
+kind = &"gloamer"
+display_name = "Gloamer"
+fae = true
+canon = "X"
+body_length = 0.7
+body_height = 1.3
+body_width = 0.6
+walk_speed = 2.0
+run_speed = 6.5
+turn_speed = 8.0
+sight_range = 40.5
+hearing_range = 44.0
+scent_range = 70.0
+max_health = 24.0
+arrow_damage = 8.0
+knife_scale = 1.5
+lethal_arrow_ids = Array[StringName]([&"ash"])
+lethal_delay = 0.0
+weak_zone_height = 0.8
+weak_zone_name = &"throat"
+burn_dps = 6.0
+leaves_prints = true
+draw_distance = 120.0
+stride = 0.6
+print_size = 0.1
+element_rows = {
+&"fire": 1.5,
+&"frost": 1.0,
+&"light": 1.5,
+&"sleep": 1.5
+}
+model_scene = ExtResource("2")

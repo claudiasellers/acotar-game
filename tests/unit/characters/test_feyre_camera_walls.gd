@@ -51,7 +51,10 @@ func test_a_thin_wall_at_her_shoulder_is_never_passed() -> void:
 
 func test_in_the_open_the_full_shoulder_offset_stays() -> void:
 	var f := await _aiming_feyre(0.0, 0.0)
-	assert_almost_eq(f.camera.global_position.x, 0.55, 0.03, "nothing beside her: the usual offset")
+	# The arm's own offset: the camera turns a little as it moves over, to keep
+	# the middle of the screen on what it was on, so the lens's world x is not it.
+	assert_almost_eq(f.camera_control._spring_arm.position.x, FeyreCamera.AIM_SHOULDER, 0.03,
+		"nothing beside her: the usual offset")
 
 
 func test_a_far_story_focus_outdoors_takes_the_shoulder_so_it_is_not_behind_her() -> void:

@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="KeyHintSet" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://ui/hud/key_hint_row.gd" id="1"]
+[ext_resource type="Script" path="res://ui/hud/key_hint_set.gd" id="2"]
+
+[sub_resource type="Resource" id="ride_steer"]
+script = ExtResource("1")
+id = &"ride_steer"
+priority = 150
+keys = Array[StringName]([&"move"])
+says = PackedStringArray("steer her (lightly to walk)")
+always = false
+
+[sub_resource type="Resource" id="ride_gallop"]
+script = ExtResource("1")
+id = &"ride_gallop"
+priority = 160
+keys = Array[StringName]([&"sprint"])
+says = PackedStringArray("gallop")
+always = false
+
+[sub_resource type="Resource" id="ride_leap"]
+script = ExtResource("1")
+id = &"ride_leap"
+priority = 170
+keys = Array[StringName]([&"jump"])
+says = PackedStringArray("leap")
+always = false
+
+[sub_resource type="Resource" id="ride_off"]
+script = ExtResource("1")
+id = &"ride_off"
+priority = 180
+keys = Array[StringName]([&"interact"])
+says = PackedStringArray("get down")
+always = false
+
+[sub_resource type="Resource" id="whistle"]
+script = ExtResource("1")
+id = &"whistle"
+priority = 190
+keys = Array[StringName]([&"call_mount"])
+says = PackedStringArray("whistle for her")
+always = false
+
+[resource]
+script = ExtResource("2")
+rows = Array[ExtResource("1")]([SubResource("ride_steer"), SubResource("ride_gallop"), SubResource("ride_leap"), SubResource("ride_off"), SubResource("whistle")])

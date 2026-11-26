@@ -1,5 +1,5 @@
 ## The grade inside the house: a flat, even ambient that only a closed room
-## needs, with no GI (T117). It sits ahead of the grounds' RegionGrade and covers the rooms
+## needs, with no GI (T117). It outranks the estate's RegionGrade (priority) and covers the rooms
 ## by height too, so the lawn over a cellar stays outdoors.
 class_name ManorInteriorGrade
 extends RegionGrade
@@ -15,6 +15,8 @@ func _init() -> void:
 	grade = &"manor_interior"
 	blend_seconds = 1.0
 	leave_seconds = 1.0
+	priority = 10
+	indoor = true
 
 
 func contains(world_pos: Vector3) -> bool:

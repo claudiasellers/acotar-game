@@ -1,7 +1,8 @@
 ## Feyre's bow as something you can see: slung across her back with her quiver
-## while she walks, swung into her hands when she aims, draws or picks an
-## arrow (Q), with the chosen arrow nocked and the string coming back to her
-## chin as she draws. The arms come up through BowArmPose.
+## while she walks, in her hands when she aims, draws or picks an arrow (Q),
+## with the chosen arrow on the string from the moment it leaves her back and
+## the string coming back to her chin as she draws. A press of fire snaps it
+## up (DRAW_SWING_SPEED), so the draw is seen from its start. The arms come up through BowArmPose.
 ##
 ## The bow, quiver and arrow are built here from a few swept tubes (no asset
 ## needed): honey ash wood, a rose-leather grip and gold nocks (R3).
@@ -13,6 +14,9 @@ const ArrowModel := preload("res://systems/bow/arrow_model.gd")
 ## Seconds the bow stays up after Q or F, with no aim held.
 const READY_HOLD := 2.5
 const SWING_SPEED := 6.0
+## How fast it comes up when she is drawing: the bow is in her hands within
+## the first quarter of the hunting bow's draw.
+const DRAW_SWING_SPEED := 20.0
 ## How far (rad) the bow arm may swing from the way she faces while she turns.
 const AIM_CONE := deg_to_rad(60.0)
 const HALF_LENGTH := 0.62
@@ -85,7 +89,7 @@ func wants_raised() -> bool:
 	if controller == null or not controller.can_shoot():
 		return false
 	var feyre := controller.feyre
-	return feyre.is_aiming or controller.is_drawing or ready_timer > 0.0
+	return controller.is_aiming or ready_timer > 0.0
 
 
 func _attach_pose() -> void:
@@ -104,7 +108,8 @@ func _attach_pose() -> void:
 func _process(delta: float) -> void:
 	ready_timer = maxf(ready_timer - delta, 0.0)
 	var real := TimeScale.real(delta)
-	raised = move_toward(raised, 1.0 if wants_raised() else 0.0, real * SWING_SPEED)
+	var up_speed := DRAW_SWING_SPEED if controller.is_drawing else SWING_SPEED
+	raised = move_toward(raised, 1.0 if wants_raised() else 0.0, real * (up_speed if wants_raised() else SWING_SPEED))
 	if pose:
 		pose.influence = smoothstep(0.0, 1.0, raised)
 		pose.aim_dir = aim_direction()
@@ -114,7 +119,7 @@ func _process(delta: float) -> void:
 
 
 ## Where the arrow would go: from her chest toward the camera's aim point,
-## kept within AIM_CONE of the way she faces. Only aiming or drawing turns her
+## kept within AIM_CONE of the way she faces. Only aiming (the draw is aiming too) turns her
 ## to the camera; when Q, F or a shot just lifts the bow she may face anywhere,
 ## and aiming straight at the camera's point swung her arms out behind her.
 ## Then the bow comes up along her own facing.
@@ -125,7 +130,7 @@ func aim_direction() -> Vector3:
 	var fwd := -feyre.model.global_basis.z
 	fwd.y = 0.0
 	fwd = fwd.normalized() if fwd.length() > 0.001 else Vector3.FORWARD
-	if not (feyre.is_aiming or controller.is_drawing):
+	if not controller.is_aiming:
 		return (fwd + Vector3.DOWN * 0.08).normalized()
 	var chest := feyre.global_position + Vector3.UP * 1.4
 	var d := feyre.aim_point() - chest
@@ -173,7 +178,7 @@ func _place() -> void:
 		nock = Vector3(0, clampf(local.y, -0.1, 0.1), clampf(local.z, bend, 0.85))
 	_stretch(string_top, top, nock)
 	_stretch(string_bottom, nock, bottom)
-	var nocked := w > 0.6 and controller._available() != &""
+	var nocked := w > 0.0 and controller.arrow_ready() != &""
 	arrow_node.visible = nocked
 	if nocked:
 		arrow_node.position = nock

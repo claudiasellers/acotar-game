@@ -1,4 +1,4 @@
-## What using a quick-bar or satchel entry does. Arrows nock that arrow type,
+## What using a quick-bar or satchel entry does. Arrows select that arrow type,
 ## edible ingredients and cooked dishes are eaten; anything else can't be
 ## pinned or used from the bar.
 class_name SatchelUse
@@ -30,7 +30,7 @@ static func can_pin(id: StringName) -> bool:
 static func verb(id: StringName) -> String:
 	match kind(id):
 		ARROW:
-			return "Nock"
+			return "Select"
 		FOOD, DISH:
 			return "Eat"
 	return ""
@@ -47,8 +47,7 @@ static func use(inv: Inventory, id: StringName, who: Object) -> bool:
 			var bow: BowController = who.get(&"bow_controller") as BowController if who else null
 			if bow == null:
 				return false
-			bow.selected = id
-			bow.arrow_type_changed.emit(id)
+			bow.select_arrow(id)
 			return true
 		FOOD:
 			if inv.remove(id, 1) == 0:

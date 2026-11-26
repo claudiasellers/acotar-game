@@ -14,7 +14,6 @@ var _saved_path: String
 
 func before_each() -> void:
 	Gameplay.reset()
-	SatchelHud.ensure_actions()
 	StoryControl.release()
 	_saved_path = GameSettings.settings_path
 	GameSettings.settings_path = SETTINGS
@@ -41,7 +40,7 @@ func _holder() -> Node:
 
 func test_there_is_one_table_and_every_row_names_a_key() -> void:
 	assert_same(KeyHints.of(get_tree()), hints)
-	for id: StringName in KeyHints.ROWS:
+	for id: StringName in KeyHints.rows():
 		var row := KeyHints.row(id)
 		assert_ne(String(row[0][0]), "", "%s opens on a key" % id)
 		for pair: Array in row:
@@ -127,7 +126,7 @@ func test_a_thought_arrow_makings_and_a_found_place_nudge_their_keys() -> void:
 	assert_true(FileAccess.get_file_as_string("res://ui/satchel/satchel_hud.gd").contains("nudge(&\"craft\")"))
 	assert_true(FileAccess.get_file_as_string("res://ui/map/world_map_hud.gd").contains("nudge(&\"map\")"))
 	for id: StringName in [&"thought", &"craft", &"map"]:
-		assert_true(KeyHints.ROWS.has(id))
+		assert_true(KeyHints.rows().has(id))
 
 
 func test_act_one_holds_its_rows_through_the_table() -> void:
@@ -135,3 +134,49 @@ func test_act_one_holds_its_rows_through_the_table() -> void:
 	for gone: String in ["KeyPrompt.make", "ConfigFile", "const PROMPTS", "GameSettings"]:
 		assert_false(src.contains(gone), "KeyPrompts still has %s" % gone)
 	assert_true(src.contains("_hints.hold(self, current)"))
+
+
+func test_a_key_the_use_prompt_names_is_not_said_twice() -> void:
+	var use := UsePrompt.of(get_tree())
+	var thing := _holder()
+	hints.hold(thing, &"skin")
+	hints.nudge(&"draw")
+	await wait_process_frames(2)
+	assert_string_contains(hints.text(), "skin")
+	use.offer(thing, "skin the doe")
+	await wait_process_frames(2)
+	assert_eq(hints.text(), "", "the use prompt has E: the hint leaves it alone")
+	assert_eq(use.text(), "E   skin the doe")
+	assert_almost_eq(float(hints._nudged[&"draw"]), KeyHints.NUDGE_SECONDS, 0.001, "a nudge behind it does not run down unseen")
+	use.offer(thing, "loose", &"fire")
+	assert_eq(hints.shown(&"draw").size(), 1, "the rest of a row stays")
+	assert_eq(String(hints.shown(&"draw")[0][0]), KeyHints.cap(&"aim"))
+	hints.hold(thing, &"beast")
+	use.offer(thing, "step in")
+	assert_eq(hints.shown(&"beast").size(), 3, "a choice she must see is never cut")
+	use.offer(thing, "")
+	await wait_process_frames(2)
+	assert_string_contains(hints.text(), "throw the knife")
+
+
+func test_the_rows_are_data_and_no_two_share_a_priority() -> void:
+	var seen := {}
+	var ids := {}
+	for file in ResourceLoader.list_directory(KeyHints.DIR):
+		if not file.ends_with(".tres"):
+			continue
+		var hints := load(KeyHints.DIR.path_join(file)) as KeyHintSet
+		assert_not_null(hints, "%s is a KeyHintSet" % file)
+		for r in hints.rows:
+			assert_false(seen.has(r.priority), "%s: priority %d is %s's" % [r.id, r.priority, seen.get(r.priority, "")])
+			seen[r.priority] = r.id
+			assert_false(ids.has(r.id), "%s is one row" % r.id)
+			ids[r.id] = true
+			assert_gt(r.keys.size(), 0)
+			assert_eq(r.keys.size(), r.says.size(), "%s: a word for every key" % r.id)
+	assert_eq(KeyHints.rows().size(), ids.size(), "the table is every file's rows")
+	var order: Array = KeyHints.rows().keys()
+	assert_eq(order[0], &"beast", "the choice she must see comes first")
+	assert_true(KeyHints.always(&"beast"))
+	assert_false(KeyHints.always(&"crouch"))
+	assert_lt(order.find(&"strike_cut_free"), order.find(&"crouch"), "lowest priority number first")

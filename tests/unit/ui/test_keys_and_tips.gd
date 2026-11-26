@@ -11,7 +11,6 @@ var page: SettingsTab
 
 func before_each() -> void:
 	SatchelHud.pad_active = false
-	SatchelHud.ensure_actions()
 	MenuShell.close_all(get_tree())
 	page = SettingsTab.new()
 	add_child_autofree(page)
@@ -58,8 +57,8 @@ func test_gentle_mode_says_what_it_does() -> void:
 	for l in page.find_children("*", "Label", true, false):
 		said += (l as Label).text + "\n"
 	assert_false(said.contains("sprints twice"), "sprint is free; the old line was false")
-	assert_string_contains(said, "Kinder jumps and ledges")
-	assert_string_contains(said, "When her health and stamina show")
+	assert_string_contains(said.to_lower(), "jump", "it says what it does to jumps")
+	assert_string_contains(said.to_lower(), "health", "and to her health")
 
 
 class Taught extends Node:

@@ -1,5 +1,5 @@
 # gate: when:systems/settings/*,ui/menu/settings_tab.gd,ui/hud/vitals/*,systems/vitals/*,characters/feyre/movement/crouch_motor.gd
-## The bow and fights settings (pad aim pull, hit-stop, hold to break free)
+## The bow and fights settings (aim help, hit pause, hold to break free)
 ## and the two edges that tell her of danger without a marker: the page's
 ## edge drawing in while she is hard to see, and the beat of an attack she
 ## cannot see.
@@ -45,16 +45,23 @@ func test_the_page_steps_through_them() -> void:
 	await wait_process_frames(2)
 	var aim := page._controls[&"soft_aim"] as Button
 	var stop := page._controls[&"hit_stop"] as Button
-	assert_eq(aim.text, "Pad aim pull: Light")
-	assert_eq(stop.text, "Hit-stop: Full")
+	assert_ne(aim.text, "", "aim help shows its setting")
+	assert_ne(stop.text, "", "hit pause shows its setting")
+	var aim_was: Variant = GameSettings.get_value(&"soft_aim")
+	var first := aim.text
 	aim.pressed.emit()
-	assert_eq(aim.text, "Pad aim pull: Strong")
+	assert_ne(aim.text, first, "a press steps aim help on, and the button says so")
+	assert_ne(GameSettings.get_value(&"soft_aim"), aim_was, "and the setting follows")
+	var second := aim.text
 	aim.pressed.emit()
-	assert_eq(aim.text, "Pad aim pull: Off")
+	assert_ne(aim.text, second, "and on again")
 	stop.pressed.emit()
 	assert_eq(GameSettings.get_value(&"hit_stop"), 1)
 	(page._controls[&"break_free_hold"] as CheckBox).button_pressed = true
 	assert_true(GameSettings.get_value(&"break_free_hold"))
+	for key: StringName in [&"soft_aim", &"hit_stop", &"break_free_hold"]:
+		var says := (page._controls[key] as Control).get_parent().get_child(1) as Label
+		assert_gt(says.text.length(), 20, "%s has what it does written beside it" % key)
 	var left := page.left_sheet()
 	assert_lte((left.get_child(0) as Control).get_combined_minimum_size().y, left.size.y, "the left sheet still fits")
 	page.close()

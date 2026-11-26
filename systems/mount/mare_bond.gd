@@ -1,18 +1,22 @@
-## Feyre and the white mare's bond (lane L47-8, docs/contracts/mare_bond.md).
-## It runs beside the main story and never touches a phase flag (R2). It grows
-## on what they do together, never on the passage of days: each step opens on
-## one threshold deed behind a real barrier, plus a few first times, all
-## one-off milestones (MILESTONES). When a step's milestones are all done the
-## next bond fact (`fact.mare_bond_*`) rises through the director's
-## ActionTrigger. Each step lets her hear Feyre's whistle from farther off and
-## carry her farther from the manor. Progress lives in WorldDeltas region
-## `mount`; the facts are the only thing anything else reads. All [X] except
-## the frame, which is canon: the first ride (ch 9), bareback lessons before
-## Calanmai (ch 20), her following the drums and being left at the Rite (ch 20-21).
+## Feyre and the white mare's bond (lane L47-8, docs/contracts/mare_bond.md),
+## run by the one bond engine (L90, docs/contracts/relationships.md): her
+## ladder is data/relationships/mare.tres, written from TIERS and MILESTONES
+## below by tools/relationships/gen_bonds.gd. It never touches a phase flag
+## (R2). It grows on what they do together, never on the passage of days: each
+## step opens on one threshold deed behind a real barrier, plus a few first
+## times, all one-off milestones. A milestone is done when fact.mare_did_<id>
+## is up, and nothing else records it. What is the mare's own lives here: how
+## far she hears the whistle and carries Feyre, the bareback run, the places
+## reached on her back, the balm and the blight (WorldDeltas region `mount`).
+## All [X] except the frame, which is canon: the first ride (ch 9), bareback
+## lessons before Calanmai (ch 20), her following the drums and being left at
+## the Rite (ch 20-21).
 class_name MareBond
 extends RefCounted
 
 const DELTAS := &"mount"
+## Her bond in the engine (data/relationships/mare.tres).
+const BOND := &"mare"
 
 ## Each step: the fact it raises, how far she hears the whistle from (m, from
 ## her or from the stables when she's home), and how far from the stables she
@@ -59,14 +63,6 @@ const BALKED_FACT := "fact.mare_balked_blight"
 const DID_PREFIX := "fact.mare_did_"
 const CALANMAI_FLAG := "calanmai_attended"
 
-## Raises a fact (the director sets it to fire its ActionTrigger); falls back to WorldState.
-static var raise: Callable
-## Called with (tier) when a new step is reached (the director plays the moment).
-static var on_tier: Array[Callable] = []
-## Called with (milestone id) when one is done (the director chimes).
-static var on_milestone: Array[Callable] = []
-
-
 static func _val(key: String, fallback: Variant) -> Variant:
 	return WorldDeltas.get_region_value(DELTAS, key, fallback)
 
@@ -77,10 +73,7 @@ static func _put(key: String, value: Variant) -> void:
 
 ## 0: not hers yet; 1: ridden; 2: trusted; 3: bareback; 4: her heart.
 static func tier() -> int:
-	for i in range(TIERS.size() - 1, 0, -1):
-		if WorldState.has_flag(TIERS[i]["fact"]):
-			return i
-	return 0
+	return maxi(Relationships.stage(BOND), 0)
 
 
 ## How far off she hears the whistle now (m).
@@ -100,7 +93,7 @@ static func can_ride_bareback() -> bool:
 # ------------------------------------------------------------------ milestones
 
 static func done(id: StringName) -> bool:
-	return (_val("bond_done", []) as Array).has(String(id))
+	return Relationships.done(BOND, id)
 
 
 ## The step (2..4) a milestone belongs to, or 0.
@@ -115,26 +108,12 @@ static func step_of(id: StringName) -> int:
 ## true the first time. A milestone may be done early; its step still waits
 ## for the one before it.
 static func mark(id: StringName) -> bool:
-	if tier() < 1 or step_of(id) == 0 or done(id):
-		return false
-	var list: Array = (_val("bond_done", []) as Array).duplicate()
-	list.append(String(id))
-	_put("bond_done", list)
-	_raise(DID_PREFIX + String(id))
-	for c in on_milestone:
-		if c.is_valid():
-			c.call(id)
-	check()
-	return true
+	return step_of(id) != 0 and Relationships.deed(BOND, id)
 
 
 ## The milestones of `step` still to do, in order.
 static func missing(step: int) -> Array[StringName]:
-	var out: Array[StringName] = []
-	for id: StringName in MILESTONES.get(step, []):
-		if not done(id):
-			out.append(id)
-	return out
+	return Relationships.missing(BOND, step)
 
 
 ## The step being worked toward now (2..4), or 0 when she isn't Feyre's yet
@@ -222,7 +201,7 @@ static func beside() -> void:
 ## She planted her feet at the blight. Returns true the first time.
 static func balked() -> bool:
 	if not WorldState.has_flag(BALKED_FACT):
-		_raise(BALKED_FACT)
+		WorldState.set_flag(BALKED_FACT, true)
 	var n := int(_val("balks", 0)) + 1
 	_put("balks", n)
 	return mark(&"balked")
@@ -274,25 +253,6 @@ static func blight_ride(metres: float) -> void:
 
 # ------------------------------------------------------------------ steps
 
-static func _raise(fact: String) -> void:
-	if raise.is_valid():
-		raise.call(fact)
-	else:
-		WorldState.set_flag(fact, true)
-
-
-## Raises every step whose milestones are done, in order. Returns the new tier, or -1.
+## Opens every step whose milestones are done, in order. Returns the new tier, or -1.
 static func check() -> int:
-	var now := tier()
-	var reached := -1
-	while now >= 1 and now + 1 < TIERS.size() and missing(now + 1).is_empty():
-		var fact := String(TIERS[now + 1]["fact"])
-		_raise(fact)
-		if not WorldState.has_flag(fact):
-			WorldState.set_flag(fact, true)
-		now += 1
-		reached = now
-		for c in on_tier:
-			if c.is_valid():
-				c.call(now)
-	return reached
+	return Relationships.check(BOND)

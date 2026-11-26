@@ -490,7 +490,7 @@ yaw_deg = 0.0
 anchor = &""
 phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
 require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
+forbid_flags = PackedStringArray("fact.tam_mood_cool")
 hour_from = 17.0
 hour_to = 21.0
 wander = 0.0
@@ -1124,6 +1124,44 @@ wander = 3.0
 canon = "C"
 notes = ""
 
+[sub_resource type="Resource" id="S59"]
+script = ExtResource("1")
+id = &"lucien_doors_waiting"
+speaker = &"lucien"
+scene = "res://characters/lucien/lucien_model.tscn"
+region = &"manor_estate"
+at = Vector2(4.5, -33.0)
+room = &"entrance_hall"
+yaw_deg = 180.0
+anchor = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods")
+require_flags = PackedStringArray("fact.luc_warm_patrol")
+forbid_flags = PackedStringArray()
+hour_from = 6.5
+hour_to = 8.0
+wander = 0.0
+canon = "A"
+notes = "waits by the front doors for her before Andras's old patrol (ch11)"
+
+[sub_resource type="Resource" id="S60"]
+script = ExtResource("1")
+id = &"tamlin_halls_late"
+speaker = &"tamlin"
+scene = "res://characters/tamlin/tamlin_model.tscn"
+region = &"manor_estate"
+at = Vector2(-4.0, -34.0)
+room = &"entrance_hall"
+yaw_deg = 90.0
+anchor = &""
+phases = PackedStringArray("p3_house_and_woods", "p4_wider_court")
+require_flags = PackedStringArray("fact.tam_warm_wounded")
+forbid_flags = PackedStringArray("fact.tam_mood_cool")
+hour_from = 22.0
+hour_to = 2.0
+wander = 0.0
+canon = "A"
+notes = "late at night in the halls, as she is (ch12)"
+
 [resource]
 script = ExtResource("2")
-spots = Array[ExtResource("1")]([SubResource("S0"), SubResource("S1"), SubResource("S2"), SubResource("S3"), SubResource("S4"), SubResource("S5"), SubResource("S6"), SubResource("S7"), SubResource("S8"), SubResource("S9"), SubResource("S10"), SubResource("S11"), SubResource("S12"), SubResource("S13"), SubResource("S14"), SubResource("S15"), SubResource("S16"), SubResource("S17"), SubResource("S18"), SubResource("S19"), SubResource("S20"), SubResource("S21"), SubResource("S22"), SubResource("S23"), SubResource("S24"), SubResource("S25"), SubResource("S26"), SubResource("S27"), SubResource("S28"), SubResource("S29"), SubResource("S30"), SubResource("S31"), SubResource("S32"), SubResource("S33"), SubResource("S34"), SubResource("S35"), SubResource("S36"), SubResource("S37"), SubResource("S38"), SubResource("S39"), SubResource("S40"), SubResource("S41"), SubResource("S42"), SubResource("S43"), SubResource("S44"), SubResource("S45"), SubResource("S46"), SubResource("S47"), SubResource("S48"), SubResource("S49"), SubResource("S50"), SubResource("S51"), SubResource("S52"), SubResource("S53"), SubResource("S54"), SubResource("S55"), SubResource("S56"), SubResource("S57"), SubResource("S58")])
+spots = Array[ExtResource("1")]([SubResource("S0"), SubResource("S1"), SubResource("S2"), SubResource("S3"), SubResource("S4"), SubResource("S5"), SubResource("S6"), SubResource("S7"), SubResource("S8"), SubResource("S9"), SubResource("S10"), SubResource("S11"), SubResource("S12"), SubResource("S13"), SubResource("S14"), SubResource("S15"), SubResource("S16"), SubResource("S17"), SubResource("S18"), SubResource("S19"), SubResource("S20"), SubResource("S21"), SubResource("S22"), SubResource("S23"), SubResource("S24"), SubResource("S25"), SubResource("S26"), SubResource("S27"), SubResource("S28"), SubResource("S29"), SubResource("S30"), SubResource("S31"), SubResource("S32"), SubResource("S33"), SubResource("S34"), SubResource("S35"), SubResource("S36"), SubResource("S37"), SubResource("S38"), SubResource("S39"), SubResource("S40"), SubResource("S41"), SubResource("S42"), SubResource("S43"), SubResource("S44"), SubResource("S45"), SubResource("S46"), SubResource("S47"), SubResource("S48"), SubResource("S49"), SubResource("S50"), SubResource("S51"), SubResource("S52"), SubResource("S53"), SubResource("S54"), SubResource("S55"), SubResource("S56"), SubResource("S57"), SubResource("S58"), SubResource("S59"), SubResource("S60")])

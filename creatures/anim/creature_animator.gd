@@ -1,24 +1,32 @@
 ## Drives a rigged creature model (tools/blender/creature_rig.py) from how the
 ## creature moves and what happens to it. Contract: docs/contracts/creature_motion.md.
 ##
-## An AnimationTree blend tree. One gait at a time (walk, trot or gallop, or
+## An AnimationTree blend tree. One gait at a time (the model's own, from its
+## gaits file: walk, trot, gallop for a quadruped, walk, run for a biped; or
 ## the stalk on the brain's `gait_hint`), picked from the body's real ground
 ## speed with hysteresis and cross-faded over a fraction of a second. Every
 ## gait clip runs at the same strides per second, so they stay in step through
 ## a change, and that cadence is the ground speed over the stride length of
 ## whatever is playing (data/animation/creatures/<model>_gaits.txt): a planted
 ## paw stays where it landed at any speed. From standing the stride grows with
-## the speed. On top: graze by `gait_hint`, two one-shot flinches (hit_l,
-## hit_r) and a final transition into a death clip that falls away from the
-## last blow. On top of the clips: the body pitches
+## the speed. On top: graze by `gait_hint`, `alert` by set_alert(), an action
+## layer for attacks and other one-off clips (play_attack, play_oneshot), two
+## one-shot flinches (hit_l, hit_r) and a final transition into a death clip
+## that falls away from the last blow. On top of the clips: the body pitches
 ## and rolls with the slope and leans into fast turns, the corpse lies along
 ## the ground, and arrows that stick in the body ride the nearest bone.
 class_name CreatureAnimator
 extends Node
 
 const GAITS_FILE := "res://data/animation/creatures/%s_gaits.txt"
-const LOOPS: Array[StringName] = [&"idle", &"walk", &"trot", &"gallop", &"stalk", &"graze"]
+const LOOPS: Array[StringName] = [&"idle", &"walk", &"trot", &"gallop", &"run", &"stalk", &"graze", &"alert"]
+## The gaits of a model whose table names none.
 const LOCO: Array[StringName] = [&"walk", &"trot", &"gallop"]
+## Clips with a native speed that are layers or states, not steps of the gait ladder.
+const NOT_LOCO: Array[StringName] = [&"idle", &"stalk", &"swim"]
+## The action layer's fades (seconds).
+const ACTION_IN := 0.07
+const ACTION_OUT := 0.22
 ## Cadence limit: past this the legs look frantic.
 const MAX_RATE := 1.7
 ## Below this share of the walk's native speed the stride shortens (and the
@@ -48,6 +56,12 @@ var native_speeds: Dictionary = {}
 var clip_lengths: Dictionary = {}
 ## Metres the body covers in one cycle of each gait clip.
 var strides: Dictionary = {}
+## This model's gait ladder, slowest first (from the gaits file).
+var loco: Array[StringName] = []
+## Seconds into a clip at which its blow lands, and metres the clip expects the
+## code to carry the body (attack and reaction clips; from the gaits file).
+var clip_contact: Dictionary = {}
+var clip_travel: Dictionary = {}
 var dead: bool = false
 ## The flank it fell onto: -1 left, +1 right (0 while alive).
 var fell_to: int = 0
@@ -58,13 +72,24 @@ var _slow_tween: Tween
 ## Which side the last arrow struck: -1 left, +1 right (0 none yet).
 var last_hit_side: int = 0
 
-## The gait in play: an index into LOCO.
+## The gait in play: an index into `loco`.
 var gait: int = 0
 ## Strides per second of every gait clip.
 var cadence: float = 0.0
 var _speed: float = 0.0
-var _trot: float = 0.0
-var _gallop: float = 0.0
+## How far each gait above the first has taken over from the one below (0..1).
+var _shift: Array[float] = []
+var _alert_on: bool = false
+var _alert: float = 0.0
+var _action_node: AnimationNodeAnimation
+var _death_nodes: Dictionary = {}
+var _action_queue: Array[StringName] = []
+var _action_left: float = 0.0
+var _action_mix: float = 0.0
+var _action_on: bool = false
+var _action_hold: bool = false
+var _action_loop: bool = false
+var _death_clip: StringName = &"death_l"
 var _stalk: float = 0.0
 var _graze: float = 0.0
 ## Gait clip -> the tree parameter of its playback rate.
@@ -101,7 +126,20 @@ static func attach(c: Creature) -> CreatureAnimator:
 	return a
 
 
-## The gait table for this model: name -> [native speed or -1, length].
+## For a model played without an animator (a story actor's): marks as looping
+## every clip its gaits file says loops. Returns how many it marked.
+static func apply_loops(player: AnimationPlayer, gaits_path: String) -> int:
+	var n := 0
+	var table := read_gaits(gaits_path)
+	for clip: StringName in table:
+		if table[clip][2] and player.has_animation(clip):
+			player.get_animation(clip).loop_mode = Animation.LOOP_LINEAR
+			n += 1
+	return n
+
+
+## The gait table for this model: name -> [native speed or -1, length, loops,
+## contact_s or -1, travel_m]. The last three are false, -1, 0 in older tables.
 static func read_gaits(path: String) -> Dictionary:
 	var out := {}
 	var f := FileAccess.open(path, FileAccess.READ)
@@ -115,7 +153,10 @@ static func read_gaits(path: String) -> Dictionary:
 		if parts.size() < 3:
 			continue
 		var speed := -1.0 if parts[1] == "-" else parts[1].to_float()
-		out[StringName(parts[0])] = [speed, parts[2].to_float()]
+		var loops := parts.size() > 3 and parts[3] == "1"
+		var contact := parts[4].to_float() if parts.size() > 4 and parts[4] != "-" else -1.0
+		var travel := parts[5].to_float() if parts.size() > 5 and parts[5] != "-" else 0.0
+		out[StringName(parts[0])] = [speed, parts[2].to_float(), loops, contact, travel]
 	return out
 
 
@@ -129,9 +170,25 @@ func _read_gaits(data: CreatureData) -> void:
 			native_speeds[clip] = row[0] * data.model_scale
 			# Metres per cycle as authored; the imported clip may be a frame longer.
 			strides[clip] = row[0] * row[1] * data.model_scale
+			if clip not in NOT_LOCO and anim.has_animation(clip):
+				loco.append(clip)
 		if anim.has_animation(clip):
 			clip_lengths[clip] = anim.get_animation(clip).length
+			if row[2]:
+				anim.get_animation(clip).loop_mode = Animation.LOOP_LINEAR
+		if row[3] >= 0.0:
+			clip_contact[clip] = row[3]
+		if row[4] != 0.0:
+			clip_travel[clip] = row[4] * data.model_scale
+	loco.sort_custom(func(a: StringName, b: StringName) -> bool: return native_speeds[a] < native_speeds[b])
+	if not loco.is_empty():
+		_shift.resize(loco.size())
+		_shift.fill(0.0)
+		return
 	# A model without a table still moves: guess from the creature's own speeds.
+	loco = LOCO.duplicate()
+	_shift.resize(loco.size())
+	_shift.fill(0.0)
 	for i in LOCO.size():
 		var clip := LOCO[i]
 		if not native_speeds.has(clip):
@@ -176,7 +233,7 @@ func _build_tree() -> void:
 	var bt := AnimationNodeBlendTree.new()
 	bt.add_node(&"idle", _anim_node(&"idle"))
 	var last := &"idle"
-	for clip in LOCO:
+	for clip in loco:
 		last = _add_mix(bt, StringName("%s_mix" % clip), last, _add_gait(bt, clip))
 	if anim.has_animation(&"stalk"):
 		last = _add_mix(bt, &"stalk_mix", last, _add_gait(bt, &"stalk"))
@@ -186,6 +243,24 @@ func _build_tree() -> void:
 		bt.connect_node(&"graze_mix", 0, last)
 		bt.connect_node(&"graze_mix", 1, &"graze")
 		last = &"graze_mix"
+	if anim.has_animation(&"alert"):
+		bt.add_node(&"alert", _anim_node(&"alert"))
+		bt.add_node(&"alert_mix", AnimationNodeBlend2.new())
+		bt.connect_node(&"alert_mix", 0, last)
+		bt.connect_node(&"alert_mix", 1, &"alert")
+		last = &"alert_mix"
+	# The action layer: one clip at a time, restarted by a seek and faded by
+	# hand, so a telegraph runs straight into its attack with no dip between.
+	_action_node = _anim_node(&"idle")
+	bt.add_node(&"action", _action_node)
+	bt.add_node(&"action_seek", AnimationNodeTimeSeek.new())
+	bt.connect_node(&"action_seek", 0, &"action")
+	bt.add_node(&"action_mix", AnimationNodeBlend2.new())
+	bt.connect_node(&"action_mix", 0, last)
+	bt.add_node(&"action_scale", AnimationNodeTimeScale.new())
+	bt.connect_node(&"action_scale", 0, &"action_seek")
+	bt.connect_node(&"action_mix", 1, &"action_scale")
+	last = &"action_mix"
 	for clip in [&"hit_l", &"hit_r"]:
 		if not anim.has_animation(clip):
 			continue
@@ -201,11 +276,14 @@ func _build_tree() -> void:
 		last = shot_name
 	var life := AnimationNodeTransition.new()
 	life.xfade_time = 0.08
+	# Two inputs per flank as before; a special death (death_throat) plays on
+	# the flank's input with its clip swapped in.
 	for input in [&"alive", &"death_l", &"death_r"]:
 		life.add_input(input)
 	bt.add_node(&"life", life)
-	bt.add_node(&"death_l", _anim_node(&"death_l"))
-	bt.add_node(&"death_r", _anim_node(&"death_r"))
+	for clip in [&"death_l", &"death_r"]:
+		_death_nodes[clip] = _anim_node(clip)
+		bt.add_node(clip, _death_nodes[clip])
 	bt.connect_node(&"life", 0, last)
 	bt.connect_node(&"life", 1, &"death_l")
 	bt.connect_node(&"life", 2, &"death_r")
@@ -223,10 +301,10 @@ func _build_tree() -> void:
 	anim.stop()
 
 
-## The gait (an index into LOCO) for ground speed `speed`, given the one in play.
+## The gait (an index into `loco`) for ground speed `speed`, given the one in play.
 func gait_for(speed: float, current: int) -> int:
 	var g := current
-	while g < LOCO.size() - 1 and speed > _midpoint(g) * (1.0 + GAIT_MARGIN):
+	while g < loco.size() - 1 and speed > _midpoint(g) * (1.0 + GAIT_MARGIN):
 		g += 1
 	while g > 0 and speed < _midpoint(g - 1) * (1.0 - GAIT_MARGIN):
 		g -= 1
@@ -234,12 +312,12 @@ func gait_for(speed: float, current: int) -> int:
 
 
 func _midpoint(lower: int) -> float:
-	return sqrt(float(native_speeds[LOCO[lower]]) * float(native_speeds[LOCO[lower + 1]]))
+	return sqrt(float(native_speeds[loco[lower]]) * float(native_speeds[loco[lower + 1]]))
 
 
 ## Playback rate of the gait in play (1 = the clip's native speed).
 func gait_rate() -> float:
-	var clip := &"stalk" if _stalk > 0.5 and clip_lengths.has(&"stalk") else LOCO[gait]
+	var clip := &"stalk" if _stalk > 0.5 and clip_lengths.has(&"stalk") else loco[gait]
 	return cadence * float(clip_lengths.get(clip, 1.0))
 
 
@@ -253,9 +331,135 @@ func hit(from: Vector3) -> void:
 	tree.set(shot, AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
 
 
+## Plays `telegraph_<id>` and then `attack_<id>` on the action layer. Returns
+## the seconds from now until the blow lands (the attack clip's contact_s
+## after the telegraph), or -1 when the model has no such attack.
+func play_attack(id: StringName) -> float:
+	var warn := StringName("telegraph_%s" % id)
+	var strike := StringName("attack_%s" % id)
+	if dead or tree == null or not anim.has_animation(strike):
+		return -1.0
+	var clips: Array[StringName] = [strike]
+	var lead := 0.0
+	if anim.has_animation(warn):
+		clips.push_front(warn)
+		lead = _length(warn)
+	_start_actions(clips)
+	return lead + float(clip_contact.get(strike, 0.0))
+
+
+## The wind-up before a blow, on its own so the code can hold or cancel it:
+## `telegraph_<id>`, stretched to `seconds` (the attack row's windup_s), its
+## last pose held until play_strike, play_attack or cancel_attack. A family
+## that calls this has no other tell: a model without the clip is an error.
+func play_windup(id: StringName, seconds: float) -> void:
+	if dead or tree == null:
+		return
+	var clip := StringName("telegraph_%s" % id)
+	if not anim.has_animation(clip):
+		push_error("%s has no %s clip" % [creature.name, clip])
+		return
+	_start_actions([clip])
+	_action_hold = true
+	_action_left = maxf(seconds, 0.05)
+	tree.set(&"parameters/action_scale/scale", _length(clip) / _action_left)
+
+
+## The blow alone (`attack_<id>`), after a wind-up the code timed itself.
+## Returns the seconds until it lands, or -1 when the model has no such clip.
+func play_strike(id: StringName) -> float:
+	var strike := StringName("attack_%s" % id)
+	if dead or tree == null or not anim.has_animation(strike):
+		return -1.0
+	_start_actions([strike])
+	return float(clip_contact.get(strike, 0.0))
+
+
+## Stops an attack (or any action clip) where it is and eases back to moving.
+func cancel_attack() -> void:
+	_action_queue.clear()
+	_action_left = 0.0
+	_action_on = false
+	_action_hold = false
+	_action_loop = false
+
+
+## Plays one clip once on the action layer (startle, call, recover, stagger,
+## dodge_l...). Returns its length, or 0 when the model does not have it.
+func play_oneshot(clip: StringName) -> float:
+	if dead or tree == null or not anim.has_animation(clip):
+		return 0.0
+	_start_actions([clip])
+	return _length(clip)
+
+
+## Keeps one clip on the action layer, looping, until another play_*, a
+## wind-up or cancel_attack replaces it (a briarling's day-long bush pose, a
+## sleeper). A clip that does not loop by itself starts over each time it
+## ends. Returns its length, or 0 when the model does not have it.
+func hold(clip: StringName) -> float:
+	if dead or tree == null or not anim.has_animation(clip):
+		return 0.0
+	_start_actions([clip])
+	_action_loop = true
+	return _length(clip)
+
+
+## True while an attack or one-off clip is playing.
+func is_acting() -> bool:
+	return _action_on
+
+
+## The clip on the action layer, or &"" when there is none.
+func action_clip() -> StringName:
+	return _action_node.animation if _action_on else &""
+
+
+## The looping `alert` layer: head up, looking about. Shows while it stands.
+func set_alert(on: bool) -> void:
+	_alert_on = on
+
+
+func _length(clip: StringName) -> float:
+	return float(clip_lengths.get(clip, anim.get_animation(clip).length))
+
+
+func _start_actions(clips: Array[StringName]) -> void:
+	_action_queue = clips
+	_next_action()
+
+
+func _next_action() -> void:
+	var clip: StringName = _action_queue.pop_front()
+	_action_node.animation = clip
+	tree.set(&"parameters/action_seek/seek_request", 0.0)
+	_action_left = _length(clip)
+	_action_on = true
+	_action_hold = false
+	_action_loop = false
+	tree.set(&"parameters/action_scale/scale", 1.0)
+
+
+func _drive_action(delta: float) -> void:
+	if _action_on:
+		_action_left -= delta
+		if _action_left <= 0.0 and _action_loop:
+			_action_left += _length(_action_node.animation)
+			if anim.get_animation(_action_node.animation).loop_mode == Animation.LOOP_NONE:
+				tree.set(&"parameters/action_seek/seek_request", 0.0)
+		elif _action_left <= 0.0:
+			if _action_queue.is_empty():
+				_action_on = _action_hold
+			else:
+				_next_action()
+	_action_mix = move_toward(_action_mix, 1.0 if _action_on else 0.0, delta / (ACTION_IN if _action_on else ACTION_OUT))
+	tree.set(&"parameters/action_mix/blend_amount", smoothstep(0.0, 1.0, _action_mix))
+
+
 ## Falls away from the last blow (struck on the right, it goes down on its
-## left flank); with no blow on record, a side fixed by its id.
-func die() -> void:
+## left flank); with no blow on record, a side fixed by its id. `variant`
+## names a special death the model may have (`throat` plays death_throat).
+func die(variant: StringName = &"") -> void:
 	if dead:
 		return
 	dead = true
@@ -263,15 +467,40 @@ func die() -> void:
 		fell_to = -last_hit_side
 	else:
 		fell_to = -1 if hash(creature.creature_id) % 2 == 0 else 1
+	var flank := &"death_l" if fell_to < 0 else &"death_r"
+	_death_clip = flank
+	var special := StringName("death_%s" % variant)
+	if variant != &"" and anim.has_animation(special):
+		_death_clip = special
 	if tree:
+		cancel_attack()
 		for clip in [&"hit_l_shot", &"hit_r_shot"]:
 			tree.set("parameters/%s/request" % clip, AnimationNodeOneShot.ONE_SHOT_REQUEST_FADE_OUT)
-		tree.set(&"parameters/life/transition_request", "death_l" if fell_to < 0 else "death_r")
+		(_death_nodes[flank] as AnimationNodeAnimation).animation = _death_clip
+		tree.set(&"parameters/life/transition_request", String(flank))
 
 
 ## Seconds the death clip runs before the body is still.
 func death_length() -> float:
-	return float(clip_lengths.get(&"death_l" if fell_to <= 0 else &"death_r", 3.0))
+	return float(clip_lengths.get(_death_clip, 3.0))
+
+
+## A BoneAttachment3D riding the named bone (a model's sockets: throat, mouth,
+## grab_point, talon_l...), or null when the model has no such bone.
+func socket(bone_name: StringName) -> BoneAttachment3D:
+	if skeleton == null:
+		return null
+	var bone := skeleton.find_bone(bone_name)
+	if bone < 0:
+		return null
+	var holder := _attachments.get(bone) as BoneAttachment3D
+	if holder == null:
+		holder = BoneAttachment3D.new()
+		holder.name = "Pin_%s" % bone_name
+		skeleton.add_child(holder)
+		holder.bone_idx = bone
+		_attachments[bone] = holder
+	return holder
 
 
 ## Slows this body's motion for staging (a hit-stop, the kill in slow
@@ -309,6 +538,7 @@ func _physics_process(delta: float) -> void:
 		return
 	if not dead:
 		_drive_gait(delta)
+	_drive_action(delta * time_scale)
 	_conform(delta)
 
 
@@ -321,18 +551,19 @@ func _drive_gait(delta: float) -> void:
 	var hint := creature.gait_hint
 	var stalks := anim.has_animation(&"stalk")
 	gait = gait_for(speed, gait)
-	_trot = move_toward(_trot, 1.0 if gait >= 1 else 0.0, GAIT_SHIFT * delta)
-	_gallop = move_toward(_gallop, 1.0 if gait >= 2 else 0.0, GAIT_SHIFT * delta)
+	for i in range(1, loco.size()):
+		_shift[i] = move_toward(_shift[i], 1.0 if gait >= i else 0.0, GAIT_SHIFT * delta)
 	_stalk = move_toward(_stalk, 1.0 if hint == &"stalk" and stalks else 0.0, LAYER_SPEED * delta)
 	_graze = move_toward(_graze, 1.0 if hint == &"graze" and speed < 0.4 else 0.0, LAYER_SPEED * 0.6 * delta)
 	# From standing, the stride grows with the speed before the cadence does.
-	var stepping := clampf(speed / (SHORT_STRIDE * float(native_speeds[&"walk"])), 0.0, 1.0)
-	var weights := {
-		&"walk": (1.0 - _stalk) * (1.0 - _gallop) * (1.0 - _trot) * stepping,
-		&"trot": (1.0 - _stalk) * (1.0 - _gallop) * _trot,
-		&"gallop": (1.0 - _stalk) * _gallop,
-		&"stalk": _stalk,
-	}
+	var stepping := clampf(speed / (SHORT_STRIDE * float(native_speeds[loco[0]])), 0.0, 1.0)
+	_shift[0] = stepping
+	# Each gait's share: its own shift, less whatever the faster ones have taken.
+	var weights := {&"stalk": _stalk}
+	var left := 1.0 - _stalk
+	for i in range(loco.size() - 1, -1, -1):
+		weights[loco[i]] = left * _shift[i]
+		left *= 1.0 - _shift[i]
 	# One cadence for every gait: ground speed over the stride of the blend,
 	# so the paws on the ground move back exactly as fast as the body goes on.
 	var metres := 0.0
@@ -349,15 +580,17 @@ func _drive_gait(delta: float) -> void:
 	cadence = 0.0
 	if metres > 0.001:
 		cadence = minf(speed / metres, MAX_RATE * beat / total)
-	tree.set(&"parameters/walk_mix/blend_amount", stepping)
-	tree.set(&"parameters/trot_mix/blend_amount", _trot)
-	tree.set(&"parameters/gallop_mix/blend_amount", _gallop)
+	for i in loco.size():
+		tree.set("parameters/%s_mix/blend_amount" % loco[i], _shift[i])
 	for clip: StringName in _rate_params:
 		tree.set(_rate_params[clip], cadence * float(clip_lengths.get(clip, 1.0)))
 	if stalks:
 		tree.set(&"parameters/stalk_mix/blend_amount", _stalk)
 	if anim.has_animation(&"graze"):
 		tree.set(&"parameters/graze_mix/blend_amount", _graze)
+	if anim.has_animation(&"alert"):
+		_alert = move_toward(_alert, 1.0 if _alert_on and speed < 0.4 else 0.0, LAYER_SPEED * delta)
+		tree.set(&"parameters/alert_mix/blend_amount", _alert)
 	var yaw := creature.rotation.y
 	var turn := wrapf(yaw - _last_yaw, -PI, PI) / maxf(delta, 1e-4)
 	_last_yaw = yaw
@@ -413,14 +646,7 @@ func _pin(arrow: Node3D) -> void:
 	var bone := nearest_bone(arrow.global_position)
 	if bone < 0:
 		return
-	var holder := _attachments.get(bone) as BoneAttachment3D
-	if holder == null:
-		holder = BoneAttachment3D.new()
-		holder.name = "Pin_%s" % skeleton.get_bone_name(bone)
-		skeleton.add_child(holder)
-		holder.bone_idx = bone
-		_attachments[bone] = holder
-	arrow.reparent(holder, true)
+	arrow.reparent(socket(skeleton.get_bone_name(bone)), true)
 
 
 ## The bone whose segment (head to each child's head) passes closest to `point`.

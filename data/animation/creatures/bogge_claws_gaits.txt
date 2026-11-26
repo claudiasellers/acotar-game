@@ -1,0 +1,6 @@
+# bogge_claws clips (creatures/models/fae/bogge_claws.gltf), 30 fps. Written by tools/blender/monsters/bogge_claws.py.
+# name native_speed_mps duration_s loop(0/1) contact_s travel_m   ('-' = does not apply)
+surface - 0.400 0 - -
+hold - 3.000 1 - -
+sink - 0.500 0 - -
+lunge - 0.300 0 0.270 -

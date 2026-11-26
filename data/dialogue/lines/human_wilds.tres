@@ -6,29 +6,6 @@
 
 [sub_resource type="Resource" id="L0"]
 script = ExtResource("1")
-id = &"bow_let_down"
-speaker = &"feyre"
-who = ""
-text = "Not yet. Draw the string farther back."
-canon = "A"
-trigger = 6
-where = &"bow.let_down"
-deed = &""
-phases = PackedStringArray()
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-hour_from = -1.0
-hour_to = -1.0
-once = true
-cooldown = 0.0
-priority = 0
-inner = true
-follow_up = &""
-delivery = "inner voice: patient with herself, under her breath"
-emotion = &"guarded"
-
-[sub_resource type="Resource" id="L1"]
-script = ExtResource("1")
 id = &"hf_snow"
 speaker = &"feyre"
 who = ""
@@ -50,7 +27,7 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L2"]
+[sub_resource type="Resource" id="L1"]
 script = ExtResource("1")
 id = &"hf_oak"
 speaker = &"feyre"
@@ -73,7 +50,7 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L3"]
+[sub_resource type="Resource" id="L2"]
 script = ExtResource("1")
 id = &"hf_ash"
 speaker = &"feyre"
@@ -96,7 +73,7 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L4"]
+[sub_resource type="Resource" id="L3"]
 script = ExtResource("1")
 id = &"hf_lodge"
 speaker = &"feyre"
@@ -119,7 +96,7 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L5"]
+[sub_resource type="Resource" id="L4"]
 script = ExtResource("1")
 id = &"ws_enter"
 speaker = &"feyre"
@@ -142,7 +119,7 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L6"]
+[sub_resource type="Resource" id="L5"]
 script = ExtResource("1")
 id = &"ws_glass"
 speaker = &"feyre"
@@ -165,7 +142,7 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L7"]
+[sub_resource type="Resource" id="L6"]
 script = ExtResource("1")
 id = &"ws_shed"
 speaker = &"feyre"
@@ -188,7 +165,7 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L8"]
+[sub_resource type="Resource" id="L7"]
 script = ExtResource("1")
 id = &"ws_return"
 speaker = &"feyre"
@@ -211,7 +188,7 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L9"]
+[sub_resource type="Resource" id="L8"]
 script = ExtResource("1")
 id = &"wall_breath"
 speaker = &"feyre"
@@ -234,7 +211,7 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L10"]
+[sub_resource type="Resource" id="L9"]
 script = ExtResource("1")
 id = &"wall_hush"
 speaker = &"feyre"
@@ -257,7 +234,7 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L11"]
+[sub_resource type="Resource" id="L10"]
 script = ExtResource("1")
 id = &"wall_back"
 speaker = &"feyre"
@@ -318,5 +295,5 @@ radius = 10.0
 [resource]
 script = ExtResource("3")
 area = &"human_wilds"
-lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11")])
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10")])
 places = Array[ExtResource("2")]([SubResource("P0"), SubResource("P1"), SubResource("P2"), SubResource("P3"), SubResource("P4")])
