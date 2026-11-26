@@ -132,8 +132,7 @@ func _unhandled_input(event: InputEvent) -> void:
 # --- Opening ----------------------------------------------------------------
 
 func _open(_s: SceneSpace = null) -> void:
-	note_mood()
-	EventBus.mood_requested.emit(&"dread", 0.55, 1.5)
+	EventBus.mood_requested.emit(self, &"dread", 0.55, 1.5)
 	say(&"triage_table")
 	# Lucien shoves the vase off; glass and petals across the marble.
 	if _vase:
@@ -328,7 +327,7 @@ func _close(_s: SceneSpace = null) -> void:
 		EventBus.journal_entry_added.emit(&"summer_faerie_alone")
 		raise("fact.summer_faerie_died_alone")
 	raise("fact.summer_faerie_buried")
-	EventBus.mood_requested.emit(&"calm", 0.0, 4.0)
+	EventBus.mood_requested.emit(self, &"calm", 0.0, 4.0)
 
 
 static func _flat_to(a: Vector3, b: Vector3) -> float:

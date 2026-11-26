@@ -42,9 +42,8 @@ static func cue(actor: StringName, cue_name: StringName) -> SceneBeat:
 ## with dread, never toned down.
 static func mood(mood_name: StringName, intensity: float, seconds: float = 1.5, shake: float = 0.0) -> SceneBeat:
 	return DoBeat.new(func(space: SceneSpace) -> void:
-		space.note_mood()
 		StoryControl.shake = shake
-		EventBus.mood_requested.emit(mood_name, intensity, seconds), "mood %s" % mood_name)
+		EventBus.mood_requested.emit(space, mood_name, intensity, seconds), "mood %s" % mood_name)
 
 
 ## Runs a function once. It receives the SceneSpace.

@@ -121,7 +121,7 @@ func _build_beats() -> Array:
 		Beats.until(func() -> bool: return _in_reach(RIM_REACH), "find the pool"),
 		Beats.run(func(_s: SceneSpace) -> void:
 			found = true
-			EventBus.grade_swap_requested.emit(GRADE_SPARKLE, 2.5)
+			EventBus.grade_swap_requested.emit(self, GRADE_SPARKLE, 2.5)
 			EventBus.celebration_requested.emit(&"vista", mark(&"pool"))
 			delight(&"unlock", &"pool"), "found"),
 		Beats.until(func() -> bool: return _tamlin_caught_up(), "tamlin catches up"),
@@ -149,10 +149,10 @@ func _build_beats() -> Array:
 		if t:
 			t.global_position = Act4Walk.ground_point(self, mark(&"tamlin_bank"))
 			Act4Walk.face(t, _feyre_pos())
-		EventBus.grade_swap_requested.emit(GRADE_DAY, 3.0), "golden hour"))
+		EventBus.grade_swap_requested.emit(self, GRADE_DAY, 3.0), "golden hour"))
 	out.append(say(&"tamlin_after"))
 	out.append(Beats.run(func(_s: SceneSpace) -> void:
-		GradeDirector.release_story_holds(get_tree()), "grade back to the region"))
+		EventBus.grade_swap_requested.emit(self, &"", 2.0), "grade back to the region"))
 	return out
 
 

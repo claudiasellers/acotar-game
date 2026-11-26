@@ -25,7 +25,7 @@ func _ready() -> void:
 func _build_beats() -> Array:
 	var b: Array = []
 	b.append(Beats.run(func(_s: SceneSpace) -> void:
-		CalanmaiKit.night_grade(get_tree(), true, 4.0), "the Calanmai night grade"))
+		CalanmaiKit.night_grade(true, 4.0), "the Calanmai night grade"))
 	b.append(Beats.control(StoryControl.Mode.LOOK, null))
 	b.append(Beats.run(func(_s: SceneSpace) -> void:
 		var pyre := mark(&"pyre_0")

@@ -16,6 +16,7 @@ func _init() -> void:
 	blend_seconds = 1.0
 	leave_seconds = 1.0
 	priority = 10
+	indoor = true
 
 
 func contains(world_pos: Vector3) -> bool:

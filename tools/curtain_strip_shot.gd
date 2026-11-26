@@ -21,7 +21,7 @@ func _run() -> void:
 	get_tree().root.add_child(estate)
 	get_tree().current_scene = estate
 	if estate.get(&"feyre") == null:
-		ShotLook.dress(estate, &"manor_interior")
+		GradeDirector.light(estate, &"manor_interior")
 	Clock.paused = true
 	var holder: Node3D
 	var give_up := Time.get_ticks_msec() + 240000

@@ -42,18 +42,12 @@ var beat_index: int = -1
 
 var _choice: StringName = &""
 var _triggers: Dictionary = {}
-var _mood_set: bool = false
 ## Feyre is inside the Entry area (or the arrive radius) right now.
 var player_present: bool = false
 ## A time shift is fading in; the scene starts when it ends.
 var shifting_time: bool = false
 ## After the scene ends or fails she has to step out before it can start again.
 var _must_leave: bool = false
-
-
-## Called by mood beats so the scene restores calm when it ends.
-func note_mood() -> void:
-	_mood_set = true
 
 
 func _ready() -> void:
@@ -253,8 +247,8 @@ func _build_beats() -> Array:
 func _finish() -> void:
 	running = false
 	_must_leave = true
-	if _mood_set:
-		EventBus.mood_requested.emit(&"calm", 0.0, 3.0)
+	# Whatever fear this scene asked for ends with it.
+	EventBus.mood_requested.emit(self, &"calm", 0.0, 3.0)
 	StoryControl.release(self)
 	EventBus.scene_space_finished.emit(space_id)
 	finished.emit()

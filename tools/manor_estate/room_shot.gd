@@ -6,7 +6,7 @@
 ## (from=to; the shots queue takes no '>').
 ## Loads the real estate, then stands a camera at eye height in a room's
 ## corners, looking across it, and saves room_<id>_<a|b>.png. Lit as the game
-## lights it (ShotLook): day through the windows, plus the rooms' own lamps.
+## lights it (GradeDirector.light): day through the windows, plus the rooms' own lamps.
 extends Node
 
 const ESTATE := "res://world/spring_court/manor_estate/manor_estate.tscn"
@@ -31,7 +31,7 @@ func _run() -> void:
 	get_tree().root.add_child(estate)
 	get_tree().current_scene = estate
 	if estate.get(&"feyre") == null:
-		ShotLook.dress(estate, &"manor_interior")
+		GradeDirector.light(estate, &"manor_interior")
 	var feyre = estate.get(&"feyre")
 	if feyre is Node3D:
 		(feyre as Node3D).visible = false

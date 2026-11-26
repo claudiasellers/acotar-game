@@ -1,7 +1,8 @@
 ## The house's candles, chandeliers and hero spots answer the story's dread
 ## (experience bar §1.5: the light drops two to three stops and the pink world
-## leaves; the candles gutter and cool). Listens to EventBus.mood_requested like GradeDirector does, so the
-## house dims and cools in step with the grade.
+## leaves; the candles gutter and cool). They follow EventBus.mood_changed, the
+## fear GradeDirector settled on, so the house dims and cools in step with the
+## grade (and ambient dread outside never reaches it).
 class_name ManorMoodLights
 extends Node
 
@@ -21,9 +22,7 @@ var _base: Array = []   # per light: [energy, colour]
 
 
 func _ready() -> void:
-	var bus := get_node_or_null(^"/root/EventBus")
-	if bus != null and bus.has_signal(&"mood_requested"):
-		bus.connect(&"mood_requested", _on_mood_requested)
+	EventBus.mood_changed.connect(follow)
 	collect.call_deferred()
 	set_process(false)
 
@@ -60,7 +59,8 @@ func _process(delta: float) -> void:
 		set_process(false)
 
 
-func _on_mood_requested(mood: StringName, intensity: float, seconds: float) -> void:
+## The fear GradeDirector settled on: `mood` at `intensity`, over `seconds`.
+func follow(mood: StringName, intensity: float, seconds: float) -> void:
 	_target = GradeDirector.dread_weight(intensity) if mood == &"dread" else 0.0
 	_rate = absf(_target - amount) / maxf(seconds, 0.001)
 	set_process(true)

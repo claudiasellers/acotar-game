@@ -55,15 +55,14 @@ func _build_beats() -> Array:
 		press_near(func() -> Vector3: return ground_mark(&"carriage_door"), 2.8, "E: get in"),
 		Beats.run(func(_s: SceneSpace) -> void:
 			StoryControl.hold(self, StoryControl.Mode.NONE)
-			note_mood()
-			EventBus.mood_requested.emit(&"enchanted_sleep", 1.0, 3.0)
+			EventBus.mood_requested.emit(self, &"enchanted_sleep", 1.0, 3.0)
 			stamp("fact.carriage_boarded"), "she gets in"),
 		say(&"sleep_thought"),
 		Beats.wait(3.0),
 		Beats.run(_away, "the road south"),
 		Beats.wait(1.5),
 		Beats.run(func(_s: SceneSpace) -> void:
-			EventBus.mood_requested.emit(&"calm", 0.0, 3.0)
+			EventBus.mood_requested.emit(self, &"calm", 0.0, 3.0)
 			StoryControl.release(self), "she wakes"),
 	]
 
@@ -110,7 +109,7 @@ func _give(_s: SceneSpace) -> void:
 
 func _away(_s: SceneSpace) -> void:
 	dismiss(&"tamlin")
-	EventBus.grade_swap_requested.emit(&"human_spring", 2.0)
+	EventBus.grade_swap_requested.emit(self, &"human_spring", 2.0)
 	for d: Array in DESTINATIONS:
 		if WorldStreamer.get_region(d[0]) != null:
 			EventBus.travel_requested.emit(d[0], d[1])

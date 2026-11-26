@@ -224,9 +224,8 @@ func _wait(pos: Vector3, speed: float, delta: float) -> void:
 	var need := SnarePlan.wait_seconds(bait)
 	if not _silenced and waited >= need - SILENCE_LEAD:
 		_silenced = true
-		note_mood()
 		# "A ripple of silence": the birds stop.
-		EventBus.mood_requested.emit(&"dread", 0.45, 3.0)
+		EventBus.mood_requested.emit(self, &"dread", 0.45, 3.0)
 	if waited >= need:
 		_spawn_suriel()
 		stage = Stage.ARRIVE
@@ -239,7 +238,7 @@ func _spawn_suriel() -> void:
 	var xform := Transform3D(Basis.IDENTITY, at).looking_at(snare_at, Vector3.UP)
 	suriel = request_actor(&"suriel", xform, func() -> Node3D: return StandIns.figure("suriel"))
 	EventBus.story_actor_cue.emit(&"suriel", &"stalk")
-	EventBus.mood_requested.emit(&"dread", 0.6, 2.0)
+	EventBus.mood_requested.emit(self, &"dread", 0.6, 2.0)
 
 
 func _approach(delta: float) -> void:
@@ -353,7 +352,7 @@ func _give_up() -> void:
 	running = false
 	_must_leave = true
 	StoryControl.release(self)
-	EventBus.mood_requested.emit(&"calm", 0.0, 2.0)
+	EventBus.mood_requested.emit(self, &"calm", 0.0, 2.0)
 	EventBus.scene_space_finished.emit(space_id)
 
 
