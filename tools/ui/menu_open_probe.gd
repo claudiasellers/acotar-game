@@ -179,7 +179,7 @@ func _dress_hud() -> void:
 		for tag: StringName in [&"venom", &"steady", &"swift", &"warm"]:
 			vitals.apply_status(&"probe", tag, 0.6, 60.0)
 		feyre.body_state.cold = 0.8
-	for verb: String in ["step in", "the curtains"]:
-		var keeper := Node.new()
-		add_child(keeper)
-		PressCard.find_or_make(keeper).show_text(verb)
+	var keeper := Node.new()
+	add_child(keeper)
+	UsePrompt.of(get_tree()).offer(keeper, "ride", &"interact")
+	UsePrompt.of(get_tree()).offer(keeper, "tend", &"interact_alt")
