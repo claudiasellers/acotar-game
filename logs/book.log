@@ -1,0 +1,23 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+Metal 4.0 - Forward+ - Using Device #0: Apple - Apple M4 (Apple9)
+
+focus guard: handed focus back 1x, render held it 180 ms
+menu_open_probe: collection strip overlap 0 px  (screen (1920.0, 1080.0))
+menu_open_probe: shot /Users/claudiasellers/Documents/acotar-game/.git/mq/shots/work/L77-51/out/book/menu_shell_collection.png
+menu_open_probe: map        strip overlap 0 px  (screen (1920.0, 1080.0))
+menu_open_probe: shot /Users/claudiasellers/Documents/acotar-game/.git/mq/shots/work/L77-51/out/book/menu_shell_map.png
+menu_open_probe: satchel    strip overlap 0 px  (screen (1920.0, 1080.0))
+menu_open_probe: shot /Users/claudiasellers/Documents/acotar-game/.git/mq/shots/work/L77-51/out/book/menu_shell_satchel.png
+menu_open_probe: wardrobe   strip overlap 0 px  (screen (1920.0, 1080.0))
+menu_open_probe: shot /Users/claudiasellers/Documents/acotar-game/.git/mq/shots/work/L77-51/out/book/menu_shell_wardrobe.png
+menu_open_probe: sketchbook strip overlap 0 px  (screen (1920.0, 1080.0))
+menu_open_probe: shot /Users/claudiasellers/Documents/acotar-game/.git/mq/shots/work/L77-51/out/book/menu_shell_sketchbook.png
+menu_open_probe: bonds      strip overlap 0 px  (screen (1920.0, 1080.0))
+menu_open_probe: shot /Users/claudiasellers/Documents/acotar-game/.git/mq/shots/work/L77-51/out/book/menu_shell_bonds.png
+menu_open_probe: weapons    strip overlap 0 px  (screen (1920.0, 1080.0))
+menu_open_probe: shot /Users/claudiasellers/Documents/acotar-game/.git/mq/shots/work/L77-51/out/book/menu_shell_weapons.png
+menu_open_probe: settings   strip overlap 0 px  (screen (1920.0, 1080.0))
+menu_open_probe: shot /Users/claudiasellers/Documents/acotar-game/.git/mq/shots/work/L77-51/out/book/menu_shell_settings.png
+menu_open_probe: done
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
