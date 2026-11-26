@@ -1114,6 +1114,11 @@ moment("hostile_glint_grab", "hostile_packs", "Greedy things. Anything that shin
 # The first charm she cuts from the sleeping Hollow Hob's necklace (bestiary
 # §10; the first on the cord is an iron horseshoe [C: iron does nothing to
 # them]). Canon X, once per save; the Keeper's to tune.
+# G29: the first time she comes within 25 m of it asleep, she sees what it
+# wears (bestiary §10.3). Canon X, once per save; the Keeper's to tune.
+moment("hob_first_sight", "hollow_hob",
+       "Iron, pewter, a child's bracelet. Mortal things, strung round that neck. And it's asleep.",
+       canon="X", once=True)
 moment("hob_charm_cut", "hollow_hob", "Iron. Someone thought this would keep them safe.", canon="X", once=True)
 
 # =============================================================================

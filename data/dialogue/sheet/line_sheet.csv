@@ -455,4 +455,5 @@ hostile_element_resisted,feyre,,"Like shooting a stone. Not that, then.",X,yes,s
 loot_first_trophy,feyre,,Like the pelt. I know what this makes me.,X,yes,scene,monster_gear.loot_first_trophy,,,"inner voice: dry, quiet, close",audio/voice/loot_first_trophy.ogg
 hostile_rout,feyre,,Let them run. They'll come back hungrier.,X,yes,scene,hostile_packs.hostile_rout,,,"inner voice: dry, quiet, close",audio/voice/hostile_rout.ogg
 hostile_glint_grab,feyre,,Greedy things. Anything that shines.,X,yes,scene,hostile_packs.hostile_glint_grab,,,"inner voice: dry, quiet, close",audio/voice/hostile_glint_grab.ogg
+hob_first_sight,feyre,,"Iron, pewter, a child's bracelet. Mortal things, strung round that neck. And it's asleep.",X,yes,scene,hollow_hob.hob_first_sight,,,"inner voice: dry, quiet, close",audio/voice/hob_first_sight.ogg
 hob_charm_cut,feyre,,Iron. Someone thought this would keep them safe.,X,yes,scene,hollow_hob.hob_charm_cut,,,"inner voice: dry, quiet, close",audio/voice/hob_charm_cut.ogg

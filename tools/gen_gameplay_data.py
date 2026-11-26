@@ -236,6 +236,16 @@ C = [
 	("col_river_glass", "River glass", [LAKES, WOODS], "Frosted green glass, smooth as soap.", "9fd8c0", "common"),
 	("col_bone_charm", "Bone charm", [WOODS, SHRINE], "A carved knot of bone on a thong.", "e8e0cc", "rare"),
 	("col_snow_owl_down", "Owl down", [W, WALLH], "A wisp of white down caught on bark.", "f5f2ea", "common"),
+	# The Hollow Hob's eight charms (bestiary §10.3, L75): cut from its necklace,
+	# never foraged (no regions); common so they don't count as rare finds.
+	("col_hob_horseshoe", "Iron horseshoe", [], "Nailed over a door once, to keep them out. It didn't.", "5a5550", "rare", "Round the Hollow Hob's neck, while it sleeps"),
+	("col_hob_iron_bracelet", "Child's iron bracelet", [], "Iron, and small enough for a child's wrist. Someone believed.", "6a625a", "rare", "Round the Hollow Hob's neck, while it sleeps"),
+	("col_hob_pewter_locket", "Pewter locket", [], "Dented shut. Something rattles inside.", "9a9a94", "rare", "Round the Hollow Hob's neck, while it sleeps"),
+	("col_hob_little_bell", "Little bell", [], "A sheep's bell, its clapper bent.", "b8913a", "rare", "Round the Hollow Hob's neck, while it sleeps"),
+	("col_hob_bone_comb", "Bone comb", [], "Fine teeth, two missing. Someone combed her hair with this.", "e6dcc4", "rare", "Round the Hollow Hob's neck, while it sleeps"),
+	("col_hob_rose_circlet", "Rose-gold circlet", [], "Thin as a reed. It would sit well on a brow.", "d49a86", "rare", "Round the Hollow Hob's neck, while it sleeps"),
+	("col_hob_pearl", "Pearl", [], "Pierced for a necklace, and kept longer than I'd like to think.", "efe9e0", "rare", "Round the Hollow Hob's neck, while it sleeps"),
+	("col_hob_ribbon", "Ribbon", [], "Faded blue, knotted round the cord three times.", "6f86a8", "rare", "Round the Hollow Hob's neck, while it sleeps"),
 ]
 
 def _arrow(id, name, effect="", drag=0.0022, brk=0.35, dmg=1.0, shaft="8c6a45", fletch="d9d2c3", price=1, mass=0.03, desc="", canon="X"):
@@ -540,6 +550,8 @@ ICON_OVERRIDES = {
 	"col_acorn_cap": "berry", "col_acorn_carved": "trinket", "col_mural_chip": "trinket", "col_seed_packet": "trinket",
 	"col_beetle_jewel": "gem", "col_dandelion_clock": "flower", "col_carved_bird": "trinket", "col_bone_charm": "trinket",
 	"col_leaf_gilded": "leaf",
+	"col_hob_iron_bracelet": "trinket", "col_hob_pewter_locket": "trinket", "col_hob_bone_comb": "trinket",
+	"col_hob_rose_circlet": "trinket",
 }
 
 
@@ -656,11 +668,17 @@ def main():
 			"weight_class = %d" % m["wc"], "craft_tags = %s" % sn_array(m["craft"]), "base_price = %d" % m["price"],
 			"color = %s" % color(m["color"]), 'canon = "%s"' % m.get("canon", "X")]
 		write("data/items/%s.tres" % m["id"], "res://data/items/item_data.gd", "ItemData", lines)
-	for cid, name, regions, desc, col, ab in C:
+	for row in C:
+		cid, name, regions, desc, col, ab = row[:6]
 		lines = ['id = &"%s"' % cid, 'display_name = "%s"' % esc(name), 'description = "%s"' % esc(desc),
 			"weight_class = 0", "color = %s" % color(col), "regions = %s" % sn_array(regions),
 			'abundance = &"%s"' % ab]
-		lines += reward_fields(cid, name, [], regions, ab, False, col, [])[0]
+		fields = reward_fields(cid, name, [], regions, ab, False, col, [])[0]
+		if len(row) > 6:
+			# A given find (no regions): common, no window, its own hint.
+			fields = ['icon = &"%s"' % icon_for(cid, name), 'rarity = &"common"', 'bound = &""',
+				'hint = "%s"' % esc(row[6])]
+		lines += fields
 		write("data/collectibles/%s.tres" % cid, "res://data/collectibles/collectible_data.gd", "CollectibleData", lines)
 	for a in ARROWS:
 		lines = ['id = &"%s"' % a["id"], 'item_id = &"%s"' % a["item_id"], 'display_name = "%s"' % a["name"],
