@@ -288,11 +288,28 @@ func test_whistle_brings_the_mare_and_she_mounts_rides_and_gets_down() -> void:
 	h.stick(Vector2.ZERO)
 	assert_gt(PlayHarness.flat_distance(from, md.mare.global_position), 5.0, "the stick rides her forward")
 	assert_gt(gallop, canter, "sprint gallops faster than the canter (%.1f vs %.1f m/s)" % [gallop, canter])
-	# She is placed in _process, the mare moves in physics: sample after a
-	# process frame, or a slow frame's extra physics ticks (~0.24 m each at a
-	# gallop) read as her lagging off the saddle (T151: really 0.9 m, the hip drop).
-	await wait_process_frames(1)
-	assert_lt(h.feyre.global_position.distance_to(md.seat_point()), 1.5, "Feyre rides along in the saddle")
+	# She is placed in _process after the mare's physics ticks. Sample once the
+	# frame is drawn: a process_frame wake-up runs before her _process, and a
+	# hitch frame (stream-in, up to 8 catch-up ticks, ~0.17 m each at 10 m/s)
+	# read as her trailing the saddle by 1.1-1.75 m (T151). She really sits 0.9 m
+	# (the hip drop) off the seat point, steadily.
+	# The sample is taken inside the frame_post_draw callback; the wait is
+	# bounded in process frames, since post-draw may never fire headless.
+	var seat_gap: Array[float] = []
+	var sample := func() -> void:
+		if seat_gap.is_empty():
+			seat_gap.append(h.feyre.global_position.distance_to(md.seat_point()))
+	RenderingServer.frame_post_draw.connect(sample, CONNECT_ONE_SHOT)
+	var waited := 0
+	while seat_gap.is_empty() and waited < 30:
+		await wait_process_frames(1)
+		waited += 1
+	if RenderingServer.frame_post_draw.is_connected(sample):
+		RenderingServer.frame_post_draw.disconnect(sample)
+	if seat_gap.is_empty():
+		# No draw happened (headless): a process frame is after her _process of the previous one.
+		seat_gap.append(h.feyre.global_position.distance_to(md.seat_point()))
+	assert_lt(seat_gap[0], 1.5, "Feyre rides along in the saddle")
 	await h.wait_until(func() -> bool: return md.mare.speed < 0.3, 60 * 6)
 	# A tap of E with nothing in reach gets her down.
 	await h.press(&"interact")
