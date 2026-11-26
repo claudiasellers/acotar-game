@@ -62,6 +62,9 @@ var _reveal_note: Label
 var _reveal_icon: TextureRect
 var _outcome: Label
 var _dishes: VBoxContainer
+## The weapon in her hand, steeped with a steeped arrow (WeaponSteep): one
+## button per arrow it would take, at a hearth or a lit camp fire.
+var _steeps: HBoxContainer
 
 
 ## Opens the screen at `at`, making one if the scene has none.
@@ -359,6 +362,9 @@ func _build() -> void:
 	_outcome = BookKit.label("", &"SatchelBody")
 	_outcome.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(_outcome)
+	_steeps = HBoxContainer.new()
+	_steeps.add_theme_constant_override(&"separation", 6)
+	col.add_child(_steeps)
 
 	col.add_child(BookKit.label("Made", &"PageSection"))
 	_dishes = VBoxContainer.new()
@@ -415,6 +421,33 @@ func _refresh() -> void:
 	_hunch.text = hunch()
 	_brew.disabled = chosen.is_empty()
 	_refresh_dishes()
+	_refresh_steeps()
+
+
+## Steep the held weapon (WeaponSteep): a button per steeped arrow it takes.
+func _refresh_steeps() -> void:
+	for c in _steeps.get_children():
+		_steeps.remove_child(c)
+		c.queue_free()
+	var rack := WeaponSteep.rack_of(feyre)
+	if not WeaponSteep.is_fire(station):
+		return
+	for arrow in WeaponSteep.offers(rack, Gameplay.inventory):
+		_steeps.add_child(_small_button(WeaponSteep.verb(rack, arrow), steep_blade.bind(arrow)))
+
+
+## Steeps the weapon in her hand with one `arrow`.
+func steep_blade(arrow: StringName) -> Dictionary:
+	var r := WeaponSteep.steep(WeaponSteep.rack_of(feyre), station, arrow)
+	_reveal.visible = false
+	if r.ok:
+		_outcome.text = String(r.text)
+		Juice.bounce_control(_outcome, 0.18)
+	else:
+		var why := String(r.reason)
+		_outcome.text = why[0].to_upper() + why.substr(1) + "."
+	_refresh()
+	return r
 
 
 ## Every ingredient she carries, pouch first.
