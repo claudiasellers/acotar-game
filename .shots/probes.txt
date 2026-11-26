@@ -1,0 +1,5 @@
+from clarity-lane L86-28
+quality look
+size 1920x1080
+timeout 900
+shot arrival res://tools/_probe/arrival_probe.tscn {out}
