@@ -11,7 +11,7 @@ A bond is told two ways on its page (owner, 2026-11-26, replacing "never a
 bar or a tier on screen"):
 
 - as **moments** in Feyre's hand, each with the day it happened;
-- by **one set of measures**, the same for everyone, drawn as dabs of paint
+- by **one set of measures**, the same for everyone, drawn as dots of her accent paint
   with a word, and explained once in the page's legend.
 
 No figure is written for a measure except the day of Since, and regard (the
@@ -75,7 +75,7 @@ Tab `bonds` in the journal, after the map. Left sheet: who she knows, each
 with the last thing that passed. Right sheet: the one she turned to
 (`show_bond(id)`): portrait, name and the five measures beside it, "These
 days", and "What has passed between us", oldest first. The left sheet ends
-with the legend, "How I read a bond": each measure's dab, name and line. `has_news()` marks the tab when `BondBook.count()` has grown
+with the legend, "How I read a bond": each measure's name and line. `has_news()` marks the tab when `BondBook.count()` has grown
 since she last opened the page (WorldDeltas `bonds/seen`).
 
 ## Not built yet
