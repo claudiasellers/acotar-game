@@ -19,7 +19,7 @@ const STOCK := {
 const FRAMES_AFTER := 12
 const OPENS := 3
 const WARM_FRAMES := 120
-const SHOT_PAGES: Array[StringName] = [&"collection", &"map", &"satchel", &"wardrobe", &"sketchbook", &"bonds", &"settings"]
+const SHOT_PAGES: Array[StringName] = [&"collection", &"map", &"satchel", &"wardrobe", &"sketchbook", &"bonds", &"weapons", &"settings"]
 ## What has happened by the time of the shots, and on which day, so the
 ## Bonds page has people on it.
 const SHOT_PAST := {
@@ -76,12 +76,13 @@ func _setup() -> void:
 	add_child(SettingsTab.new())
 	add_child(StoryJournal.new())
 	add_child(BondsTab.new())
+	add_child(WeaponsTab.new())
 	add_child(WorldMapHud.new())
 	add_child(SatchelHud.new())
 
 
 func _pages() -> Array[StringName]:
-	return [&"none", &"satchel", &"wardrobe", &"collection", &"sketchbook", &"bonds", &"map", &"settings"]
+	return [&"none", &"satchel", &"wardrobe", &"collection", &"sketchbook", &"bonds", &"weapons", &"map", &"settings"]
 
 
 ## &"none" times plain frames, the baseline the hitch is read against.
@@ -164,6 +165,11 @@ func _check_overlap(page: StringName) -> void:
 ## statuses (two rows and "+1"), two E cards, the controls hint.
 func _dress_hud() -> void:
 	add_child(VitalsHud.new())
+	var rack := WeaponRack.of(feyre)
+	rack.add(&"wpn_gloamer_hookknife", 0.9)
+	rack.add(&"wpn_blackvein_jaw_shears", 0.5)
+	rack.add(&"wpn_fishers_gaff", 0.2)
+	rack.imbue(1, &"ember", 1)
 	var vitals := Vitals.of(feyre)
 	if vitals:
 		for tag: StringName in [&"venom", &"steady", &"swift", &"warm"]:

@@ -45,7 +45,7 @@ static func of(player: Node) -> WeaponRack:
 	return r
 
 
-## The pickup log's notes as it wears (the rack card comes with the UI).
+## The pickup log's notes as it wears.
 const WORN_NOTE := "The %s is cracking."
 const LAST_NOTE := "The %s won't take another blow."
 const BROKE_NOTE := "The %s broke."
@@ -88,7 +88,7 @@ func add(weapon_id: StringName, wear: float = 1.0, imbue: ImbueSlots = null) -> 
 		return -1
 	var slots := imbue if imbue else ImbueSlots.new(w.imbue_slots)
 	carried.append({"id": weapon_id, "left": maxi(int(round(w.durability * clampf(wear, 0.0, 1.0))), 1), "imbue": slots})
-	# Empty-handed, she takes it up at once (until the rack card lets her choose).
+	# Empty-handed, she takes it up at once; the Weapons page lets her choose.
 	if held < 0:
 		held = carried.size() - 1
 	picked.emit(weapon_id)

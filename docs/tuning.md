@@ -289,6 +289,9 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | `VitalsHud.HIDDEN_FULL` | `ui/hud/vitals/vitals_hud.gd` | 0.5 | 0.4–0.7 | the `Vitals.sight_scale` at which the page's edge is fully drawn in around a hidden Feyre (crouched is 0.55) | L77 |
 | `VitalsHud.REFUSED_SHAKE` | `ui/hud/vitals/vitals_hud.gd` | 9° | 5–14 | how far the stamina bow shakes its head when she asks for more stamina than she has (`VitalsHud.stamina_refused`) | L77 |
 | `BrewMenu.UNMADE_ALPHA` | `ui/chemistry/brew_menu.gd` | 0.55 | 0.4–0.7 | how faint a known recipe is on the brewing page when she can't make it here and now | L77 |
+| `WeaponWords.POWER_BANDS` | `ui/weapons/weapon_words.gd` | 0.95, 1.15, 1.7 | n/a | where a weapon's power beside the knife's 1 reads lighter, about the same, harder, twice as hard | L77 |
+| `WeaponWords.SWING_BANDS` / `REACH_BANDS` | `ui/weapons/weapon_words.gd` | 0.6, 0.85 s / 1.7, 2.0 m | n/a | where a weapon reads quick or slow, short or long on the Weapons page | L77 |
+| `WeaponWords.SOUND_FROM` | `ui/weapons/weapon_words.gd` | 0.7 | 0.5–0.9 | the share of durability left from which a weapon reads "Sound." | L77 |
 | hidden edge reach and weight | `ui/hud/vitals/edge_fx.gdshader` (`hidden`) | starts 0.78–0.88 of the way out, 0.55 opacity | reach 0.7–0.9; opacity 0.4–0.7 | how far the paper edge comes in and how solid it is | L77 |
 | `VitalsEdgeFx.WARN_OPACITY` / `WARN_RATE` / `WARN_START` | `ui/hud/vitals/edge_fx.gd` | 0.85; 11 rad/s; 0.4 | 0.6–1.0; 8–14; 0.2–0.6 | the unseen-attack beat on the side it comes from: how solid at its peak, how fast it beats, and how strong it starts before rising to full as the blow nears. Its length is the wind-up's own seconds (the caller's) | L77 |
 | `StatusPage.CHIP` / `STAGE_WORDS` | `ui/dressing_room/status_page.gd` | 60 px; Fine, Rising, Danger | chip 48–72 | a status's chip on the "How I am" page, and what a gauge's three stages are called beside its name | L77 |

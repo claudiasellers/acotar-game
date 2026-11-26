@@ -295,7 +295,7 @@ func test_taking_a_drop_and_swapping_when_full() -> void:
 	for i in WeaponRack.CAPACITY - 1:
 		rack.add(HOOK)
 	var e := WeaponDrop.spawn(self, Vector3.ZERO, &"wpn_pruning_hook")
-	assert_eq(e.use_verb, "swap for pruning hook")
+	assert_eq(e.use_verb, "swap my knuckle-club for pruning hook", "the prompt names what she gives up")
 	assert_true(e.use(her))
 	assert_eq(rack.carried.size(), WeaponRack.CAPACITY)
 	var left := _drops()
