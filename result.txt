@@ -1,0 +1,12 @@
+status ok
+request onelight-6
+commit cf0c01ea52b79369e902624031fb57d0e95be4a9
+machine Claudias-Mac-mini
+godot 4.7.2.stable.official.ed1daf0bf
+quality look
+size 1920x1080
+renderer project default
+prep ok 21s: import 9s, generated content 12s (levels.sh)
+note focus guard: handed focus back 1x, render held it 176 ms
+shot beastdoor ok exit=0 17s files=1
+answered 2026-11-26T20:20:08Z after 42s
