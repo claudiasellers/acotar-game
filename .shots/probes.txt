@@ -1,0 +1,5 @@
+from clarity-lane L86-41
+quality look
+size 1920x1080
+timeout 900
+shot track res://tools/_probe/track_probe.tscn {out}
