@@ -35,7 +35,7 @@ const ELEMENTS := {
 }
 const EMPTY_SLOT := "An empty place for a steep."
 ## Said once under the slots while any is empty: where a steep is made (WeaponSteep).
-const STEEP_HOW := "A steeped arrow at a hearth or a camp fire fills it."
+const STEEP_HOW := "With it in my hand at a hearth or a camp fire, a steeped arrow fills it."
 const NO_SLOTS := "It won't hold a steep."
 
 
