@@ -1,0 +1,370 @@
+== import
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Started Project initialization (5 steps)[39m[0m
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Scanning file structure...[39m[0m
+[  16% ] [90m[1mfirst_scan_filesystem[22m | Loading global class names...[39m[0m
+[  33% ] [90m[1mfirst_scan_filesystem[22m | Verifying GDExtensions...[39m[0m
+[  50% ] [90m[1mfirst_scan_filesystem[22m | Creating autoload scripts...[39m[0m
+[  66% ] [90m[1mfirst_scan_filesystem[22m | Initializing plugins...[39m[0m
+[  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
+[92m[ DONE ][39m [1mfirst_scan_filesystem[22m
+[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | Started Registering global classes... (118 steps)[39m[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | RegionDef[39m[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   1% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   2% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   3% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   4% ] [90m[1mupdate_scripts_classes[22m | CreatureAnimator[39m[0m
+[   5% ] [90m[1mupdate_scripts_classes[22m | PlaceholderBody[39m[0m
+[   5% ] [90m[1mupdate_scripts_classes[22m | Attor[39m[0m
+[   6% ] [90m[1mupdate_scripts_classes[22m | Harvestable[39m[0m
+[   7% ] [90m[1mupdate_scripts_classes[22m | DreadField[39m[0m
+[   8% ] [90m[1mupdate_scripts_classes[22m | HobRoamer[39m[0m
+[   9% ] [90m[1mupdate_scripts_classes[22m | NagaRoamer[39m[0m
+[  10% ] [90m[1mupdate_scripts_classes[22m | CourtNpc[39m[0m
+[  10% ] [90m[1mupdate_scripts_classes[22m | Bird[39m[0m
+[  11% ] [90m[1mupdate_scripts_classes[22m | Prey[39m[0m
+[  12% ] [90m[1mupdate_scripts_classes[22m | CreatureSenses[39m[0m
+[  13% ] [90m[1mupdate_scripts_classes[22m | CreatureSpawner[39m[0m
+[  14% ] [90m[1mupdate_scripts_classes[22m | CreatureSpawnTable[39m[0m
+[  15% ] [90m[1mupdate_scripts_classes[22m | SpawnEntry[39m[0m
+[  15% ] [90m[1mupdate_scripts_classes[22m | HoofPrint[39m[0m
+[  16% ] [90m[1mupdate_scripts_classes[22m | TrackLayer[39m[0m
+[  17% ] [90m[1mupdate_scripts_classes[22m | GreatWolf[39m[0m
+[  18% ] [90m[1mupdate_scripts_classes[22m | Wolf[39m[0m
+[  19% ] [90m[1mupdate_scripts_classes[22m | WolfPack[39m[0m
+[  20% ] [90m[1mupdate_scripts_classes[22m | CreatureData[39m[0m
+[  21% ] [90m[1mupdate_scripts_classes[22m | StorySpawner[39m[0m
+[  21% ] [90m[1mupdate_scripts_classes[22m | ArrowData[39m[0m
+[  22% ] [90m[1mupdate_scripts_classes[22m | BowData[39m[0m
+[  23% ] [90m[1mupdate_scripts_classes[22m | BrewRule[39m[0m
+[  24% ] [90m[1mupdate_scripts_classes[22m | CollectionReward[39m[0m
+[  25% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  26% ] [90m[1mupdate_scripts_classes[22m | RideNorth[39m[0m
+[  26% ] [90m[1mupdate_scripts_classes[22m | Act2DreadSpace[39m[0m
+[  27% ] [90m[1mupdate_scripts_classes[22m | BoggeHunt[39m[0m
+[  28% ] [90m[1mupdate_scripts_classes[22m | CurtainTrap[39m[0m
+[  29% ] [90m[1mupdate_scripts_classes[22m | FirstDinner[39m[0m
+[  30% ] [90m[1mupdate_scripts_classes[22m | PucaLure[39m[0m
+[  31% ] [90m[1mupdate_scripts_classes[22m | WoundDressing[39m[0m
+[  31% ] [90m[1mupdate_scripts_classes[22m | SummerFaerieTriage[39m[0m
+[  32% ] [90m[1mupdate_scripts_classes[22m | NagaAmbush[39m[0m
+[  33% ] [90m[1mupdate_scripts_classes[22m | SurielSnare[39m[0m
+[  34% ] [90m[1mupdate_scripts_classes[22m | AttorInTheGarden[39m[0m
+[  35% ] [90m[1mupdate_scripts_classes[22m | StarlightPoolSwim[39m[0m
+[  36% ] [90m[1mupdate_scripts_classes[22m | CalanmaiKit[39m[0m
+[  36% ] [90m[1mupdate_scripts_classes[22m | CavePath[39m[0m
+[  37% ] [90m[1mupdate_scripts_classes[22m | RiteFires[39m[0m
+[  38% ] [90m[1mupdate_scripts_classes[22m | CarriageFarewell[39m[0m
+[  39% ] [90m[1mupdate_scripts_classes[22m | FountainHead[39m[0m
+[  40% ] [90m[1mupdate_scripts_classes[22m | SolsticeNight[39m[0m
+[  41% ] [90m[1mupdate_scripts_classes[22m | Beats[39m[0m
+[  42% ] [90m[1mupdate_scripts_classes[22m | MomentSpace[39m[0m
+[  42% ] [90m[1mupdate_scripts_classes[22m | SceneSpace[39m[0m
+[  43% ] [90m[1mupdate_scripts_classes[22m | BeastDoorLighting[39m[0m
+[  44% ] [90m[1mupdate_scripts_classes[22m | WolfHuntLighting[39m[0m
+[  45% ] [90m[1mupdate_scripts_classes[22m | SoundDirector[39m[0m
+[  46% ] [90m[1mupdate_scripts_classes[22m | BondBook[39m[0m
+[  47% ] [90m[1mupdate_scripts_classes[22m | VitalsState[39m[0m
+[  47% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  48% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  49% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  50% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  51% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  52% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  52% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  53% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  54% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  55% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  56% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  57% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  57% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  58% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  59% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  60% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  61% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  62% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  63% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  63% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  64% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  65% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  66% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  67% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  68% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  68% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  69% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  70% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  71% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  72% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  73% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  73% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  74% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  75% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  76% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  77% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  78% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  78% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  79% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  80% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  81% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  82% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  83% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  84% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  84% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  85% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  86% ] [90m[1mupdate_scripts_classes[22m | BondsTab[39m[0m
+[  87% ] [90m[1mupdate_scripts_classes[22m | HudLayout[39m[0m
+[  88% ] [90m[1mupdate_scripts_classes[22m | VitalsEdgeFx[39m[0m
+[  89% ] [90m[1mupdate_scripts_classes[22m | VitalsHud[39m[0m
+[  89% ] [90m[1mupdate_scripts_classes[22m | MareTendingView[39m[0m
+[  90% ] [90m[1mupdate_scripts_classes[22m | Icons[39m[0m
+[  91% ] [90m[1mupdate_scripts_classes[22m | JournalTheme[39m[0m
+[  92% ] [90m[1mupdate_scripts_classes[22m | GradeDirector[39m[0m
+[  93% ] [90m[1mupdate_scripts_classes[22m | GradePreset[39m[0m
+[  94% ] [90m[1mupdate_scripts_classes[22m | RegionGrade[39m[0m
+[  94% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  95% ] [90m[1mupdate_scripts_classes[22m | ManorHouseBuilder[39m[0m
+[  96% ] [90m[1mupdate_scripts_classes[22m | ManorInteriorGrade[39m[0m
+[  97% ] [90m[1mupdate_scripts_classes[22m | ManorEstate[39m[0m
+[  98% ] [90m[1mupdate_scripts_classes[22m | AmbientLife[39m[0m
+[92m[ DONE ][39m [1mupdate_scripts_classes[22m
+[0m
+[   0% ] [90m[1m_update_scan_actions[22m | Started Scanning actions... (201 steps)[39m[0m
+[   0% ] [90m[1m_update_scan_actions[22m | alis.blend[39m[0m
+[   0% ] [90m[1m_update_scan_actions[22m | elain.blend[39m[0m
+[   0% ] [90m[1m_update_scan_actions[22m | father.blend[39m[0m
+[   1% ] [90m[1m_update_scan_actions[22m | hair.blend[39m[0m
+[   1% ] [90m[1m_update_scan_actions[22m | feyre.blend[39m[0m
+[   2% ] [90m[1m_update_scan_actions[22m | gowns.blend[39m[0m
+[   2% ] [90m[1m_update_scan_actions[22m | wardrobe.blend[39m[0m
+[   3% ] [90m[1m_update_scan_actions[22m | lucien.blend[39m[0m
+[   3% ] [90m[1m_update_scan_actions[22m | nesta.blend[39m[0m
+[   4% ] [90m[1m_update_scan_actions[22m | rhysand.blend[39m[0m
+[   4% ] [90m[1m_update_scan_actions[22m | summer_faerie.blend[39m[0m
+[   5% ] [90m[1m_update_scan_actions[22m | tamlin_beast.blend[39m[0m
+[   5% ] [90m[1m_update_scan_actions[22m | tamlin.blend[39m[0m
+[   6% ] [90m[1m_update_scan_actions[22m | attor.gltf[39m[0m
+[   6% ] [90m[1m_update_scan_actions[22m | bogge_claws.gltf[39m[0m
+[   7% ] [90m[1m_update_scan_actions[22m | bogge_eye_albedo.webp[39m[0m
+[   7% ] [90m[1m_update_scan_actions[22m | bogge_eye_orm.webp[39m[0m
+[   8% ] [90m[1m_update_scan_actions[22m | bogge_jaw_normal.webp[39m[0m
+[   8% ] [90m[1m_update_scan_actions[22m | bogge_jaw_orm.webp[39m[0m
+[   9% ] [90m[1m_update_scan_actions[22m | gloamer_orm.webp[39m[0m
+[   9% ] [90m[1m_update_scan_actions[22m | hollow_crow_albedo.webp[39m[0m
+[  10% ] [90m[1m_update_scan_actions[22m | hollow_hob.gltf[39m[0m
+[  10% ] [90m[1m_update_scan_actions[22m | naga.gltf[39m[0m
+[  11% ] [90m[1m_update_scan_actions[22m | naga_albedo.webp[39m[0m
+[  11% ] [90m[1m_update_scan_actions[22m | naga_emit.webp[39m[0m
+[  12% ] [90m[1m_update_scan_actions[22m | naga_mask.webp[39m[0m
+[  12% ] [90m[1m_update_scan_actions[22m | suriel_emit.webp[39m[0m
+[  13% ] [90m[1m_update_scan_actions[22m | archeron_mother.gltf[39m[0m
+[  13% ] [90m[1m_update_scan_actions[22m | archeron_mother_eye_iris.png[39m[0m
+[  14% ] [90m[1m_update_scan_actions[22m | archeron_mother_hair_strands_dry.png[39m[0m
+[  14% ] [90m[1m_update_scan_actions[22m | blessed_2.gltf[39m[0m
+[  15% ] [90m[1m_update_scan_actions[22m | blessed_2_face.png[39m[0m
+[  15% ] [90m[1m_update_scan_actions[22m | blessed_2_hair_strands_dry.png[39m[0m
+[  16% ] [90m[1m_update_scan_actions[22m | blessed_eye_iris.png[39m[0m
+[  16% ] [90m[1m_update_scan_actions[22m | blessed_face.png[39m[0m
+[  17% ] [90m[1m_update_scan_actions[22m | blessed_hair_strands_dry.png[39m[0m
+[  17% ] [90m[1m_update_scan_actions[22m | calanmai_1_eye_iris.png[39m[0m
+[  18% ] [90m[1m_update_scan_actions[22m | calanmai_1_face.png[39m[0m
+[  18% ] [90m[1m_update_scan_actions[22m | calanmai_1_hair_strands_dry.png[39m[0m
+[  19% ] [90m[1m_update_scan_actions[22m | calanmai_2.gltf[39m[0m
+[  19% ] [90m[1m_update_scan_actions[22m | calanmai_3_eye_iris.png[39m[0m
+[  20% ] [90m[1m_update_scan_actions[22m | fae_birch.gltf[39m[0m
+[  20% ] [90m[1m_update_scan_actions[22m | fae_fox.gltf[39m[0m
+[  21% ] [90m[1m_update_scan_actions[22m | fae_greenbrown_true.gltf[39m[0m
+[  21% ] [90m[1m_update_scan_actions[22m | fae_longlimb_true.gltf[39m[0m
+[  22% ] [90m[1m_update_scan_actions[22m | fae_longlimb_true_eye_iris.png[39m[0m
+[  22% ] [90m[1m_update_scan_actions[22m | fae_mushroom.gltf[39m[0m
+[  23% ] [90m[1m_update_scan_actions[22m | fae_nymph.gltf[39m[0m
+[  23% ] [90m[1m_update_scan_actions[22m | fae_nymph_hair_strands_dry.png[39m[0m
+[  24% ] [90m[1m_update_scan_actions[22m | fae_nymph_hair_strands_wet.png[39m[0m
+[  24% ] [90m[1m_update_scan_actions[22m | fae_owl.gltf[39m[0m
+[  25% ] [90m[1m_update_scan_actions[22m | fae_pixie.gltf[39m[0m
+[  25% ] [90m[1m_update_scan_actions[22m | fae_rose_eye_iris.png[39m[0m
+[  26% ] [90m[1m_update_scan_actions[22m | fae_rose_hair_strands_dry.png[39m[0m
+[  26% ] [90m[1m_update_scan_actions[22m | fae_satyr.gltf[39m[0m
+[  27% ] [90m[1m_update_scan_actions[22m | fae_stag.gltf[39m[0m
+[  27% ] [90m[1m_update_scan_actions[22m | gardener_1_true.gltf[39m[0m
+[  28% ] [90m[1m_update_scan_actions[22m | gardener_2_true.gltf[39m[0m
+[  28% ] [90m[1m_update_scan_actions[22m | human_elder.gltf[39m[0m
+[  29% ] [90m[1m_update_scan_actions[22m | human_elder_eye_iris.png[39m[0m
+[  29% ] [90m[1m_update_scan_actions[22m | human_elder_face.png[39m[0m
+[  30% ] [90m[1m_update_scan_actions[22m | human_elder_hair_strands_dry.png[39m[0m
+[  30% ] [90m[1m_update_scan_actions[22m | human_man.gltf[39m[0m
+[  31% ] [90m[1m_update_scan_actions[22m | human_man_eye_iris.png[39m[0m
+[  31% ] [90m[1m_update_scan_actions[22m | human_man_face.png[39m[0m
+[  32% ] [90m[1m_update_scan_actions[22m | human_man_hair_strands_dry.png[39m[0m
+[  32% ] [90m[1m_update_scan_actions[22m | human_woman.gltf[39m[0m
+[  33% ] [90m[1m_update_scan_actions[22m | human_woman_eye_iris.png[39m[0m
+[  33% ] [90m[1m_update_scan_actions[22m | human_woman_face.png[39m[0m
+[  34% ] [90m[1m_update_scan_actions[22m | human_woman_hair_strands_dry.png[39m[0m
+[  34% ] [90m[1m_update_scan_actions[22m | human_youth.gltf[39m[0m
+[  35% ] [90m[1m_update_scan_actions[22m | human_youth_eye_iris.png[39m[0m
+[  35% ] [90m[1m_update_scan_actions[22m | human_youth_face.png[39m[0m
+[  36% ] [90m[1m_update_scan_actions[22m | human_youth_hair_strands_dry.png[39m[0m
+[  36% ] [90m[1m_update_scan_actions[22m | mercenary.gltf[39m[0m
+[  37% ] [90m[1m_update_scan_actions[22m | mercenary_eye_iris.png[39m[0m
+[  37% ] [90m[1m_update_scan_actions[22m | mercenary_face.png[39m[0m
+[  38% ] [90m[1m_update_scan_actions[22m | mercenary_hair_strands_dry.png[39m[0m
+[  38% ] [90m[1m_update_scan_actions[22m | mortal_elder.gltf[39m[0m
+[  39% ] [90m[1m_update_scan_actions[22m | mortal_elder_eye_iris.png[39m[0m
+[  39% ] [90m[1m_update_scan_actions[22m | mortal_elder_face.png[39m[0m
+[  40% ] [90m[1m_update_scan_actions[22m | mortal_elder_hair_strands_dry.png[39m[0m
+[  40% ] [90m[1m_update_scan_actions[22m | mortal_man.gltf[39m[0m
+[  41% ] [90m[1m_update_scan_actions[22m | mortal_man_eye_iris.png[39m[0m
+[  41% ] [90m[1m_update_scan_actions[22m | mortal_man_face.png[39m[0m
+[  42% ] [90m[1m_update_scan_actions[22m | mortal_man_hair_strands_dry.png[39m[0m
+[  42% ] [90m[1m_update_scan_actions[22m | mortal_queen_1.gltf[39m[0m
+[  43% ] [90m[1m_update_scan_actions[22m | mortal_queen_1_eye_iris.png[39m[0m
+[  43% ] [90m[1m_update_scan_actions[22m | mortal_queen_1_face.png[39m[0m
+[  44% ] [90m[1m_update_scan_actions[22m | mortal_queen_1_hair_strands_dry.png[39m[0m
+[  44% ] [90m[1m_update_scan_actions[22m | mortal_queen_2.gltf[39m[0m
+[  45% ] [90m[1m_update_scan_actions[22m | mortal_queen_2_eye_iris.png[39m[0m
+[  45% ] [90m[1m_update_scan_actions[22m | mortal_queen_2_face.png[39m[0m
+[  46% ] [90m[1m_update_scan_actions[22m | mortal_queen_2_hair_strands_dry.png[39m[0m
+[  46% ] [90m[1m_update_scan_actions[22m | mortal_queen_3.gltf[39m[0m
+[  47% ] [90m[1m_update_scan_actions[22m | mortal_queen_3_eye_iris.png[39m[0m
+[  47% ] [90m[1m_update_scan_actions[22m | mortal_queen_3_face.png[39m[0m
+[  48% ] [90m[1m_update_scan_actions[22m | mortal_queen_3_hair_strands_dry.png[39m[0m
+[  48% ] [90m[1m_update_scan_actions[22m | mortal_woman.gltf[39m[0m
+[  49% ] [90m[1m_update_scan_actions[22m | mortal_woman_eye_iris.png[39m[0m
+[  49% ] [90m[1m_update_scan_actions[22m | mortal_woman_face.png[39m[0m
+[  50% ] [90m[1m_update_scan_actions[22m | mortal_woman_hair_strands_dry.png[39m[0m
+[  50% ] [90m[1m_update_scan_actions[22m | mortal_youth.gltf[39m[0m
+[  50% ] [90m[1m_update_scan_actions[22m | mortal_youth_eye_iris.png[39m[0m
+[  51% ] [90m[1m_update_scan_actions[22m | mortal_youth_face.png[39m[0m
+[  51% ] [90m[1m_update_scan_actions[22m | mortal_youth_hair_strands_dry.png[39m[0m
+[  52% ] [90m[1m_update_scan_actions[22m | old_court_lady.gltf[39m[0m
+[  52% ] [90m[1m_update_scan_actions[22m | old_court_lady_2.gltf[39m[0m
+[  53% ] [90m[1m_update_scan_actions[22m | old_court_lady_2_eye_iris.png[39m[0m
+[  53% ] [90m[1m_update_scan_actions[22m | old_court_lady_2_face.png[39m[0m
+[  54% ] [90m[1m_update_scan_actions[22m | old_court_lady_2_hair_strands_dry.png[39m[0m
+[  54% ] [90m[1m_update_scan_actions[22m | old_court_lady_eye_iris.png[39m[0m
+[  55% ] [90m[1m_update_scan_actions[22m | old_court_lady_face.png[39m[0m
+[  55% ] [90m[1m_update_scan_actions[22m | old_court_lady_hair_strands_dry.png[39m[0m
+[  56% ] [90m[1m_update_scan_actions[22m | old_court_lord.gltf[39m[0m
+[  56% ] [90m[1m_update_scan_actions[22m | old_court_lord_eye_iris.png[39m[0m
+[  57% ] [90m[1m_update_scan_actions[22m | old_court_lord_face.png[39m[0m
+[  57% ] [90m[1m_update_scan_actions[22m | old_court_lord_hair_strands_dry.png[39m[0m
+[  58% ] [90m[1m_update_scan_actions[22m | peddler.gltf[39m[0m
+[  58% ] [90m[1m_update_scan_actions[22m | peddler_eye_iris.png[39m[0m
+[  59% ] [90m[1m_update_scan_actions[22m | peddler_face.png[39m[0m
+[  59% ] [90m[1m_update_scan_actions[22m | peddler_hair_strands_dry.png[39m[0m
+[  60% ] [90m[1m_update_scan_actions[22m | potion_maker_true.gltf[39m[0m
+[  60% ] [90m[1m_update_scan_actions[22m | reveler_1.gltf[39m[0m
+[  61% ] [90m[1m_update_scan_actions[22m | reveler_1_eye_iris.png[39m[0m
+[  61% ] [90m[1m_update_scan_actions[22m | reveler_1_face.png[39m[0m
+[  62% ] [90m[1m_update_scan_actions[22m | reveler_1_hair_strands_dry.png[39m[0m
+[  62% ] [90m[1m_update_scan_actions[22m | reveler_2.gltf[39m[0m
+[  63% ] [90m[1m_update_scan_actions[22m | reveler_2_eye_iris.png[39m[0m
+[  63% ] [90m[1m_update_scan_actions[22m | reveler_2_face.png[39m[0m
+[  64% ] [90m[1m_update_scan_actions[22m | reveler_2_hair_strands_dry.png[39m[0m
+[  64% ] [90m[1m_update_scan_actions[22m | reveler_3.gltf[39m[0m
+[  65% ] [90m[1m_update_scan_actions[22m | reveler_3_eye_iris.png[39m[0m
+[  65% ] [90m[1m_update_scan_actions[22m | reveler_3_face.png[39m[0m
+[  66% ] [90m[1m_update_scan_actions[22m | reveler_3_hair_strands_dry.png[39m[0m
+[  66% ] [90m[1m_update_scan_actions[22m | seamstress_true.gltf[39m[0m
+[  67% ] [90m[1m_update_scan_actions[22m | sentry_1.gltf[39m[0m
+[  67% ] [90m[1m_update_scan_actions[22m | sentry_1_eye_iris.png[39m[0m
+[  68% ] [90m[1m_update_scan_actions[22m | sentry_1_face.png[39m[0m
+[  68% ] [90m[1m_update_scan_actions[22m | sentry_1_hair_strands_dry.png[39m[0m
+[  69% ] [90m[1m_update_scan_actions[22m | sentry_2.gltf[39m[0m
+[  69% ] [90m[1m_update_scan_actions[22m | sentry_2_eye_iris.png[39m[0m
+[  70% ] [90m[1m_update_scan_actions[22m | sentry_2_face.png[39m[0m
+[  70% ] [90m[1m_update_scan_actions[22m | sentry_2_hair_strands_dry.png[39m[0m
+[  71% ] [90m[1m_update_scan_actions[22m | servant_cook_true.gltf[39m[0m
+[  71% ] [90m[1m_update_scan_actions[22m | servant_cook_true_eye_iris.png[39m[0m
+[  72% ] [90m[1m_update_scan_actions[22m | servant_cook_true_face.png[39m[0m
+[  72% ] [90m[1m_update_scan_actions[22m | servant_cook_true_hair_strands_dry.png[39m[0m
+[  73% ] [90m[1m_update_scan_actions[22m | servant_footman_true.gltf[39m[0m
+[  73% ] [90m[1m_update_scan_actions[22m | servant_footman_true_eye_iris.png[39m[0m
+[  74% ] [90m[1m_update_scan_actions[22m | servant_footman_true_face.png[39m[0m
+[  74% ] [90m[1m_update_scan_actions[22m | servant_footman_true_hair_strands_dry.png[39m[0m
+[  75% ] [90m[1m_update_scan_actions[22m | servant_maid_true.gltf[39m[0m
+[  75% ] [90m[1m_update_scan_actions[22m | servant_maid_true_eye_iris.png[39m[0m
+[  76% ] [90m[1m_update_scan_actions[22m | servant_maid_true_face.png[39m[0m
+[  76% ] [90m[1m_update_scan_actions[22m | servant_maid_true_hair_strands_dry.png[39m[0m
+[  77% ] [90m[1m_update_scan_actions[22m | war_fae_1.gltf[39m[0m
+[  77% ] [90m[1m_update_scan_actions[22m | war_fae_1_eye_iris.png[39m[0m
+[  78% ] [90m[1m_update_scan_actions[22m | war_fae_1_face.png[39m[0m
+[  78% ] [90m[1m_update_scan_actions[22m | war_fae_1_hair_strands_dry.png[39m[0m
+[  79% ] [90m[1m_update_scan_actions[22m | war_fae_2.gltf[39m[0m
+[  79% ] [90m[1m_update_scan_actions[22m | war_fae_2_eye_iris.png[39m[0m
+[  80% ] [90m[1m_update_scan_actions[22m | war_fae_2_face.png[39m[0m
+[  80% ] [90m[1m_update_scan_actions[22m | war_fae_2_hair_strands_dry.png[39m[0m
+[  81% ] [90m[1m_update_scan_actions[22m | young_feyre.gltf[39m[0m
+[  81% ] [90m[1m_update_scan_actions[22m | young_feyre_eye_iris.png[39m[0m
+[  82% ] [90m[1m_update_scan_actions[22m | young_feyre_face.png[39m[0m
+[  82% ] [90m[1m_update_scan_actions[22m | young_feyre_hair_strands_dry.png[39m[0m
+[  83% ] [90m[1m_update_scan_actions[22m | butterfly.gltf[39m[0m
+[  83% ] [90m[1m_update_scan_actions[22m | cat.gltf[39m[0m
+[  84% ] [90m[1m_update_scan_actions[22m | crow.gltf[39m[0m
+[  84% ] [90m[1m_update_scan_actions[22m | faelight.gltf[39m[0m
+[  85% ] [90m[1m_update_scan_actions[22m | fox.gltf[39m[0m
+[  85% ] [90m[1m_update_scan_actions[22m | hawk.gltf[39m[0m
+[  86% ] [90m[1m_update_scan_actions[22m | hen.gltf[39m[0m
+[  86% ] [90m[1m_update_scan_actions[22m | lamb.gltf[39m[0m
+[  87% ] [90m[1m_update_scan_actions[22m | lark.gltf[39m[0m
+[  87% ] [90m[1m_update_scan_actions[22m | owl.gltf[39m[0m
+[  88% ] [90m[1m_update_scan_actions[22m | rabbit.gltf[39m[0m
+[  88% ] [90m[1m_update_scan_actions[22m | songbird_blue.gltf[39m[0m
+[  89% ] [90m[1m_update_scan_actions[22m | songbird_gold.gltf[39m[0m
+[  89% ] [90m[1m_update_scan_actions[22m | songbird_rose.gltf[39m[0m
+[  90% ] [90m[1m_update_scan_actions[22m | squirrel.gltf[39m[0m
+[  90% ] [90m[1m_update_scan_actions[22m | swan.gltf[39m[0m
+[  91% ] [90m[1m_update_scan_actions[22m | water_sprite.gltf[39m[0m
+[  91% ] [90m[1m_update_scan_actions[22m | bird.gltf[39m[0m
+[  92% ] [90m[1m_update_scan_actions[22m | deer.gltf[39m[0m
+[  92% ] [90m[1m_update_scan_actions[22m | wolf.gltf[39m[0m
+[  93% ] [90m[1m_update_scan_actions[22m | lampwing.gltf[39m[0m
+[  93% ] [90m[1m_update_scan_actions[22m | lampwing_albedo.webp[39m[0m
+[  94% ] [90m[1m_update_scan_actions[22m | alis_true.webp[39m[0m
+[  94% ] [90m[1m_update_scan_actions[22m | elain.webp[39m[0m
+[  95% ] [90m[1m_update_scan_actions[22m | father.webp[39m[0m
+[  95% ] [90m[1m_update_scan_actions[22m | lucien.webp[39m[0m
+[  96% ] [90m[1m_update_scan_actions[22m | mare.webp[39m[0m
+[  96% ] [90m[1m_update_scan_actions[22m | nesta.webp[39m[0m
+[  97% ] [90m[1m_update_scan_actions[22m | stranger.webp[39m[0m
+[  97% ] [90m[1m_update_scan_actions[22m | tamlin.webp[39m[0m
+[  98% ] [90m[1m_update_scan_actions[22m | tamlin_beast.webp[39m[0m
+[  98% ] [90m[1m_update_scan_actions[22m | snow_normal.png[39m[0m
+[  99% ] [90m[1m_update_scan_actions[22m | trees.csv[39m[0m
+[92m[ DONE ][39m [1m_update_scan_actions[22m
+[0m
+[   0% ] [90m[1mreimport[22m | Started (Re)Importing Assets (9 steps)[39m[0m
+[   0% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  10% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  20% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  30% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  40% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  50% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  60% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  70% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  80% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   0% ] [90m[1mreimport[22m | Executing pre-reimport operations...[39m[0m
+[   0% ] [90m[1mreimport[22m | alis_true.webp[39m[0m
+[  10% ] [90m[1mreimport[22m | elain.webp[39m[0m
+[  20% ] [90m[1mreimport[22m | father.webp[39m[0m
+[  30% ] [90m[1mreimport[22m | lucien.webp[39m[0m
+[  40% ] [90m[1mreimport[22m | mare.webp[39m[0m
+[  50% ] [90m[1mreimport[22m | nesta.webp[39m[0m
+[  60% ] [90m[1mreimport[22m | stranger.webp[39m[0m
+[  70% ] [90m[1mreimport[22m | tamlin.webp[39m[0m
+[  80% ] [90m[1mreimport[22m | tamlin_beast.webp[39m[0m
+[  90% ] [90m[1mreimport[22m | Finalizing Asset Import...[39m[0m
+[92m[ DONE ][39m [1mreimport[22m
+[0m
+[   0% ] [90m[1mreimport[22m | Started (Re)Importing Assets (9 steps)[39m[0m
+[   0% ] [90m[1mreimport[22m | Executing post-reimport operations...[39m[0m
+[92m[ DONE ][39m [1mreimport[22m
+[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Started Loading editor (5 steps)[39m[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Loading editor layout...[39m[0m
+[  16% ] [90m[1mloading_editor_layout[22m | Loading docks...[39m[0m
+[92m[ DONE ][39m [1mloading_editor_layout[22m
+[0m
+== levels.sh ensure

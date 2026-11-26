@@ -1,0 +1,23 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+Metal 4.0 - Forward+ - Using Device #0: Apple - Apple M4 (Apple9)
+
+ERROR: This function should never be used outside the editor, it can severely damage performance.
+   at: global_shader_parameter_get_list (servers/rendering/renderer_rd/storage_rd/material_storage.cpp:1848)
+   GDScript backtrace (most recent call first):
+       [0] ensure_wetness_global (res://world/shared/weather/spring_weather.gd:87)
+       [1] _ready (res://world/shared/weather/spring_weather.gd:59)
+       [2] _ready (res://systems/props/touch_world.gd:27)
+       [3] _run (res://tools/creatures/beast_door_light_probe.gd:43)
+focus guard: handed focus back 1x, render held it 192 ms
+LIGHT gain 0.7 frame 0 door bursts: shot door, mean 28.1, dark<30 71%, beast box [P: (330, 179), S: (858, 768)] mean 33.9
+LIGHT gain 1.0 frame 0 door bursts: shot door, mean 29.9, dark<30 70%, beast box [P: (302, 102), S: (912, 918)] mean 33.9
+LIGHT gain 1.4 frame 0 door bursts: shot door, mean 31.3, dark<30 70%, beast box [P: (230, 0), S: (1011, 1080)] mean 32.9
+LIGHT gain 0.7 frame 1 fills the room: shot low, mean 26.0, dark<30 71%, beast box [P: (0, 0), S: (1920, 1080)] mean 26.0
+LIGHT gain 1.0 frame 1 fills the room: shot low, mean 27.5, dark<30 66%, beast box [P: (0, 0), S: (1920, 1080)] mean 27.5
+LIGHT gain 1.4 frame 1 fills the room: shot low, mean 30.8, dark<30 63%, beast box [P: (0, 0), S: (1920, 1080)] mean 30.8
+LIGHT gain 0.7 frame 2 throw window: shot window, mean 28.1, dark<30 59%, beast box [P: (54, 0), S: (1414, 1080)] mean 27.1
+LIGHT gain 1.0 frame 2 throw window: shot window, mean 32.0, dark<30 57%, beast box [P: (56, 0), S: (1412, 1080)] mean 30.4
+LIGHT gain 1.4 frame 2 throw window: shot window, mean 36.3, dark<30 55%, beast box [P: (58, 0), S: (1410, 1080)] mean 34.0
+LIGHT gain 0.7 frame 3 father pleads: shot plead, mean 25.3, dark<30 67%, beast box [P: (0, 0), S: (1117, 1080)] mean 26.8
+LIGHT gain 1.0 frame 3 father pleads: shot plead, mean 28.1, dark<30 64%, beast box [P: (0, 0), S: (1122, 1080)] mean 29.6
+LIGHT gain 1.4 frame 3 father pleads: shot plead, mean 31.2, dark<30 62%, beast box [P: (0, 0), S: (1125, 1080)] mean 32.7
