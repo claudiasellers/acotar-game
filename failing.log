@@ -1,0 +1,44 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+---  GUT  ---
+[INFO]:  using [/Users/claudiasellers/Documents/acotar-game/.git/mq/batches/1795658629/gate/scratch/gut_tests_unit_navigation_test_nav_routing.gd/Library/Application Support/Godot/app_userdata/ACOTAR- The Spring Court] for temporary output.
+Godot version:  4.7.2
+GUT version:  9.7.1
+
+
+res://tests/unit/navigation/test_nav_routing.gd
+* test_routes_through_the_door
+* test_feet_above_the_mesh_still_pass_each_corner
+    [Failed]:  [9.36573219299316] expected to be < than [0.6]:  round by the door and arrives
+      at line 81
+* test_next_corner_skips_one_underfoot
+* test_parse_runs_on_the_main_thread_and_bake_callback_lands
+* test_leaving_the_tree_waits_for_the_tile_bake
+* test_without_a_navmesh_it_steers_straight
+* test_edge_merge_grid_is_finer_than_the_bake
+6/7 passed.
+
+
+
+
+==============================================
+= Run Summary
+==============================================
+
+res://tests/unit/navigation/test_nav_routing.gd
+- test_feet_above_the_mesh_still_pass_each_corner
+    [Failed]:  [9.36573219299316] expected to be < than [0.6]:  round by the door and arrives
+          at line 81
+
+Totals
+------
+Scripts               1
+Tests                 7
+Passing Tests         6
+Failing Tests         1
+Asserts           619/620
+Time              26.173s
+
+
+---- 1 failing tests ----
+
