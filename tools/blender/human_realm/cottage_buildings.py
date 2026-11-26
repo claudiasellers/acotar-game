@@ -108,6 +108,19 @@ def shell(collision):
     L.box((2 * HX, 0.3, 2 * HZ), at=(0, -0.15, 0), col=L.EARTH, col_fn=L.mottled(L.EARTH, 0.05, 2), collision=collision)
 
 
+def _rail_spans(y, openings, x0=-HX - 0.05, x1=HX + 0.05, frame=0.13):
+    """[x0, x1] less each opening that rail height `y` passes through (and its frame)."""
+    cuts = sorted((o[0] - frame, o[1] + frame) for o in openings if o[2] - 0.1 < y < o[3] + 0.2)
+    spans, at = [], x0
+    for a, b in cuts:
+        if a > at:
+            spans.append((at, a))
+        at = max(at, b)
+    if at < x1:
+        spans.append((at, x1))
+    return spans
+
+
 def cottage():
     L.seed(11)
     shell(False)
@@ -116,7 +129,9 @@ def cottage():
         for z in (-HZ + 0.1, HZ - 0.1):
             L.box((0.18, H - 1.0, 0.18), at=(x, 1.0 + (H - 1.0) / 2, z), col=L.TIMBER)
     for z in (-HZ - 0.04, HZ + 0.04):
-        L.box((2 * HX + 0.1, 0.16, 0.12), at=(0, 1.1, z), col=L.TIMBER)
+        # The mid rail stops at the door and window frames, never across them.
+        for a, b in _rail_spans(1.1, [DOOR, WIN_FRONT] if z < 0 else [WIN_BACK]):
+            L.box((b - a, 0.16, 0.12), at=((a + b) / 2, 1.1, z), col=L.TIMBER)
         L.box((2 * HX + 0.1, 0.2, 0.14), at=(0, H - 0.1, z), col=L.TIMBER)
         for x in (-3.4, -0.6, 2.3, 3.6):
             L.box((0.14, H - 1.2, 0.1), at=(x, 1.1 + (H - 1.1) / 2, z), col=L.TIMBER)
