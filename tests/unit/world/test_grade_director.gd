@@ -91,24 +91,7 @@ func test_the_house_grade_has_no_gi_and_the_manor_tone_mapper() -> void:
 	assert_eq(night.tonemap_mode, inside.tonemap_mode, "no pop at nightfall")
 	assert_almost_eq(GradeDirector.with_night(inside, 0.0).ambient_energy, inside.ambient_energy, 0.0001)
 	var spring := GradeDirector.load_preset(&"spring")
-	assert_eq(GradeDirector.with_night(spring, 1.0), spring, "Spring darkens with the sun alone")
-
-
-## The human winter night (L89-5, R3): the overcast day sky and its ambient
-## stayed up all night, so the cottage read as an afternoon. At night the sky,
-## the ambient and the fog fall; the screen itself is never darkened.
-func test_the_winter_night_is_dark_by_light_not_by_the_screen() -> void:
-	var winter := GradeDirector.load_preset(&"human_winter")
-	assert_eq(winter.night_look, &"human_winter_night")
-	var night := GradeDirector.with_night(winter, 1.0)
-	assert_lt(night.ambient_energy, winter.ambient_energy * 0.5, "a low night ambient")
-	assert_gt(night.ambient_color.b, night.ambient_color.r, "and a cold one")
-	assert_lt(night.sky_horizon.get_luminance(), 0.15, "no grey-white day in the windows")
-	assert_almost_eq(night.exposure, winter.exposure, 0.0001, "never a darker screen")
-	assert_almost_eq(night.saturation, winter.saturation, 0.0001)
-	assert_almost_eq(night.contrast, winter.contrast, 0.0001)
-	assert_eq(night.tonemap_mode, winter.tonemap_mode, "no pop at nightfall")
-	assert_almost_eq(GradeDirector.with_night(winter, 0.0).ambient_energy, winter.ambient_energy, 0.0001)
+	assert_eq(GradeDirector.with_night(spring, 1.0), spring, "outdoor grades darken with the sun alone")
 
 
 func test_mix_switches_lut_at_half() -> void:

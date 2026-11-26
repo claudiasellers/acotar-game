@@ -1,10 +1,10 @@
-## Measures how readable the beast at the door is under the scene's real
-## lighting (lane L55): night, the staged cameras.
-##   godot res://tools/creatures/beast_door_light_probe.tscn -- <out_dir> [off] [no_feyre] [gains=1,2,4]
-## off: without BeastDoorLighting (the "before"). no_feyre: a bare camera
-## stands in for her (cloud lavapipe crashes on it, F46). Prints per frame: frame mean
-## luma, share of near-black pixels (<30) and the mean luma inside the beast's
-## screen box; writes light_sheet_g<gain>.png (four frames) per gain.
+## Measures how readable the beast at the door is under the game's normal
+## lighting (no scene rig since L89-6): night, the staged cameras.
+##   godot res://tools/creatures/beast_door_light_probe.tscn -- <out_dir> [no_feyre]
+## no_feyre: a bare camera stands in for her (cloud lavapipe crashes on it,
+## F46). Prints per frame: frame mean luma, share of near-black pixels (<30)
+## and the mean luma inside the beast's screen box; writes light_sheet.png
+## (four frames).
 extends Node
 
 const FEYRE := "res://characters/feyre/feyre.tscn"
@@ -22,9 +22,7 @@ var _out := "user://beast_door_light"
 var _frame := 0
 var _staging: BeastDoorStaging
 var _beast: Node3D
-var _rig: BeastDoorLighting
-var _gains: Array[float] = [1.0]
-var _sheets: Array[Image] = []
+var _sheet := Image.create(TILE.x * 2, TILE.y * 2, false, Image.FORMAT_RGB8)
 
 
 func _ready() -> void:
@@ -34,7 +32,6 @@ func _ready() -> void:
 func _run() -> void:
 	var args := OS.get_cmdline_user_args()
 	_out = args[0] if args.size() > 0 else _out
-	var lit := not args.has("off")
 	DirAccess.make_dir_recursive_absolute(_out)
 	Clock.paused = true
 	Clock.time_of_day = 0.9
@@ -90,16 +87,6 @@ func _run() -> void:
 	_beast = beast
 	_staging = BeastDoorStaging.new()
 	space.add_child(_staging)
-	if lit:
-		_rig = BeastDoorLighting.new()
-		space.add_child(_rig)
-	for a in args:
-		if a.begins_with("gains="):
-			_gains.clear()
-			for g in a.trim_prefix("gains=").split(","):
-				_gains.append(float(g))
-	for g in _gains:
-		_sheets.append(Image.create(TILE.x * 2, TILE.y * 2, false, Image.FORMAT_RGB8))
 	await _settle(2.0)
 	# As BeastDoor plays it: full dread (her fear and the sound) as the door breaks.
 	EventBus.mood_requested.emit(self, &"dread", 1.0, 0.2)
@@ -122,23 +109,13 @@ func _run() -> void:
 	StoryControl.set_mode(StoryControl.Mode.LOOK)
 	await _settle(2.4)
 	await _grab("father pleads")
-	for i in _gains.size():
-		_sheets[i].save_png(_out + "/light_sheet_g%s.png" % _gains[i])
+	_sheet.save_png(_out + "/light_sheet.png")
 	get_tree().quit(0)
 
 
 func _grab(label: String) -> void:
-	for i in _gains.size():
-		if _rig != null:
-			_rig.gain = _gains[i]
-			_rig._apply()
-		await get_tree().process_frame
-		await get_tree().process_frame
-		await _grab_one(label, i)
-	_frame += 1
-
-
-func _grab_one(label: String, gi: int) -> void:
+	await get_tree().process_frame
+	await get_tree().process_frame
 	await RenderingServer.frame_post_draw
 	var img := get_viewport().get_texture().get_image()
 	img.convert(Image.FORMAT_RGB8)
@@ -146,10 +123,11 @@ func _grab_one(label: String, gi: int) -> void:
 	var box := _screen_box(cam, img.get_size())
 	var stats := _luma(img, Rect2i(Vector2i.ZERO, img.get_size()))
 	var beast_stats := _luma(img, box) if box.has_area() else [0.0, 0.0]
-	print("LIGHT gain %.1f frame %d %s: shot %s, mean %.1f, dark<30 %.0f%%, beast box %s mean %.1f" % [
-			_gains[gi], _frame, label, _staging.shot_name, stats[0], stats[1] * 100.0, box, beast_stats[0]])
+	print("LIGHT frame %d %s: shot %s, mean %.1f, dark<30 %.0f%%, beast box %s mean %.1f" % [
+			_frame, label, _staging.shot_name, stats[0], stats[1] * 100.0, box, beast_stats[0]])
 	img.resize(TILE.x, TILE.y, Image.INTERPOLATE_LANCZOS)
-	_sheets[gi].blit_rect(img, Rect2i(Vector2i.ZERO, TILE), Vector2i((_frame % 2) * TILE.x, (_frame / 2) * TILE.y))
+	_sheet.blit_rect(img, Rect2i(Vector2i.ZERO, TILE), Vector2i((_frame % 2) * TILE.x, (_frame / 2) * TILE.y))
+	_frame += 1
 
 
 ## [mean luma 0..255, share of pixels under 30], sampled every 4th pixel.
