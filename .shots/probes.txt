@@ -1,0 +1,3 @@
+from L75 steep-blade
+quality look
+shot steep res://tools/weapons/steep_shot.tscn {out}/steep.png
