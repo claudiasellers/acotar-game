@@ -142,3 +142,22 @@ func test_the_ride_waits_until_the_cottage_scene_is_over() -> void:
 	# A finished space stays in the live group; only running counts.
 	cottage.running = false
 	assert_true(ride.can_start(), "then out to the mare")
+
+
+func test_the_ridden_mare_is_gone_from_the_manor_once_she_is_down() -> void:
+	var ride := RideNorth.new()
+	ride.auto_tick = false
+	add_child(ride)  # after_each frees the ride
+	var feyre := Node3D.new()
+	add_child_autofree(feyre)
+	ride._rider = feyre
+	ride.horse = MareMount.new()
+	ride.horse.data = RideNorth.MARE_DATA
+	ride.add_child(ride.horse)
+	ride.horse.global_position = Vector3(3, 0, 0)
+	ride.horse.go_home()
+	ride.step = RideNorth.Step.DONE
+	ride._process(1.0)
+	assert_not_null(ride.horse, "she walks off first, not gone the moment Feyre is down")
+	ride._process(RideNorth.MARE_GONE_BY)
+	assert_null(ride.horse, "then gone from the drive: the only mare is the one in the stables")
