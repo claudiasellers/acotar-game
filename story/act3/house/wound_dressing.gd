@@ -127,8 +127,7 @@ func _foyer_beats() -> Array:
 		beats.append(Beats.run(func(_s: SceneSpace) -> void: _set_map_down(null, false), "the map is on the table"))
 	beats += [
 		Beats.run(func(_s: SceneSpace) -> void:
-			EventBus.mood_requested.emit(&"dread", 0.75, 2.5)
-			note_mood()
+			EventBus.mood_requested.emit(self, &"dread", 0.75, 2.5)
 			StoryControl.hold(self, StoryControl.Mode.LOOK)
 			StoryControl.set_focus(_marker(&"garden_doors")), "a breeze"),
 		say(&"breeze"),
@@ -145,7 +144,7 @@ func _foyer_beats() -> Array:
 		say(&"shift"),
 		Beats.run(func(_s: SceneSpace) -> void:
 			_end_flash()
-			EventBus.mood_requested.emit(&"dread", 0.35, 2.0)
+			EventBus.mood_requested.emit(self, &"dread", 0.35, 2.0)
 			StoryControl.set_focus(actor(&"tamlin")), "Tamlin, still and weary"),
 		say(&"feyre_bogge"),
 		say(&"tamlin_yes"),
@@ -250,7 +249,7 @@ func _infirmary_beats() -> Array:
 	return [
 		Beats.run(func(_s: SceneSpace) -> void:
 			StoryControl.hold(self, StoryControl.Mode.WALK, PackedStringArray(["interact"]))
-			EventBus.mood_requested.emit(&"calm", 0.0, 3.0), "the small infirmary"),
+			EventBus.mood_requested.emit(self, &"calm", 0.0, 3.0), "the small infirmary"),
 		say(&"supplies"),
 		Beats.until(_gather, "until the supplies are on the table"),
 		say(&"fill"),

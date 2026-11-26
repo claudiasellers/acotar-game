@@ -263,7 +263,7 @@ func _carried_home() -> void:
 	if _campfire:
 		_campfire.queue_free()
 		_campfire = null
-	CalanmaiKit.night_grade(get_tree(), false)
+	CalanmaiKit.night_grade(false)
 	raise(CARRIED_FACT)
 	# The house may still be streamed in (the hill is near enough): then set her
 	# down on the hall floor directly, since the director's travel only lands

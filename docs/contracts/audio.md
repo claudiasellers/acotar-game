@@ -11,7 +11,7 @@ gets sound by emitting what it already emits. Files are self-made and CC0
 | Event (owner) | Sound |
 |---|---|
 | Feyre crosses a space (`WorldStreamer.region_at`, cottage interior anchor) | ambience bed crossfade 2.5 s, music crossfade 4 s |
-| `EventBus.mood_requested(&"dread", i, s)` | bed x (1-i), music x (1-i)^2, sub-bass dread bed x i. Outside a story scene, a dread rising past 0.5 plays the one wrong sound (`horror_wrong`) |
+| `EventBus.mood_changed(&"dread", i, s)` (GradeDirector's settled mood) | bed x (1-i), music x (1-i)^2, sub-bass dread bed x i. Outside a story scene, a dread rising past 0.5 plays the one wrong sound (`horror_wrong`) |
 | `WallSenseVolume.proximity_changed(a)` | bed and music drop to 10% at the line |
 | Feyre moves on the floor | footstep per stride (0.6–2.1 m by speed), surface by space: snow, wood (cottage interior), grass (Prythian) |
 | `Feyre.jump_motor.jumped / landed` | cloth whoosh; heavy snow landing above 7 m/s impact |

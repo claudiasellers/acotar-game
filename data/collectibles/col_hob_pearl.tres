@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_hob_pearl"
+display_name = "Pearl"
+description = "Pierced for a necklace, and kept longer than I'd like to think."
+weight_class = 0
+color = Color(0.937, 0.914, 0.878, 1)
+regions = Array[StringName]([])
+abundance = &"rare"
+icon = &"gem"
+rarity = &"common"
+bound = &""
+hint = "Round the Hollow Hob's neck, while it sleeps"

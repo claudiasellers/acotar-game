@@ -13,14 +13,14 @@ const TARGET_SCRIPT := preload("res://world/shared/test_hill/archery_target.gd")
 const HILL_CENTER := Vector2(30.0, -40.0)
 const SPAWN := Vector2(0.0, 70.0)
 
-var sun: DirectionalLight3D
 var feyre: Feyre
 
 
 func _ready() -> void:
 	if PhaseManager.phase_set == null:
 		PhaseManager.start(PHASES)
-	_build_environment()
+	# The game's look: the World's environment and sun under a GradeDirector.
+	GradeDirector.light(self, &"spring")
 	_build_terrain()
 	_build_flowers()
 	_build_ledges()
@@ -39,13 +39,6 @@ func _ready() -> void:
 	add_child(hud)
 
 
-func _process(_delta: float) -> void:
-	# The sun follows the in-game clock: 0.25 is sunrise, 0.75 sunset.
-	var angle := (Clock.time_of_day - 0.25) * TAU
-	sun.rotation = Vector3(-sin(angle) * deg_to_rad(80.0) - 0.05, deg_to_rad(-35.0), 0.0)
-	sun.light_energy = clampf(sin(angle) * 1.6, 0.0, 1.3)
-
-
 ## Terrain height in metres at a world x/z position.
 static func height_at(x: float, z: float) -> float:
 	var hill := 26.0 * exp(-(pow(x - HILL_CENTER.x, 2) + pow(z - HILL_CENTER.y, 2)) / (2.0 * 28.0 * 28.0))
@@ -53,40 +46,6 @@ static func height_at(x: float, z: float) -> float:
 	var rolling := 1.6 * sin(x * 0.045) * cos(z * 0.038) + 0.7 * sin(x * 0.13 + z * 0.09)
 	var edge := clampf((maxf(absf(x), absf(z)) - 100.0) / 28.0, 0.0, 1.0)
 	return hill + ridge + rolling + edge * edge * 18.0
-
-
-func _build_environment() -> void:
-	var env := Environment.new()
-	env.background_mode = Environment.BG_SKY
-	var sky := Sky.new()
-	var sky_mat := ProceduralSkyMaterial.new()
-	sky_mat.sky_top_color = Color(0.38, 0.55, 0.78)
-	sky_mat.sky_horizon_color = Color(0.86, 0.80, 0.78)
-	sky_mat.ground_horizon_color = Color(0.70, 0.66, 0.62)
-	sky_mat.ground_bottom_color = Color(0.25, 0.28, 0.22)
-	sky.sky_material = sky_mat
-	env.sky = sky
-	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	env.tonemap_mode = Environment.TONE_MAPPER_AGX
-	env.ssao_enabled = true
-	env.sdfgi_enabled = true
-	env.glow_enabled = true
-	env.fog_enabled = true
-	env.fog_light_color = Color(0.85, 0.80, 0.82)
-	env.fog_density = 0.0015
-	env.volumetric_fog_enabled = true
-	env.volumetric_fog_density = 0.01
-	env.volumetric_fog_albedo = Color(1.0, 0.95, 0.92)
-	var world_env := WorldEnvironment.new()
-	world_env.environment = env
-	add_child(world_env)
-
-	sun = DirectionalLight3D.new()
-	sun.name = "Sun"
-	sun.light_color = Color(1.0, 0.93, 0.84)
-	sun.shadow_enabled = true
-	sun.directional_shadow_max_distance = 180.0
-	add_child(sun)
 
 
 func _build_terrain() -> void:

@@ -6,4 +6,4 @@ extends Node3D
 func _ready() -> void:
 	var estate := (load("res://world/spring_court/manor_estate/manor_estate.tscn") as PackedScene).instantiate() as ManorEstate
 	add_child(estate)
-	ShotLook.dress(estate)
+	GradeDirector.light(estate)

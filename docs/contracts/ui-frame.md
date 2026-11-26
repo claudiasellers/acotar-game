@@ -29,7 +29,7 @@ here and from nowhere else.
 
 | Constant | Value | What draws there |
 |---|---|---|
-| `EDGE` | 1 | screen-edge effects (venom, low health, frost, dread, stealth) |
+| `EDGE` | 1 | screen-edge effects (venom, low health, frost, stealth) |
 | `FILM` | 3 | the film stack: the grade at `FILM - 1`, inserts at `FILM`, a staged lens's letterbox at `FILM + 1`, the film's veil at `FILM + 3`, its text at `FILM + 4` |
 | `HUD` | 10 | `HudLayout`, the only HUD layer (the hunt demo's label shares the number) |
 | `BACKDROP` | 17 | the dim behind an open screen |
@@ -236,7 +236,7 @@ static func quiet(tree: SceneTree) -> bool
 | `CONTROLS` | yes | yes | yes | no | no |
 
 `quiet()` is true in any mode but `PLAY`, and while dread is in the air: a
-`mood_requested(&"dread", > 0)` that has not been calmed and is under 30 s old
+`mood_changed(&"dread", > 0)` (GradeDirector's settled mood) that has not been calmed and is under 30 s old
 (`HudLayout.dread()`). Celebration cards and Feyre's thoughts queue while it
 is quiet and ask again (R3: a pastel card never lands on the Suriel). Chapter
 cards are not celebrations and do not wait.

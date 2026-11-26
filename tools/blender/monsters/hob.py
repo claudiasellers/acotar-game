@@ -384,7 +384,7 @@ def hard_parts(cord):
 
     # the cord
     rope = kit.sculpt_material("hob_rope", _rope)
-    add(sweep("cord", cord["path"], _ngon(0.024, 5), closed=True), 60, rope)
+    add(sweep("cord", cord["path"], _ngon(0.034, 5), closed=True), 60, rope)
     for i, o in enumerate(charms(cord["hooks"])):
         out.append((kit.tag(o, 71 + i), 71 + i))
     return out
@@ -396,8 +396,8 @@ def _rope(nt, bsdf):
     x, y, z = g.split(P)
     twist = g.math("SINE", g.math("MULTIPLY", g.math("ADD", g.math("ADD", x, y), z), 190.0))
     fibre = g.noise(g.scale_vec(P, (1.0, 1.0, 1.0)), 260.0, 2.0)
-    col = g.mix_rgb(g.smooth(twist, -0.6, 0.6), (0.2, 0.15, 0.075), (0.42, 0.34, 0.17))
-    col = g.mix_rgb(g.math("MULTIPLY", g.smooth(g.noise(P, 9.0, 2.0), 0.5, 0.7), 0.6), col, (0.2, 0.26, 0.09))
+    col = g.mix_rgb(g.smooth(twist, -0.6, 0.6), (0.36, 0.3, 0.17), (0.7, 0.62, 0.38))      # bleached, pale against the granite
+    col = g.mix_rgb(g.math("MULTIPLY", g.smooth(g.noise(P, 9.0, 2.0), 0.5, 0.7), 0.25), col, (0.2, 0.26, 0.09))
     g.out(bsdf, color=col, rough=0.92, normal=g.bump(g.math("ADD", g.math("MULTIPLY", twist, 0.5), fibre), 0.004))
 
 
@@ -424,15 +424,15 @@ LID_SHUT = 82.0        # degrees of `eyelid_*` pitch that close the eye
 def charms(hooks):
     """The eight things it took from mortals, each hanging under its hook on
     the cord (bestiary §10.3). Returns the meshes in socket order."""
-    S = 1.5                                   # a little over life size, so they read at its scale
-    iron = kit.sculpt_material("hob_iron", lambda nt, bsdf: _metal(nt, bsdf, (0.11, 0.085, 0.07), (0.3, 0.13, 0.05), 0.75))
-    pewter = kit.sculpt_material("hob_pewter", lambda nt, bsdf: _metal(nt, bsdf, (0.4, 0.4, 0.38), (0.22, 0.22, 0.2), 0.42))
-    brass = kit.sculpt_material("hob_brass", lambda nt, bsdf: _metal(nt, bsdf, (0.55, 0.42, 0.15), (0.2, 0.26, 0.14), 0.4))
+    S = 2.4                                   # well over life size: they must read from 25 m against its chest (G29)
+    iron = kit.sculpt_material("hob_iron", lambda nt, bsdf: _metal(nt, bsdf, (0.5, 0.47, 0.43), (0.42, 0.2, 0.08), 0.5))
+    pewter = kit.sculpt_material("hob_pewter", lambda nt, bsdf: _metal(nt, bsdf, (0.68, 0.68, 0.65), (0.4, 0.4, 0.37), 0.36))
+    brass = kit.sculpt_material("hob_brass", lambda nt, bsdf: _metal(nt, bsdf, (0.78, 0.6, 0.2), (0.45, 0.42, 0.2), 0.34))
     rose = kit.sculpt_material("hob_rosegold", lambda nt, bsdf: _metal(nt, bsdf, (0.74, 0.45, 0.36), (0.5, 0.3, 0.24), 0.28))
     bone = kit.plain("hob_bone", (0.7, 0.63, 0.48), 0.5)
     pearl = kit.plain("hob_pearl", (0.83, 0.8, 0.74), 0.22)
     silk = grad_material("hob_ribbon", (0.5, 0.09, 0.12), (0.36, 0.1, 0.12), rough=0.6)
-    twine = kit.plain("hob_twine", (0.3, 0.24, 0.12), 0.9)
+    twine = kit.plain("hob_twine", (0.6, 0.52, 0.32), 0.9)
     out = []
 
     def done(i, pieces):

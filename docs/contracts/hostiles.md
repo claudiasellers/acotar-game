@@ -249,8 +249,12 @@ of 3-5); no sites yet (plan §6.2, a later hand-in).
   blow. A `sneak` or `finisher` while `is_sleeping()` (its routine sleep not
   roused, or a sleep arrow) cuts the next charm: `fact.hob_charm.<1..8>`, the
   `charm_N` mesh hides, `charm_cut_stir` plays, awareness rises under curious,
-  a pickup-log note, and her once-line `hob_charm_cut`. No damage. The eighth
-  cut settles the site. The charms aren't collectibles yet (item rows next).
+  the charm's keepsake into her bag (`CHARM_ITEMS`, `col_hob_*`: common, no
+  regions, never foraged; the collection book's find shows it, and a
+  pickup-log note only when there's no room), and her once-line `hob_charm_cut`.
+  No damage. The eighth cut settles the site.
+- **First sight** (G29): asleep, with her within `FIRST_SIGHT_M` (25 m), her
+  once-thought `hob_first_sight` points at the necklace.
 - **The fight**: `call_clip` `stand_roar`; `hob_swat` (strike_reach 4 m), and
   `hob_stomp` when she's within 3 m; `hob_throw` from 6 to 25 m every 8 s,
   aimed where she stood at the tell and landing only within 2.5 m of it.

@@ -90,7 +90,7 @@ func _run() -> void:
 	await _settle(3.5)
 	if shot > 0:
 		# The scene's dread, as WolfKill asks it after the doe look.
-		EventBus.mood_requested.emit(&"dread", 0.5, 1.0)
+		EventBus.mood_requested.emit(self, &"dread", 0.5, 1.0)
 		await _settle(2.0)
 	await _grab(shot, cam, wolf if shot in [1, 3] else doe)
 	get_tree().quit(0)

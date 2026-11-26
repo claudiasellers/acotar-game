@@ -115,7 +115,7 @@ func abort(fail_fact: String = "") -> void:
 	running = false
 	_must_leave = true
 	StoryControl.release(self)
-	EventBus.mood_requested.emit(&"calm", 0.0, 2.0)
+	EventBus.mood_requested.emit(self, &"calm", 0.0, 2.0)
 	EventBus.scene_space_finished.emit(space_id)
 
 
@@ -188,9 +188,9 @@ func _beat_for(step: Dictionary) -> SceneBeat:
 				EventBus.weather_requested.emit(StringName(step.get("w", "clear")), s), "weather")
 		"grade":
 			return Beats.run(func(_sp: SceneSpace) -> void:
-				EventBus.grade_swap_requested.emit(StringName(step.get("to", "spring")), s if s > 0.0 else 2.0), "grade")
+				EventBus.grade_swap_requested.emit(self, StringName(step.get("to", "spring")), s if s > 0.0 else 2.0), "grade")
 		"grade_release":
-			return Beats.run(func(_sp: SceneSpace) -> void: GradeDirector.release_story_holds(get_tree()), "grade release")
+			return Beats.run(func(_sp: SceneSpace) -> void: EventBus.grade_swap_requested.emit(self, &"", 2.0), "grade release")
 		"grant":
 			return Beats.run(func(_sp: SceneSpace) -> void:
 				EventBus.story_item_granted.emit(StringName(step.get("item", "")), int(step.get("n", 1))), "grant")

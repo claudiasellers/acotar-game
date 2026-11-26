@@ -9,7 +9,6 @@ render_mode unshaded;
 
 uniform float strength = 1.0;
 uniform float aspect = 1.7778;
-uniform float dread = 0.0;
 uniform float low_health = 0.0;
 uniform float venom = 0.0;
 uniform float cold = 0.0;
@@ -76,12 +75,6 @@ void fragment() {
 	vec4 acc = vec4(0.0);
 	float s = strength;
 
-	// Dread: a creeping dark that eats in from the edges.
-	if (dread > 0.0) {
-		float n = fbm(uv * 5.0 + vec2(TIME * 0.05, -TIME * 0.04));
-		float m = smoothstep(0.85 - dread * 0.45, 1.2, v + (n - 0.5) * 0.35);
-		over(acc, ICHOR, m * dread * 0.8 * s);
-	}
 	// Low health: rose-black thorns that pulse with a heartbeat.
 	if (low_health > 0.0) {
 		float beat = pow(abs(sin(TIME * 3.6)), 8.0);

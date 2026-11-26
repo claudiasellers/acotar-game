@@ -58,7 +58,7 @@ var _following: bool = false
 func _ready() -> void:
 	super._ready()
 	# A day hunt (ch9-10). Arriving at dusk brings the morning to her; at
-	# night the bogge grade and the dread take the wood to black.
+	# night the bogge grade takes the wood to black.
 	day_only = true
 	if arrive_radius <= 0.0:
 		arrive_radius = 8.0
@@ -127,7 +127,7 @@ func fog_density() -> float:
 func _set_out() -> void:
 	cast(&"lucien", &"lucien_start", &"freeze")
 	_walking_lucien = true
-	EventBus.mood_requested.emit(&"calm", 0.0, 1.0)
+	EventBus.mood_requested.emit(self, &"calm", 0.0, 1.0)
 
 
 func _freeze() -> void:
@@ -136,12 +136,11 @@ func _freeze() -> void:
 	if lucien:
 		lucien.global_position = mark(&"lucien_freeze")
 		lucien.look_at(Vector3(mark(&"elm").x, lucien.global_position.y, mark(&"elm").z), Vector3.UP)
-	note_mood()
 	StoryControl.shake = 0.08
-	# Dread, but not black: she has to see the wood to keep her eyes on the elm.
-	EventBus.mood_requested.emit(&"dread", 0.45, 2.5)
+	# Dread, but she has to stay steady enough to keep her eyes on the elm.
+	EventBus.mood_requested.emit(self, &"dread", 0.45, 2.5)
 	# No grade swap: the shared "bogge" grade's volumetrics (0.06, 60x spring)
-	# black the screen out. The dread mood and this scene's own mist do it.
+	# black the screen out. This scene's own mist does it.
 	# Her eyes go to the elm at first; after that, holding them there is hers.
 	StoryControl.set_focus(_elm_marker())
 	sound(&"drone", -14.0)
@@ -187,7 +186,7 @@ func _safe() -> void:
 	sound(&"chatter", -80.0)
 	sound(&"heartbeat", -18.0, 0.8)
 	sound(&"drone", -24.0)
-	EventBus.mood_requested.emit(&"dread", 0.2, 3.0)
+	EventBus.mood_requested.emit(self, &"dread", 0.2, 3.0)
 
 
 ## Per frame: how real the Bogge is, the fog, the elm, Lucien's walk.

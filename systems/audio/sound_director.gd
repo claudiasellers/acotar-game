@@ -105,7 +105,7 @@ func _ready() -> void:
 	var ui := UiSounds.new()
 	ui.director = self
 	add_child(ui)
-	EventBus.mood_requested.connect(_on_mood)
+	EventBus.mood_changed.connect(_on_mood)
 	EventBus.story_actor_cue.connect(_on_actor_cue)
 	EventBus.creature_hit.connect(_on_creature_hit)
 	EventBus.hostile_windup.connect(_on_hostile_windup)

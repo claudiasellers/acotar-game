@@ -58,10 +58,10 @@ thrown back up into the shade band. Probe: `tools/lighting/bounce_probe.tscn`.
 | `ambient_light_source` | world/shared/world/world.tscn | SKY (3) (unchanged) | | Ambient from the sky's radiance, not a flat colour | L60 |
 | `reflected_light_source` | world.tscn | SKY (2) (unchanged) | | Reflections from the sky | L60 |
 | `ambient_light_sky_contribution` | world.tscn; GradePreset default (every grade but `manor_interior`) | 0.7 (was 0.6) | 0–1 | Sky share of the ambient; the rest is the grade's `ambient_color`. `manor_interior` uses 0.0, a flat ambient (T117) | L60 |
-| `ssao_radius` / `ssao_intensity` | world.tscn, BounceLight.SSAO_RADIUS / SSAO_INTENSITY | 1.0 / 1.2 (were 1.5 / 1.5) | 0.01–16 / 0–16 | Contact shadow in corners and under things; ambient only | L60 |
-| SSAO quality | BounceLight.apply (RenderingServer) | medium, half size (Godot's defaults) | | Global to the renderer | L60 |
-| `ssil_enabled` | BounceLight.SSIL_PROFILES | on for `high`, off for `mac` (GameSettings.shadow_profile_name()) | | Screen-space colour bleed; `BOUNCE_SSIL=0/1` forces it for a perf pass | L60 |
-| SSIL quality / `ssil_radius` / `ssil_intensity` | BounceLight | low, half size / 5.0 / 1.0 (Godot's defaults but quality) | | Cost and reach of the bleed | L60 |
+| `ssao_radius` / `ssao_intensity` | GradeDirector.SSAO_RADIUS / SSAO_INTENSITY | 1.0 / 1.2 (were 1.5 / 1.5) | 0.01–16 / 0–16 | Contact shadow in corners and under things; ambient only | L60 |
+| SSAO quality | GradeDirector.screen_space_bounce (RenderingServer) | medium, half size (Godot's defaults) | | Global to the renderer | L60 |
+| `ssil_enabled` | GradeDirector.SSIL_PROFILES | on for `high`, off for `mac` (GameSettings.shadow_profile_name()) | | Screen-space colour bleed; `BOUNCE_SSIL=0/1` forces it for a perf pass | L60 |
+| SSIL quality / `ssil_radius` / `ssil_intensity` | GradeDirector.screen_space_bounce | low, half size / 5.0 / 1.0 (Godot's defaults but quality) | | Cost and reach of the bleed | L60 |
 | SDFGI outdoors | GradePreset.sdfgi (off outdoors) | off | | Not enabled: waits for the Mac measurement with volumetric fog (`BOUNCE_SDFGI=1 make perf`) | L60 |
 | `ground_bounce` | candy_lit.gdshaderinc (`CANDY_BOUNCE_DEFAULT`) | 0.35; 0.0 on the manor's room shells (boiserie, plaster_ceiling, sky_ceiling: the flat interior ambient lights the rooms) | 0–1 | Bounce strength. Directional lights only, scaled by the light's height over the horizon and by how much the face looks down (1 down, 0.5 sideways, 0 up); the surface's own shadow does not block it; the lit band does not take it | L60 |
 | `ground_bounce_color` | candy_lit.gdshaderinc | (0.523, 0.548, 0.545) sRGB | colour | Mean albedo of the 11 terrain textures, equal weights, averaged in linear light (`tools/lighting/terrain_albedo_average.gd`). Per texture: snow (0.79,0.83,0.91), frozen_earth (0.42,0.39,0.37), rock (0.48,0.50,0.56), winter_grass (0.62,0.59,0.45), spring_grass (0.27,0.36,0.21), moss (0.22,0.43,0.30), forest_floor (0.40,0.31,0.24), path (0.50,0.40,0.31), riverbed (0.50,0.52,0.52), blight (0.46,0.44,0.48), ice (0.72,0.86,0.92). Snow and ice make it near-neutral; a greener Spring bounce is an art-direction call | L60 |
@@ -345,10 +345,14 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 
 | Tunable | Where | Default | Range | What it does | Lane |
 |---|---|---|---|---|---|
-| `dread_day_look` | grade_preset.gd (set in human_winter.tres) | `&"dread_winter_day"` | preset id or empty | The look dread blends toward while the sun is up; empty = the night `dread` preset. Night always takes `dread`, so the beast at the door (L55) is unchanged. | L18 |
-| `dread_winter_day` exposure / sky / fog | world/shared/grades/dread_winter_day.tres | 0.56 / grey overcast / 0.016 | — | Winter-day horror: drained colour, the fog closing in pale (ambient_inject 0.6), the overcast and snow as the light. | L18 |
 | `BREAK_ENERGY`, `BREAK_ANGLE`, `BREAK_FROM` | story/staging/wolf_hunt_lighting.gd | 8, 24°, (-6, 34, 14) | — | The break in the overcast over the doe's clearing (shadowed, shows in the fog). | L18 |
 | `RIM_ENERGY`, `RIM_BACK`, `RIM_UP` | story/staging/wolf_hunt_lighting.gd | 18, 1.6 m, 2.4 m | — | Cold rim behind the doe and the great wolf, opposite the camera. | L18 |
+
+## Beast at the door light (L55, rescaled L89)
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| `MOON_ENERGY`, `FIRE_GAIN`, `FIRE_FLARE`, `RIM_ENERGY`, `GLOW_ENERGY` | story/staging/beast_door_lighting.gd | 8, 3, 5, 6.5, 1.6 (were 35, 14, 22, 30, 7 under the dread grade, scaled ×0.22 when fear stopped darkening the screen) | — | Moon through the broken door, the hearth turned up, the rim and back glow on the beast, on a winter night at the grade's own exposure. | L89 |
 
 ## Standing arms (owner, 2026-11-24: "arms out so far to the sides")
 
@@ -362,7 +366,6 @@ over (`docs/contracts/creature_motion.md`, "People: clips without a rebuild").
 | `POSTURE["idle"]["arms"]` | tools/blender/feyre_moves/retarget_moves.py | -2 (was 3) | -4–3 | Degrees the player Feyre's arms are moved out from the captured standing pose; negative brings them in. | arms-rest |
 | `ARM_CLEAR` / `arm_clear` | tools/blender/cast/cast_<id>.py; `DESIGNS` rows in cast_minor.py, cast_village.py | 0; Alis 8, Elain 10; 2 to 10 on 20 court and village rows | 0–10 | Degrees one body's arms hang further out, for what it wears at the hip. Measured, not chosen: the least that keeps `arm_clip_probe.gd` under 5 mm. Bring a skirt in, or pose the hands on it, before lowering one. | arms-rest |
 | `arm_out` | tools/blender/fae_people.py `CAST` rows, default in person_rig.py `animate()` | -0.03 rad (was 0.06); fox, greenbrown, gardener_1 0.0; stag 0.04 | -0.06–0.06 | Added to the older fae figures' bind pose, which holds the arms about 11 degrees out. | arms-rest |
-| `dread_winter_day` exposure / sky / fog | world/shared/grades/dread_winter_day.tres | 0.8 / grey overcast / 0.012 | — | Winter-day horror that darkens little (L18-14): drained colour, pale fog closing in (ambient_inject 0.6), the overcast and snow as the light. | L18 |
 | `RIM_ENERGY`, `RIM_BACK`, `RIM_UP` | story/staging/wolf_hunt_lighting.gd | 12, 1.6 m, 2.4 m | — | Cold rim behind the doe and the great wolf, opposite the camera; the only light the hunt adds. | L18 |
 | `size_by_phase` / `Inventory.FULL_QUIVER` | data/bows/quiver_loadouts.tres; systems/inventory/inventory.gd | 3, 3, 10, 20, then 30 | — | Arrows her quiver holds by phase (bow design §8.1): three in her hand through the wolf, 10 on the grounds, 20 from the house and woods, 30 after. It only grows. | L80 |
 | `COMBO_PITCH`, `COMBO_MAX` | systems/interaction/interactor.gd | 0.06, 8 | 0.03–0.1 | Each further arrow pulled from one body in one press chimes this much higher, up to this many steps. | L80 |

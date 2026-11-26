@@ -37,13 +37,13 @@ var hud: HudLayout
 func before_each() -> void:
 	hud = HudLayout.of(get_tree())
 	StoryControl.set_mode(StoryControl.Mode.FULL)
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	ChapterHeading.clear(get_tree())
 
 
 func after_each() -> void:
 	StoryControl.set_mode(StoryControl.Mode.FULL)
-	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	EventBus.mood_changed.emit(&"calm", 0.0, 0.0)
 	ChapterHeading.clear(get_tree())
 
 
