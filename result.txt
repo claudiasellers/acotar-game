@@ -1,0 +1,14 @@
+status partial
+request L76-4
+commit 7756a0706c8fb9092531a13a8b76bfe35b95a153
+machine Claudias-Mac-mini
+godot 4.7.2.stable.official.ed1daf0bf
+quality look
+size 1920x1080
+renderer project default
+prep ok 38s: import 18s, generated content 20s (levels.sh)
+note focus guard: handed focus back 1x, render held it 182 ms
+shot vitals ok exit=0 126s files=2
+note focus guard: handed focus back 7x, render held it 3691 ms
+shot pages timeout exit=124 307s files=1
+answered 2026-11-26T03:50:31Z after 473s
