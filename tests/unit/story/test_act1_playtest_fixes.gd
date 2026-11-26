@@ -180,16 +180,3 @@ func test_the_rides_end_leaves_him_to_the_arrival() -> void:
 	beast.lead(hall)  # the arrival's one order: down the hall
 	ride._end(ride)
 	assert_eq(beast._destination, hall, "the ride ending (her slide down done) never sends him back to the steps")
-
-
-func test_leading_he_never_stands_stuck_on_a_doorstep() -> void:
-	var beast := BeastActor.new()
-	add_child_autofree(beast)
-	beast.lead(Vector3(0, 0, -12))
-	var moved_straight := false
-	for i in 120:  # two seconds held in place (a path baked short of the hall)
-		moved_straight = beast._lead_stuck(1.0 / 60.0)
-	assert_true(moved_straight, "after standing in place for LEAD_STUCK_AFTER he takes the straight line")
-	beast.lead(Vector3(5, 0, -12))
-	assert_false(beast._lead_stuck(1.0 / 60.0), "a new goal gives the navmesh another chance")
-

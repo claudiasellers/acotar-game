@@ -267,30 +267,6 @@ func _animate(moving: bool) -> void:
 	_moving = moving
 
 
-## Seconds standing in place, leading, before he walks his goal straight.
-const LEAD_STUCK_AFTER := 1.5
-var _stuck_goal := Vector3.INF
-var _stuck_at := Vector3.INF
-var _stuck_t := 0.0
-
-
-func _lead_stuck(delta: float) -> bool:
-	if not _stuck_goal.is_equal_approx(_destination):
-		_stuck_goal = _destination
-		_stuck_at = global_position
-		_stuck_t = 0.0
-	if _stuck_t < 0.0:
-		return true  # straight for the rest of this goal
-	if global_position.distance_to(_stuck_at) > 0.6:  # jitter on the spot is still stuck
-		_stuck_at = global_position
-		_stuck_t = 0.0
-		return false
-	_stuck_t += delta
-	if _stuck_t >= LEAD_STUCK_AFTER:
-		_stuck_t = -1.0
-	return _stuck_t < 0.0
-
-
 ## Walking over rising or falling ground (the ride's road, the estate's
 ## drive), his feet stay on it: the ground just under him (a short ray, so a
 ## roof or ceiling overhead is never taken for it), else the height of where
@@ -320,11 +296,6 @@ func _process(delta: float) -> void:
 	if to.length() > 0.05:
 		# Round the walls on the navmesh (T5); straight when there is none.
 		var dir := NavMover.on(self).steer(_destination) if to.length() >= NavMover.MIN_DISTANCE else to
-		# Leading her, a navmesh path that gets him nowhere (the manor's front
-		# door: a path baked short of the hall, and he stood on the step for
-		# good) gives way to the straight line until his goal moves.
-		if stage == Stage.LEAD and to.length() >= NavMover.MIN_DISTANCE and _lead_stuck(delta):
-			dir = to
 		var step := minf((burst_speed if _bursting else walk_speed) * delta, to.length())
 		global_position += dir.normalized() * step
 		_keep_to_ground(step)
