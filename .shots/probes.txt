@@ -1,0 +1,5 @@
+from one-light-lane
+quality look
+shot onelight res://tools/lighting/one_light_probe.tscn {out}
+shot beastdoor res://tools/creatures/beast_door_light_probe.tscn {out}
+shot wolfhunt res://tools/lighting/wolf_hunt_light_probe.tscn {out} shot=2
