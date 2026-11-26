@@ -162,7 +162,7 @@ func update_bow(delta: float, aim_held: bool, fire_held: bool, focus_held: bool 
 	_time += delta
 	_recover = maxf(_recover - real, 0.0)
 	var allowed := can_shoot()
-	if not allowed or _available() == &"":
+	if not allowed or arrow_ready() == &"":
 		_owed = false
 	elif _fire_was_held and not fire_held and not _taken_back:
 		# She has let go of the string: an arrow will fly, now or when the draw is full.
@@ -177,7 +177,7 @@ func update_bow(delta: float, aim_held: bool, fire_held: bool, focus_held: bool 
 	var drawing_hand := (fire_held and not _taken_back) or _owed
 	is_precise = aim_held and allowed
 	is_aiming = allowed and (aim_held or drawing_hand)
-	is_nocked = is_aiming and _available() != &""
+	is_nocked = is_aiming and arrow_ready() != &""
 	_note_string(fire_held)
 	if drawing_hand and is_aiming and visual:
 		# Her draw keeps the bow up a moment for the next arrow; a bow raised
@@ -201,7 +201,7 @@ func update_bow(delta: float, aim_held: bool, fire_held: bool, focus_held: bool 
 			arrow = _loose()
 			# Nothing is owed now: she is aiming only if something is still held.
 			is_aiming = aim_held or fire_held
-			is_nocked = is_aiming and _available() != &""
+			is_nocked = is_aiming and arrow_ready() != &""
 	_update_hold(real)
 	_update_focus(real, focus_held)
 	return arrow
@@ -540,7 +540,7 @@ static func predict_path(from: Vector3, velocity: Vector3, drag: float, space: P
 
 ## Looses the nocked arrow, at the bow's full speed.
 func release() -> Arrow:
-	var arrow_item := _available()
+	var arrow_item := arrow_ready()
 	if arrow_item == &"" or Gameplay.inventory.remove(arrow_item, 1) == 0:
 		return null
 	var muzzle := muzzle()
@@ -556,7 +556,9 @@ func release() -> Arrow:
 	return arrow
 
 
-func _available() -> StringName:
+## The arrow a press of fire would put on the string: the chosen type, or a
+## plain one when that has run out (FALLBACK_ARROW), or &"" with none.
+func arrow_ready() -> StringName:
 	if Gameplay.inventory.arrow_count(selected) > 0:
 		return selected
 	if Gameplay.inventory.arrow_count(FALLBACK_ARROW) > 0:

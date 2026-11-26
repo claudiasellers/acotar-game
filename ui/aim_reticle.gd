@@ -38,25 +38,24 @@ var catch_left := 0.0
 var pulse_left := 0.0
 
 
-func _init(controller: BowController = null) -> void:
+func _init(controller: BowController) -> void:
 	bow = controller
 	name = "Reticle"
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
 func _ready() -> void:
-	if bow:
-		bow.full_draw.connect(func() -> void: catch_left = bow.tuning.full_draw_catch_s)
+	bow.full_draw.connect(func() -> void: catch_left = bow.tuning.full_draw_catch_s)
 	EventBus.creature_hit.connect(_on_creature_hit)
 
 
 func _on_creature_hit(_id: StringName, _kind: StringName, cause: StringName, _part: StringName) -> void:
 	if String(cause).begins_with("arrow") and bool(GameSettings.get_value(&"hit_marks")):
-		pulse_left = bow.tuning.hit_pulse_s if bow else 0.2
+		pulse_left = bow.tuning.hit_pulse_s
 
 
 func _process(delta: float) -> void:
-	var feyre := bow.feyre if bow else null
+	var feyre := bow.feyre
 	var show := feyre != null and bow.is_up() and feyre.camera != null
 	visible = show
 	if not show:

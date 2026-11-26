@@ -67,7 +67,8 @@ func _verb() -> String:
 	var rack := _rack_of(_player())
 	if rack and rack.is_full():
 		var held := rack.held_weapon()
-		return "swap for %s" % label if held else "take %s" % label
+		# Full with the knife in hand, there is nothing to swap: say so.
+		return "swap my %s for %s" % [held.display_name.to_lower(), label] if held else "no room for %s" % label
 	return "take %s" % label
 
 

@@ -85,9 +85,12 @@ swap (L76/L77) write these slots; they don't build a second system.
   durability, plus each trophy at its chance. The rolls are seeded by the
   creature id and the day (`LootTable.roll`).
 - `WeaponDrop` (`systems/weapons/weapon_drop.gd`) has the Interactor's station
-  shape: `station_id` `weapon_drop`, `use_verb` ("take hook-knife", or "swap
-  for …" when the rack is full), `open_now()` and `use(user)`. With the rack
-  full, it swaps in the held weapon, which is left lying there. The first
+  shape: `station_id` `weapon_drop`, `use_verb` ("take hook-knife"; with the rack
+  full, "swap my knuckle-club for hook-knife", naming the held weapon she
+  gives up, or "no room for hook-knife" with only the knife in hand),
+  `open_now()` and `use(user)`. With the rack full, it swaps in the held
+  weapon, which is left lying there. What she carries, holds and leaves is
+  the Weapons page's (`ui/weapons/weapons_tab.gd`, `docs/contracts/ui-frame.md` step 8s). The first
   trophy from a speaking family (`SPEAKING_FAMILIES`: naga) plays
   `loot_first_trophy` once.
 - `CampContainer` (`creatures/hostile/camp_container.gd`): `HostileSite`
