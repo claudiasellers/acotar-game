@@ -178,7 +178,7 @@ func _place() -> void:
 		nock = Vector3(0, clampf(local.y, -0.1, 0.1), clampf(local.z, bend, 0.85))
 	_stretch(string_top, top, nock)
 	_stretch(string_bottom, nock, bottom)
-	var nocked := w > 0.0 and controller._available() != &""
+	var nocked := w > 0.0 and controller.arrow_ready() != &""
 	arrow_node.visible = nocked
 	if nocked:
 		arrow_node.position = nock
