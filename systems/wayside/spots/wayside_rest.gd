@@ -28,7 +28,6 @@ func use(user: Node) -> void:
 
 
 func _process(delta: float) -> void:
-	update_prompt()
 	if _easing <= 0.0 or _feyre == null or not is_instance_valid(_feyre):
 		return
 	if _feyre.look_input_this_frame:

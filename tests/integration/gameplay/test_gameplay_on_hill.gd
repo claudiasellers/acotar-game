@@ -255,7 +255,7 @@ func test_nearest_find_glints_and_names_itself() -> void:
 	assert_true(focus._glint.get_node(^"GroundGlow").visible, "a glow on the ground under it")
 	var offer := UsePrompt.of(get_tree()).offered()
 	assert_false(offer.is_empty(), "the use prompt offers the pick in reach")
-	assert_string_contains(String(offer[0]) if not offer.is_empty() else "", "pick")
+	assert_string_contains(String(offer[0][0]) if not offer.is_empty() else "", "pick")
 	var id: StringName = focus.focus.id
 	var before := Gameplay.inventory.count(id)
 	assert_true(feyre.interactor.interact())

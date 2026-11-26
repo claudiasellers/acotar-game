@@ -89,3 +89,22 @@ func test_the_satchels_wardrobe_opens_on_how_she_is() -> void:
 	await wait_process_frames(2)
 	assert_eq(DressingRoom.view().find_children("*", "StatusPage", true, false).size(), 0, "the vanity is for her face")
 	DressingRoom.close_room(feyre)
+
+
+func test_the_page_is_the_legend_for_every_sign() -> void:
+	var page := StatusPage.new()
+	add_child_autofree(page)
+	var tags: Array[StringName] = []
+	for row in page.legend.get_children():
+		tags.append(StringName(row.name))
+		assert_eq((row.find_child("Title", true, false) as Label).text, StatusRules.title(row.name))
+		assert_eq((row.find_child("Blurb", true, false) as Label).text, StatusRules.blurb(row.name))
+		assert_eq((row.find_child("State", true, false) as Label).text, "", "the legend tells what, not how much")
+	assert_eq(tags, StatusRules.ORDER, "every sign there is, in the HUD's order, had or not")
+	var col := page.legend.get_parent()
+	assert_eq(col.get_child(0).name, &"HowToRead0", "how to read a chip comes first, seen on opening")
+	assert_eq(col.get_child(1).name, &"HowToRead1")
+	assert_string_contains(StatusPage.HOW_TO_READ[0], "red rim")
+	assert_true(VitalsStatusRow.hurts(StatusPage.sample(&"venom")), "the legend's venom wears its red rim")
+	assert_false(VitalsStatusRow.hurts(StatusPage.sample(&"cold")), "a calm gauge does not")
+	assert_eq(page.horizontal_scroll_mode, ScrollContainer.SCROLL_MODE_DISABLED, "the long list scrolls down, never across")

@@ -193,8 +193,12 @@ func test_gauges_escalate_and_always_show() -> void:
 	assert_true(tags.has(&"cold") and tags.has(&"hunger"), "calm gauges are still listed")
 	var hud := VitalsHud.new()
 	add_child_autofree(hud)
-	assert_true(hud._status_wanted({"tag": &"hunger", "seconds_left": -1.0, "total": -1.0, "stage": 0}),
-		"Auto shows a calm gauge")
+	await wait_process_frames(2)
+	hud._vitals = v
+	hud._player = player
+	hud._update_statuses(0.1, VitalsHud.Mode.CONTEXTUAL, true)
+	var shown: Array = hud.status_row.shown.map(func(s: Dictionary) -> StringName: return s.tag)
+	assert_eq(shown.slice(0, 2), [&"cold", &"hunger"], "Auto shows the calm gauges, first")
 
 
 func test_every_status_tag_has_a_name_and_a_line() -> void:
@@ -375,11 +379,23 @@ func test_save_round_trip() -> void:
 	other.free()
 
 
-func test_hud_contextual_shows_dangers_and_new_buffs_only() -> void:
+func test_hud_shows_a_status_exactly_while_she_has_it() -> void:
 	var hud := VitalsHud.new()
 	add_child_autofree(hud)
 	await wait_process_frames(2)
-	assert_true(hud._status_wanted({"tag": &"venom", "seconds_left": -1.0, "total": -1.0}))
-	hud._first_seen[&"steady"] = hud._clock - 10.0
-	assert_false(hud._status_wanted({"tag": &"steady", "seconds_left": 100.0, "total": 200.0}), "old buff hides")
-	assert_true(hud._status_wanted({"tag": &"steady", "seconds_left": 10.0, "total": 200.0}), "near its end")
+	hud._vitals = v
+	hud._player = player
+	player.body_state.add_effect(&"steady", 1.0, 200.0)
+	var tags := func() -> Array: return hud.status_row.shown.map(func(s: Dictionary) -> StringName: return s.tag)
+	hud._update_statuses(0.1, VitalsHud.Mode.CONTEXTUAL, true)
+	assert_has(tags.call(), &"steady", "a new buff shows")
+	for i in 30:
+		hud._update_statuses(1.0, VitalsHud.Mode.CONTEXTUAL, true)
+	assert_has(tags.call(), &"steady", "and stays while she has it, in Auto too: no buff hides on its own")
+	player.body_state.effects.erase(&"steady")
+	hud._update_statuses(VitalsHud.STATUS_LINGER * 0.5, VitalsHud.Mode.CONTEXTUAL, true)
+	assert_has(tags.call(), &"steady", "a status that leaves lingers a moment, so nothing flickers")
+	hud._update_statuses(VitalsHud.STATUS_LINGER, VitalsHud.Mode.CONTEXTUAL, true)
+	assert_does_not_have(tags.call(), &"steady", "then it goes")
+	hud._update_statuses(0.1, VitalsHud.Mode.OFF, true)
+	assert_eq(hud.status_row.shown.size(), 0, "Off shows none")

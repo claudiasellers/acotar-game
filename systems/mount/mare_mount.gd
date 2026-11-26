@@ -9,6 +9,8 @@ extends CharacterBody3D
 signal arrived
 signal balked
 signal used(rider: Node)
+## Her second action (tend), asked through Interactor's second key.
+signal tend_asked(rider: Node)
 
 enum State { STANDING, COMING, RIDDEN, GOING_HOME }
 
@@ -105,6 +107,24 @@ func set_mountable(on: bool) -> void:
 		add_to_group(&"station")
 	elif not on and is_in_group(&"station"):
 		remove_from_group(&"station")
+
+
+## What the use prompt names beside her, set by MountDirector each frame:
+## "ride" on the first key, "tend" on the second ("" when not now).
+var use_verb: String = ""
+var alt_verb: String = ""
+## Her reach for both, from her middle (metres).
+var use_reach: float = MountDirector.PROMPT_RADIUS
+
+
+## A station only while E would mount her.
+func open_now() -> bool:
+	return use_verb != ""
+
+
+## Interactor calls this on the second key; MountDirector listens through `tend_asked`.
+func use_alt(user: Node) -> void:
+	tend_asked.emit(user)
 
 
 ## Interactor calls this on E; MountDirector listens through `used`.

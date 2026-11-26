@@ -97,9 +97,9 @@ static func cap(action: StringName) -> String:
 			return "Right stick" if pad else "Mouse"
 		SatchelHud.ACTION_OPEN:
 			return "LB" if pad else KeyPrompt.key(action)
-		&"tend_mount":
-			# No pad button of its own: a hold of interact there (MountDirector).
-			return "Hold " + KeyPrompt.key(&"interact") if pad else KeyPrompt.key(action)
+		&"interact_alt":
+			# No pad button of its own: a hold of interact there (Interactor).
+			return UsePrompt.key_for(action)
 	return KeyPrompt.key(action)
 
 
@@ -181,17 +181,19 @@ func wanted() -> StringName:
 	return &""
 
 
-## Row `id` as it shows now. While the use prompt names a key for the thing
-## in her reach, a pair on that key is left out: the key is on screen once,
-## with the verb of the thing itself, and the row keeps what else it says.
-## A row marked always is a choice and are never cut.
+## Row `id` as it shows now. While the use prompt names keys for the things
+## in her reach, a pair on one of those keys is left out: each key is on
+## screen once, with the verb of the thing itself, and the row keeps what else
+## it says. A row marked always is a choice and are never cut.
 func shown(id: StringName) -> Array:
-	var offered := UsePrompt.of(get_tree()).offered()
-	if offered.is_empty() or always(id):
+	var keys: Array[StringName] = []
+	for pair: Array in UsePrompt.of(get_tree()).offered():
+		keys.append(pair[1])
+	if keys.is_empty() or always(id):
 		return row(id)
 	var out: Array = []
 	for pair: Array in rows().get(id, []):
-		if pair[0] != offered[1]:
+		if not keys.has(pair[0]):
 			out.append([cap(pair[0]), pair[1]])
 	return out
 
