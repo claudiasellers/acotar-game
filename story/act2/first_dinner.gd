@@ -134,7 +134,9 @@ func _pull_out_her_chair(_s: SceneSpace) -> void:
 
 
 func _sit(_s: SceneSpace) -> void:
-	chair.tuck(0.5)
+	# Home at once, before she is set on her mark: slid out, the chair stands
+	# on that mark, and her body set inside it is pushed half a metre off.
+	chair.tuck(0.0)
 	_seat_her()
 	seated = true
 	_seen_presses = presses()
