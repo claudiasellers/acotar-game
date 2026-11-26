@@ -60,6 +60,16 @@ var _face: Vector3 = Vector3.INF
 ## Out on the road (the ride north): his feet keep to the ground whatever he is
 ## doing, not only while he leads.
 var outdoors: bool = false
+## How big he is: model, blocking box and stride together (the ride north and
+## leading her in make him larger than her on the mare, owner 2026-11-26).
+## The animation slows with it, so his feet still match the ground.
+var body_scale: float = 1.0:
+	set(value):
+		body_scale = maxf(value, 0.1)
+		_fit_body()
+var _box: BoxShape3D
+var _box_size := Vector3.ONE
+var _box_at := Vector3.ZERO
 
 
 func _ready() -> void:
@@ -263,7 +273,7 @@ func _animate(moving: bool) -> void:
 	elif stage in [Stage.PRESENCE, Stage.LOOM, Stage.SPEAK, Stage.BREAK]:
 		clip = &"snarl_hold"
 	if current != clip or moving != _moving:
-		_cast.call(&"play", clip, walk_speed if moving else -1.0)
+		_cast.call(&"play", clip, walk_speed / body_scale if moving else -1.0)
 	_moving = moving
 
 
@@ -314,7 +324,7 @@ func _process(delta: float) -> void:
 		visible = false
 	_breath += delta
 	if _model:
-		_model.scale = Vector3.ONE * (1.0 + sin(_breath * 1.3) * 0.015 * (0.5 + intensity))
+		_model.scale = Vector3.ONE * body_scale * (1.0 + sin(_breath * 1.3) * 0.015 * (0.5 + intensity))
 	if _eye_mat:
 		_eye_mat.emission_energy_multiplier = 1.0 + intensity * 3.0 + (2.0 if stage == Stage.SPEAK else 0.0)
 	_apply_field()
@@ -363,13 +373,33 @@ func _build_body() -> void:
 	body.collision_mask = 0
 	var shape := CollisionShape3D.new()
 	var box := BoxShape3D.new()
-	box.size = size
+	_box = box
+	_box_size = size
+	_box_at = Vector3(bounds.get_center().x, size.y * 0.5, bounds.get_center().z)
 	shape.shape = box
-	shape.position = Vector3(bounds.get_center().x, size.y * 0.5, bounds.get_center().z)
 	body.add_child(shape)
+	_fit_body()
 	add_child(body)
 	visibility_changed.connect(func() -> void:
 		shape.set_deferred(&"disabled", not visible))
+
+
+func _fit_body() -> void:
+	if _box == null:
+		return
+	_box.size = _box_size * body_scale
+	var shape := _box_owner()
+	if shape:
+		shape.position = _box_at * body_scale
+
+
+func _box_owner() -> CollisionShape3D:
+	if body == null:
+		return null
+	for c in body.get_children():
+		if c is CollisionShape3D and (c as CollisionShape3D).shape == _box:
+			return c as CollisionShape3D
+	return null
 
 
 func _build_placeholder() -> Node3D:
