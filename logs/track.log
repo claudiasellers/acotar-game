@@ -1,0 +1,31 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+Metal 4.0 - Forward+ - Using Device #0: Apple - Apple M4 (Apple9)
+
+ERROR: This function should never be used outside the editor, it can severely damage performance.
+   at: global_shader_parameter_get_list (servers/rendering/renderer_rd/storage_rd/material_storage.cpp:1848)
+   GDScript backtrace (most recent call first):
+       [0] ensure_wetness_global (res://world/shared/weather/spring_weather.gd:87)
+       [1] _ready (res://world/shared/weather/spring_weather.gd:59)
+       [2] _ready (res://systems/props/touch_world.gd:27)
+       [3] _ready (res://story/act1/act1_game.gd:45)
+       [4] _run (res://tools/_probe/track_probe.gd:65)
+PROBE ride | feyre (-154.2, 5.1, 2167.1) | ride running true beat 'follow the beast' step 0 mare (-151.9, 5.0, 2153.6) (13.8 m) verb '' station true | prompt []
+SHOT 0a_at_the_mare | feyre (-152.4, 5.1, 2152.3) | ride running true beat 'follow the beast' step 0 mare (-151.9, 5.0, 2153.6) (1.4 m) verb 'ride' station true | prompt [["ride", &"interact"]]
+SHOT 0b_getting_up | feyre (-151.9, 5.0, 2152.8) | ride running true beat 'follow the beast' step 1 mare (-151.9, 5.0, 2153.6) (0.8 m) verb '' station false | prompt []
+PROBE bridge at 237 m, seam 802 m
+SHOT 1_on_the_track | feyre (-108.8, 5.4, 2045.1) | ride running true beat 'follow the beast' step 2 mare (-108.8, 4.2, 2045.3) (0.2 m) verb '' station false | prompt []
+PROBE 1_on_the_track at 122 m after 14 s
+SHOT 2_to_the_bridge | feyre (-84.2, 3.1, 1957.5) | ride running true beat 'follow the beast' step 2 mare (-84.3, 2.1, 1957.6) (0.1 m) verb '' station false | prompt []
+PROBE 2_to_the_bridge at 213 m after 24 s
+SHOT 3_on_the_bridge | feyre (-73.4, 4.1, 1931.8) | ride running true beat 'follow the beast' step 2 mare (-73.5, 3.0, 1931.9) (0.2 m) verb '' station false | prompt []
+PROBE 3_on_the_bridge at 241 m after 26 s
+SHOT 4_to_the_wall | feyre (-66.3, 3.9, 1534.3) | ride running true beat 'follow the beast' step 2 mare (-66.2, 2.7, 1534.4) (0.1 m) verb '' station false | prompt []
+PROBE 4_to_the_wall at 662 m after 54 s
+SHOT 5_at_the_gap | feyre (-95.3, -2.7, 1423.6) | ride running true beat 'follow the beast' step 2 mare (-95.3, -3.8, 1423.7) (0.1 m) verb '' station false | prompt []
+PROBE 5_at_the_gap at 778 m after 62 s
+PROBE result: THROUGH
+ERROR: 2 shaders of type ParticlesShaderRD were never freed
+   at: ~ShaderRD (servers/rendering/renderer_rd/shader_rd.cpp:1236)
+WARNING: 15 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 2 RID allocations of type 'N10RendererRD15MaterialStorage6ShaderE' were leaked at exit.

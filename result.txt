@@ -1,0 +1,11 @@
+status ok
+request L86-track-1
+commit b6df5478e6caf65a9ff80ad31b3cfe7a78af9dfd
+machine Claudias-Mac-mini
+godot 4.7.2.stable.official.ed1daf0bf
+quality look
+size 1920x1080
+renderer project default
+prep ok 816s: import 8s, generated content 808s (levels.sh)
+shot track ok exit=0 81s files=7
+answered 2026-11-27T00:02:01Z after 901s
