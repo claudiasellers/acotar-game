@@ -3,6 +3,8 @@
 #   make play     run the game (its output goes to .tools/play.log)
 #   make setup    install the git pre-push hook (checks lead/ready-* pushes for missing .uid files)
 #                 and copy in any generated content already built (local or shared cache)
+#   make jump BEAT=beast_door SLOT=1
+#                 put Story SLOT (1-3, as on the title's Load) at the start of a beat; backs up what was there
 #   make perf     frame budget pass over tools/shots/canonical.txt -> tools/perf/out/<date>.csv
 #   make clean    free disk: delete Godot's import cache and generated content
 #
@@ -17,7 +19,7 @@ GODOT_DIR     := .tools/godot-$(GODOT_VERSION)
 GODOT         := $(GODOT_DIR)/Godot.app/Contents/MacOS/Godot
 GODOT_URL     := https://github.com/godotengine/godot/releases/download/$(GODOT_VERSION)-stable/Godot_v$(GODOT_VERSION)-stable_macos.universal.zip
 
-.PHONY: setup play update clean godot pull generate bake import perf
+.PHONY: setup play update clean godot pull generate bake import perf jump
 
 setup:
 	@tools/mq/install_hooks.sh
@@ -31,6 +33,11 @@ play: godot bake import
 	@echo "Starting the game. This terminal stays busy until you quit the game. Log: .tools/play.log"
 	@"$(GODOT)" --path . >.tools/play.log 2>&1; rc=$$?; \
 	if [ $$rc -ne 0 ]; then echo "The game stopped with exit code $$rc. Log: .tools/play.log"; fi; exit $$rc
+
+# Dev jump (tools/dev/jump_save.sh): quit the game first.
+SLOT ?= 1
+jump: godot bake import
+	@tools/dev/jump_save.sh "$(BEAT)" "$(SLOT)"
 
 update: pull godot generate bake import
 	@echo "Up to date. Godot $(GODOT_VERSION) in $(GODOT_DIR)."

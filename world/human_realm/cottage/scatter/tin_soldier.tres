@@ -7,6 +7,6 @@ script = ExtResource("1_e28ko")
 id = &"tin_soldier"
 mesh_path = "res://world/human_realm/cottage/assets/small/tin_soldier.glb"
 tags = PackedStringArray("collectible", "canon:X")
-instances = PackedFloat32Array(-180.66376, 4.7962947, 2228.1484, 3.7340925, 1, -133.69801, 5.156725, 2173.5557, 1.077711, 1, -172.20882, 3.2146728, 2284.2695, 3.8891747, 1, -293.93677, 3.3680496, 2255.8198, 1.737263, 1)
+instances = PackedFloat32Array(-88.05908, -0.057217356, 2113.3516, 1.3165046, 1, -332.69495, 2.5116258, 2266.524, 0.23142296, 1, -133.1651, 5.1535535, 2144.9944, 0.03630802, 1, -256.3543, 4.5825524, 2183.09, 2.1578326, 1)
 cast_shadow = false
 draw_distance = 60.0

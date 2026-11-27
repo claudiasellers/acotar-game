@@ -52,8 +52,6 @@ func _ready() -> void:
 	decision_made.connect(func(fact: String) -> void: chosen_fact = fact)
 	# Camera and lens for the scene, camera only (lane L22, story/staging/).
 	add_child(BeastDoorStaging.new())
-	# Moon through the door, the hearth, a rim on him: lights only (lane L55).
-	add_child(BeastDoorLighting.new())
 	guide = BeastDoorGuide.new()
 	add_child(guide)
 	throw = BeastDoorThrow.new()

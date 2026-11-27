@@ -49,7 +49,7 @@ func inside(p: Vector2) -> bool:
 func free_at(p: Vector2, clearance: float = 0.5, allow_reserved: bool = false) -> bool:
 	if not inside(p):
 		return false
-	if HumanRealmLayout.distance_to_road(p) < HumanRealmLayout.ROAD_HALF_WIDTH + clearance + 0.5:
+	if HumanRealmLayout.distance_to_road_edge(p) < clearance + 0.5:
 		return false
 	if HumanRealmLayout.distance_to_path(p) < HumanRealmLayout.PATH_HALF_WIDTH + clearance:
 		return false

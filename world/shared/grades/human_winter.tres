@@ -37,5 +37,3 @@ volumetric_light_energy = 1.5
 cloud_cover = 0.78
 cloud_color = Color(0.86, 0.88, 0.92, 1)
 cloud_shade = Color(0.68, 0.70, 0.76, 1)
-; After dark the sky, ambient and fog fall to a cold low night (L89-5).
-night_look = &"human_winter_night"

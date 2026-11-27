@@ -106,11 +106,12 @@ const STOP_REACH := 1.0
 ## Her thoughts, in road order: [beat, world x/z they come at]. Marks past the
 ## Wall are measured on from the gap. Each comes once, never over another line.
 const THOUGHTS_SOUTH := [
-	[&"still", Vector2(20.0, 2205.0)],
-	[&"village", Vector2(330.0, 2245.0)],
-	[&"ash", Vector2(180.0, 1985.0)],
-	[&"faerie", Vector2(95.0, 1860.0)],
-	[&"lamb", Vector2(40.0, 1760.0)],
+	[&"still", Vector2(-140.0, 2130.0)],
+	# The village is behind her now, off to the east; she still sees her father there.
+	[&"village", Vector2(-118.0, 2075.0)],
+	[&"ash", Vector2(-95.0, 2000.0)],
+	[&"faerie", Vector2(-45.0, 1840.0)],
+	[&"lamb", Vector2(-10.0, 1730.0)],
 	[&"smell_metal", Vector2(-82.0, 1475.0)],
 ]
 const THOUGHTS_NORTH := [
@@ -237,16 +238,15 @@ func _build_beats() -> Array:
 
 # ------------------------------------------------------------------ the road
 
-## The whole road as world x/z: out of the cottage yard along the cottage road
-## to the village square, the village north road to the Wall (HumanRealmLayout
-## ROADS[0], ROADS[1]), the wall seam's defile through the gap, the woods road
-## to the manor avenue (BorderWoodsTerrain), the sentry gate and the drive.
+## The whole road as world x/z: out of the cottage yard straight north on the
+## ride track over its creek bridge to the Wall (HumanRealmLayout
+## RIDE_NORTH_TRACK, about 790 m; owner: the old way round by the village was
+## far too long), the wall seam's defile through the gap, the woods road to the
+## manor avenue (BorderWoodsTerrain), the sentry gate and the drive.
 static func route_points() -> PackedVector2Array:
 	var out := PackedVector2Array()
-	for p in HumanRealmLayout.ROADS[0]:
-		out.append(p)
-	var north: PackedVector2Array = HumanRealmLayout.ROADS[1]
-	for i in range(1, north.size()):
+	var north: PackedVector2Array = HumanRealmLayout.RIDE_NORTH_TRACK
+	for i in north.size():
 		if north[i].y <= WorldMap.WALL_Z + 60.0:
 			break
 		out.append(north[i])

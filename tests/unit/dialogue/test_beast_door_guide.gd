@@ -166,6 +166,8 @@ func test_the_ride_is_played_from_the_cottage_road_to_the_steps() -> void:
 		var on := Geometry2D.get_closest_point_to_segment(gap, road[i], road[i + 1])
 		through = through or on.distance_to(gap) < 3.0
 	assert_true(through, "through the gap in the Wall")
+	# Straight north on the ride track, not round by the village (owner: far too long).
+	assert_lt(ride.seam_at(), 900.0, "the Wall within 900 m of her door (%.0f m)" % ride.seam_at())
 	# Her thoughts come in road order, the metal just before the Wall, birds just after.
 	var at: Array = ride._marks.map(func(m: Array) -> float: return m[1])
 	for i in at.size() - 1:
